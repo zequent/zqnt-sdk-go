@@ -6,21 +6,20 @@ package adaptergrpc
 
 import (
 	"github.com/Zequent/zqnt-edge-sdk-go/adapter/domains"
-	// zqntpbbuf message types (package _go → alias it)
-	zqntpb "buf.build/gen/go/zqnt/protos/protocolbuffers/go"
+	proto "github.com/Zequent/zqnt-edge-sdk-go/gen/proto"
 )
 
 // Mapper converts between proto request/response messages and domain structs.
 type Mapper struct{}
 
-func (m *Mapper) MapCoordinates(p *zqntpb.Coordinates) domains.Coordinates {
+func (m *Mapper) MapCoordinates(p *proto.Coordinates) domains.Coordinates {
 	if p == nil {
 		return domains.Coordinates{}
 	}
 	return domains.Coordinates{Lat: p.Latitude, Lon: p.Longitude, Alt: p.Altitude}
 }
 
-func (m *Mapper) MapTakeOffRequest(r *zqntpb.EdgeTakeOffRequest) *domains.TakeOffRequest {
+func (m *Mapper) MapTakeOffRequest(r *proto.EdgeTakeOffRequest) *domains.TakeOffRequest {
 	if r == nil {
 		return nil
 	}
@@ -31,7 +30,7 @@ func (m *Mapper) MapTakeOffRequest(r *zqntpb.EdgeTakeOffRequest) *domains.TakeOf
 	}
 }
 
-func (m *Mapper) MapGoToRequest(r *zqntpb.EdgeGoToRequest) *domains.GoToRequest {
+func (m *Mapper) MapGoToRequest(r *proto.EdgeGoToRequest) *domains.GoToRequest {
 	if r == nil {
 		return nil
 	}
@@ -42,7 +41,7 @@ func (m *Mapper) MapGoToRequest(r *zqntpb.EdgeGoToRequest) *domains.GoToRequest 
 	}
 }
 
-func (m *Mapper) MapReturnToHomeRequest(r *zqntpb.EdgeReturnToHomeRequest) *domains.ReturnToHomeRequest {
+func (m *Mapper) MapReturnToHomeRequest(r *proto.EdgeReturnToHomeRequest) *domains.ReturnToHomeRequest {
 	if r == nil {
 		return nil
 	}
@@ -57,7 +56,7 @@ func (m *Mapper) MapReturnToHomeRequest(r *zqntpb.EdgeReturnToHomeRequest) *doma
 	return req
 }
 
-func (m *Mapper) MapLookAtRequest(r *zqntpb.EdgeLookAtRequest) *domains.LookAtRequest {
+func (m *Mapper) MapLookAtRequest(r *proto.EdgeLookAtRequest) *domains.LookAtRequest {
 	if r == nil {
 		return nil
 	}
@@ -81,7 +80,7 @@ func (m *Mapper) MapLookAtRequest(r *zqntpb.EdgeLookAtRequest) *domains.LookAtRe
 	return req
 }
 
-func (m *Mapper) MapTakePhotoRequest(r *zqntpb.EdgeTakePhotoRequest) *domains.TakePhotoRequest {
+func (m *Mapper) MapTakePhotoRequest(r *proto.EdgeTakePhotoRequest) *domains.TakePhotoRequest {
 	if r == nil {
 		return nil
 	}
@@ -91,7 +90,7 @@ func (m *Mapper) MapTakePhotoRequest(r *zqntpb.EdgeTakePhotoRequest) *domains.Ta
 	}
 }
 
-func (m *Mapper) MapManualControlInput(r *zqntpb.EdgeManualControlInputRequest) *domains.ManualControlInput {
+func (m *Mapper) MapManualControlInput(r *proto.EdgeManualControlInputRequest) *domains.ManualControlInput {
 	if r == nil {
 		return nil
 	}
@@ -121,7 +120,7 @@ func (m *Mapper) MapManualControlInput(r *zqntpb.EdgeManualControlInputRequest) 
 	return input
 }
 
-func (m *Mapper) MapChangeLensRequest(r *zqntpb.EdgeChangeCameraLensRequest) *domains.ChangeLensRequest {
+func (m *Mapper) MapChangeLensRequest(r *proto.EdgeChangeCameraLensRequest) *domains.ChangeLensRequest {
 	if r == nil {
 		return nil
 	}
@@ -136,7 +135,7 @@ func (m *Mapper) MapChangeLensRequest(r *zqntpb.EdgeChangeCameraLensRequest) *do
 	return req
 }
 
-func (m *Mapper) MapChangeZoomRequest(r *zqntpb.EdgeChangeCameraZoomRequest) *domains.ChangeZoomRequest {
+func (m *Mapper) MapChangeZoomRequest(r *proto.EdgeChangeCameraZoomRequest) *domains.ChangeZoomRequest {
 	if r == nil {
 		return nil
 	}
@@ -157,7 +156,7 @@ func (m *Mapper) MapChangeZoomRequest(r *zqntpb.EdgeChangeCameraZoomRequest) *do
 	return req
 }
 
-func (m *Mapper) MapStartLiveStreamRequest(r *zqntpb.EdgeStartLiveStreamRequest) *domains.LiveStreamStartRequest {
+func (m *Mapper) MapStartLiveStreamRequest(r *proto.EdgeStartLiveStreamRequest) *domains.LiveStreamStartRequest {
 	if r == nil {
 		return nil
 	}
@@ -173,7 +172,7 @@ func (m *Mapper) MapStartLiveStreamRequest(r *zqntpb.EdgeStartLiveStreamRequest)
 	return req
 }
 
-func (m *Mapper) MapStopLiveStreamRequest(r *zqntpb.EdgeStopLiveStreamRequest) *domains.LiveStreamStopRequest {
+func (m *Mapper) MapStopLiveStreamRequest(r *proto.EdgeStopLiveStreamRequest) *domains.LiveStreamStopRequest {
 	if r == nil {
 		return nil
 	}
@@ -187,7 +186,7 @@ func (m *Mapper) MapStopLiveStreamRequest(r *zqntpb.EdgeStopLiveStreamRequest) *
 	return req
 }
 
-func (m *Mapper) MapGetDetectionsRequest(r *zqntpb.EdgeGetDetectionsRequest) *domains.GetDetectionsRequest {
+func (m *Mapper) MapGetDetectionsRequest(r *proto.EdgeGetDetectionsRequest) *domains.GetDetectionsRequest {
 	if r == nil {
 		return nil
 	}

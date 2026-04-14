@@ -1,7 +1,3 @@
-buf.build/gen/go/zqnt/protos/grpc/go v1.6.1-20260414050018-2ff4a13b535a.1 h1:HtCXCYIY7C1bFKwH/FEHYL15a85jDBynnRkQyHhQBiI=
-buf.build/gen/go/zqnt/protos/grpc/go v1.6.1-20260414050018-2ff4a13b535a.1/go.mod h1:c7zgiHoQboko8CPSz+0/e/4O8lN7evZakuwTJdzPGnM=
-buf.build/gen/go/zqnt/protos/protocolbuffers/go v1.36.11-20260414050018-2ff4a13b535a.1 h1:naMDLqLXmhaRFff9a2Gebvjm1L0B4VjAVQL4kFnOg9k=
-buf.build/gen/go/zqnt/protos/protocolbuffers/go v1.36.11-20260414050018-2ff4a13b535a.1/go.mod h1:M+eexA70hFUOc9ymYS3WTZ96xveSgXpERIIUa4UqY3U=
 github.com/go-logr/logr v1.4.3 h1:CjnDlHq8ikf6E492q6eKboGOC0T8CDaOvkHCIg8idEI=
 github.com/go-logr/logr v1.4.3/go.mod h1:9T104GzyrTigFIr8wt5mBrctHMim0Nb2HLGrmQ40KvY=
 github.com/go-logr/stdr v1.2.2 h1:hSWxHoqTgW2S2qGc0LTAI563KZ5YKYRhT3MFKZMbjag=

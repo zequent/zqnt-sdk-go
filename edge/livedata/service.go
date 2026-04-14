@@ -5,8 +5,8 @@ package livedata
 import (
 	"context"
 
-	zqntpb "buf.build/gen/go/zqnt/protos/protocolbuffers/go"
 	"github.com/Zequent/zqnt-edge-sdk-go/adapter/domains"
+	proto "github.com/Zequent/zqnt-edge-sdk-go/gen/proto"
 )
 
 // LiveDataService manages persistent gRPC client-streaming connections to the
@@ -18,7 +18,7 @@ type LiveDataService interface {
 
 	// ProduceTelemetry sends a pre-built proto request directly.
 	// Use this for advanced cases where you need full control over the proto payload.
-	ProduceTelemetry(ctx context.Context, deviceSN string, req *zqntpb.ProduceTelemetryRequest) error
+	ProduceTelemetry(ctx context.Context, deviceSN string, req *proto.ProduceTelemetryRequest) error
 
 	// CloseStream closes the persistent stream for the given device.
 	CloseStream(ctx context.Context, deviceSN string) error

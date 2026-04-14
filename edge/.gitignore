@@ -6,6 +6,7 @@
 
 # Generated proto code — regenerate with `make proto`
 gen/proto/*.go
+gen/*
 
 # IDE
 .idea/

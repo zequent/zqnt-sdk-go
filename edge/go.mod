@@ -3,8 +3,6 @@ module github.com/Zequent/zqnt-edge-sdk-go
 go 1.24.0
 
 require (
-	buf.build/gen/go/zqnt/protos/grpc/go v1.6.1-20260414050018-2ff4a13b535a.1
-	buf.build/gen/go/zqnt/protos/protocolbuffers/go v1.36.11-20260414050018-2ff4a13b535a.1
 	github.com/google/uuid v1.6.0
 	google.golang.org/grpc v1.78.0
 	google.golang.org/protobuf v1.36.11

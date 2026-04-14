@@ -1,10 +1,9 @@
 package connector
 
 import (
-	zqntgrpc "buf.build/gen/go/zqnt/protos/grpc/go/_gogrpc"
-	zqntpb "buf.build/gen/go/zqnt/protos/protocolbuffers/go"
 	"context"
 	"github.com/Zequent/zqnt-edge-sdk-go/adapter/domains"
+	proto "github.com/Zequent/zqnt-edge-sdk-go/gen/proto"
 	"github.com/Zequent/zqnt-edge-sdk-go/internal/protohelpers"
 	"github.com/Zequent/zqnt-edge-sdk-go/internal/retry"
 	"log/slog"
@@ -12,20 +11,20 @@ import (
 
 // ServiceImpl is the gRPC-backed ConnectorService implementation.
 type ServiceImpl struct {
-	stub   zqntgrpc.ConnectorServiceClient
+	stub   proto.ConnectorServiceClient
 	mapper *Mapper
 	log    *slog.Logger
 }
 
 // NewServiceImpl creates a new ConnectorService implementation.
-func NewServiceImpl(stub zqntgrpc.ConnectorServiceClient, log *slog.Logger) *ServiceImpl {
+func NewServiceImpl(stub proto.ConnectorServiceClient, log *slog.Logger) *ServiceImpl {
 	return &ServiceImpl{stub: stub, mapper: &Mapper{}, log: log}
 }
 
 // ---- helpers ----------------------------------------------------------------
 
-func newBase(sn string) *zqntpb.RequestBase {
-	return &zqntpb.RequestBase{
+func newBase(sn string) *proto.RequestBase {
+	return &proto.RequestBase{
 		Tid:       protohelpers.GenerateTID(),
 		Sn:        sn,
 		Timestamp: protohelpers.Now(),
@@ -35,8 +34,8 @@ func newBase(sn string) *zqntpb.RequestBase {
 // ---- Asset operations -------------------------------------------------------
 
 func (s *ServiceImpl) GetAssetBySN(ctx context.Context, sn string) (*domains.AssetDTO, error) {
-	req := &zqntpb.ConnectorGetAssetBySnRequest{Base: newBase(sn)}
-	resp, err := retry.Do(ctx, func(c context.Context) (*zqntpb.ConnectorResponse, error) {
+	req := &proto.ConnectorGetAssetBySnRequest{Base: newBase(sn)}
+	resp, err := retry.Do(ctx, func(c context.Context) (*proto.ConnectorResponse, error) {
 		return s.stub.GetAssetBySn(c, req)
 	})
 	if err != nil {
@@ -50,8 +49,8 @@ func (s *ServiceImpl) GetAssetBySN(ctx context.Context, sn string) (*domains.Ass
 }
 
 func (s *ServiceImpl) GetAssetByID(ctx context.Context, id string) (*domains.AssetDTO, error) {
-	req := &zqntpb.ConnectorGetAssetByIdRequest{Base: newBase(""), Id: id}
-	resp, err := retry.Do(ctx, func(c context.Context) (*zqntpb.ConnectorResponse, error) {
+	req := &proto.ConnectorGetAssetByIdRequest{Base: newBase(""), Id: id}
+	resp, err := retry.Do(ctx, func(c context.Context) (*proto.ConnectorResponse, error) {
 		return s.stub.GetAssetById(c, req)
 	})
 	if err != nil {
@@ -65,8 +64,8 @@ func (s *ServiceImpl) GetAssetByID(ctx context.Context, id string) (*domains.Ass
 }
 
 func (s *ServiceImpl) GetSubAssetBySN(ctx context.Context, sn string) (*domains.SubAssetDTO, error) {
-	req := &zqntpb.ConnectorGetSubAssetBySnRequest{Base: newBase(sn)}
-	resp, err := retry.Do(ctx, func(c context.Context) (*zqntpb.ConnectorResponse, error) {
+	req := &proto.ConnectorGetSubAssetBySnRequest{Base: newBase(sn)}
+	resp, err := retry.Do(ctx, func(c context.Context) (*proto.ConnectorResponse, error) {
 		return s.stub.GetSubAssetBySn(c, req)
 	})
 	if err != nil {
@@ -80,12 +79,12 @@ func (s *ServiceImpl) GetSubAssetBySN(ctx context.Context, sn string) (*domains.
 }
 
 func (s *ServiceImpl) UpdateAsset(ctx context.Context, id string, asset *domains.AssetDTO) (*domains.AssetDTO, error) {
-	req := &zqntpb.ConnectorUpdateAssetRequest{
+	req := &proto.ConnectorUpdateAssetRequest{
 		Base:     newBase(asset.SN),
 		AssetId:  id,
 		AssetDTO: s.mapper.AssetToProto(asset),
 	}
-	resp, err := retry.Do(ctx, func(c context.Context) (*zqntpb.ConnectorResponse, error) {
+	resp, err := retry.Do(ctx, func(c context.Context) (*proto.ConnectorResponse, error) {
 		return s.stub.UpdateAsset(c, req)
 	})
 	if err != nil {
@@ -99,11 +98,11 @@ func (s *ServiceImpl) UpdateAsset(ctx context.Context, id string, asset *domains
 }
 
 func (s *ServiceImpl) RegisterAsset(ctx context.Context, asset *domains.AssetDTO) (*domains.AssetDTO, error) {
-	req := &zqntpb.ConnectorRegisterAssetRequest{
+	req := &proto.ConnectorRegisterAssetRequest{
 		Base:     newBase(asset.SN),
 		AssetDTO: s.mapper.AssetToProto(asset),
 	}
-	resp, err := retry.Do(ctx, func(c context.Context) (*zqntpb.ConnectorResponse, error) {
+	resp, err := retry.Do(ctx, func(c context.Context) (*proto.ConnectorResponse, error) {
 		return s.stub.RegisterAsset(c, req)
 	})
 	if err != nil {
@@ -117,8 +116,8 @@ func (s *ServiceImpl) RegisterAsset(ctx context.Context, asset *domains.AssetDTO
 }
 
 func (s *ServiceImpl) DeRegisterAsset(ctx context.Context, _ string) (bool, error) {
-	req := &zqntpb.ConnectorDeRegisterAssetRequest{Base: newBase("")}
-	resp, err := retry.Do(ctx, func(c context.Context) (*zqntpb.ConnectorResponse, error) {
+	req := &proto.ConnectorDeRegisterAssetRequest{Base: newBase("")}
+	resp, err := retry.Do(ctx, func(c context.Context) (*proto.ConnectorResponse, error) {
 		return s.stub.DeRegisterAsset(c, req)
 	})
 	if err != nil {
@@ -134,8 +133,8 @@ func (s *ServiceImpl) DeRegisterAsset(ctx context.Context, _ string) (bool, erro
 // ---- Mission operations -----------------------------------------------------
 
 func (s *ServiceImpl) GetMissionByID(ctx context.Context, id string) (*domains.MissionDTO, error) {
-	req := &zqntpb.ConnectorGetMissionRequest{Base: newBase(""), MissionId: id}
-	resp, err := retry.Do(ctx, func(c context.Context) (*zqntpb.ConnectorResponse, error) {
+	req := &proto.ConnectorGetMissionRequest{Base: newBase(""), MissionId: id}
+	resp, err := retry.Do(ctx, func(c context.Context) (*proto.ConnectorResponse, error) {
 		return s.stub.GetMission(c, req)
 	})
 	if err != nil {
@@ -149,11 +148,11 @@ func (s *ServiceImpl) GetMissionByID(ctx context.Context, id string) (*domains.M
 }
 
 func (s *ServiceImpl) CreateMission(ctx context.Context, mission *domains.MissionDTO) (*domains.MissionDTO, error) {
-	req := &zqntpb.ConnectorCreateMissionRequest{
+	req := &proto.ConnectorCreateMissionRequest{
 		Base:       newBase(""),
 		MissionDTO: s.mapper.MissionToProto(mission),
 	}
-	resp, err := retry.Do(ctx, func(c context.Context) (*zqntpb.ConnectorResponse, error) {
+	resp, err := retry.Do(ctx, func(c context.Context) (*proto.ConnectorResponse, error) {
 		return s.stub.CreateMission(c, req)
 	})
 	if err != nil {
@@ -167,12 +166,12 @@ func (s *ServiceImpl) CreateMission(ctx context.Context, mission *domains.Missio
 }
 
 func (s *ServiceImpl) UpdateMission(ctx context.Context, id string, mission *domains.MissionDTO) (*domains.MissionDTO, error) {
-	req := &zqntpb.ConnectorUpdateMissionRequest{
+	req := &proto.ConnectorUpdateMissionRequest{
 		Base:       newBase(""),
 		MissionId:  id,
 		MissionDTO: s.mapper.MissionToProto(mission),
 	}
-	resp, err := retry.Do(ctx, func(c context.Context) (*zqntpb.ConnectorResponse, error) {
+	resp, err := retry.Do(ctx, func(c context.Context) (*proto.ConnectorResponse, error) {
 		return s.stub.UpdateMission(c, req)
 	})
 	if err != nil {
@@ -186,8 +185,8 @@ func (s *ServiceImpl) UpdateMission(ctx context.Context, id string, mission *dom
 }
 
 func (s *ServiceImpl) DeleteMission(ctx context.Context, id string) (bool, error) {
-	req := &zqntpb.ConnectorDeleteMissionRequest{Base: newBase(""), MissionId: id}
-	resp, err := retry.Do(ctx, func(c context.Context) (*zqntpb.ConnectorResponse, error) {
+	req := &proto.ConnectorDeleteMissionRequest{Base: newBase(""), MissionId: id}
+	resp, err := retry.Do(ctx, func(c context.Context) (*proto.ConnectorResponse, error) {
 		return s.stub.DeleteMission(c, req)
 	})
 	if err != nil {
@@ -203,8 +202,8 @@ func (s *ServiceImpl) DeleteMission(ctx context.Context, id string) (bool, error
 // ---- Task operations --------------------------------------------------------
 
 func (s *ServiceImpl) GetTaskByID(ctx context.Context, id string) (*domains.TaskDTO, error) {
-	req := &zqntpb.ConnectorGetTaskRequest{Base: newBase(""), TaskId: id}
-	resp, err := retry.Do(ctx, func(c context.Context) (*zqntpb.ConnectorResponse, error) {
+	req := &proto.ConnectorGetTaskRequest{Base: newBase(""), TaskId: id}
+	resp, err := retry.Do(ctx, func(c context.Context) (*proto.ConnectorResponse, error) {
 		return s.stub.GetTask(c, req)
 	})
 	if err != nil {
@@ -218,8 +217,8 @@ func (s *ServiceImpl) GetTaskByID(ctx context.Context, id string) (*domains.Task
 }
 
 func (s *ServiceImpl) GetTaskByFlightID(ctx context.Context, flightID string) (*domains.TaskDTO, error) {
-	req := &zqntpb.ConnectorGetTaskRequest{Base: newBase(""), TaskId: flightID}
-	resp, err := retry.Do(ctx, func(c context.Context) (*zqntpb.ConnectorResponse, error) {
+	req := &proto.ConnectorGetTaskRequest{Base: newBase(""), TaskId: flightID}
+	resp, err := retry.Do(ctx, func(c context.Context) (*proto.ConnectorResponse, error) {
 		return s.stub.GetTaskByFlightId(c, req)
 	})
 	if err != nil {
@@ -233,11 +232,11 @@ func (s *ServiceImpl) GetTaskByFlightID(ctx context.Context, flightID string) (*
 }
 
 func (s *ServiceImpl) CreateTask(ctx context.Context, task *domains.TaskDTO) (*domains.TaskDTO, error) {
-	req := &zqntpb.ConnectorCreateTaskRequest{
+	req := &proto.ConnectorCreateTaskRequest{
 		Base:    newBase(""),
 		TaskDTO: s.mapper.TaskToProto(task),
 	}
-	resp, err := retry.Do(ctx, func(c context.Context) (*zqntpb.ConnectorResponse, error) {
+	resp, err := retry.Do(ctx, func(c context.Context) (*proto.ConnectorResponse, error) {
 		return s.stub.CreateTask(c, req)
 	})
 	if err != nil {
@@ -251,12 +250,12 @@ func (s *ServiceImpl) CreateTask(ctx context.Context, task *domains.TaskDTO) (*d
 }
 
 func (s *ServiceImpl) UpdateTask(ctx context.Context, id string, task *domains.TaskDTO) (*domains.TaskDTO, error) {
-	req := &zqntpb.ConnectorUpdateTaskRequest{
+	req := &proto.ConnectorUpdateTaskRequest{
 		Base:    newBase(""),
 		TaskId:  id,
 		TaskDTO: s.mapper.TaskToProto(task),
 	}
-	resp, err := retry.Do(ctx, func(c context.Context) (*zqntpb.ConnectorResponse, error) {
+	resp, err := retry.Do(ctx, func(c context.Context) (*proto.ConnectorResponse, error) {
 		return s.stub.UpdateTask(c, req)
 	})
 	if err != nil {
@@ -270,8 +269,8 @@ func (s *ServiceImpl) UpdateTask(ctx context.Context, id string, task *domains.T
 }
 
 func (s *ServiceImpl) DeleteTask(ctx context.Context, id string) (bool, error) {
-	req := &zqntpb.ConnectorDeleteTaskRequest{Base: newBase(""), TaskId: id}
-	resp, err := retry.Do(ctx, func(c context.Context) (*zqntpb.ConnectorResponse, error) {
+	req := &proto.ConnectorDeleteTaskRequest{Base: newBase(""), TaskId: id}
+	resp, err := retry.Do(ctx, func(c context.Context) (*proto.ConnectorResponse, error) {
 		return s.stub.DeleteTask(c, req)
 	})
 	if err != nil {
@@ -287,8 +286,8 @@ func (s *ServiceImpl) DeleteTask(ctx context.Context, id string) (bool, error) {
 // ---- Scheduler operations ---------------------------------------------------
 
 func (s *ServiceImpl) GetSchedulerByID(ctx context.Context, id string) (*domains.SchedulerDTO, error) {
-	req := &zqntpb.ConnectorGetSchedulerRequest{Base: newBase(""), SchedulerId: &id}
-	resp, err := retry.Do(ctx, func(c context.Context) (*zqntpb.ConnectorResponse, error) {
+	req := &proto.ConnectorGetSchedulerRequest{Base: newBase(""), SchedulerId: &id}
+	resp, err := retry.Do(ctx, func(c context.Context) (*proto.ConnectorResponse, error) {
 		return s.stub.GetScheduler(c, req)
 	})
 	if err != nil {
@@ -302,11 +301,11 @@ func (s *ServiceImpl) GetSchedulerByID(ctx context.Context, id string) (*domains
 }
 
 func (s *ServiceImpl) CreateScheduler(ctx context.Context, sched *domains.SchedulerDTO) (*domains.SchedulerDTO, error) {
-	req := &zqntpb.ConnectorCreateSchedulerRequest{
+	req := &proto.ConnectorCreateSchedulerRequest{
 		Base:         newBase(""),
 		SchedulerDTO: s.mapper.SchedulerToProto(sched),
 	}
-	resp, err := retry.Do(ctx, func(c context.Context) (*zqntpb.ConnectorResponse, error) {
+	resp, err := retry.Do(ctx, func(c context.Context) (*proto.ConnectorResponse, error) {
 		return s.stub.CreateScheduler(c, req)
 	})
 	if err != nil {
@@ -320,12 +319,12 @@ func (s *ServiceImpl) CreateScheduler(ctx context.Context, sched *domains.Schedu
 }
 
 func (s *ServiceImpl) UpdateScheduler(ctx context.Context, id string, sched *domains.SchedulerDTO) (*domains.SchedulerDTO, error) {
-	req := &zqntpb.ConnectorUpdateSchedulerRequest{
+	req := &proto.ConnectorUpdateSchedulerRequest{
 		Base:         newBase(""),
 		SchedulerId:  id,
 		SchedulerDTO: s.mapper.SchedulerToProto(sched),
 	}
-	resp, err := retry.Do(ctx, func(c context.Context) (*zqntpb.ConnectorResponse, error) {
+	resp, err := retry.Do(ctx, func(c context.Context) (*proto.ConnectorResponse, error) {
 		return s.stub.UpdateScheduler(c, req)
 	})
 	if err != nil {
@@ -339,8 +338,8 @@ func (s *ServiceImpl) UpdateScheduler(ctx context.Context, id string, sched *dom
 }
 
 func (s *ServiceImpl) DeleteScheduler(ctx context.Context, id string) (bool, error) {
-	req := &zqntpb.ConnectorDeleteSchedulerRequest{Base: newBase(""), SchedulerId: id}
-	resp, err := retry.Do(ctx, func(c context.Context) (*zqntpb.ConnectorResponse, error) {
+	req := &proto.ConnectorDeleteSchedulerRequest{Base: newBase(""), SchedulerId: id}
+	resp, err := retry.Do(ctx, func(c context.Context) (*proto.ConnectorResponse, error) {
 		return s.stub.DeleteScheduler(c, req)
 	})
 	if err != nil {
@@ -356,8 +355,8 @@ func (s *ServiceImpl) DeleteScheduler(ctx context.Context, id string) (bool, err
 // ---- Organization -----------------------------------------------------------
 
 func (s *ServiceImpl) GetOrganizationByID(ctx context.Context, _ string) (*domains.OrganizationDTO, error) {
-	req := &zqntpb.ConnectorGetOrganizationRequest{Base: newBase("")}
-	resp, err := retry.Do(ctx, func(c context.Context) (*zqntpb.ConnectorResponse, error) {
+	req := &proto.ConnectorGetOrganizationRequest{Base: newBase("")}
+	resp, err := retry.Do(ctx, func(c context.Context) (*proto.ConnectorResponse, error) {
 		return s.stub.GetOrganization(c, req)
 	})
 	if err != nil {

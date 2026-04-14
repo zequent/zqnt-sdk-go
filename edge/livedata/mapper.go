@@ -1,8 +1,8 @@
 package livedata
 
 import (
-	zqntpb "buf.build/gen/go/zqnt/protos/protocolbuffers/go"
 	"github.com/Zequent/zqnt-edge-sdk-go/adapter/domains"
+	proto "github.com/Zequent/zqnt-edge-sdk-go/gen/proto"
 
 	"github.com/Zequent/zqnt-edge-sdk-go/internal/protohelpers"
 
@@ -12,31 +12,31 @@ import (
 // Mapper converts TelemetryRequestData domain objects to ProduceTelemetryRequest protos.
 type Mapper struct{}
 
-func (m *Mapper) Map(data *domains.TelemetryRequestData) *zqntpb.ProduceTelemetryRequest {
+func (m *Mapper) Map(data *domains.TelemetryRequestData) *proto.ProduceTelemetryRequest {
 	if data == nil {
 		return nil
 	}
 
-	base := &zqntpb.RequestBase{
+	base := &proto.RequestBase{
 		Tid:       data.TID,
 		Sn:        data.SN,
 		Timestamp: protohelpers.Now(),
 	}
 
-	req := &zqntpb.ProduceTelemetryRequest{Base: base}
+	req := &proto.ProduceTelemetryRequest{Base: base}
 
 	switch data.Type {
 	case domains.TelemetryTypeAsset:
-		req.Type = zqntpb.LiveDataType_ASSET_TELEMETRY
+		req.Type = proto.LiveDataType_ASSET_TELEMETRY
 		if data.AssetTelemetry != nil {
-			req.Telemetry = &zqntpb.ProduceTelemetryRequest_AssetTelemetry{
+			req.Telemetry = &proto.ProduceTelemetryRequest_AssetTelemetry{
 				AssetTelemetry: m.mapAssetTelemetry(data.AssetTelemetry),
 			}
 		}
 	case domains.TelemetryTypeSubAsset:
-		req.Type = zqntpb.LiveDataType_SUBASSET_TELEMETRY
+		req.Type = proto.LiveDataType_SUBASSET_TELEMETRY
 		if data.SubAssetTelemetry != nil {
-			req.Telemetry = &zqntpb.ProduceTelemetryRequest_SubAssetTelemetry{
+			req.Telemetry = &proto.ProduceTelemetryRequest_SubAssetTelemetry{
 				SubAssetTelemetry: m.mapSubAssetTelemetry(data.SubAssetTelemetry),
 			}
 		}
@@ -45,11 +45,11 @@ func (m *Mapper) Map(data *domains.TelemetryRequestData) *zqntpb.ProduceTelemetr
 	return req
 }
 
-func (m *Mapper) mapAssetTelemetry(d *domains.AssetTelemetryData) *zqntpb.AssetTelemetry {
+func (m *Mapper) mapAssetTelemetry(d *domains.AssetTelemetryData) *proto.AssetTelemetry {
 	if d == nil {
 		return nil
 	}
-	t := &zqntpb.AssetTelemetry{
+	t := &proto.AssetTelemetry{
 		Id:        d.ID,
 		Timestamp: timestamppb.New(d.Timestamp),
 	}
@@ -73,7 +73,7 @@ func (m *Mapper) mapAssetTelemetry(d *domains.AssetTelemetryData) *zqntpb.AssetT
 	t.PositionValid = d.PositionValid
 
 	if d.SubAssetInformation != nil {
-		t.SubAssetInformation = &zqntpb.AssetTelemetry_AssetSubAssetInformation{
+		t.SubAssetInformation = &proto.AssetTelemetry_AssetSubAssetInformation{
 			Sn:     d.SubAssetInformation.SN,
 			Model:  d.SubAssetInformation.Model,
 			Paired: d.SubAssetInformation.Paired,
@@ -81,24 +81,24 @@ func (m *Mapper) mapAssetTelemetry(d *domains.AssetTelemetryData) *zqntpb.AssetT
 		}
 	}
 	if d.NetworkInformation != nil {
-		ni := &zqntpb.AssetTelemetry_AssetNetworkInformation{
+		ni := &proto.AssetTelemetry_AssetNetworkInformation{
 			Rate: d.NetworkInformation.Rate,
 		}
 		t.NetworkInformation = ni
 	}
 	if d.AirConditioner != nil {
-		t.AirConditioner = &zqntpb.AssetTelemetry_AssetAirConditioner{
+		t.AirConditioner = &proto.AssetTelemetry_AssetAirConditioner{
 			SwitchTime: d.AirConditioner.SwitchTime,
 		}
 	}
 	return t
 }
 
-func (m *Mapper) mapSubAssetTelemetry(d *domains.SubAssetTelemetryData) *zqntpb.SubAssetTelemetry {
+func (m *Mapper) mapSubAssetTelemetry(d *domains.SubAssetTelemetryData) *proto.SubAssetTelemetry {
 	if d == nil {
 		return nil
 	}
-	t := &zqntpb.SubAssetTelemetry{
+	t := &proto.SubAssetTelemetry{
 		Id:        d.ID,
 		Timestamp: timestamppb.New(d.Timestamp),
 	}
@@ -119,7 +119,7 @@ func (m *Mapper) mapSubAssetTelemetry(d *domains.SubAssetTelemetryData) *zqntpb.
 	t.Country = d.Country
 
 	if d.BatteryInformation != nil {
-		t.BatteryInformation = &zqntpb.SubAssetTelemetry_SubAssetBatteryInformation{
+		t.BatteryInformation = &proto.SubAssetTelemetry_SubAssetBatteryInformation{
 			Percentage:        d.BatteryInformation.Percentage,
 			RemainingTime:     d.BatteryInformation.RemainingTime,
 			ReturnToHomePower: d.BatteryInformation.ReturnHomePower,
@@ -131,17 +131,17 @@ func (m *Mapper) mapSubAssetTelemetry(d *domains.SubAssetTelemetryData) *zqntpb.
 	return t
 }
 
-func (m *Mapper) mapPayloadTelemetry(d *domains.PayloadTelemetryData) *zqntpb.PayloadTelemetry {
+func (m *Mapper) mapPayloadTelemetry(d *domains.PayloadTelemetryData) *proto.PayloadTelemetry {
 	if d == nil {
 		return nil
 	}
-	p := &zqntpb.PayloadTelemetry{
+	p := &proto.PayloadTelemetry{
 		Id:        d.ID,
 		Name:      d.Name,
 		Timestamp: timestamppb.New(d.Timestamp),
 	}
 	if d.CameraData != nil {
-		p.CameraData = &zqntpb.PayloadTelemetry_CameraData{
+		p.CameraData = &proto.PayloadTelemetry_CameraData{
 			CurrentLens: d.CameraData.CurrentLens,
 			GimbalPitch: d.CameraData.GimbalPitch,
 			GimbalYaw:   d.CameraData.GimbalYaw,
@@ -150,7 +150,7 @@ func (m *Mapper) mapPayloadTelemetry(d *domains.PayloadTelemetryData) *zqntpb.Pa
 		}
 	}
 	if d.RangeFinderData != nil {
-		p.RangeFinderData = &zqntpb.PayloadTelemetry_RangeFinderData{
+		p.RangeFinderData = &proto.PayloadTelemetry_RangeFinderData{
 			TargetLatitude:  d.RangeFinderData.TargetLatitude,
 			TargetLongitude: d.RangeFinderData.TargetLongitude,
 			TargetDistance:  d.RangeFinderData.TargetDistance,
@@ -158,7 +158,7 @@ func (m *Mapper) mapPayloadTelemetry(d *domains.PayloadTelemetryData) *zqntpb.Pa
 		}
 	}
 	if d.SensorData != nil {
-		p.SensorData = &zqntpb.PayloadTelemetry_SensorData{
+		p.SensorData = &proto.PayloadTelemetry_SensorData{
 			TargetTemperature: d.SensorData.TargetTemperature,
 		}
 	}

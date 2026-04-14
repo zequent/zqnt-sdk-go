@@ -8,25 +8,24 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
-    env:
-      GOPROXY: "https://buf.build/gen/go,https://proxy.golang.org,direct"
-      GONOSUMDB: "buf.build/*"
-      GOPRIVATE: "buf.build/*"
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
           cache: false
 
-      - name: Authenticate buf.build
+      - name: Install protoc tools
         run: |
-          echo "machine buf.build login ${{ secrets.BUF_TOKEN }} password ${{ secrets.BUF_TOKEN }}" >> ~/.netrc
-          chmod 600 ~/.netrc
+          go install github.com/bufbuild/buf/cmd/buf@latest
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 
-      - name: Download dependencies
-        run: go mod download
+      - name: Generate protos
+        run: make proto
 
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v6
@@ -37,24 +36,23 @@ jobs:
   build-and-test:
     name: Build & Test
     runs-on: ubuntu-latest
-    env:
-      GOPROXY: "https://buf.build/gen/go,https://proxy.golang.org,direct"
-      GONOSUMDB: "buf.build/*"
-      GOPRIVATE: "buf.build/*"
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
 
-      - name: Authenticate buf.build
+      - name: Install protoc tools
         run: |
-          echo "machine buf.build login ${{ secrets.BUF_TOKEN }} password ${{ secrets.BUF_TOKEN }}" >> ~/.netrc
-          chmod 600 ~/.netrc
+          go install github.com/bufbuild/buf/cmd/buf@latest
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 
-      - name: Download dependencies
-        run: go mod download
+      - name: Generate protos
+        run: make proto
 
       - name: Build
         run: go build ./...

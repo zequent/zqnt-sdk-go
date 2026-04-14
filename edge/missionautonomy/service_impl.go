@@ -6,29 +6,25 @@ import (
 
 	"github.com/Zequent/zqnt-edge-sdk-go/adapter/domains"
 	"github.com/Zequent/zqnt-edge-sdk-go/connector"
+	proto "github.com/Zequent/zqnt-edge-sdk-go/gen/proto"
 	"github.com/Zequent/zqnt-edge-sdk-go/internal/protohelpers"
 	"github.com/Zequent/zqnt-edge-sdk-go/internal/retry"
-	// zqntpbbuf message types (package _go → alias it)
-	zqntpb "buf.build/gen/go/zqnt/protos/protocolbuffers/go"
-
-	// gRPC service stubs (package _gogrpc → alias it)
-	zqntgrpc "buf.build/gen/go/zqnt/protos/grpc/go/_gogrpc"
 )
 
 // ServiceImpl is the gRPC-backed MissionAutonomyService implementation.
 type ServiceImpl struct {
-	stub   zqntgrpc.MissionAutonomyServiceClient
+	stub   proto.MissionAutonomyServiceClient
 	mapper *connector.Mapper
 	log    *slog.Logger
 }
 
 // NewServiceImpl creates a new MissionAutonomyService implementation.
-func NewServiceImpl(stub zqntgrpc.MissionAutonomyServiceClient, log *slog.Logger) *ServiceImpl {
+func NewServiceImpl(stub proto.MissionAutonomyServiceClient, log *slog.Logger) *ServiceImpl {
 	return &ServiceImpl{stub: stub, mapper: &connector.Mapper{}, log: log}
 }
 
-func newBase() *zqntpb.RequestBase {
-	return &zqntpb.RequestBase{
+func newBase() *proto.RequestBase {
+	return &proto.RequestBase{
 		Tid:       protohelpers.GenerateTID(),
 		Timestamp: protohelpers.Now(),
 	}
@@ -36,11 +32,11 @@ func newBase() *zqntpb.RequestBase {
 
 // ---- Mission ----------------------------------------------------------------
 
-func (s *ServiceImpl) CreateMission(ctx context.Context, req *zqntpb.CreateMissionRequest) (*domains.MissionDTO, error) {
+func (s *ServiceImpl) CreateMission(ctx context.Context, req *proto.CreateMissionRequest) (*domains.MissionDTO, error) {
 	if req.Base == nil {
 		req.Base = newBase()
 	}
-	resp, err := retry.Do(ctx, func(c context.Context) (*zqntpb.MissionResponse, error) {
+	resp, err := retry.Do(ctx, func(c context.Context) (*proto.MissionResponse, error) {
 		return s.stub.CreateMission(c, req)
 	})
 	if err != nil {
@@ -53,11 +49,11 @@ func (s *ServiceImpl) CreateMission(ctx context.Context, req *zqntpb.CreateMissi
 	return s.mapper.MissionFromProto(resp.GetMissionDTO()), nil
 }
 
-func (s *ServiceImpl) UpdateMission(ctx context.Context, req *zqntpb.UpdateMissionRequest) (*domains.MissionDTO, error) {
+func (s *ServiceImpl) UpdateMission(ctx context.Context, req *proto.UpdateMissionRequest) (*domains.MissionDTO, error) {
 	if req.Base == nil {
 		req.Base = newBase()
 	}
-	resp, err := retry.Do(ctx, func(c context.Context) (*zqntpb.MissionResponse, error) {
+	resp, err := retry.Do(ctx, func(c context.Context) (*proto.MissionResponse, error) {
 		return s.stub.UpdateMission(c, req)
 	})
 	if err != nil {
@@ -70,11 +66,11 @@ func (s *ServiceImpl) UpdateMission(ctx context.Context, req *zqntpb.UpdateMissi
 	return s.mapper.MissionFromProto(resp.GetMissionDTO()), nil
 }
 
-func (s *ServiceImpl) GetMission(ctx context.Context, req *zqntpb.GetMissionRequest) (*domains.MissionDTO, error) {
+func (s *ServiceImpl) GetMission(ctx context.Context, req *proto.GetMissionRequest) (*domains.MissionDTO, error) {
 	if req.Base == nil {
 		req.Base = newBase()
 	}
-	resp, err := retry.Do(ctx, func(c context.Context) (*zqntpb.MissionResponse, error) {
+	resp, err := retry.Do(ctx, func(c context.Context) (*proto.MissionResponse, error) {
 		return s.stub.GetMission(c, req)
 	})
 	if err != nil {
@@ -87,11 +83,11 @@ func (s *ServiceImpl) GetMission(ctx context.Context, req *zqntpb.GetMissionRequ
 	return s.mapper.MissionFromProto(resp.GetMissionDTO()), nil
 }
 
-func (s *ServiceImpl) DeleteMission(ctx context.Context, req *zqntpb.DeleteMissionRequest) (bool, error) {
+func (s *ServiceImpl) DeleteMission(ctx context.Context, req *proto.DeleteMissionRequest) (bool, error) {
 	if req.Base == nil {
 		req.Base = newBase()
 	}
-	resp, err := retry.Do(ctx, func(c context.Context) (*zqntpb.MissionResponse, error) {
+	resp, err := retry.Do(ctx, func(c context.Context) (*proto.MissionResponse, error) {
 		return s.stub.DeleteMission(c, req)
 	})
 	if err != nil {
@@ -106,11 +102,11 @@ func (s *ServiceImpl) DeleteMission(ctx context.Context, req *zqntpb.DeleteMissi
 
 // ---- Task -------------------------------------------------------------------
 
-func (s *ServiceImpl) GetTask(ctx context.Context, req *zqntpb.GetTaskRequest) (*domains.TaskDTO, error) {
+func (s *ServiceImpl) GetTask(ctx context.Context, req *proto.GetTaskRequest) (*domains.TaskDTO, error) {
 	if req.Base == nil {
 		req.Base = newBase()
 	}
-	resp, err := retry.Do(ctx, func(c context.Context) (*zqntpb.TaskResponse, error) {
+	resp, err := retry.Do(ctx, func(c context.Context) (*proto.TaskResponse, error) {
 		return s.stub.GetTask(c, req)
 	})
 	if err != nil {
@@ -123,11 +119,11 @@ func (s *ServiceImpl) GetTask(ctx context.Context, req *zqntpb.GetTaskRequest) (
 	return s.mapper.TaskFromProto(resp.GetTaskDTO()), nil
 }
 
-func (s *ServiceImpl) GetTaskByFlightID(ctx context.Context, req *zqntpb.GetTaskRequest) (*domains.TaskDTO, error) {
+func (s *ServiceImpl) GetTaskByFlightID(ctx context.Context, req *proto.GetTaskRequest) (*domains.TaskDTO, error) {
 	if req.Base == nil {
 		req.Base = newBase()
 	}
-	resp, err := retry.Do(ctx, func(c context.Context) (*zqntpb.TaskResponse, error) {
+	resp, err := retry.Do(ctx, func(c context.Context) (*proto.TaskResponse, error) {
 		return s.stub.GetTaskByFlightId(c, req)
 	})
 	if err != nil {
@@ -140,11 +136,11 @@ func (s *ServiceImpl) GetTaskByFlightID(ctx context.Context, req *zqntpb.GetTask
 	return s.mapper.TaskFromProto(resp.GetTaskDTO()), nil
 }
 
-func (s *ServiceImpl) CreateTask(ctx context.Context, req *zqntpb.CreateTaskRequest) (*domains.TaskDTO, error) {
+func (s *ServiceImpl) CreateTask(ctx context.Context, req *proto.CreateTaskRequest) (*domains.TaskDTO, error) {
 	if req.Base == nil {
 		req.Base = newBase()
 	}
-	resp, err := retry.Do(ctx, func(c context.Context) (*zqntpb.TaskResponse, error) {
+	resp, err := retry.Do(ctx, func(c context.Context) (*proto.TaskResponse, error) {
 		return s.stub.CreateTask(c, req)
 	})
 	if err != nil {
@@ -157,11 +153,11 @@ func (s *ServiceImpl) CreateTask(ctx context.Context, req *zqntpb.CreateTaskRequ
 	return s.mapper.TaskFromProto(resp.GetTaskDTO()), nil
 }
 
-func (s *ServiceImpl) UpdateTask(ctx context.Context, req *zqntpb.UpdateTaskRequest) (*domains.TaskDTO, error) {
+func (s *ServiceImpl) UpdateTask(ctx context.Context, req *proto.UpdateTaskRequest) (*domains.TaskDTO, error) {
 	if req.Base == nil {
 		req.Base = newBase()
 	}
-	resp, err := retry.Do(ctx, func(c context.Context) (*zqntpb.TaskResponse, error) {
+	resp, err := retry.Do(ctx, func(c context.Context) (*proto.TaskResponse, error) {
 		return s.stub.UpdateTask(c, req)
 	})
 	if err != nil {
@@ -174,11 +170,11 @@ func (s *ServiceImpl) UpdateTask(ctx context.Context, req *zqntpb.UpdateTaskRequ
 	return s.mapper.TaskFromProto(resp.GetTaskDTO()), nil
 }
 
-func (s *ServiceImpl) DeleteTask(ctx context.Context, req *zqntpb.DeleteTaskRequest) (bool, error) {
+func (s *ServiceImpl) DeleteTask(ctx context.Context, req *proto.DeleteTaskRequest) (bool, error) {
 	if req.Base == nil {
 		req.Base = newBase()
 	}
-	resp, err := retry.Do(ctx, func(c context.Context) (*zqntpb.TaskResponse, error) {
+	resp, err := retry.Do(ctx, func(c context.Context) (*proto.TaskResponse, error) {
 		return s.stub.DeleteTask(c, req)
 	})
 	if err != nil {
@@ -191,11 +187,11 @@ func (s *ServiceImpl) DeleteTask(ctx context.Context, req *zqntpb.DeleteTaskRequ
 	return true, nil
 }
 
-func (s *ServiceImpl) StartTask(ctx context.Context, req *zqntpb.StartTaskRequest) (*domains.TaskDTO, error) {
+func (s *ServiceImpl) StartTask(ctx context.Context, req *proto.StartTaskRequest) (*domains.TaskDTO, error) {
 	if req.Base == nil {
 		req.Base = newBase()
 	}
-	resp, err := retry.Do(ctx, func(c context.Context) (*zqntpb.TaskResponse, error) {
+	resp, err := retry.Do(ctx, func(c context.Context) (*proto.TaskResponse, error) {
 		return s.stub.StartTask(c, req)
 	})
 	if err != nil {
@@ -208,11 +204,11 @@ func (s *ServiceImpl) StartTask(ctx context.Context, req *zqntpb.StartTaskReques
 	return s.mapper.TaskFromProto(resp.GetTaskDTO()), nil
 }
 
-func (s *ServiceImpl) StopTask(ctx context.Context, req *zqntpb.StopTaskRequest) (*domains.TaskDTO, error) {
+func (s *ServiceImpl) StopTask(ctx context.Context, req *proto.StopTaskRequest) (*domains.TaskDTO, error) {
 	if req.Base == nil {
 		req.Base = newBase()
 	}
-	resp, err := retry.Do(ctx, func(c context.Context) (*zqntpb.TaskResponse, error) {
+	resp, err := retry.Do(ctx, func(c context.Context) (*proto.TaskResponse, error) {
 		return s.stub.StopTask(c, req)
 	})
 	if err != nil {
@@ -227,11 +223,11 @@ func (s *ServiceImpl) StopTask(ctx context.Context, req *zqntpb.StopTaskRequest)
 
 // ---- Scheduler --------------------------------------------------------------
 
-func (s *ServiceImpl) GetScheduler(ctx context.Context, req *zqntpb.GetSchedulerRequest) (*domains.SchedulerDTO, error) {
+func (s *ServiceImpl) GetScheduler(ctx context.Context, req *proto.GetSchedulerRequest) (*domains.SchedulerDTO, error) {
 	if req.Base == nil {
 		req.Base = newBase()
 	}
-	resp, err := retry.Do(ctx, func(c context.Context) (*zqntpb.SchedulerResponse, error) {
+	resp, err := retry.Do(ctx, func(c context.Context) (*proto.SchedulerResponse, error) {
 		return s.stub.GetScheduler(c, req)
 	})
 	if err != nil {
@@ -244,11 +240,11 @@ func (s *ServiceImpl) GetScheduler(ctx context.Context, req *zqntpb.GetScheduler
 	return s.mapper.SchedulerFromProto(resp.GetSchedulerDTO()), nil
 }
 
-func (s *ServiceImpl) CreateScheduler(ctx context.Context, req *zqntpb.CreateSchedulerRequest) (*domains.SchedulerDTO, error) {
+func (s *ServiceImpl) CreateScheduler(ctx context.Context, req *proto.CreateSchedulerRequest) (*domains.SchedulerDTO, error) {
 	if req.Base == nil {
 		req.Base = newBase()
 	}
-	resp, err := retry.Do(ctx, func(c context.Context) (*zqntpb.SchedulerResponse, error) {
+	resp, err := retry.Do(ctx, func(c context.Context) (*proto.SchedulerResponse, error) {
 		return s.stub.CreateScheduler(c, req)
 	})
 	if err != nil {
@@ -261,11 +257,11 @@ func (s *ServiceImpl) CreateScheduler(ctx context.Context, req *zqntpb.CreateSch
 	return s.mapper.SchedulerFromProto(resp.GetSchedulerDTO()), nil
 }
 
-func (s *ServiceImpl) UpdateScheduler(ctx context.Context, req *zqntpb.UpdateSchedulerRequest) (*domains.SchedulerDTO, error) {
+func (s *ServiceImpl) UpdateScheduler(ctx context.Context, req *proto.UpdateSchedulerRequest) (*domains.SchedulerDTO, error) {
 	if req.Base == nil {
 		req.Base = newBase()
 	}
-	resp, err := retry.Do(ctx, func(c context.Context) (*zqntpb.SchedulerResponse, error) {
+	resp, err := retry.Do(ctx, func(c context.Context) (*proto.SchedulerResponse, error) {
 		return s.stub.UpdateScheduler(c, req)
 	})
 	if err != nil {
@@ -278,11 +274,11 @@ func (s *ServiceImpl) UpdateScheduler(ctx context.Context, req *zqntpb.UpdateSch
 	return s.mapper.SchedulerFromProto(resp.GetSchedulerDTO()), nil
 }
 
-func (s *ServiceImpl) DeleteScheduler(ctx context.Context, req *zqntpb.DeleteSchedulerRequest) (bool, error) {
+func (s *ServiceImpl) DeleteScheduler(ctx context.Context, req *proto.DeleteSchedulerRequest) (bool, error) {
 	if req.Base == nil {
 		req.Base = newBase()
 	}
-	resp, err := retry.Do(ctx, func(c context.Context) (*zqntpb.SchedulerResponse, error) {
+	resp, err := retry.Do(ctx, func(c context.Context) (*proto.SchedulerResponse, error) {
 		return s.stub.DeleteScheduler(c, req)
 	})
 	if err != nil {

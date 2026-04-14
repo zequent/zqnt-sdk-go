@@ -3,8 +3,8 @@ package connector
 import (
 	"time"
 
-	zqntpb "buf.build/gen/go/zqnt/protos/protocolbuffers/go"
 	"github.com/Zequent/zqnt-edge-sdk-go/adapter/domains"
+	proto "github.com/Zequent/zqnt-edge-sdk-go/gen/proto"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -15,7 +15,7 @@ type Mapper struct{}
 
 // ---- proto → domain ---------------------------------------------------------
 
-func (m *Mapper) AssetFromProto(p *zqntpb.AssetProtoDTO) *domains.AssetDTO {
+func (m *Mapper) AssetFromProto(p *proto.AssetProtoDTO) *domains.AssetDTO {
 	if p == nil {
 		return nil
 	}
@@ -43,7 +43,7 @@ func (m *Mapper) AssetFromProto(p *zqntpb.AssetProtoDTO) *domains.AssetDTO {
 	return dto
 }
 
-func (m *Mapper) SubAssetFromProto(p *zqntpb.SubAssetProtoDTO) *domains.SubAssetDTO {
+func (m *Mapper) SubAssetFromProto(p *proto.SubAssetProtoDTO) *domains.SubAssetDTO {
 	if p == nil {
 		return nil
 	}
@@ -69,7 +69,7 @@ func (m *Mapper) SubAssetFromProto(p *zqntpb.SubAssetProtoDTO) *domains.SubAsset
 	return dto
 }
 
-func (m *Mapper) OrgFromProto(p *zqntpb.OrganizationProtoDTO) *domains.OrganizationDTO {
+func (m *Mapper) OrgFromProto(p *proto.OrganizationProtoDTO) *domains.OrganizationDTO {
 	if p == nil {
 		return nil
 	}
@@ -81,7 +81,7 @@ func (m *Mapper) OrgFromProto(p *zqntpb.OrganizationProtoDTO) *domains.Organizat
 	}
 }
 
-func (m *Mapper) MissionFromProto(p *zqntpb.MissionProtoDTO) *domains.MissionDTO {
+func (m *Mapper) MissionFromProto(p *proto.MissionProtoDTO) *domains.MissionDTO {
 	if p == nil {
 		return nil
 	}
@@ -119,7 +119,7 @@ func (m *Mapper) MissionFromProto(p *zqntpb.MissionProtoDTO) *domains.MissionDTO
 	return dto
 }
 
-func (m *Mapper) TaskFromProto(p *zqntpb.TaskProtoDTO) *domains.TaskDTO {
+func (m *Mapper) TaskFromProto(p *proto.TaskProtoDTO) *domains.TaskDTO {
 	if p == nil {
 		return nil
 	}
@@ -153,7 +153,7 @@ func (m *Mapper) TaskFromProto(p *zqntpb.TaskProtoDTO) *domains.TaskDTO {
 	return dto
 }
 
-func (m *Mapper) SchedulerFromProto(p *zqntpb.SchedulerProtoDTO) *domains.SchedulerDTO {
+func (m *Mapper) SchedulerFromProto(p *proto.SchedulerProtoDTO) *domains.SchedulerDTO {
 	if p == nil {
 		return nil
 	}
@@ -180,11 +180,11 @@ func (m *Mapper) SchedulerFromProto(p *zqntpb.SchedulerProtoDTO) *domains.Schedu
 
 // ---- domain → zqntpb ---------------------------------------------------------
 
-func (m *Mapper) AssetToProto(dto *domains.AssetDTO) *zqntpb.AssetProtoDTO {
+func (m *Mapper) AssetToProto(dto *domains.AssetDTO) *proto.AssetProtoDTO {
 	if dto == nil {
 		return nil
 	}
-	p := &zqntpb.AssetProtoDTO{
+	p := &proto.AssetProtoDTO{
 		Id:           dto.ID,
 		Sn:           dto.SN,
 		Name:         dto.Name,
@@ -204,11 +204,11 @@ func (m *Mapper) AssetToProto(dto *domains.AssetDTO) *zqntpb.AssetProtoDTO {
 	return p
 }
 
-func (m *Mapper) SubAssetToProto(dto *domains.SubAssetDTO) *zqntpb.SubAssetProtoDTO {
+func (m *Mapper) SubAssetToProto(dto *domains.SubAssetDTO) *proto.SubAssetProtoDTO {
 	if dto == nil {
 		return nil
 	}
-	p := &zqntpb.SubAssetProtoDTO{
+	p := &proto.SubAssetProtoDTO{
 		Id:           dto.ID,
 		Sn:           dto.SN,
 		Name:         dto.Name,
@@ -226,11 +226,11 @@ func (m *Mapper) SubAssetToProto(dto *domains.SubAssetDTO) *zqntpb.SubAssetProto
 	return p
 }
 
-func (m *Mapper) MissionToProto(dto *domains.MissionDTO) *zqntpb.MissionProtoDTO {
+func (m *Mapper) MissionToProto(dto *domains.MissionDTO) *proto.MissionProtoDTO {
 	if dto == nil {
 		return nil
 	}
-	p := &zqntpb.MissionProtoDTO{
+	p := &proto.MissionProtoDTO{
 		Name:           dto.Name,
 		Description:    dto.Description,
 		AssignedAssets: dto.AssignedAssets,
@@ -249,11 +249,11 @@ func (m *Mapper) MissionToProto(dto *domains.MissionDTO) *zqntpb.MissionProtoDTO
 	return p
 }
 
-func (m *Mapper) TaskToProto(dto *domains.TaskDTO) *zqntpb.TaskProtoDTO {
+func (m *Mapper) TaskToProto(dto *domains.TaskDTO) *proto.TaskProtoDTO {
 	if dto == nil {
 		return nil
 	}
-	p := &zqntpb.TaskProtoDTO{}
+	p := &proto.TaskProtoDTO{}
 	p.Id = dto.ID
 	p.MissionId = dto.MissionID
 	p.Name = dto.Name
@@ -267,11 +267,11 @@ func (m *Mapper) TaskToProto(dto *domains.TaskDTO) *zqntpb.TaskProtoDTO {
 	return p
 }
 
-func (m *Mapper) SchedulerToProto(dto *domains.SchedulerDTO) *zqntpb.SchedulerProtoDTO {
+func (m *Mapper) SchedulerToProto(dto *domains.SchedulerDTO) *proto.SchedulerProtoDTO {
 	if dto == nil {
 		return nil
 	}
-	p := &zqntpb.SchedulerProtoDTO{
+	p := &proto.SchedulerProtoDTO{
 		Name:           dto.Name,
 		CronExpression: dto.CronExpression,
 	}
