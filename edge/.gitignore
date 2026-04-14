@@ -1,0 +1,13 @@
+# Go
+*.exe
+*.test
+*.out
+/vendor/
+
+# Generated proto code — regenerate with `make proto`
+gen/proto/*.go
+
+# IDE
+.idea/
+*.iml
+.vscode/
