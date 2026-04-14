@@ -17,6 +17,18 @@ jobs:
         with:
           go-version-file: go.mod
 
+      - name: Authenticate buf.build
+        run: |
+          echo "machine buf.build login ${{ secrets.BUF_TOKEN }} password ${{ secrets.BUF_TOKEN }}" >> ~/.netrc
+      - name: Get dependencies
+        env:
+          GONOSUMDB: "buf.build/*"
+          GOPRIVATE: "buf.build/*"
+        run: |
+          go mod tidy
+          go mod download
+          go mod vendor
+
       - name: Build
         run: go build -mod=vendor ./...
 
