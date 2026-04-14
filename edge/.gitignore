@@ -4,9 +4,8 @@
 *.out
 /vendor/
 
-# Generated proto code — regenerate with `make proto`
-gen/proto/*.go
-gen/*
+# Build artifacts
+gen/proto_tmp/
 
 # IDE
 .idea/
