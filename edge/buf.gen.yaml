@@ -1,18 +1,30 @@
 version: v2
 
 inputs:
-  - module: buf.build/zqnt/protos:1.0.0-PR3-6bf7cc5-SNAPSHOT
+  - directory: proto
 
 plugins:
   # Generates message structs and enums (*.pb.go)
-  - remote: buf.build/protocolbuffers/go
+  - local: protoc-gen-go
     out: gen/proto
     opt:
       - paths=source_relative
+      - Mcommon.proto=github.com/Zequent/zqnt-edge-sdk-go/gen/proto
+      - Medge.proto=github.com/Zequent/zqnt-edge-sdk-go/gen/proto
+      - Mconnector.proto=github.com/Zequent/zqnt-edge-sdk-go/gen/proto
+      - Mlive-data.proto=github.com/Zequent/zqnt-edge-sdk-go/gen/proto
+      - Mmission-autonomy.proto=github.com/Zequent/zqnt-edge-sdk-go/gen/proto
+      - Mremote-control.proto=github.com/Zequent/zqnt-edge-sdk-go/gen/proto
 
   # Generates gRPC client stubs and server interfaces (*_grpc.pb.go)
-  - remote: buf.build/grpc/go
+  - local: protoc-gen-go-grpc
     out: gen/proto
     opt:
       - paths=source_relative
+      - Mcommon.proto=github.com/Zequent/zqnt-edge-sdk-go/gen/proto
+      - Medge.proto=github.com/Zequent/zqnt-edge-sdk-go/gen/proto
+      - Mconnector.proto=github.com/Zequent/zqnt-edge-sdk-go/gen/proto
+      - Mlive-data.proto=github.com/Zequent/zqnt-edge-sdk-go/gen/proto
+      - Mmission-autonomy.proto=github.com/Zequent/zqnt-edge-sdk-go/gen/proto
+      - Mremote-control.proto=github.com/Zequent/zqnt-edge-sdk-go/gen/proto
       - require_unimplemented_servers=true
