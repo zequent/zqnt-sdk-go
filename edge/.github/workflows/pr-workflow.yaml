@@ -16,6 +16,16 @@ jobs:
           go-version-file: go.mod
           cache: false
 
+      - name: Authenticate buf.build
+        run: echo "machine buf.build login ${{ secrets.BUF_TOKEN }} password ${{ secrets.BUF_TOKEN }}" >> ~/.netrc
+
+      - name: Download dependencies
+        env:
+          GOPRIVATE: "buf.build/*"
+          GONOSUMDB: "buf.build/*"
+          GONOPROXY: "buf.build/*"
+        run: go mod download
+
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
@@ -32,11 +42,21 @@ jobs:
         with:
           go-version-file: go.mod
 
+      - name: Authenticate buf.build
+        run: echo "machine buf.build login ${{ secrets.BUF_TOKEN }} password ${{ secrets.BUF_TOKEN }}" >> ~/.netrc
+
+      - name: Download dependencies
+        env:
+          GOPRIVATE: "buf.build/*"
+          GONOSUMDB: "buf.build/*"
+          GONOPROXY: "buf.build/*"
+        run: go mod download
+
       - name: Build
-        run: go build -mod=vendor ./...
+        run: go build ./...
 
       - name: Test
-        run: go test -mod=vendor -race -count=1 ./...
+        run: go test -race -count=1 ./...
 
       - name: Vet
-        run: go vet -mod=vendor ./...
+        run: go vet ./...
