@@ -24,6 +24,8 @@ jobs:
         env:
           GONOSUMDB: "buf.build/*"
           GOPRIVATE: "buf.build/*"
+          GONOSUMCHECK: "buf.build/*"
+
         run: |
           go mod tidy
           go mod download
