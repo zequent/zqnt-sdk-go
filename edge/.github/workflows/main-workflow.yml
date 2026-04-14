@@ -10,6 +10,10 @@ jobs:
   build-and-test:
     name: Build & Test
     runs-on: ubuntu-latest
+    env:
+      GOPROXY: "https://buf.build/gen/go,https://proxy.golang.org,direct"
+      GONOSUMDB: "buf.build/*"
+      GOPRIVATE: "buf.build/*"
     steps:
       - uses: actions/checkout@v4
 
@@ -18,13 +22,11 @@ jobs:
           go-version-file: go.mod
 
       - name: Authenticate buf.build
-        run: echo "machine buf.build login ${{ secrets.BUF_TOKEN }} password ${{ secrets.BUF_TOKEN }}" >> ~/.netrc
+        run: |
+          echo "machine buf.build login ${{ secrets.BUF_TOKEN }} password ${{ secrets.BUF_TOKEN }}" >> ~/.netrc
+          chmod 600 ~/.netrc
 
       - name: Download dependencies
-        env:
-          GOPRIVATE: "buf.build/*"
-          GONOSUMDB: "buf.build/*"
-          GONOPROXY: "buf.build/*"
         run: go mod download
 
       - name: Build
