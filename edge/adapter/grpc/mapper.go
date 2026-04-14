@@ -5,7 +5,7 @@
 package adaptergrpc
 
 import (
-	"edge-go-sdk/adapter/domains"
+	"github.com/Zequent/zqnt-edge-sdk-go/adapter/domains"
 	// zqntpbbuf message types (package _go → alias it)
 	zqntpb "buf.build/gen/go/zqnt/protos/protocolbuffers/go"
 )

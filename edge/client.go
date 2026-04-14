@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"net"
 
-	"edge-go-sdk/adapter"
-	adaptergrpc "edge-go-sdk/adapter/grpc"
-	"edge-go-sdk/connector"
-	"edge-go-sdk/livedata"
-	"edge-go-sdk/missionautonomy"
+	"github.com/Zequent/zqnt-edge-sdk-go/adapter"
+	adaptergrpc "github.com/Zequent/zqnt-edge-sdk-go/adapter/grpc"
+	"github.com/Zequent/zqnt-edge-sdk-go/connector"
+	"github.com/Zequent/zqnt-edge-sdk-go/livedata"
+	"github.com/Zequent/zqnt-edge-sdk-go/missionautonomy"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -36,13 +36,13 @@ import (
 //	// Produce telemetry
 //	client.LiveData().ProduceTelemetryData(ctx, &domains.TelemetryRequestData{...})
 type EdgeClient struct {
-	cfg             *config
-	adapterServer   *adaptergrpc.Server
-	grpcServer      *grpc.Server
-	liveData        *livedata.ServiceImpl
-	connectorSvc    *connector.ServiceImpl
-	missionSvc      *missionautonomy.ServiceImpl
-	backendConn     *grpc.ClientConn
+	cfg           *config
+	adapterServer *adaptergrpc.Server
+	grpcServer    *grpc.Server
+	liveData      *livedata.ServiceImpl
+	connectorSvc  *connector.ServiceImpl
+	missionSvc    *missionautonomy.ServiceImpl
+	backendConn   *grpc.ClientConn
 }
 
 // NewEdgeClient creates and configures an EdgeClient.

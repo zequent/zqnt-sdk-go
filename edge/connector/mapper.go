@@ -3,8 +3,8 @@ package connector
 import (
 	"time"
 
-	"edge-go-sdk/adapter/domains"
 	zqntpb "buf.build/gen/go/zqnt/protos/protocolbuffers/go"
+	"github.com/Zequent/zqnt-edge-sdk-go/adapter/domains"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 )

@@ -8,7 +8,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"edge-go-sdk/adapter/domains"
+	"github.com/Zequent/zqnt-edge-sdk-go/adapter/domains"
 	// zqntpbbuf message types (package _go → alias it)
 	zqntpb "buf.build/gen/go/zqnt/protos/protocolbuffers/go"
 
@@ -47,10 +47,10 @@ type ServiceImpl struct {
 // NewServiceImpl creates a new LiveDataService implementation.
 func NewServiceImpl(stub zqntgrpc.LiveDataServiceClient, log *slog.Logger) *ServiceImpl {
 	return &ServiceImpl{
-		stub:    stub,
-		mapper:  &Mapper{},
-		log:     log,
-		streams: make(map[string]*streamEntry),
+		stub:     stub,
+		mapper:   &Mapper{},
+		log:      log,
+		streams:  make(map[string]*streamEntry),
 		attempts: make(map[string]int),
 	}
 }

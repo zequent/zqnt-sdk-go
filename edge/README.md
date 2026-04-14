@@ -1,5 +1,11 @@
 # Edge Go SDK — Developer Setup
 
+## Module
+
+```
+github.com/Zequent/zqnt-edge-sdk-go
+```
+
 ## Prerequisites
 
 - **Go 1.24+** — `go version` to verify
@@ -133,3 +139,48 @@ make check
 
 **Module not found in vendor**
 - Run `go mod vendor` to re-sync the vendor directory after any `go.mod` changes
+
+---
+
+## Customer / Integrator Setup
+
+This SDK is consumed as a standard Go module from `github.com/Zequent/zqnt-edge-sdk-go`.
+
+**1. Configure Go for private modules** (both GitHub and BSR — run once per machine):
+
+```bash
+go env -w GOPRIVATE="github.com/Zequent/*,buf.build/*"
+go env -w GONOSUMDB="github.com/Zequent/*,buf.build/*"
+go env -w GONOPROXY="github.com/Zequent/*,buf.build/*"
+```
+
+**2. Authenticate with buf.build** (needed to resolve transitive BSR dependencies):
+
+```bash
+buf registry login buf.build
+# Enter your buf.build token when prompted
+```
+
+**3. Add the SDK to your project:**
+
+```bash
+go get github.com/Zequent/zqnt-edge-sdk-go@v<version>
+```
+
+**4. Use it:**
+
+```go
+import (
+    edgesdk "github.com/Zequent/zqnt-edge-sdk-go"
+    "github.com/Zequent/zqnt-edge-sdk-go/adapter"
+    "github.com/Zequent/zqnt-edge-sdk-go/adapter/domains"
+)
+
+type MyAdapter struct {
+    adapter.UnimplementedEdgeAdapter
+}
+
+client, err := edgesdk.NewEdgeClient(backendAddr, deviceSN, &MyAdapter{})
+```
+
+See `example/main.go` for a full working example.

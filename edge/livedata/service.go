@@ -5,8 +5,8 @@ package livedata
 import (
 	"context"
 
-	"edge-go-sdk/adapter/domains"
 	zqntpb "buf.build/gen/go/zqnt/protos/protocolbuffers/go"
+	"github.com/Zequent/zqnt-edge-sdk-go/adapter/domains"
 )
 
 // LiveDataService manages persistent gRPC client-streaming connections to the

@@ -1,13 +1,13 @@
 package connector
 
 import (
-	"context"
-	"edge-go-sdk/internal/protohelpers"
-	"edge-go-sdk/internal/retry"
-	"log/slog"
-	"edge-go-sdk/adapter/domains"
-	zqntpb "buf.build/gen/go/zqnt/protos/protocolbuffers/go"
 	zqntgrpc "buf.build/gen/go/zqnt/protos/grpc/go/_gogrpc"
+	zqntpb "buf.build/gen/go/zqnt/protos/protocolbuffers/go"
+	"context"
+	"github.com/Zequent/zqnt-edge-sdk-go/adapter/domains"
+	"github.com/Zequent/zqnt-edge-sdk-go/internal/protohelpers"
+	"github.com/Zequent/zqnt-edge-sdk-go/internal/retry"
+	"log/slog"
 )
 
 // ServiceImpl is the gRPC-backed ConnectorService implementation.

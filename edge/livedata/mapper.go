@@ -1,10 +1,10 @@
 package livedata
 
 import (
-	"edge-go-sdk/adapter/domains"
 	zqntpb "buf.build/gen/go/zqnt/protos/protocolbuffers/go"
+	"github.com/Zequent/zqnt-edge-sdk-go/adapter/domains"
 
-	"edge-go-sdk/internal/protohelpers"
+	"github.com/Zequent/zqnt-edge-sdk-go/internal/protohelpers"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -120,8 +120,8 @@ func (m *Mapper) mapSubAssetTelemetry(d *domains.SubAssetTelemetryData) *zqntpb.
 
 	if d.BatteryInformation != nil {
 		t.BatteryInformation = &zqntpb.SubAssetTelemetry_SubAssetBatteryInformation{
-			Percentage:      d.BatteryInformation.Percentage,
-			RemainingTime:   d.BatteryInformation.RemainingTime,
+			Percentage:        d.BatteryInformation.Percentage,
+			RemainingTime:     d.BatteryInformation.RemainingTime,
 			ReturnToHomePower: d.BatteryInformation.ReturnHomePower,
 		}
 	}

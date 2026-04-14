@@ -5,7 +5,7 @@ package adapter
 import (
 	"context"
 
-	"edge-go-sdk/adapter/domains"
+	"github.com/Zequent/zqnt-edge-sdk-go/adapter/domains"
 )
 
 // EdgeAdapter is the interface SDK consumers implement to control their hardware.

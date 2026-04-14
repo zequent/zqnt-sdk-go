@@ -3,10 +3,10 @@
 // for all other commands.
 //
 // Before running:
-//   1. Run `make proto` to generate the proto Go bindings.
-//   2. Run `go mod tidy` to download dependencies.
-//   3. Set the BACKEND_ADDR and LISTEN_ADDR environment variables, or use
-//      the defaults below.
+//  1. Run `make proto` to generate the proto Go bindings.
+//  2. Run `go mod tidy` to download dependencies.
+//  3. Set the BACKEND_ADDR and LISTEN_ADDR environment variables, or use
+//     the defaults below.
 package main
 
 import (
@@ -17,9 +17,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	edgesdk "edge-go-sdk"
-	"edge-go-sdk/adapter"
-	"edge-go-sdk/adapter/domains"
+	edgesdk "github.com/Zequent/zqnt-edge-sdk-go"
+	"github.com/Zequent/zqnt-edge-sdk-go/adapter"
+	"github.com/Zequent/zqnt-edge-sdk-go/adapter/domains"
 )
 
 // MyDroneAdapter is a minimal EdgeAdapter implementation.

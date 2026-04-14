@@ -4,10 +4,10 @@ import (
 	"context"
 	"log/slog"
 
-	"edge-go-sdk/adapter/domains"
-	"edge-go-sdk/connector"
-	"edge-go-sdk/internal/protohelpers"
-	"edge-go-sdk/internal/retry"
+	"github.com/Zequent/zqnt-edge-sdk-go/adapter/domains"
+	"github.com/Zequent/zqnt-edge-sdk-go/connector"
+	"github.com/Zequent/zqnt-edge-sdk-go/internal/protohelpers"
+	"github.com/Zequent/zqnt-edge-sdk-go/internal/retry"
 	// zqntpbbuf message types (package _go → alias it)
 	zqntpb "buf.build/gen/go/zqnt/protos/protocolbuffers/go"
 

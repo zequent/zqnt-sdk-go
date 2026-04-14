@@ -1,4 +1,4 @@
-module edge-go-sdk
+module github.com/Zequent/zqnt-edge-sdk-go
 
 go 1.24.0
 

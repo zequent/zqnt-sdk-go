@@ -6,13 +6,13 @@ import (
 	"io"
 	"log/slog"
 
-	"edge-go-sdk/adapter"
-	"edge-go-sdk/adapter/domains"
+	"github.com/Zequent/zqnt-edge-sdk-go/adapter"
+	"github.com/Zequent/zqnt-edge-sdk-go/adapter/domains"
 	// zqntpbbuf message types (package _go → alias it)
 	zqntpb "buf.build/gen/go/zqnt/protos/protocolbuffers/go"
 	// gRPC service stubs (package _gogrpc →alias it)
 	zqntgrpc "buf.build/gen/go/zqnt/protos/grpc/go/_gogrpc"
-	"edge-go-sdk/internal/protohelpers"
+	"github.com/Zequent/zqnt-edge-sdk-go/internal/protohelpers"
 
 	"google.golang.org/grpc"
 )
@@ -417,4 +417,3 @@ func (s *Server) PrepareTask(ctx context.Context, req *zqntpb.EdgePrepareTaskReq
 	}
 	return s.toEdgeResponse(req.Base, result), nil
 }
-
