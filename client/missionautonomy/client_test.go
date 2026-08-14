@@ -10,6 +10,7 @@ import (
 	missionautonomypb "github.com/Zequent/zqnt-client-sdk-go/gen/missionautonomy/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/protobuf/proto"
 )
 
 type fakeService struct {
@@ -34,6 +35,17 @@ func (s *fakeService) StartSkillExecution(ctx context.Context, req *execdto.Skil
 
 func (s *fakeService) UpsertApplication(ctx context.Context, req *execdto.UpsertApplicationRequest) (*execdto.ApplicationResponse, error) {
 	return &execdto.ApplicationResponse{Response: &execdto.ApplicationResponse_Application{Application: req.GetApplication()}}, nil
+}
+
+func (s *fakeService) ListApplications(ctx context.Context, req *execdto.ListApplicationsRequest) (*execdto.ApplicationListResponse, error) {
+	return &execdto.ApplicationListResponse{
+		Response: &execdto.ApplicationListResponse_Result{
+			Result: &execdto.ApplicationList{
+				Applications:  []*execution.ApplicationProtoDTO{{Id: "app-1"}},
+				NextPageToken: proto.String("page-2"),
+			},
+		},
+	}, nil
 }
 
 func dialFake(t *testing.T, svc missionautonomypb.MissionAutonomyServiceServer) *Client {
@@ -88,6 +100,42 @@ func TestStartSkillExecutionSendsTheExecutionId(t *testing.T) {
 	}
 	if fake.lastLifecycleRequest.GetExecutionId() != "exec-42" {
 		t.Fatalf("expected the execution id to be sent, got %q", fake.lastLifecycleRequest.GetExecutionId())
+	}
+}
+
+func TestExecuteApplicationSendsAnApplicationSpec(t *testing.T) {
+	fake := &fakeService{}
+	client := dialFake(t, fake)
+
+	got, err := client.ExecuteApplication(context.Background(), "asset-1", "app-1", "skill-1", "2", nil, "idem-2")
+	if err != nil {
+		t.Fatalf("ExecuteApplication: %v", err)
+	}
+	if got.GetId() != "exec-1" {
+		t.Fatalf("expected exec-1, got %q", got.GetId())
+	}
+	appSpec := fake.lastExecuteRequest.GetSpec().GetApplication()
+	if appSpec == nil || appSpec.GetApplicationId() != "app-1" || appSpec.GetSkillId() != "skill-1" {
+		t.Fatalf("expected an application spec for app-1/skill-1, got %v", fake.lastExecuteRequest.GetSpec())
+	}
+	if appSpec.GetApplicationVersion() != "2" {
+		t.Fatalf("expected version 2, got %q", appSpec.GetApplicationVersion())
+	}
+}
+
+func TestListApplicationsReturnsThePageAndNextToken(t *testing.T) {
+	fake := &fakeService{}
+	client := dialFake(t, fake)
+
+	apps, nextPageToken, err := client.ListApplications(context.Background(), nil, false, 0, "")
+	if err != nil {
+		t.Fatalf("ListApplications: %v", err)
+	}
+	if len(apps) != 1 || apps[0].GetId() != "app-1" {
+		t.Fatalf("expected one app-1, got %v", apps)
+	}
+	if nextPageToken != "page-2" {
+		t.Fatalf("expected page-2, got %q", nextPageToken)
 	}
 }
 

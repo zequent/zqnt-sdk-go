@@ -188,6 +188,109 @@ func simpleSpec(commandID string, parameters *structpb.Struct) *execution.SkillE
 	}
 }
 
+// applicationSpec builds a SkillExecutionSpecProto that runs a named Skill out of a deployed
+// Application, instead of a single ad-hoc command — the ApplicationExecutionSpecProto branch of
+// the execution spec's oneof. applicationVersion is optional ("" runs the latest version).
+func applicationSpec(applicationID, skillID, applicationVersion string, parameters *structpb.Struct) *execution.SkillExecutionSpecProto {
+	spec := &execution.ApplicationExecutionSpecProto{ApplicationId: applicationID, SkillId: skillID, Parameters: parameters}
+	if applicationVersion != "" {
+		spec.ApplicationVersion = &applicationVersion
+	}
+	return &execution.SkillExecutionSpecProto{
+		Execution: &execution.SkillExecutionSpecProto_Application{Application: spec},
+	}
+}
+
+// CreateApplicationExecution creates (but does not start) an execution of one Skill from a
+// deployed Application — the counterpart to CreateSimpleExecution for named, versioned Skills
+// rather than single ad-hoc commands.
+func (c *Client) CreateApplicationExecution(ctx context.Context, assetSn, applicationID, skillID, applicationVersion string, parameters *structpb.Struct, idempotencyKey string) (*execution.SkillExecutionProtoDTO, error) {
+	req := &execdto.CreateSkillExecutionRequest{
+		Base:           &base.RequestBase{Tid: newTid(), Sn: assetSn, Timestamp: timestamppb.Now()},
+		Spec:           applicationSpec(applicationID, skillID, applicationVersion, parameters),
+		IdempotencyKey: idempotencyKey,
+	}
+	resp, err := c.grpc.CreateSkillExecution(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("missionautonomy: CreateSkillExecution(%s/%s): %w", applicationID, skillID, err)
+	}
+	if resp.GetHasErrors() {
+		return nil, fmt.Errorf("missionautonomy: CreateSkillExecution(%s/%s): %s", applicationID, skillID, resp.GetError().GetErrorMessage())
+	}
+	return resp.GetExecution(), nil
+}
+
+// ExecuteApplication creates and atomically starts an execution of one Skill from a deployed
+// Application — the counterpart to ExecuteSimple for named, versioned Skills.
+func (c *Client) ExecuteApplication(ctx context.Context, assetSn, applicationID, skillID, applicationVersion string, parameters *structpb.Struct, idempotencyKey string) (*execution.SkillExecutionProtoDTO, error) {
+	req := &execdto.ExecuteSkillRequest{
+		Base:           &base.RequestBase{Tid: newTid(), Sn: assetSn, Timestamp: timestamppb.Now()},
+		Spec:           applicationSpec(applicationID, skillID, applicationVersion, parameters),
+		IdempotencyKey: idempotencyKey,
+	}
+	resp, err := c.grpc.ExecuteSkill(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("missionautonomy: ExecuteSkill(%s/%s): %w", applicationID, skillID, err)
+	}
+	if resp.GetHasErrors() {
+		return nil, fmt.Errorf("missionautonomy: ExecuteSkill(%s/%s): %s", applicationID, skillID, resp.GetError().GetErrorMessage())
+	}
+	return resp.GetExecution(), nil
+}
+
+// ListApplications lists deployed capability packages, optionally scoped and/or filtered to
+// enabled-only. Pass scope=nil for every scope; pageSize=0/pageToken="" to use RPC defaults.
+func (c *Client) ListApplications(ctx context.Context, scope *execution.ApplicationScopeProtoDTO, enabledOnly bool, pageSize int32, pageToken string) (apps []*execution.ApplicationProtoDTO, nextPageToken string, err error) {
+	req := &execdto.ListApplicationsRequest{Base: requestBase(), Scope: scope}
+	if enabledOnly {
+		req.EnabledOnly = &enabledOnly
+	}
+	if pageSize != 0 {
+		req.PageSize = &pageSize
+	}
+	if pageToken != "" {
+		req.PageToken = &pageToken
+	}
+	resp, err := c.grpc.ListApplications(ctx, req)
+	if err != nil {
+		return nil, "", fmt.Errorf("missionautonomy: ListApplications: %w", err)
+	}
+	if resp.GetHasErrors() {
+		return nil, "", fmt.Errorf("missionautonomy: ListApplications: %s", resp.GetError().GetErrorMessage())
+	}
+	return resp.GetResult().GetApplications(), resp.GetResult().GetNextPageToken(), nil
+}
+
+// ListSkillExecutions lists executions, filtered by any combination of the optional fields on
+// query (pass "" / nil to omit a filter).
+func (c *Client) ListSkillExecutions(ctx context.Context, query *execdto.ListSkillExecutionsRequest) (executions []*execution.SkillExecutionProtoDTO, nextPageToken string, err error) {
+	if query == nil {
+		query = &execdto.ListSkillExecutionsRequest{}
+	}
+	query.Base = requestBase()
+	resp, err := c.grpc.ListSkillExecutions(ctx, query)
+	if err != nil {
+		return nil, "", fmt.Errorf("missionautonomy: ListSkillExecutions: %w", err)
+	}
+	if resp.GetHasErrors() {
+		return nil, "", fmt.Errorf("missionautonomy: ListSkillExecutions: %s", resp.GetError().GetErrorMessage())
+	}
+	return resp.GetResult().GetExecutions(), resp.GetResult().GetNextPageToken(), nil
+}
+
+// ResolveExecutionConfig resolves effective config values for context, restricted to keys when
+// non-empty (pass nil/empty to resolve every known key).
+func (c *Client) ResolveExecutionConfig(ctx context.Context, execContext *execution.ExecutionConfigContextProto, keys []string) (*execution.ResolvedExecutionConfigProtoDTO, error) {
+	resp, err := c.grpc.ResolveExecutionConfig(ctx, &execdto.ResolveExecutionConfigRequest{Base: requestBase(), Context: execContext, Keys: keys})
+	if err != nil {
+		return nil, fmt.Errorf("missionautonomy: ResolveExecutionConfig: %w", err)
+	}
+	if resp.GetHasErrors() {
+		return nil, fmt.Errorf("missionautonomy: ResolveExecutionConfig: %s", resp.GetError().GetErrorMessage())
+	}
+	return resp.GetConfig(), nil
+}
+
 func requestBase() *base.RequestBase {
 	return &base.RequestBase{Tid: newTid(), Timestamp: timestamppb.Now()}
 }
