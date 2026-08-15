@@ -59,6 +59,46 @@ See [`example/main.go`](example/main.go) for a complete working example with gra
 
 ---
 
+## Skill Registry (new)
+
+`skillregistry` lets an adapter self-report its own command contracts directly into the platform's
+persisted Skill Registry, alongside the older `GetCapabilities` snapshot below:
+
+```go
+import (
+    "github.com/Zequent/zqnt-edge-sdk-go/skillregistry"
+    connectorpb "github.com/Zequent/zqnt-edge-sdk-go/gen/connector/proto"
+)
+
+svc := skillregistry.NewServiceImpl(connectorpb.NewConnectorServiceClient(conn), logger)
+svc.ObserveSkillContract(ctx, &connectorpb.SkillContractProtoDTO{CommandId: "acme.custom_scan"})
+```
+
+It's generated from the **current** proto schema (`gen/connector/proto`), not the `proto/` submodule
+pinned by the rest of this SDK — see "Two proto generations" below for why.
+
+### Two proto generations, on purpose
+
+This SDK's `proto/` submodule (`zqnt-protos`) is pinned to a schema that predates the platform's
+Skill/Capability/Application model — its `connector.proto`/`edge.proto` don't have
+`ObserveSkillContract`, `ListSkillContracts`, or the 5-value `CapabilityState` enum at all; they're
+still on a plain `bool available` for the old `Capability`/`GetCapabilities` message pair used by
+`adapter/grpc/server.go`. Rather than bump the submodule (a real, coordinated breaking change to a
+dependency this repo doesn't own) just to add one new package, `skillregistry` vendors its own
+up-to-date generated code under `gen/connector/...`, `gen/common/...`, etc. — alongside, not
+replacing, the submodule-generated `gen/proto`. The two coexist without conflict (different Go
+package paths) and `make proto` / the `proto/` submodule are untouched.
+
+Two consequences worth knowing:
+- **`GetCapabilities`'s wire format is the older, 2-value schema** (`available bool`, not
+  `CapabilityState`) until the submodule itself is bumped — that's a separate, bigger change
+  (updating `zqnt-protos`, then regenerating and testing this SDK's existing surface against it)
+  that wasn't done here.
+- **This repo had zero test files before this change.** `skillregistry` has coverage; the rest of
+  the SDK (everything under `adapter/`, `connector/`, `livedata/`, `missionautonomy/`) does not.
+
+---
+
 ## How It Works
 
 Your application acts as a gRPC server that the Zequent backend connects to. You implement `EdgeAdapter` — the interface that receives commands (TakeOff, GoTo, ReturnToHome, etc.) and translates them to your hardware.
