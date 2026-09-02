@@ -1,4 +1,4 @@
-GEN_DIR := gen/proto
+GEN_DIR := gen
 
 .PHONY: help setup proto build vet tidy check clean
 
@@ -6,7 +6,7 @@ GEN_DIR := gen/proto
 help:
 	@echo "Available targets:"
 	@echo "  setup   Install buf and protoc plugins (run once)"
-	@echo "  proto   Regenerate code from proto/ submodule"
+	@echo "  proto   Regenerate code from the zqnt-platform monorepo proto source"
 	@echo "  build   Compile the SDK and example"
 	@echo "  vet     Run go vet"
 	@echo "  tidy    go mod tidy"
@@ -25,7 +25,7 @@ setup:
 
 # ── proto generation ─────────────────────────────────────────────────────────
 proto:
-	@echo "→ Generating from proto/ submodule..."
+	@echo "→ Generating from ../../../utils/zqnt-utils/src/main/proto..."
 	@mkdir -p $(GEN_DIR)
 	buf generate
 	@echo "✓ Proto generation complete."

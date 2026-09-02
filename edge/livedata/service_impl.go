@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/Zequent/zqnt-edge-sdk-go/adapter/domains"
-	proto "github.com/Zequent/zqnt-edge-sdk-go/gen/proto"
+	livedatapb "github.com/Zequent/zqnt-edge-sdk-go/gen/livedata/proto"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -23,7 +23,7 @@ const (
 
 // streamEntry holds a single active client-streaming connection.
 type streamEntry struct {
-	stream proto.LiveDataService_ProduceTelemetryClient
+	stream livedatapb.LiveDataService_ProduceTelemetryClient
 	cancel context.CancelFunc
 }
 
@@ -31,7 +31,7 @@ type streamEntry struct {
 // It maintains one persistent bidirectional stream per device SN and
 // reconnects automatically on transient failures.
 type ServiceImpl struct {
-	stub         proto.LiveDataServiceClient
+	stub         livedatapb.LiveDataServiceClient
 	mapper       *Mapper
 	log          *slog.Logger
 	mu           sync.RWMutex
@@ -41,7 +41,7 @@ type ServiceImpl struct {
 }
 
 // NewServiceImpl creates a new LiveDataService implementation.
-func NewServiceImpl(stub proto.LiveDataServiceClient, log *slog.Logger) *ServiceImpl {
+func NewServiceImpl(stub livedatapb.LiveDataServiceClient, log *slog.Logger) *ServiceImpl {
 	return &ServiceImpl{
 		stub:     stub,
 		mapper:   &Mapper{},
@@ -59,7 +59,7 @@ func (s *ServiceImpl) ProduceTelemetryData(ctx context.Context, data *domains.Te
 	return s.ProduceTelemetry(ctx, data.SN, req)
 }
 
-func (s *ServiceImpl) ProduceTelemetry(ctx context.Context, deviceSN string, req *proto.ProduceTelemetryRequest) error {
+func (s *ServiceImpl) ProduceTelemetry(ctx context.Context, deviceSN string, req *livedatapb.ProduceTelemetryRequest) error {
 	if s.shuttingDown.Load() {
 		s.log.Warn("cannot produce telemetry: service is shutting down", "sn", deviceSN)
 		return nil
@@ -167,7 +167,7 @@ func (s *ServiceImpl) createStream(ctx context.Context, deviceSN string) (*strea
 	return entry, nil
 }
 
-func (s *ServiceImpl) monitorStream(_ context.Context, deviceSN string, entry *streamEntry, stream proto.LiveDataService_ProduceTelemetryClient) {
+func (s *ServiceImpl) monitorStream(_ context.Context, deviceSN string, entry *streamEntry, stream livedatapb.LiveDataService_ProduceTelemetryClient) {
 	_, err := stream.CloseAndRecv()
 	if err == nil {
 		s.log.Info("telemetry stream completed normally", "sn", deviceSN)

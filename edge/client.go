@@ -14,7 +14,9 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	proto "github.com/Zequent/zqnt-edge-sdk-go/gen/proto"
+	connectorpb "github.com/Zequent/zqnt-edge-sdk-go/gen/connector/proto"
+	livedatapb "github.com/Zequent/zqnt-edge-sdk-go/gen/livedata/proto"
+	missionautonomypb "github.com/Zequent/zqnt-edge-sdk-go/gen/missionautonomy/proto"
 )
 
 // EdgeClient is the main entry point of the edge-go-sdk.
@@ -68,9 +70,9 @@ func NewEdgeClient(endpoint, sn string, edgeAdapter adapter.EdgeAdapter, opts ..
 	log := cfg.logger
 
 	// Build outbound service clients.
-	ldSvc := livedata.NewServiceImpl(proto.NewLiveDataServiceClient(conn), log)
-	connSvc := connector.NewServiceImpl(proto.NewConnectorServiceClient(conn), log)
-	maSvc := missionautonomy.NewServiceImpl(proto.NewMissionAutonomyServiceClient(conn), log)
+	ldSvc := livedata.NewServiceImpl(livedatapb.NewLiveDataServiceClient(conn), log)
+	connSvc := connector.NewServiceImpl(connectorpb.NewConnectorServiceClient(conn), log)
+	maSvc := missionautonomy.NewServiceImpl(missionautonomypb.NewMissionAutonomyServiceClient(conn), log)
 
 	// Build the inbound gRPC server for EdgeAdapterService.
 	grpcSrv := grpc.NewServer()

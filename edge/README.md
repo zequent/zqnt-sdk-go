@@ -74,28 +74,49 @@ svc := skillregistry.NewServiceImpl(connectorpb.NewConnectorServiceClient(conn),
 svc.ObserveSkillContract(ctx, &connectorpb.SkillContractProtoDTO{CommandId: "acme.custom_scan"})
 ```
 
-It's generated from the **current** proto schema (`gen/connector/proto`), not the `proto/` submodule
-pinned by the rest of this SDK — see "Two proto generations" below for why.
+It's generated from the current proto schema (`gen/connector/proto`) — as of 2026-09-02, that's now
+the *only* schema this SDK generates from; see "One proto source of truth" below.
 
-### Two proto generations, on purpose
+### One proto source of truth (as of 2026-09-02)
 
-This SDK's `proto/` submodule (`zqnt-protos`) is pinned to a schema that predates the platform's
-Skill/Capability/Application model — its `connector.proto`/`edge.proto` don't have
-`ObserveSkillContract`, `ListSkillContracts`, or the 5-value `CapabilityState` enum at all; they're
-still on a plain `bool available` for the old `Capability`/`GetCapabilities` message pair used by
-`adapter/grpc/server.go`. Rather than bump the submodule (a real, coordinated breaking change to a
-dependency this repo doesn't own) just to add one new package, `skillregistry` vendors its own
-up-to-date generated code under `gen/connector/...`, `gen/common/...`, etc. — alongside, not
-replacing, the submodule-generated `gen/proto`. The two coexist without conflict (different Go
-package paths) and `make proto` / the `proto/` submodule are untouched.
+Until 2026-09-02 this SDK generated from two independent schemas: a `proto/` git submodule
+(`zqnt-protos`, a separately-versioned repo) that every RPC in `adapter/`, `connector/`, `livedata/`,
+and `missionautonomy/` was built against, and a second, up-to-date generation vendored alongside it
+for `skillregistry` alone (see git history for that reasoning). The submodule had drifted badly —
+frozen months before the platform's Skill/Capability/Application/mission-autonomy migration, so its
+`connector.proto`/`edge.proto`/`mission-autonomy.proto` had no `ObserveSkillContract`, no
+`CapabilityState`, no Application/SkillExecution API at all, and `connector`/`missionautonomy`'s
+whole Mission/Task/Scheduler CRUD surface no longer exists on the real backend.
 
-Two consequences worth knowing:
-- **`GetCapabilities`'s wire format is the older, 2-value schema** (`available bool`, not
-  `CapabilityState`) until the submodule itself is bumped — that's a separate, bigger change
-  (updating `zqnt-protos`, then regenerating and testing this SDK's existing surface against it)
-  that wasn't done here.
-- **This repo had zero test files before this change.** `skillregistry` has coverage; the rest of
-  the SDK (everything under `adapter/`, `connector/`, `livedata/`, `missionautonomy/`) does not.
+The submodule and its generated `gen/proto` package are gone. Every package in this SDK now
+generates from `../../../utils/zqnt-utils/src/main/proto` in the `zqnt-platform` monorepo — the
+same canonical `.proto` source every other language SDK/adapter in the platform uses (see
+`buf.gen.yaml`). Run `make proto` to regenerate.
+
+What changed as a result, if you're upgrading from before this migration:
+- **`connector.ConnectorService`**: Mission/Task/Scheduler CRUD methods are gone (the backend
+  doesn't have them anymore — replaced by `missionautonomy`'s Application/SkillExecution model).
+  Asset/Organization operations remain, reshaped to match the current `AssetProtoDTO` (mostly-optional
+  pointer fields, `SubAssets`/`Payloads` replacing the old singular `SubAsset`, no more `Online`
+  field on the DTO itself).
+- **`missionautonomy.MissionAutonomyService`**: reduced to just `GetScheduler` — Application/
+  SkillExecution administration is a console/platform-side concern, not something an edge adapter
+  itself calls (mirrors edge-python-sdk's own already-migrated `MissionAutonomyClient` exactly).
+- **`adapter.EdgeAdapter`**: unchanged — still the same interface your hardware integration
+  implements. The wire mapping underneath it (`adapter/grpc/`) was fully rewritten against the
+  current `CommandResponse`/`CapabilityState` schema, but nothing about the Go-level interface
+  contract you implement against changed.
+- A handful of RPCs new on the current schema (`StartRecording`, `StopRecording`,
+  `LiveStreamSplitScreen`, `SendCustomCommand`, `PauseTask`, `ResumeTask`, inbound `RegisterAsset`/
+  `DeregisterAsset`) have no `EdgeAdapter` interface method yet and are left unimplemented
+  (return a clean `codes.Unimplemented`, same as any command your own adapter doesn't override) —
+  a deliberate, separately-scoped follow-up, not a regression.
+
+**This repo had zero test files before the `skillregistry` addition.** `skillregistry` has
+coverage; the rest of the SDK (everything under `adapter/`, `connector/`, `livedata/`,
+`missionautonomy/`) still does not — the migration above was verified by `go build`/`go vet`
+across the whole repo plus careful field-by-field review against the real generated schema, not by
+a test suite, since none exists.
 
 ---
 

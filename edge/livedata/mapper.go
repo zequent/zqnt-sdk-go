@@ -2,7 +2,8 @@ package livedata
 
 import (
 	"github.com/Zequent/zqnt-edge-sdk-go/adapter/domains"
-	proto "github.com/Zequent/zqnt-edge-sdk-go/gen/proto"
+	commonpb "github.com/Zequent/zqnt-edge-sdk-go/gen/common/proto"
+	livedatapb "github.com/Zequent/zqnt-edge-sdk-go/gen/livedata/proto"
 
 	"github.com/Zequent/zqnt-edge-sdk-go/internal/protohelpers"
 
@@ -12,68 +13,80 @@ import (
 // Mapper converts TelemetryRequestData domain objects to ProduceTelemetryRequest protos.
 type Mapper struct{}
 
-func (m *Mapper) Map(data *domains.TelemetryRequestData) *proto.ProduceTelemetryRequest {
+func (m *Mapper) Map(data *domains.TelemetryRequestData) *livedatapb.ProduceTelemetryRequest {
 	if data == nil {
 		return nil
 	}
 
-	base := &proto.RequestBase{
+	base := &commonpb.RequestBase{
 		Tid:       data.TID,
 		Sn:        data.SN,
 		Timestamp: protohelpers.Now(),
 	}
 
-	req := &proto.ProduceTelemetryRequest{Base: base}
+	telemetry := &livedatapb.Telemetry{
+		Sn:        data.SN,
+		Timestamp: timestamppb.Now(),
+	}
 
 	switch data.Type {
 	case domains.TelemetryTypeAsset:
-		req.Type = proto.LiveDataType_ASSET_TELEMETRY
-		if data.AssetTelemetry != nil {
-			req.Telemetry = &proto.ProduceTelemetryRequest_AssetTelemetry{
-				AssetTelemetry: m.mapAssetTelemetry(data.AssetTelemetry),
-			}
+		if d := data.AssetTelemetry; d != nil {
+			telemetry.Id = d.ID
+			telemetry.Timestamp = timestamppb.New(d.Timestamp)
+			telemetry.Latitude = f32to64(d.Latitude)
+			telemetry.Longitude = f32to64(d.Longitude)
+			telemetry.AbsoluteAltitude = d.AbsoluteAltitude
+			telemetry.RelativeAltitude = d.RelativeAltitude
+			telemetry.WindSpeed = d.WindSpeed
+			telemetry.Heading = d.Heading
+			telemetry.Source = &livedatapb.Telemetry_Asset{Asset: m.mapAssetTelemetry(d)}
 		}
 	case domains.TelemetryTypeSubAsset:
-		req.Type = proto.LiveDataType_SUBASSET_TELEMETRY
-		if data.SubAssetTelemetry != nil {
-			req.Telemetry = &proto.ProduceTelemetryRequest_SubAssetTelemetry{
-				SubAssetTelemetry: m.mapSubAssetTelemetry(data.SubAssetTelemetry),
-			}
+		if d := data.SubAssetTelemetry; d != nil {
+			telemetry.Id = d.ID
+			telemetry.Timestamp = timestamppb.New(d.Timestamp)
+			telemetry.Latitude = f32to64(d.Latitude)
+			telemetry.Longitude = f32to64(d.Longitude)
+			telemetry.AbsoluteAltitude = d.AbsoluteAltitude
+			telemetry.RelativeAltitude = d.RelativeAltitude
+			telemetry.WindSpeed = d.WindSpeed
+			telemetry.Heading = d.Heading
+			telemetry.Source = &livedatapb.Telemetry_SubAsset{SubAsset: m.mapSubAssetTelemetry(d)}
 		}
 	}
 
-	return req
+	return &livedatapb.ProduceTelemetryRequest{
+		Base:      base,
+		Telemetry: &livedatapb.ProduceTelemetryRequest_Data{Data: telemetry},
+	}
 }
 
-func (m *Mapper) mapAssetTelemetry(d *domains.AssetTelemetryData) *proto.AssetTelemetry {
+func (m *Mapper) mapAssetTelemetry(d *domains.AssetTelemetryData) *livedatapb.AssetTelemetryDetails {
 	if d == nil {
 		return nil
 	}
-	t := &proto.AssetTelemetry{
-		Id:        d.ID,
-		Timestamp: timestamppb.New(d.Timestamp),
+	t := &livedatapb.AssetTelemetryDetails{
+		EnvironmentTemp:               d.EnvironmentTemp,
+		InsideTemp:                    d.InsideTemp,
+		Humidity:                      d.Humidity,
+		Mode:                          enumPtr[commonpb.AssetMode](commonpb.AssetMode_value, d.Mode),
+		Rainfall:                      enumPtr[commonpb.RainfallEnum](commonpb.RainfallEnum_value, d.Rainfall),
+		SubAssetAtHome:                d.SubAssetAtHome,
+		SubAssetCharging:              d.SubAssetCharging,
+		SubAssetPercentage:            d.SubAssetPercentage,
+		DebugModeOpen:                 d.DebugModeOpen,
+		HasActiveManualControlSession: d.HasActiveManualControl,
+		CoverState:                    enumPtr[commonpb.AssetCoverStateEnum](commonpb.AssetCoverStateEnum_value, d.CoverState),
+		WorkingVoltage:                d.WorkingVoltage,
+		WorkingCurrent:                d.WorkingCurrent,
+		SupplyVoltage:                 d.SupplyVoltage,
+		PositionValid:                 d.PositionValid,
+		ManualControlState:            enumPtr[commonpb.ManualControlStateEnum](commonpb.ManualControlStateEnum_value, d.ManualControlState),
 	}
-	t.Latitude = d.Latitude
-	t.Longitude = d.Longitude
-	t.AbsoluteAltitude = d.AbsoluteAltitude
-	t.RelativeAltitude = d.RelativeAltitude
-	t.EnvironmentTemp = d.EnvironmentTemp
-	t.InsideTemp = d.InsideTemp
-	t.Humidity = d.Humidity
-	t.SubAssetAtHome = d.SubAssetAtHome
-	t.SubAssetCharging = d.SubAssetCharging
-	t.SubAssetPercentage = d.SubAssetPercentage
-	t.Heading = d.Heading
-	t.DebugModeOpen = d.DebugModeOpen
-	t.HasActiveManualControlSession = d.HasActiveManualControl
-	t.WorkingVoltage = d.WorkingVoltage
-	t.WorkingCurrent = d.WorkingCurrent
-	t.SupplyVoltage = d.SupplyVoltage
-	t.WindSpeed = d.WindSpeed
-	t.PositionValid = d.PositionValid
 
 	if d.SubAssetInformation != nil {
-		t.SubAssetInformation = &proto.AssetTelemetry_AssetSubAssetInformation{
+		t.SubAssetInformation = &livedatapb.AssetTelemetryDetails_AssetSubAssetInformation{
 			Sn:     d.SubAssetInformation.SN,
 			Model:  d.SubAssetInformation.Model,
 			Paired: d.SubAssetInformation.Paired,
@@ -81,45 +94,40 @@ func (m *Mapper) mapAssetTelemetry(d *domains.AssetTelemetryData) *proto.AssetTe
 		}
 	}
 	if d.NetworkInformation != nil {
-		ni := &proto.AssetTelemetry_AssetNetworkInformation{
-			Rate: d.NetworkInformation.Rate,
+		t.NetworkInformation = &livedatapb.AssetTelemetryDetails_AssetNetworkInformation{
+			Type:    enumPtr[commonpb.NetworkTypeEnum](commonpb.NetworkTypeEnum_value, d.NetworkInformation.Type),
+			Rate:    d.NetworkInformation.Rate,
+			Quality: enumPtr[commonpb.NetworkStateQualityEnum](commonpb.NetworkStateQualityEnum_value, d.NetworkInformation.Quality),
 		}
-		t.NetworkInformation = ni
 	}
 	if d.AirConditioner != nil {
-		t.AirConditioner = &proto.AssetTelemetry_AssetAirConditioner{
+		t.AirConditioner = &livedatapb.AssetTelemetryDetails_AssetAirConditioner{
+			State:      enumPtr[commonpb.AssetAirConditionerStateEnum](commonpb.AssetAirConditionerStateEnum_value, d.AirConditioner.State),
 			SwitchTime: d.AirConditioner.SwitchTime,
 		}
 	}
 	return t
 }
 
-func (m *Mapper) mapSubAssetTelemetry(d *domains.SubAssetTelemetryData) *proto.SubAssetTelemetry {
+func (m *Mapper) mapSubAssetTelemetry(d *domains.SubAssetTelemetryData) *livedatapb.SubAssetTelemetryDetails {
 	if d == nil {
 		return nil
 	}
-	t := &proto.SubAssetTelemetry{
-		Id:        d.ID,
-		Timestamp: timestamppb.New(d.Timestamp),
+	t := &livedatapb.SubAssetTelemetryDetails{
+		HorizontalSpeed:       d.HorizontalSpeed,
+		VerticalSpeed:         d.VerticalSpeed,
+		WindDirection:         d.WindDirection,
+		Gear:                  d.Gear,
+		HeightLimit:           d.HeightLimit,
+		HomeDistance:          d.HomeDistance,
+		TotalMovementDistance: d.TotalMovementDistance,
+		TotalMovementTime:     d.TotalMovementTime,
+		Mode:                  enumPtr[commonpb.SubAssetMode](commonpb.SubAssetMode_value, d.Mode),
+		Country:               d.Country,
 	}
-	t.Latitude = d.Latitude
-	t.Longitude = d.Longitude
-	t.AbsoluteAltitude = d.AbsoluteAltitude
-	t.RelativeAltitude = d.RelativeAltitude
-	t.HorizontalSpeed = d.HorizontalSpeed
-	t.VerticalSpeed = d.VerticalSpeed
-	t.WindSpeed = d.WindSpeed
-	t.WindDirection = d.WindDirection
-	t.Heading = d.Heading
-	t.Gear = d.Gear
-	t.HeightLimit = d.HeightLimit
-	t.HomeDistance = d.HomeDistance
-	t.TotalMovementDistance = d.TotalMovementDistance
-	t.TotalMovementTime = d.TotalMovementTime
-	t.Country = d.Country
 
 	if d.BatteryInformation != nil {
-		t.BatteryInformation = &proto.SubAssetTelemetry_SubAssetBatteryInformation{
+		t.BatteryInformation = &livedatapb.SubAssetTelemetryDetails_SubAssetBatteryInformation{
 			Percentage:        d.BatteryInformation.Percentage,
 			RemainingTime:     d.BatteryInformation.RemainingTime,
 			ReturnToHomePower: d.BatteryInformation.ReturnHomePower,
@@ -131,17 +139,17 @@ func (m *Mapper) mapSubAssetTelemetry(d *domains.SubAssetTelemetryData) *proto.S
 	return t
 }
 
-func (m *Mapper) mapPayloadTelemetry(d *domains.PayloadTelemetryData) *proto.PayloadTelemetry {
+func (m *Mapper) mapPayloadTelemetry(d *domains.PayloadTelemetryData) *livedatapb.PayloadTelemetry {
 	if d == nil {
 		return nil
 	}
-	p := &proto.PayloadTelemetry{
+	p := &livedatapb.PayloadTelemetry{
 		Id:        d.ID,
 		Name:      d.Name,
 		Timestamp: timestamppb.New(d.Timestamp),
 	}
 	if d.CameraData != nil {
-		p.CameraData = &proto.PayloadTelemetry_CameraData{
+		p.CameraData = &livedatapb.PayloadTelemetry_CameraData{
 			CurrentLens: d.CameraData.CurrentLens,
 			GimbalPitch: d.CameraData.GimbalPitch,
 			GimbalYaw:   d.CameraData.GimbalYaw,
@@ -150,17 +158,44 @@ func (m *Mapper) mapPayloadTelemetry(d *domains.PayloadTelemetryData) *proto.Pay
 		}
 	}
 	if d.RangeFinderData != nil {
-		p.RangeFinderData = &proto.PayloadTelemetry_RangeFinderData{
-			TargetLatitude:  d.RangeFinderData.TargetLatitude,
-			TargetLongitude: d.RangeFinderData.TargetLongitude,
+		p.RangeFinderData = &livedatapb.PayloadTelemetry_RangeFinderData{
+			TargetLatitude:  f32to64(d.RangeFinderData.TargetLatitude),
+			TargetLongitude: f32to64(d.RangeFinderData.TargetLongitude),
 			TargetDistance:  d.RangeFinderData.TargetDistance,
 			TargetAltitude:  d.RangeFinderData.TargetAltitude,
 		}
 	}
 	if d.SensorData != nil {
-		p.SensorData = &proto.PayloadTelemetry_SensorData{
+		p.SensorData = &livedatapb.PayloadTelemetry_SensorData{
 			TargetTemperature: d.SensorData.TargetTemperature,
 		}
 	}
 	return p
+}
+
+// f32to64 converts a *float32 to a *float64 (Telemetry.latitude/longitude and
+// PayloadTelemetry.RangeFinderData's target lat/lon widened from float32 to double in the current
+// schema; the domain model still carries float32, matching every other telemetry field).
+func f32to64(v *float32) *float64 {
+	if v == nil {
+		return nil
+	}
+	f := float64(*v)
+	return &f
+}
+
+// enumPtr resolves a domain *string (the proto enum's full name, e.g. "ASSET_MODE_WORKING") to a
+// pointer to the generated enum type T via protoc-gen-go's standard <Enum>_value map. Returns nil
+// if the domain pointer is nil or the name isn't recognized (rather than sending a zero value,
+// which is itself a meaningful enum member in every one of these enums).
+func enumPtr[T ~int32](valueMap map[string]int32, s *string) *T {
+	if s == nil {
+		return nil
+	}
+	v, ok := valueMap[*s]
+	if !ok {
+		return nil
+	}
+	t := T(v)
+	return &t
 }

@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/Zequent/zqnt-edge-sdk-go/adapter/domains"
-	proto "github.com/Zequent/zqnt-edge-sdk-go/gen/proto"
+	assetpb "github.com/Zequent/zqnt-edge-sdk-go/gen/common/asset/proto"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -15,279 +15,204 @@ type Mapper struct{}
 
 // ---- proto → domain ---------------------------------------------------------
 
-func (m *Mapper) AssetFromProto(p *proto.AssetProtoDTO) *domains.AssetDTO {
+func (m *Mapper) AssetFromProto(p *assetpb.AssetProtoDTO) *domains.AssetDTO {
 	if p == nil {
 		return nil
 	}
 	dto := &domains.AssetDTO{
-		ID:           p.Id,
-		SN:           p.Sn,
-		Name:         p.Name,
-		Type:         p.Type.String(),
-		Vendor:       p.Vendor.String(),
-		Connection:   p.Connection.String(),
-		Model:        p.Model,
-		Organization: p.Organization,
-		Online:       p.Online,
-		StreamType:   p.StreamType.String(),
+		ID:                     p.Id,
+		SN:                     p.Sn,
+		Name:                   p.Name,
+		Type:                   enumString(p.Type),
+		Vendor:                 enumString(p.Vendor),
+		Connection:             enumString(p.Connection),
+		SystemConnectionString: p.SystemConnectionString,
+		Model:                  p.Model,
+		ExternalDeviceType:     p.ExternalDeviceType,
+		ExternalDeviceSubType:  p.ExternalDeviceSubType,
+		Organization:           p.Organization,
+		ExternalID:             p.ExternalId,
+		ModifiedFrom:           p.ModifiedFrom,
+		LiveStreamPushURL:      p.LiveStreamPushUrl,
+		LiveStreamPullURL:      p.LiveStreamPullUrl,
+		CreatedAt:              tPtr(p.CreatedAt),
+		ModifiedAt:             tPtr(p.ModifiedAt),
 	}
-	dto.ConnectionString = p.ConnectionString
-	dto.Port = p.Port
-	dto.LiveStreamServer = p.LiveStreamServer
-	dto.ExternalDeviceType = p.ExternalDeviceType
-	dto.ExternalDeviceSubType = p.ExternalDeviceSubType
-	dto.ExternalID = p.ExternalId
-	if p.SubAssetDTO != nil {
-		dto.SubAsset = m.SubAssetFromProto(p.SubAssetDTO)
+	for _, sa := range p.SubAssets {
+		if d := m.SubAssetFromProto(sa); d != nil {
+			dto.SubAssets = append(dto.SubAssets, *d)
+		}
+	}
+	for _, pl := range p.Payloads {
+		if d := m.PayloadFromProto(pl); d != nil {
+			dto.Payloads = append(dto.Payloads, *d)
+		}
 	}
 	return dto
 }
 
-func (m *Mapper) SubAssetFromProto(p *proto.SubAssetProtoDTO) *domains.SubAssetDTO {
+func (m *Mapper) SubAssetFromProto(p *assetpb.SubAssetProtoDTO) *domains.SubAssetDTO {
 	if p == nil {
 		return nil
 	}
 	dto := &domains.SubAssetDTO{
-		ID:           p.Id,
-		SN:           p.Sn,
-		Name:         p.Name,
-		Type:         p.Type.String(),
-		Vendor:       p.Vendor.String(),
-		Connection:   p.Connection.String(),
-		Model:        p.Model,
-		Organization: p.Organization,
-		Online:       p.Online,
-		StreamType:   p.StreamType.String(),
+		ID:                     p.Id,
+		SN:                     p.Sn,
+		Name:                   p.Name,
+		Type:                   enumString(p.Type),
+		Vendor:                 enumString(p.Vendor),
+		Connection:             enumString(p.Connection),
+		SystemConnectionString: p.SystemConnectionString,
+		Model:                  p.Model,
+		ExternalDeviceType:     p.ExternalDeviceType,
+		ExternalDeviceSubType:  p.ExternalDeviceSubType,
+		ExternalID:             p.ExternalId,
+		StreamURLPredefined:    p.StreamUrlPredefined,
+		ModifiedFrom:           p.ModifiedFrom,
+		LiveStreamPushURL:      p.LiveStreamPushUrl,
+		LiveStreamPullURL:      p.LiveStreamPullUrl,
+		CreatedAt:              tPtr(p.CreatedAt),
+		ModifiedAt:             tPtr(p.ModifiedAt),
 	}
-	dto.ConnectionString = p.ConnectionString
-	dto.Port = p.Port
-	dto.LiveStreamServer = p.LiveStreamServer
-	dto.ExternalDeviceType = p.ExternalDeviceType
-	dto.ExternalDeviceSubType = p.ExternalDeviceSubType
-	dto.ExternalID = p.ExternalId
-	dto.StreamURLPredefined = p.StreamUrlPredefined
+	for _, pl := range p.Payloads {
+		if d := m.PayloadFromProto(pl); d != nil {
+			dto.Payloads = append(dto.Payloads, *d)
+		}
+	}
 	return dto
 }
 
-func (m *Mapper) OrgFromProto(p *proto.OrganizationProtoDTO) *domains.OrganizationDTO {
+func (m *Mapper) PayloadFromProto(p *assetpb.AssetPayloadProtoDTO) *domains.AssetPayloadDTO {
+	if p == nil {
+		return nil
+	}
+	return &domains.AssetPayloadDTO{
+		ID:              p.Id,
+		ExternalID:      p.ExternalId,
+		ExternalType:    p.ExternalType,
+		SlotIndex:       p.SlotIndex,
+		Name:            p.Name,
+		SerialNumber:    p.SerialNumber,
+		Kind:            p.Kind,
+		Vendor:          p.Vendor,
+		Model:           p.Model,
+		FirmwareVersion: p.FirmwareVersion,
+		LibraryVersion:  p.LibraryVersion,
+		Active:          p.Active,
+		PayloadRef:      p.PayloadRef,
+		LastSeenAt:      tPtr(p.LastSeenAt),
+		CreatedAt:       tPtr(p.CreatedAt),
+		ModifiedAt:      tPtr(p.ModifiedAt),
+	}
+}
+
+func (m *Mapper) OrgFromProto(p *assetpb.OrganizationProtoDTO) *domains.OrganizationDTO {
 	if p == nil {
 		return nil
 	}
 	return &domains.OrganizationDTO{
-		ID:          p.Id,
+		ID:          p.GetId(),
 		Name:        p.Name,
 		Description: p.Description,
 		Assets:      p.Assets,
 	}
 }
 
-func (m *Mapper) MissionFromProto(p *proto.MissionProtoDTO) *domains.MissionDTO {
-	if p == nil {
-		return nil
-	}
-	dto := &domains.MissionDTO{
-		Name:           p.Name,
-		Description:    p.Description,
-		Status:         p.Status.String(),
-		Type:           p.Type.String(),
-		AssignedAssets: p.AssignedAssets,
-	}
-	dto.ID = p.Id
-	dto.GeoJSON = p.GeoJson
-	dto.UpdatedUser = p.UpdatedUser
-	if p.StartDate != nil {
-		t := p.StartDate.AsTime()
-		dto.StartDate = &t
-	}
-	if p.EndDate != nil {
-		t := p.EndDate.AsTime()
-		dto.EndDate = &t
-	}
-	if p.CreatedAt != nil {
-		t := p.CreatedAt.AsTime()
-		dto.CreatedAt = &t
-	}
-	if p.ModifiedAt != nil {
-		t := p.ModifiedAt.AsTime()
-		dto.ModifiedAt = &t
-	}
-	for _, task := range p.Tasks {
-		if td := m.TaskFromProto(task); td != nil {
-			dto.Tasks = append(dto.Tasks, *td)
-		}
-	}
-	return dto
-}
+// ---- domain → proto ---------------------------------------------------------
 
-func (m *Mapper) TaskFromProto(p *proto.TaskProtoDTO) *domains.TaskDTO {
-	if p == nil {
-		return nil
-	}
-	dto := &domains.TaskDTO{
-		Status: p.Status.String(),
-	}
-	dto.ID = p.Id
-	dto.MissionID = p.MissionId
-	dto.Name = p.Name
-	dto.Description = p.Description
-	dto.AssetID = p.AssetId
-	dto.SNNumber = p.SnNumber
-	dto.CurrentProgress = p.CurrentProgress
-	dto.CurrentStep = p.CurrentStep
-	if p.TaskType != nil {
-		s := p.GetTaskType().String()
-		dto.TaskType = &s
-	}
-	if p.BreakReason != nil {
-		s := p.GetBreakReason().String()
-		dto.BreakReason = &s
-	}
-	if p.CreatedAt != nil {
-		t := p.CreatedAt.AsTime()
-		dto.CreatedAt = &t
-	}
-	if p.ModifiedAt != nil {
-		t := p.ModifiedAt.AsTime()
-		dto.ModifiedAt = &t
-	}
-	return dto
-}
-
-func (m *Mapper) SchedulerFromProto(p *proto.SchedulerProtoDTO) *domains.SchedulerDTO {
-	if p == nil {
-		return nil
-	}
-	dto := &domains.SchedulerDTO{
-		Name:           p.Name,
-		CronExpression: p.CronExpression,
-		Type:           p.Type.String(),
-	}
-	dto.ID = p.Id
-	dto.MissionID = p.MissionId
-	dto.TaskID = p.TaskId
-	dto.Active = p.Active
-	dto.ClientTimeZone = p.ClientTimeZone
-	if p.CreatedAt != nil {
-		t := p.CreatedAt.AsTime()
-		dto.CreatedAt = &t
-	}
-	if p.ModifiedAt != nil {
-		t := p.ModifiedAt.AsTime()
-		dto.ModifiedAt = &t
-	}
-	return dto
-}
-
-// ---- domain → zqntpb ---------------------------------------------------------
-
-func (m *Mapper) AssetToProto(dto *domains.AssetDTO) *proto.AssetProtoDTO {
+func (m *Mapper) AssetToProto(dto *domains.AssetDTO) *assetpb.AssetProtoDTO {
 	if dto == nil {
 		return nil
 	}
-	p := &proto.AssetProtoDTO{
-		Id:           dto.ID,
-		Sn:           dto.SN,
-		Name:         dto.Name,
-		Model:        dto.Model,
-		Organization: dto.Organization,
-		Online:       dto.Online,
+	p := &assetpb.AssetProtoDTO{
+		Id:                     dto.ID,
+		Sn:                     dto.SN,
+		Name:                   dto.Name,
+		SystemConnectionString: dto.SystemConnectionString,
+		Model:                  dto.Model,
+		ExternalDeviceType:     dto.ExternalDeviceType,
+		ExternalDeviceSubType:  dto.ExternalDeviceSubType,
+		Organization:           dto.Organization,
+		ExternalId:             dto.ExternalID,
+		ModifiedFrom:           dto.ModifiedFrom,
+		LiveStreamPushUrl:      dto.LiveStreamPushURL,
+		LiveStreamPullUrl:      dto.LiveStreamPullURL,
 	}
-	p.ConnectionString = dto.ConnectionString
-	p.Port = dto.Port
-	p.LiveStreamServer = dto.LiveStreamServer
-	p.ExternalDeviceType = dto.ExternalDeviceType
-	p.ExternalDeviceSubType = dto.ExternalDeviceSubType
-	p.ExternalId = dto.ExternalID
-	if dto.SubAsset != nil {
-		p.SubAssetDTO = m.SubAssetToProto(dto.SubAsset)
+	for _, sa := range dto.SubAssets {
+		sa := sa
+		p.SubAssets = append(p.SubAssets, m.SubAssetToProto(&sa))
+	}
+	for _, pl := range dto.Payloads {
+		pl := pl
+		p.Payloads = append(p.Payloads, m.PayloadToProto(&pl))
 	}
 	return p
 }
 
-func (m *Mapper) SubAssetToProto(dto *domains.SubAssetDTO) *proto.SubAssetProtoDTO {
+func (m *Mapper) SubAssetToProto(dto *domains.SubAssetDTO) *assetpb.SubAssetProtoDTO {
 	if dto == nil {
 		return nil
 	}
-	p := &proto.SubAssetProtoDTO{
-		Id:           dto.ID,
-		Sn:           dto.SN,
-		Name:         dto.Name,
-		Model:        dto.Model,
-		Organization: dto.Organization,
-		Online:       dto.Online,
+	p := &assetpb.SubAssetProtoDTO{
+		Id:                     dto.ID,
+		Sn:                     dto.SN,
+		Name:                   dto.Name,
+		SystemConnectionString: dto.SystemConnectionString,
+		Model:                  dto.Model,
+		ExternalDeviceType:     dto.ExternalDeviceType,
+		ExternalDeviceSubType:  dto.ExternalDeviceSubType,
+		ExternalId:             dto.ExternalID,
+		StreamUrlPredefined:    dto.StreamURLPredefined,
+		ModifiedFrom:           dto.ModifiedFrom,
+		LiveStreamPushUrl:      dto.LiveStreamPushURL,
+		LiveStreamPullUrl:      dto.LiveStreamPullURL,
 	}
-	p.ConnectionString = dto.ConnectionString
-	p.Port = dto.Port
-	p.LiveStreamServer = dto.LiveStreamServer
-	p.ExternalDeviceType = dto.ExternalDeviceType
-	p.ExternalDeviceSubType = dto.ExternalDeviceSubType
-	p.ExternalId = dto.ExternalID
-	p.StreamUrlPredefined = dto.StreamURLPredefined
-	return p
-}
-
-func (m *Mapper) MissionToProto(dto *domains.MissionDTO) *proto.MissionProtoDTO {
-	if dto == nil {
-		return nil
-	}
-	p := &proto.MissionProtoDTO{
-		Name:           dto.Name,
-		Description:    dto.Description,
-		AssignedAssets: dto.AssignedAssets,
-	}
-	p.Id = dto.ID
-	p.GeoJson = dto.GeoJSON
-	p.UpdatedUser = dto.UpdatedUser
-	p.StartDate = tsPtr(dto.StartDate)
-	p.EndDate = tsPtr(dto.EndDate)
-	p.CreatedAt = tsPtr(dto.CreatedAt)
-	p.ModifiedAt = tsPtr(dto.ModifiedAt)
-	for _, task := range dto.Tasks {
-		t := task
-		p.Tasks = append(p.Tasks, m.TaskToProto(&t))
+	for _, pl := range dto.Payloads {
+		pl := pl
+		p.Payloads = append(p.Payloads, m.PayloadToProto(&pl))
 	}
 	return p
 }
 
-func (m *Mapper) TaskToProto(dto *domains.TaskDTO) *proto.TaskProtoDTO {
+func (m *Mapper) PayloadToProto(dto *domains.AssetPayloadDTO) *assetpb.AssetPayloadProtoDTO {
 	if dto == nil {
 		return nil
 	}
-	p := &proto.TaskProtoDTO{}
-	p.Id = dto.ID
-	p.MissionId = dto.MissionID
-	p.Name = dto.Name
-	p.Description = dto.Description
-	p.AssetId = dto.AssetID
-	p.SnNumber = dto.SNNumber
-	p.CurrentProgress = dto.CurrentProgress
-	p.CurrentStep = dto.CurrentStep
-	p.CreatedAt = tsPtr(dto.CreatedAt)
-	p.ModifiedAt = tsPtr(dto.ModifiedAt)
-	return p
+	return &assetpb.AssetPayloadProtoDTO{
+		Id:              dto.ID,
+		ExternalId:      dto.ExternalID,
+		ExternalType:    dto.ExternalType,
+		SlotIndex:       dto.SlotIndex,
+		Name:            dto.Name,
+		SerialNumber:    dto.SerialNumber,
+		Kind:            dto.Kind,
+		Vendor:          dto.Vendor,
+		Model:           dto.Model,
+		FirmwareVersion: dto.FirmwareVersion,
+		LibraryVersion:  dto.LibraryVersion,
+		Active:          dto.Active,
+		PayloadRef:      dto.PayloadRef,
+	}
 }
 
-func (m *Mapper) SchedulerToProto(dto *domains.SchedulerDTO) *proto.SchedulerProtoDTO {
-	if dto == nil {
-		return nil
+// ---- helpers ------------------------------------------------------------------
+
+type stringer interface{ String() string }
+
+// enumString safely stringifies a nilable proto enum pointer (every scalar Asset/SubAsset enum
+// field is `optional` in the current schema, so it arrives as e.g. *AssetVendor, not AssetVendor).
+// Returns "" for nil rather than panicking on a nil dereference.
+func enumString[T stringer](e *T) string {
+	if e == nil {
+		return ""
 	}
-	p := &proto.SchedulerProtoDTO{
-		Name:           dto.Name,
-		CronExpression: dto.CronExpression,
-	}
-	p.Id = dto.ID
-	p.MissionId = dto.MissionID
-	p.TaskId = dto.TaskID
-	p.Active = dto.Active
-	p.ClientTimeZone = dto.ClientTimeZone
-	p.CreatedAt = tsPtr(dto.CreatedAt)
-	p.ModifiedAt = tsPtr(dto.ModifiedAt)
-	return p
+	return (*e).String()
 }
 
-func tsPtr(t *time.Time) *timestamppb.Timestamp {
-	if t == nil {
+func tPtr(ts *timestamppb.Timestamp) *time.Time {
+	if ts == nil {
 		return nil
 	}
-	return timestamppb.New(*t)
+	t := ts.AsTime()
+	return &t
 }
