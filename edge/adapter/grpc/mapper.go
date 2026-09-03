@@ -185,6 +185,25 @@ func (m *Mapper) MapStopLiveStreamRequest(r *devicecontrolpb.LiveStreamStopComma
 	return req
 }
 
+func (m *Mapper) MapCustomCommandRequest(r *devicecontrolpb.CustomCommandRequest) *domains.CustomCommandRequest {
+	if r == nil {
+		return nil
+	}
+	req := &domains.CustomCommandRequest{
+		SN:        r.Base.GetSn(),
+		TID:       r.Base.GetTid(),
+		CommandID: r.CommandId,
+	}
+	if r.Target != nil && r.Target.TargetRef != nil {
+		v := r.Target.GetTargetRef()
+		req.TargetRef = &v
+	}
+	if r.Params != nil {
+		req.Params = r.Params.AsMap()
+	}
+	return req
+}
+
 func (m *Mapper) MapGetDetectionsRequest(r *detectionpb.DetectionStreamRequest) *domains.GetDetectionsRequest {
 	if r == nil {
 		return nil

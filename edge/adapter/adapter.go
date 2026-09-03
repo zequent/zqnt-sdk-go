@@ -68,6 +68,17 @@ type EdgeAdapter interface {
 	StartTask(ctx context.Context, taskID, tid string) (*domains.CommandResult, error)
 	StopTask(ctx context.Context, taskID string) (*domains.CommandResult, error)
 	PrepareTask(ctx context.Context, taskID, tid string) (*domains.CommandResult, error)
+
+	// PauseTask and ResumeTask, LiveStreamSplitScreen and SendCustomCommand below all exist on the
+	// current wire schema (edge.proto) but had no EdgeAdapter interface method before this branch --
+	// see adapter/grpc/server.go's former "intentionally left unimplemented" list. All four also
+	// exist on edge-java-sdk v1.3.0's EdgeAdapterService (pauseTask/resumeTask/liveStreamSplitScreen/
+	// sendCustomCommand), so closing this gap is part of matching v1.3.0's command surface, not a
+	// separate concern.
+	PauseTask(ctx context.Context, taskID, tid string) (*domains.CommandResult, error)
+	ResumeTask(ctx context.Context, taskID, tid string) (*domains.CommandResult, error)
+	LiveStreamSplitScreen(ctx context.Context, sn string, enabled bool) (*domains.CommandResult, error)
+	SendCustomCommand(ctx context.Context, req *domains.CustomCommandRequest) (*domains.CommandResult, error)
 }
 
 // UnimplementedEdgeAdapter provides NOT_IMPLEMENTED default implementations for all
@@ -184,4 +195,20 @@ func (UnimplementedEdgeAdapter) StopTask(_ context.Context, taskID string) (*dom
 
 func (UnimplementedEdgeAdapter) PrepareTask(_ context.Context, taskID, _ string) (*domains.CommandResult, error) {
 	return domains.NotImplemented("prepareTask is not implemented for this asset", taskID), nil
+}
+
+func (UnimplementedEdgeAdapter) PauseTask(_ context.Context, taskID, _ string) (*domains.CommandResult, error) {
+	return domains.NotImplemented("pauseTask is not implemented for this asset", taskID), nil
+}
+
+func (UnimplementedEdgeAdapter) ResumeTask(_ context.Context, taskID, _ string) (*domains.CommandResult, error) {
+	return domains.NotImplemented("resumeTask is not implemented for this asset", taskID), nil
+}
+
+func (UnimplementedEdgeAdapter) LiveStreamSplitScreen(_ context.Context, sn string, _ bool) (*domains.CommandResult, error) {
+	return domains.NotImplemented("liveStreamSplitScreen is not implemented for this asset", sn), nil
+}
+
+func (UnimplementedEdgeAdapter) SendCustomCommand(_ context.Context, req *domains.CustomCommandRequest) (*domains.CommandResult, error) {
+	return domains.NotImplemented("sendCustomCommand is not implemented for this asset", req.SN), nil
 }

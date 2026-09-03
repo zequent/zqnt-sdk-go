@@ -80,6 +80,22 @@ type LiveStreamStopRequest struct {
 	VideoID string
 }
 
+// CustomCommandRequest is the payload for a SendCustomCommand command -- an escape hatch for
+// adapter/vendor-specific commands that have no dedicated RPC of their own.
+//
+// v1.3.0 parity note: the v1.3.0 Java SDK's sendCustomCommand(sn, componentId, commandType, params)
+// had a componentId string; the current wire message (CustomCommandRequest) dropped that field
+// (proto3 `reserved 4 "component_id"`) in favor of the more general CapabilityTarget below, which a
+// v1.3.0-era caller has no way to populate -- TargetRef is nil for such callers, same as any other
+// field that predates it.
+type CustomCommandRequest struct {
+	SN        string
+	TID       string
+	CommandID string
+	TargetRef *string
+	Params    map[string]any
+}
+
 // GetDetectionsRequest is the payload for a GetDetections server-streaming call.
 type GetDetectionsRequest struct {
 	SN        string

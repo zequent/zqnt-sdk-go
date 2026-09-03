@@ -19,13 +19,17 @@ import (
 
 // Server implements edgepb.EdgeAdapterServiceServer by delegating each RPC to the
 // user-provided EdgeAdapter. RPCs with no equivalent on the EdgeAdapter interface
-// (StartRecording/StopRecording/LiveStreamSplitScreen/SendCustomCommand/PauseTask/ResumeTask/
-// RegisterAsset/DeregisterAsset -- all new on the current schema, no wire contract existed for
-// them before) are intentionally left unimplemented, inherited from the embedded
-// UnimplementedEdgeAdapterServiceServer (returns a clean codes.Unimplemented) -- matches this
-// SDK's own standing convention: "only the commands a device supports need to be overridden;
-// everything else defaults to NOT_IMPLEMENTED" (see CLAUDE.md / edge-python-sdk's identical
-// pattern). Adding real support for those is a separate, deliberate follow-up, not done here.
+// (StartRecording/StopRecording/RegisterAsset/DeregisterAsset -- all new on the current schema,
+// out of scope for v1.3.0 parity, no wire contract existed for them before) are intentionally left
+// unimplemented, inherited from the embedded UnimplementedEdgeAdapterServiceServer (returns a
+// clean codes.Unimplemented) -- matches this SDK's own standing convention: "only the commands a
+// device supports need to be overridden; everything else defaults to NOT_IMPLEMENTED" (see
+// CLAUDE.md / edge-python-sdk's identical pattern). Adding real support for those is a separate,
+// deliberate follow-up, not done here.
+//
+// LiveStreamSplitScreen/SendCustomCommand/PauseTask/ResumeTask *are* implemented below -- all four
+// exist on edge-java-sdk v1.3.0's EdgeAdapterService, so closing this gap is part of v1.3.0 command
+// surface parity (see adapter.EdgeAdapter's doc comment on those methods).
 type Server struct {
 	edgepb.UnimplementedEdgeAdapterServiceServer
 	adapter adapter.EdgeAdapter
@@ -70,6 +74,46 @@ func (s *Server) toCommandResponse(base *commonpb.RequestBase, result *domains.C
 		hasErr := true
 		resp.HasErrors = &hasErr
 		resp.Response = &devicecontrolpb.CommandResponse_Error{
+			Error: &commonpb.GlobalErrorMessage{
+				ErrorMessage: result.Message,
+				ErrorCode:    commonpb.ErrorCode_ERROR_CODE_ASSET,
+				Timestamp:    protohelpers.Now(),
+			},
+		}
+	}
+	return resp
+}
+
+// toCustomCommandResponse mirrors toCommandResponse but for CustomCommandResponse's own envelope
+// shape (result/empty/error/progress oneof, no Struct result since domains.CommandResult carries
+// none -- an adapter wanting to return structured data overrides SendCustomCommand's caller-visible
+// behavior at a higher layer, this SDK only carries CommandResult through).
+func (s *Server) toCustomCommandResponse(base *commonpb.RequestBase, commandID string, result *domains.CommandResult) *devicecontrolpb.CustomCommandResponse {
+	resp := &devicecontrolpb.CustomCommandResponse{
+		Meta:      &commonpb.ResponseMeta{Tid: base.GetTid(), Sn: base.GetSn(), Timestamp: protohelpers.Now()},
+		CommandId: commandID,
+	}
+	if result.IsNotImplemented() {
+		hasErr := true
+		resp.HasErrors = &hasErr
+		resp.Response = &devicecontrolpb.CustomCommandResponse_Error{
+			Error: &commonpb.GlobalErrorMessage{
+				ErrorMessage: result.Message,
+				ErrorCode:    commonpb.ErrorCode_ERROR_CODE_CLIENT,
+				Timestamp:    protohelpers.Now(),
+			},
+		}
+		s.log.Warn("command not implemented", "message", result.Message, "sn", base.GetSn())
+		return resp
+	}
+	if result.IsSuccess() {
+		hasErr := false
+		resp.HasErrors = &hasErr
+		resp.Response = &devicecontrolpb.CustomCommandResponse_Empty{Empty: &emptypb.Empty{}}
+	} else {
+		hasErr := true
+		resp.HasErrors = &hasErr
+		resp.Response = &devicecontrolpb.CustomCommandResponse_Error{
 			Error: &commonpb.GlobalErrorMessage{
 				ErrorMessage: result.Message,
 				ErrorCode:    commonpb.ErrorCode_ERROR_CODE_ASSET,
@@ -418,4 +462,53 @@ func (s *Server) StopTask(ctx context.Context, req *devicecontrolpb.TaskCommandR
 		return s.toErrorResponse(req.Base, err), nil
 	}
 	return s.toCommandResponse(req.Base, result), nil
+}
+
+func (s *Server) PauseTask(ctx context.Context, req *devicecontrolpb.TaskCommandRequest) (*devicecontrolpb.CommandResponse, error) {
+	s.log.Info("PauseTask", "sn", req.Base.GetSn(), "taskId", req.TaskId)
+	result, err := s.adapter.PauseTask(ctx, req.TaskId, req.Base.GetTid())
+	if err != nil {
+		return s.toErrorResponse(req.Base, err), nil
+	}
+	return s.toCommandResponse(req.Base, result), nil
+}
+
+func (s *Server) ResumeTask(ctx context.Context, req *devicecontrolpb.TaskCommandRequest) (*devicecontrolpb.CommandResponse, error) {
+	s.log.Info("ResumeTask", "sn", req.Base.GetSn(), "taskId", req.TaskId)
+	result, err := s.adapter.ResumeTask(ctx, req.TaskId, req.Base.GetTid())
+	if err != nil {
+		return s.toErrorResponse(req.Base, err), nil
+	}
+	return s.toCommandResponse(req.Base, result), nil
+}
+
+func (s *Server) LiveStreamSplitScreen(ctx context.Context, req *devicecontrolpb.ToggleCommandRequest) (*devicecontrolpb.CommandResponse, error) {
+	s.log.Info("LiveStreamSplitScreen", "sn", req.Base.GetSn(), "enabled", req.Enabled)
+	result, err := s.adapter.LiveStreamSplitScreen(ctx, req.Base.GetSn(), req.Enabled)
+	if err != nil {
+		return s.toErrorResponse(req.Base, err), nil
+	}
+	return s.toCommandResponse(req.Base, result), nil
+}
+
+func (s *Server) SendCustomCommand(ctx context.Context, req *devicecontrolpb.CustomCommandRequest) (*devicecontrolpb.CustomCommandResponse, error) {
+	s.log.Info("SendCustomCommand", "sn", req.Base.GetSn(), "commandId", req.CommandId)
+	result, err := s.adapter.SendCustomCommand(ctx, s.mapper.MapCustomCommandRequest(req))
+	if err != nil {
+		s.log.Error("error processing command", "sn", req.Base.GetSn(), "tid", req.Base.GetTid(), "error", err)
+		hasErr := true
+		return &devicecontrolpb.CustomCommandResponse{
+			HasErrors: &hasErr,
+			Meta:      &commonpb.ResponseMeta{Tid: req.Base.GetTid(), Sn: req.Base.GetSn(), Timestamp: protohelpers.Now()},
+			CommandId: req.CommandId,
+			Response: &devicecontrolpb.CustomCommandResponse_Error{
+				Error: &commonpb.GlobalErrorMessage{
+					ErrorMessage: err.Error(),
+					ErrorCode:    commonpb.ErrorCode_ERROR_CODE_SYSTEM,
+					Timestamp:    protohelpers.Now(),
+				},
+			},
+		}, nil
+	}
+	return s.toCustomCommandResponse(req.Base, req.CommandId, result), nil
 }
