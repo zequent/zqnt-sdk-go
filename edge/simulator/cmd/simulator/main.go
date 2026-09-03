@@ -20,9 +20,9 @@ import (
 	edgesdk "github.com/Zequent/zqnt-edge-sdk-go"
 	"github.com/Zequent/zqnt-edge-sdk-go/adapter/domains"
 	"github.com/Zequent/zqnt-edge-sdk-go/discovery"
-	commonpb "github.com/Zequent/zqnt-edge-sdk-go/gen/common/proto"
 	"github.com/Zequent/zqnt-edge-sdk-go/simulator"
 	"github.com/Zequent/zqnt-edge-sdk-go/simulator/engine"
+	commonpb "github.com/zequent/zqnt-utils-golang/gen/common/proto"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -43,7 +43,15 @@ func main() {
 	redisAddr := envOr("REDIS_ADDR", "localhost:6379")
 	sn := envOr("DEVICE_SN", "SIM-DRONE-001")
 
-	vendor := commonpb.AssetVendor_ASSET_VENDOR_ZQNT.String()
+	// AssetVendor.ASSET_VENDOR_ZQNT ("non-hardware bridge/integration assets ... that register
+	// themselves as an EdgeAdapterService endpoint without owning a physical vendor protocol" --
+	// exactly this simulator's situation) doesn't exist yet on the v1.3.0-pinned proto this branch
+	// depends on (zqnt-utils-golang v1.3.0); it was added alongside the later Skill Registry
+	// migration. MAVLINK is the closest existing v1.3.0-era fit among the 8 real vendor values
+	// (DJI/AUTEL/ROS/MAVLINK/RTMP_RTSP/SAPIENT/BETAFLIGHT/RNS): a real dockless, software-driven
+	// drone with no physical-dock coupling, same shape this simulator has. Not a perfect semantic
+	// match -- flagged here rather than silently picked.
+	vendor := commonpb.AssetVendor_ASSET_VENDOR_MAVLINK.String()
 	assetType := commonpb.AssetTypeEnum_ASSET_TYPE_AIRCRAFT.String()
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)

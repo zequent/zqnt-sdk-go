@@ -14,9 +14,9 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	connectorpb "github.com/Zequent/zqnt-edge-sdk-go/gen/connector/proto"
-	livedatapb "github.com/Zequent/zqnt-edge-sdk-go/gen/livedata/proto"
-	missionautonomypb "github.com/Zequent/zqnt-edge-sdk-go/gen/missionautonomy/proto"
+	connectorpb "github.com/zequent/zqnt-utils-golang/gen/connector/proto"
+	livedatapb "github.com/zequent/zqnt-utils-golang/gen/livedata/proto"
+	missionautonomypb "github.com/zequent/zqnt-utils-golang/gen/missionautonomy/proto"
 )
 
 // EdgeClient is the main entry point of the edge-go-sdk.

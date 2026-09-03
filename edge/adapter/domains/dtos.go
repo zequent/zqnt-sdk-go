@@ -85,23 +85,19 @@ type OrganizationDTO struct {
 
 // SchedulerDTO is the domain representation of a scheduler.
 //
-// Reshaped 2026-09-02: Mission/Task-bound scheduling (MissionID/TaskID) no longer exists --
-// schedulers now target either a bare command (CommandID) or an Application+Skill pair
-// (ApplicationID/SkillID), matching the current mission-free capability-execution model. Mirrors
-// edge-python-sdk's already-migrated SchedulerDTO (edge_sdk/models/scheduler.py) field-for-field.
+// v1.3.0 wire shape: schedulers are Mission/Task-bound (MissionID/TaskID) -- the current-schema
+// shape (AssetSN/CommandID/ApplicationID/SkillID/ExecutionParameters/AutoStart, no
+// MissionID/TaskID) doesn't exist yet on the v1.3.0-pinned SchedulerProtoDTO this branch depends
+// on (zqnt-utils-golang v1.3.0). See edge-go-sdk's main/2.0.0-track for the reshaped version.
 type SchedulerDTO struct {
-	ID                  *string
-	Name                string
-	CronExpression      string
-	Type                string
-	Active              *bool
-	ClientTimeZone      *string
-	CreatedAt           *time.Time
-	ModifiedAt          *time.Time
-	AssetSN             *string
-	CommandID           *string
-	ApplicationID       *string
-	SkillID             *string
-	ExecutionParameters map[string]any
-	AutoStart           *bool
+	ID             *string
+	Name           string
+	MissionID      *string
+	TaskID         *string
+	CronExpression string
+	Type           string
+	Active         *bool
+	ClientTimeZone *string
+	CreatedAt      *time.Time
+	ModifiedAt     *time.Time
 }

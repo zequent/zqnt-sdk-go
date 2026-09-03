@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/Zequent/zqnt-edge-sdk-go/adapter/domains"
-	livedatapb "github.com/Zequent/zqnt-edge-sdk-go/gen/livedata/proto"
+	livedatapb "github.com/zequent/zqnt-utils-golang/gen/livedata/proto"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

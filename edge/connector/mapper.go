@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/Zequent/zqnt-edge-sdk-go/adapter/domains"
-	assetpb "github.com/Zequent/zqnt-edge-sdk-go/gen/common/asset/proto"
+	assetpb "github.com/zequent/zqnt-utils-golang/gen/common/asset/proto"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 )

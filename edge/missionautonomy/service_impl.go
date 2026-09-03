@@ -6,12 +6,12 @@ import (
 	"time"
 
 	"github.com/Zequent/zqnt-edge-sdk-go/adapter/domains"
-	commonpb "github.com/Zequent/zqnt-edge-sdk-go/gen/common/proto"
-	missionautonomycontractspb "github.com/Zequent/zqnt-edge-sdk-go/gen/missionautonomy/contracts/proto"
-	missionautonomydtopb "github.com/Zequent/zqnt-edge-sdk-go/gen/missionautonomy/dto/proto"
-	missionautonomypb "github.com/Zequent/zqnt-edge-sdk-go/gen/missionautonomy/proto"
 	"github.com/Zequent/zqnt-edge-sdk-go/internal/protohelpers"
 	"github.com/Zequent/zqnt-edge-sdk-go/internal/retry"
+	commonpb "github.com/zequent/zqnt-utils-golang/gen/common/proto"
+	missionautonomycontractspb "github.com/zequent/zqnt-utils-golang/gen/missionautonomy/contracts/proto"
+	missionautonomydtopb "github.com/zequent/zqnt-utils-golang/gen/missionautonomy/dto/proto"
+	missionautonomypb "github.com/zequent/zqnt-utils-golang/gen/missionautonomy/proto"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -61,25 +61,18 @@ func schedulerFromProto(p *missionautonomydtopb.SchedulerProtoDTO) *domains.Sche
 	if p == nil {
 		return nil
 	}
-	dto := &domains.SchedulerDTO{
+	return &domains.SchedulerDTO{
 		ID:             p.Id,
 		Name:           p.Name,
+		MissionID:      p.MissionId,
+		TaskID:         p.TaskId,
 		CronExpression: p.CronExpression,
 		Type:           p.Type.String(),
 		Active:         p.Active,
 		ClientTimeZone: p.ClientTimeZone,
 		CreatedAt:      tPtr(p.CreatedAt),
 		ModifiedAt:     tPtr(p.ModifiedAt),
-		AssetSN:        p.AssetSn,
-		CommandID:      p.CommandId,
-		ApplicationID:  p.ApplicationId,
-		SkillID:        p.SkillId,
-		AutoStart:      p.AutoStart,
 	}
-	if p.ExecutionParameters != nil {
-		dto.ExecutionParameters = p.ExecutionParameters.AsMap()
-	}
-	return dto
 }
 
 func tPtr(ts *timestamppb.Timestamp) *time.Time {

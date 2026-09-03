@@ -1,14 +1,13 @@
 // Package missionautonomy provides the MissionAutonomyService interface and its gRPC-backed
 // implementation.
 //
-// Reshaped 2026-09-02: Mission/Task CRUD (CreateMission/UpdateMission/GetTask/StartTask/...) was
-// retired from MissionAutonomyService entirely in the platform's Skill/Application migration --
-// those RPCs no longer exist on the current mission-autonomy.proto at all, replaced by the
-// capability-execution model (Application/SkillExecution). The edge-side surface is deliberately
-// tiny as a result: Application/SkillExecution administration is a console/platform-side concern,
-// not something an edge adapter itself calls. Mirrors edge-python-sdk's own already-migrated
-// MissionAutonomyClient (edge_sdk/client/mission_autonomy_client.py) exactly -- Scheduler lookup
-// is the only thing that survived on the edge side.
+// v1.3.0 wire shape (this branch depends on zqnt-utils-golang v1.3.0, not the current-schema
+// proto): Mission/Task CRUD and Task-lifecycle RPCs (CreateMission/GetTask/StartTask/...) still
+// exist on mission-autonomy.proto at this pin, but nothing here calls them -- an edge adapter has
+// never needed to reach through to Mission/Task CRUD itself (that's always been a console/
+// platform-side concern), so this interface was already this narrow before the later
+// capability-execution migration reshaped the DTOs underneath it. Scheduler lookup is the one
+// thing an adapter genuinely needs (to know its own schedule), hence the only method kept.
 package missionautonomy
 
 import (

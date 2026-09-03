@@ -7,11 +7,11 @@ import (
 
 	"github.com/Zequent/zqnt-edge-sdk-go/adapter"
 	"github.com/Zequent/zqnt-edge-sdk-go/adapter/domains"
-	detectionpb "github.com/Zequent/zqnt-edge-sdk-go/gen/common/detection/proto"
-	commonpb "github.com/Zequent/zqnt-edge-sdk-go/gen/common/proto"
-	devicecontrolpb "github.com/Zequent/zqnt-edge-sdk-go/gen/devicecontrol/contracts/proto"
-	edgepb "github.com/Zequent/zqnt-edge-sdk-go/gen/edge/sdk/proto"
 	"github.com/Zequent/zqnt-edge-sdk-go/internal/protohelpers"
+	detectionpb "github.com/zequent/zqnt-utils-golang/gen/common/detection/proto"
+	commonpb "github.com/zequent/zqnt-utils-golang/gen/common/proto"
+	devicecontrolpb "github.com/zequent/zqnt-utils-golang/gen/devicecontrol/contracts/proto"
+	edgepb "github.com/zequent/zqnt-utils-golang/gen/edge/sdk/proto"
 
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"

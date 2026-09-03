@@ -19,14 +19,10 @@ jobs:
           go-version-file: go.mod
           cache: false
 
-      - name: Install protoc tools
+      - name: Configure private module access
         run: |
-          go install github.com/bufbuild/buf/cmd/buf@latest
-          go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-
-      - name: Generate protos
-        run: make proto
+          go env -w GOPRIVATE="github.com/Zequent/*,github.com/zequent/*"
+          git config --global url."https://x-access-token:${{ secrets.GH_PAT }}@github.com/".insteadOf "https://github.com/"
 
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v6
@@ -47,14 +43,10 @@ jobs:
         with:
           go-version-file: go.mod
 
-      - name: Install protoc tools
+      - name: Configure private module access
         run: |
-          go install github.com/bufbuild/buf/cmd/buf@latest
-          go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-
-      - name: Generate protos
-        run: make proto
+          go env -w GOPRIVATE="github.com/Zequent/*,github.com/zequent/*"
+          git config --global url."https://x-access-token:${{ secrets.GH_PAT }}@github.com/".insteadOf "https://github.com/"
 
       - name: Build
         run: go build ./...

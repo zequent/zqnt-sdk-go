@@ -7,9 +7,9 @@ Go SDK for connecting edge devices (drones, robots) to the Zequent platform via 
 **1. Add the SDK to your project:**
 
 ```bash
-go env -w GONOSUMDB="github.com/Zequent/*"
-go env -w GONOPROXY="github.com/Zequent/*"
-go get github.com/Zequent/zqnt-edge-sdk-go@latest
+go env -w GONOSUMDB="github.com/Zequent/*,github.com/zequent/*"
+go env -w GONOPROXY="github.com/Zequent/*,github.com/zequent/*"
+go get github.com/Zequent/zqnt-edge-sdk-go@v1.3.0-compat  # this branch's tag; proto stubs come from github.com/zequent/zqnt-utils-golang@v1.3.0
 ```
 
 **2. Implement your adapter:**
@@ -59,64 +59,46 @@ See [`example/main.go`](example/main.go) for a complete working example with gra
 
 ---
 
-## Skill Registry (new)
+## This branch: pinned to the v1.3.0 wire contract
 
-`skillregistry` lets an adapter self-report its own command contracts directly into the platform's
-persisted Skill Registry, alongside the older `GetCapabilities` snapshot below:
+`feature/v1.3.0-compat-simulator` intentionally targets an older wire contract than this SDK's
+main/`feature/skill-registry-v2` line (the 2.0.0 track). It exists so customers still integrated
+against `edge-java-sdk`'s real, published `v1.3.0` tag have a Go-side simulator that speaks the
+exact same contract — not the current one, verified-compatible-by-diff-and-hope.
 
-```go
-import (
-    "github.com/Zequent/zqnt-edge-sdk-go/skillregistry"
-    connectorpb "github.com/Zequent/zqnt-edge-sdk-go/gen/connector/proto"
-)
+**Proto source**: no local generation in this repo anymore (no `buf.gen.yaml`, no `gen/`). Stubs
+come from [`github.com/zequent/zqnt-utils-golang`](../../../utils/zqnt-utils-golang) `v1.3.0` — a
+published, versioned dependency, mirroring how `edge-java-sdk` depends on `zqnt-utils-java` and
+`edge-python-sdk` depends on the `zqnt-utils` pip package, rather than generating its own proto
+code inline. That module's `v1.3.0` tag is pinned to `0e072f869b650f3c3f769b89a677f23e8a1b0766`,
+the exact `zqnt-protos` commit `zqnt-utils-java:1.3.0` (and so `edge-java-sdk` v1.3.0) itself
+depends on — see `utils/zqnt-utils`'s own `v1.3.0` tag. (The SDK's main/2.0.0-track line still
+generates its own `gen/` locally via `buf generate` against the live monorepo proto checkout, no
+pin at all — that's the thing this branch deliberately doesn't do.)
 
-svc := skillregistry.NewServiceImpl(connectorpb.NewConnectorServiceClient(conn), logger)
-svc.ObserveSkillContract(ctx, &connectorpb.SkillContractProtoDTO{CommandId: "acme.custom_scan"})
-```
+**Verified wire-compatible with the current 2.0.0-track proto** (diffed directly, not assumed):
+`edge.proto`, `common.proto`, `live-data.proto`, `live-data-types.proto` are byte-identical between
+the v1.3.0 pin and current HEAD — the entire `EdgeAdapterService`/telemetry surface hasn't moved at
+all. `asset.proto` and `device-control-contracts.proto` differ only additively (new `AssetVendor`
+value, new optional `Capability` fields the Skill Registry uses) — nothing this SDK's hand-written
+code depends on. `connector.proto`/`mission-autonomy*.proto` differ substantially (the whole
+Mission/Task/Scheduler CRUD → capability-execution rewrite), which is why `missionautonomy`'s
+`SchedulerDTO` here uses `MissionID`/`TaskID` (the v1.3.0 shape), not the reshaped
+`AssetSN`/`CommandID`/`ApplicationID`/`SkillID` fields the 2.0.0-track branch has, and why
+`skillregistry/` doesn't exist on this branch at all — it has no v1.3.0 analog (Skill Registry is
+new-schema-only), so it was removed rather than left to not compile.
 
-It's generated from the current proto schema (`gen/connector/proto`) — as of 2026-09-02, that's now
-the *only* schema this SDK generates from; see "One proto source of truth" below.
+**`adapter.EdgeAdapter`**: closed the one real gap found diffing this interface against
+`EdgeAdapterService.java` at the real `v1.3.0` tag — `PauseTask`/`ResumeTask`/
+`LiveStreamSplitScreen`/`SendCustomCommand` now have real interface methods (previously
+NOT_IMPLEMENTED-only, `edge.proto`'s wire RPCs for them already existed but nothing routed to
+them). Everything else in the interface already matched v1.3.0 field-for-field.
 
-### One proto source of truth (as of 2026-09-02)
-
-Until 2026-09-02 this SDK generated from two independent schemas: a `proto/` git submodule
-(`zqnt-protos`, a separately-versioned repo) that every RPC in `adapter/`, `connector/`, `livedata/`,
-and `missionautonomy/` was built against, and a second, up-to-date generation vendored alongside it
-for `skillregistry` alone (see git history for that reasoning). The submodule had drifted badly —
-frozen months before the platform's Skill/Capability/Application/mission-autonomy migration, so its
-`connector.proto`/`edge.proto`/`mission-autonomy.proto` had no `ObserveSkillContract`, no
-`CapabilityState`, no Application/SkillExecution API at all, and `connector`/`missionautonomy`'s
-whole Mission/Task/Scheduler CRUD surface no longer exists on the real backend.
-
-The submodule and its generated `gen/proto` package are gone. Every package in this SDK now
-generates from `../../../utils/zqnt-utils/src/main/proto` in the `zqnt-platform` monorepo — the
-same canonical `.proto` source every other language SDK/adapter in the platform uses (see
-`buf.gen.yaml`). Run `make proto` to regenerate.
-
-What changed as a result, if you're upgrading from before this migration:
-- **`connector.ConnectorService`**: Mission/Task/Scheduler CRUD methods are gone (the backend
-  doesn't have them anymore — replaced by `missionautonomy`'s Application/SkillExecution model).
-  Asset/Organization operations remain, reshaped to match the current `AssetProtoDTO` (mostly-optional
-  pointer fields, `SubAssets`/`Payloads` replacing the old singular `SubAsset`, no more `Online`
-  field on the DTO itself).
-- **`missionautonomy.MissionAutonomyService`**: reduced to just `GetScheduler` — Application/
-  SkillExecution administration is a console/platform-side concern, not something an edge adapter
-  itself calls (mirrors edge-python-sdk's own already-migrated `MissionAutonomyClient` exactly).
-- **`adapter.EdgeAdapter`**: unchanged — still the same interface your hardware integration
-  implements. The wire mapping underneath it (`adapter/grpc/`) was fully rewritten against the
-  current `CommandResponse`/`CapabilityState` schema, but nothing about the Go-level interface
-  contract you implement against changed.
-- A handful of RPCs new on the current schema (`StartRecording`, `StopRecording`,
-  `LiveStreamSplitScreen`, `SendCustomCommand`, `PauseTask`, `ResumeTask`, inbound `RegisterAsset`/
-  `DeregisterAsset`) have no `EdgeAdapter` interface method yet and are left unimplemented
-  (return a clean `codes.Unimplemented`, same as any command your own adapter doesn't override) —
-  a deliberate, separately-scoped follow-up, not a regression.
-
-**This repo had zero test files before the `skillregistry` addition.** `skillregistry` has
-coverage; the rest of the SDK (everything under `adapter/`, `connector/`, `livedata/`,
-`missionautonomy/`) still does not — the migration above was verified by `go build`/`go vet`
-across the whole repo plus careful field-by-field review against the real generated schema, not by
-a test suite, since none exists.
+**This repo had zero test files before the `skillregistry` addition** (now removed on this
+branch); the rest of the SDK still doesn't — verified by `go build`/`go vet` plus live-verifying
+the `simulator/` against a real running connector/live-data/remote-control stack (register →
+TakeOff/GoTo/ReturnToHome move it → live telemetry visible via `StreamTelemetry`), not by a test
+suite.
 
 ---
 
@@ -148,6 +130,9 @@ Override any of these methods in your adapter:
 | `EnableGimbalTracking` | Enable object tracking |
 | `GetDetections` | Stream object detection results |
 | `GetCapabilities` | Report device capabilities |
+| `PauseTask` / `ResumeTask` | Pause/resume a running task |
+| `LiveStreamSplitScreen` | Toggle livestream split-screen view |
+| `SendCustomCommand` | Vendor/adapter-specific escape hatch for commands with no dedicated RPC |
 
 ---
 
