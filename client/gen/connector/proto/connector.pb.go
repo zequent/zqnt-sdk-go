@@ -7,19 +7,15 @@
 package proto
 
 import (
-	proto2 "github.com/Zequent/zqnt-client-sdk-go/gen/common/asset/proto"
+	proto1 "github.com/Zequent/zqnt-client-sdk-go/gen/common/asset/proto"
 	proto "github.com/Zequent/zqnt-client-sdk-go/gen/common/base/proto"
 	_ "github.com/Zequent/zqnt-client-sdk-go/gen/common/proto"
-	proto3 "github.com/Zequent/zqnt-client-sdk-go/gen/devicecontrol/contracts/proto"
-	proto5 "github.com/Zequent/zqnt-client-sdk-go/gen/events/proto"
-	proto6 "github.com/Zequent/zqnt-client-sdk-go/gen/execution/contracts/proto"
-	proto1 "github.com/Zequent/zqnt-client-sdk-go/gen/execution/dto/proto"
-	proto4 "github.com/Zequent/zqnt-client-sdk-go/gen/missionautonomy/contracts/proto"
+	proto3 "github.com/Zequent/zqnt-client-sdk-go/gen/events/proto"
+	proto2 "github.com/Zequent/zqnt-client-sdk-go/gen/missionautonomy/contracts/proto"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	fieldmaskpb "google.golang.org/protobuf/types/known/fieldmaskpb"
-	structpb "google.golang.org/protobuf/types/known/structpb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
@@ -32,117 +28,6 @@ const (
 	// Verify that runtime/protoimpl is sufficiently up-to-date.
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
-
-type SkillContractStatus int32
-
-const (
-	SkillContractStatus_SKILL_CONTRACT_STATUS_ACTIVE     SkillContractStatus = 0
-	SkillContractStatus_SKILL_CONTRACT_STATUS_DRAFT      SkillContractStatus = 1
-	SkillContractStatus_SKILL_CONTRACT_STATUS_DEPRECATED SkillContractStatus = 2
-	SkillContractStatus_SKILL_CONTRACT_STATUS_RETIRED    SkillContractStatus = 3
-)
-
-// Enum value maps for SkillContractStatus.
-var (
-	SkillContractStatus_name = map[int32]string{
-		0: "SKILL_CONTRACT_STATUS_ACTIVE",
-		1: "SKILL_CONTRACT_STATUS_DRAFT",
-		2: "SKILL_CONTRACT_STATUS_DEPRECATED",
-		3: "SKILL_CONTRACT_STATUS_RETIRED",
-	}
-	SkillContractStatus_value = map[string]int32{
-		"SKILL_CONTRACT_STATUS_ACTIVE":     0,
-		"SKILL_CONTRACT_STATUS_DRAFT":      1,
-		"SKILL_CONTRACT_STATUS_DEPRECATED": 2,
-		"SKILL_CONTRACT_STATUS_RETIRED":    3,
-	}
-)
-
-func (x SkillContractStatus) Enum() *SkillContractStatus {
-	p := new(SkillContractStatus)
-	*p = x
-	return p
-}
-
-func (x SkillContractStatus) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (SkillContractStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_connector_proto_enumTypes[0].Descriptor()
-}
-
-func (SkillContractStatus) Type() protoreflect.EnumType {
-	return &file_connector_proto_enumTypes[0]
-}
-
-func (x SkillContractStatus) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use SkillContractStatus.Descriptor instead.
-func (SkillContractStatus) EnumDescriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{0}
-}
-
-// Structural verdict comparing a schema_version's input/output schema against the command_id's
-// previous version — computed by SkillContractCompatibilityChecker (connector) on each observation
-// that introduces a new schema_version for an already-known command_id.
-type SkillContractCompatibility int32
-
-const (
-	SkillContractCompatibility_SKILL_CONTRACT_COMPATIBILITY_UNKNOWN SkillContractCompatibility = 0
-	// First version ever observed for this command_id — nothing to compare against.
-	SkillContractCompatibility_SKILL_CONTRACT_COMPATIBILITY_NEW SkillContractCompatibility = 1
-	// Only additive/optional changes versus the previous version (safe for existing graphs/callers).
-	SkillContractCompatibility_SKILL_CONTRACT_COMPATIBILITY_COMPATIBLE SkillContractCompatibility = 2
-	// A required input was added/changed or an existing input/output property was removed or
-	// retyped — existing authored graphs referencing the previous version may now be invalid.
-	SkillContractCompatibility_SKILL_CONTRACT_COMPATIBILITY_BREAKING SkillContractCompatibility = 3
-)
-
-// Enum value maps for SkillContractCompatibility.
-var (
-	SkillContractCompatibility_name = map[int32]string{
-		0: "SKILL_CONTRACT_COMPATIBILITY_UNKNOWN",
-		1: "SKILL_CONTRACT_COMPATIBILITY_NEW",
-		2: "SKILL_CONTRACT_COMPATIBILITY_COMPATIBLE",
-		3: "SKILL_CONTRACT_COMPATIBILITY_BREAKING",
-	}
-	SkillContractCompatibility_value = map[string]int32{
-		"SKILL_CONTRACT_COMPATIBILITY_UNKNOWN":    0,
-		"SKILL_CONTRACT_COMPATIBILITY_NEW":        1,
-		"SKILL_CONTRACT_COMPATIBILITY_COMPATIBLE": 2,
-		"SKILL_CONTRACT_COMPATIBILITY_BREAKING":   3,
-	}
-)
-
-func (x SkillContractCompatibility) Enum() *SkillContractCompatibility {
-	p := new(SkillContractCompatibility)
-	*p = x
-	return p
-}
-
-func (x SkillContractCompatibility) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (SkillContractCompatibility) Descriptor() protoreflect.EnumDescriptor {
-	return file_connector_proto_enumTypes[1].Descriptor()
-}
-
-func (SkillContractCompatibility) Type() protoreflect.EnumType {
-	return &file_connector_proto_enumTypes[1]
-}
-
-func (x SkillContractCompatibility) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use SkillContractCompatibility.Descriptor instead.
-func (SkillContractCompatibility) EnumDescriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{1}
-}
 
 type TelemetryType int32
 
@@ -177,11 +62,11 @@ func (x TelemetryType) String() string {
 }
 
 func (TelemetryType) Descriptor() protoreflect.EnumDescriptor {
-	return file_connector_proto_enumTypes[2].Descriptor()
+	return file_connector_proto_enumTypes[0].Descriptor()
 }
 
 func (TelemetryType) Type() protoreflect.EnumType {
-	return &file_connector_proto_enumTypes[2]
+	return &file_connector_proto_enumTypes[0]
 }
 
 func (x TelemetryType) Number() protoreflect.EnumNumber {
@@ -190,117 +75,13 @@ func (x TelemetryType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use TelemetryType.Descriptor instead.
 func (TelemetryType) EnumDescriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{2}
-}
-
-type PersistSkillExecutionRequest struct {
-	state         protoimpl.MessageState         `protogen:"open.v1"`
-	Base          *proto.RequestBase             `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
-	Execution     *proto1.SkillExecutionProtoDTO `protobuf:"bytes,2,opt,name=execution,proto3" json:"execution,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *PersistSkillExecutionRequest) Reset() {
-	*x = PersistSkillExecutionRequest{}
-	mi := &file_connector_proto_msgTypes[0]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *PersistSkillExecutionRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*PersistSkillExecutionRequest) ProtoMessage() {}
-
-func (x *PersistSkillExecutionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[0]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PersistSkillExecutionRequest.ProtoReflect.Descriptor instead.
-func (*PersistSkillExecutionRequest) Descriptor() ([]byte, []int) {
 	return file_connector_proto_rawDescGZIP(), []int{0}
-}
-
-func (x *PersistSkillExecutionRequest) GetBase() *proto.RequestBase {
-	if x != nil {
-		return x.Base
-	}
-	return nil
-}
-
-func (x *PersistSkillExecutionRequest) GetExecution() *proto1.SkillExecutionProtoDTO {
-	if x != nil {
-		return x.Execution
-	}
-	return nil
-}
-
-type AppendSkillExecutionEventRequest struct {
-	state         protoimpl.MessageState           `protogen:"open.v1"`
-	Base          *proto.RequestBase               `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
-	Event         *proto1.SkillExecutionEventProto `protobuf:"bytes,2,opt,name=event,proto3" json:"event,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *AppendSkillExecutionEventRequest) Reset() {
-	*x = AppendSkillExecutionEventRequest{}
-	mi := &file_connector_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *AppendSkillExecutionEventRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*AppendSkillExecutionEventRequest) ProtoMessage() {}
-
-func (x *AppendSkillExecutionEventRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use AppendSkillExecutionEventRequest.ProtoReflect.Descriptor instead.
-func (*AppendSkillExecutionEventRequest) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *AppendSkillExecutionEventRequest) GetBase() *proto.RequestBase {
-	if x != nil {
-		return x.Base
-	}
-	return nil
-}
-
-func (x *AppendSkillExecutionEventRequest) GetEvent() *proto1.SkillExecutionEventProto {
-	if x != nil {
-		return x.Event
-	}
-	return nil
 }
 
 type UpsertAssetPayloadRequest struct {
 	state      protoimpl.MessageState       `protogen:"open.v1"`
 	Base       *proto.RequestBase           `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
-	Payload    *proto2.AssetPayloadProtoDTO `protobuf:"bytes,2,opt,name=payload,proto3" json:"payload,omitempty"`
+	Payload    *proto1.AssetPayloadProtoDTO `protobuf:"bytes,2,opt,name=payload,proto3" json:"payload,omitempty"`
 	SubAssetSn *string                      `protobuf:"bytes,3,opt,name=sub_asset_sn,json=subAssetSn,proto3,oneof" json:"sub_asset_sn,omitempty"`
 	Owner      *AssetPayloadOwner           `protobuf:"bytes,4,opt,name=owner,proto3,oneof" json:"owner,omitempty"`
 	// Empty means a full upsert; otherwise only listed paths change.
@@ -311,7 +92,7 @@ type UpsertAssetPayloadRequest struct {
 
 func (x *UpsertAssetPayloadRequest) Reset() {
 	*x = UpsertAssetPayloadRequest{}
-	mi := &file_connector_proto_msgTypes[2]
+	mi := &file_connector_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -323,7 +104,7 @@ func (x *UpsertAssetPayloadRequest) String() string {
 func (*UpsertAssetPayloadRequest) ProtoMessage() {}
 
 func (x *UpsertAssetPayloadRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[2]
+	mi := &file_connector_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -336,7 +117,7 @@ func (x *UpsertAssetPayloadRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpsertAssetPayloadRequest.ProtoReflect.Descriptor instead.
 func (*UpsertAssetPayloadRequest) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{2}
+	return file_connector_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *UpsertAssetPayloadRequest) GetBase() *proto.RequestBase {
@@ -346,7 +127,7 @@ func (x *UpsertAssetPayloadRequest) GetBase() *proto.RequestBase {
 	return nil
 }
 
-func (x *UpsertAssetPayloadRequest) GetPayload() *proto2.AssetPayloadProtoDTO {
+func (x *UpsertAssetPayloadRequest) GetPayload() *proto1.AssetPayloadProtoDTO {
 	if x != nil {
 		return x.Payload
 	}
@@ -387,7 +168,7 @@ type AssetPayloadOwner struct {
 
 func (x *AssetPayloadOwner) Reset() {
 	*x = AssetPayloadOwner{}
-	mi := &file_connector_proto_msgTypes[3]
+	mi := &file_connector_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -399,7 +180,7 @@ func (x *AssetPayloadOwner) String() string {
 func (*AssetPayloadOwner) ProtoMessage() {}
 
 func (x *AssetPayloadOwner) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[3]
+	mi := &file_connector_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -412,7 +193,7 @@ func (x *AssetPayloadOwner) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AssetPayloadOwner.ProtoReflect.Descriptor instead.
 func (*AssetPayloadOwner) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{3}
+	return file_connector_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *AssetPayloadOwner) GetOwner() isAssetPayloadOwner_Owner {
@@ -466,7 +247,7 @@ type ListAssetPayloadsRequest struct {
 
 func (x *ListAssetPayloadsRequest) Reset() {
 	*x = ListAssetPayloadsRequest{}
-	mi := &file_connector_proto_msgTypes[4]
+	mi := &file_connector_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -478,7 +259,7 @@ func (x *ListAssetPayloadsRequest) String() string {
 func (*ListAssetPayloadsRequest) ProtoMessage() {}
 
 func (x *ListAssetPayloadsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[4]
+	mi := &file_connector_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -491,7 +272,7 @@ func (x *ListAssetPayloadsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAssetPayloadsRequest.ProtoReflect.Descriptor instead.
 func (*ListAssetPayloadsRequest) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{4}
+	return file_connector_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *ListAssetPayloadsRequest) GetBase() *proto.RequestBase {
@@ -519,7 +300,7 @@ type DeleteAssetPayloadRequest struct {
 
 func (x *DeleteAssetPayloadRequest) Reset() {
 	*x = DeleteAssetPayloadRequest{}
-	mi := &file_connector_proto_msgTypes[5]
+	mi := &file_connector_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -531,7 +312,7 @@ func (x *DeleteAssetPayloadRequest) String() string {
 func (*DeleteAssetPayloadRequest) ProtoMessage() {}
 
 func (x *DeleteAssetPayloadRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[5]
+	mi := &file_connector_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -544,7 +325,7 @@ func (x *DeleteAssetPayloadRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteAssetPayloadRequest.ProtoReflect.Descriptor instead.
 func (*DeleteAssetPayloadRequest) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{5}
+	return file_connector_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *DeleteAssetPayloadRequest) GetBase() *proto.RequestBase {
@@ -572,7 +353,7 @@ type AssetPayloadResponse struct {
 	state         protoimpl.MessageState       `protogen:"open.v1"`
 	Tid           string                       `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
 	HasErrors     bool                         `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
-	Payload       *proto2.AssetPayloadProtoDTO `protobuf:"bytes,3,opt,name=payload,proto3,oneof" json:"payload,omitempty"`
+	Payload       *proto1.AssetPayloadProtoDTO `protobuf:"bytes,3,opt,name=payload,proto3,oneof" json:"payload,omitempty"`
 	Error         *proto.GlobalErrorMessage    `protobuf:"bytes,4,opt,name=error,proto3,oneof" json:"error,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -580,7 +361,7 @@ type AssetPayloadResponse struct {
 
 func (x *AssetPayloadResponse) Reset() {
 	*x = AssetPayloadResponse{}
-	mi := &file_connector_proto_msgTypes[6]
+	mi := &file_connector_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -592,7 +373,7 @@ func (x *AssetPayloadResponse) String() string {
 func (*AssetPayloadResponse) ProtoMessage() {}
 
 func (x *AssetPayloadResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[6]
+	mi := &file_connector_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -605,7 +386,7 @@ func (x *AssetPayloadResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AssetPayloadResponse.ProtoReflect.Descriptor instead.
 func (*AssetPayloadResponse) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{6}
+	return file_connector_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *AssetPayloadResponse) GetTid() string {
@@ -622,7 +403,7 @@ func (x *AssetPayloadResponse) GetHasErrors() bool {
 	return false
 }
 
-func (x *AssetPayloadResponse) GetPayload() *proto2.AssetPayloadProtoDTO {
+func (x *AssetPayloadResponse) GetPayload() *proto1.AssetPayloadProtoDTO {
 	if x != nil {
 		return x.Payload
 	}
@@ -640,7 +421,7 @@ type AssetPayloadListResponse struct {
 	state         protoimpl.MessageState         `protogen:"open.v1"`
 	Tid           string                         `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
 	HasErrors     bool                           `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
-	Payloads      []*proto2.AssetPayloadProtoDTO `protobuf:"bytes,3,rep,name=payloads,proto3" json:"payloads,omitempty"`
+	Payloads      []*proto1.AssetPayloadProtoDTO `protobuf:"bytes,3,rep,name=payloads,proto3" json:"payloads,omitempty"`
 	Error         *proto.GlobalErrorMessage      `protobuf:"bytes,4,opt,name=error,proto3,oneof" json:"error,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -648,7 +429,7 @@ type AssetPayloadListResponse struct {
 
 func (x *AssetPayloadListResponse) Reset() {
 	*x = AssetPayloadListResponse{}
-	mi := &file_connector_proto_msgTypes[7]
+	mi := &file_connector_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -660,7 +441,7 @@ func (x *AssetPayloadListResponse) String() string {
 func (*AssetPayloadListResponse) ProtoMessage() {}
 
 func (x *AssetPayloadListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[7]
+	mi := &file_connector_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -673,7 +454,7 @@ func (x *AssetPayloadListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AssetPayloadListResponse.ProtoReflect.Descriptor instead.
 func (*AssetPayloadListResponse) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{7}
+	return file_connector_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *AssetPayloadListResponse) GetTid() string {
@@ -690,7 +471,7 @@ func (x *AssetPayloadListResponse) GetHasErrors() bool {
 	return false
 }
 
-func (x *AssetPayloadListResponse) GetPayloads() []*proto2.AssetPayloadProtoDTO {
+func (x *AssetPayloadListResponse) GetPayloads() []*proto1.AssetPayloadProtoDTO {
 	if x != nil {
 		return x.Payloads
 	}
@@ -698,908 +479,6 @@ func (x *AssetPayloadListResponse) GetPayloads() []*proto2.AssetPayloadProtoDTO 
 }
 
 func (x *AssetPayloadListResponse) GetError() *proto.GlobalErrorMessage {
-	if x != nil {
-		return x.Error
-	}
-	return nil
-}
-
-type SetAssetPropertyRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
-	Sn            string                 `protobuf:"bytes,2,opt,name=sn,proto3" json:"sn,omitempty"`
-	Key           string                 `protobuf:"bytes,3,opt,name=key,proto3" json:"key,omitempty"`
-	Value         *structpb.Value        `protobuf:"bytes,4,opt,name=value,proto3" json:"value,omitempty"`
-	Description   *string                `protobuf:"bytes,5,opt,name=description,proto3,oneof" json:"description,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SetAssetPropertyRequest) Reset() {
-	*x = SetAssetPropertyRequest{}
-	mi := &file_connector_proto_msgTypes[8]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SetAssetPropertyRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SetAssetPropertyRequest) ProtoMessage() {}
-
-func (x *SetAssetPropertyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[8]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SetAssetPropertyRequest.ProtoReflect.Descriptor instead.
-func (*SetAssetPropertyRequest) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{8}
-}
-
-func (x *SetAssetPropertyRequest) GetBase() *proto.RequestBase {
-	if x != nil {
-		return x.Base
-	}
-	return nil
-}
-
-func (x *SetAssetPropertyRequest) GetSn() string {
-	if x != nil {
-		return x.Sn
-	}
-	return ""
-}
-
-func (x *SetAssetPropertyRequest) GetKey() string {
-	if x != nil {
-		return x.Key
-	}
-	return ""
-}
-
-func (x *SetAssetPropertyRequest) GetValue() *structpb.Value {
-	if x != nil {
-		return x.Value
-	}
-	return nil
-}
-
-func (x *SetAssetPropertyRequest) GetDescription() string {
-	if x != nil && x.Description != nil {
-		return *x.Description
-	}
-	return ""
-}
-
-type ListAssetPropertiesRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
-	Sn            string                 `protobuf:"bytes,2,opt,name=sn,proto3" json:"sn,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ListAssetPropertiesRequest) Reset() {
-	*x = ListAssetPropertiesRequest{}
-	mi := &file_connector_proto_msgTypes[9]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListAssetPropertiesRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListAssetPropertiesRequest) ProtoMessage() {}
-
-func (x *ListAssetPropertiesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[9]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListAssetPropertiesRequest.ProtoReflect.Descriptor instead.
-func (*ListAssetPropertiesRequest) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{9}
-}
-
-func (x *ListAssetPropertiesRequest) GetBase() *proto.RequestBase {
-	if x != nil {
-		return x.Base
-	}
-	return nil
-}
-
-func (x *ListAssetPropertiesRequest) GetSn() string {
-	if x != nil {
-		return x.Sn
-	}
-	return ""
-}
-
-type DeleteAssetPropertyRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
-	Sn            string                 `protobuf:"bytes,2,opt,name=sn,proto3" json:"sn,omitempty"`
-	Key           string                 `protobuf:"bytes,3,opt,name=key,proto3" json:"key,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *DeleteAssetPropertyRequest) Reset() {
-	*x = DeleteAssetPropertyRequest{}
-	mi := &file_connector_proto_msgTypes[10]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *DeleteAssetPropertyRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DeleteAssetPropertyRequest) ProtoMessage() {}
-
-func (x *DeleteAssetPropertyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[10]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DeleteAssetPropertyRequest.ProtoReflect.Descriptor instead.
-func (*DeleteAssetPropertyRequest) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{10}
-}
-
-func (x *DeleteAssetPropertyRequest) GetBase() *proto.RequestBase {
-	if x != nil {
-		return x.Base
-	}
-	return nil
-}
-
-func (x *DeleteAssetPropertyRequest) GetSn() string {
-	if x != nil {
-		return x.Sn
-	}
-	return ""
-}
-
-func (x *DeleteAssetPropertyRequest) GetKey() string {
-	if x != nil {
-		return x.Key
-	}
-	return ""
-}
-
-type AssetPropertyResponse struct {
-	state         protoimpl.MessageState        `protogen:"open.v1"`
-	Tid           string                        `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
-	HasErrors     bool                          `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
-	Property      *proto2.AssetPropertyProtoDTO `protobuf:"bytes,3,opt,name=property,proto3,oneof" json:"property,omitempty"`
-	Error         *proto.GlobalErrorMessage     `protobuf:"bytes,4,opt,name=error,proto3,oneof" json:"error,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *AssetPropertyResponse) Reset() {
-	*x = AssetPropertyResponse{}
-	mi := &file_connector_proto_msgTypes[11]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *AssetPropertyResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*AssetPropertyResponse) ProtoMessage() {}
-
-func (x *AssetPropertyResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[11]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use AssetPropertyResponse.ProtoReflect.Descriptor instead.
-func (*AssetPropertyResponse) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{11}
-}
-
-func (x *AssetPropertyResponse) GetTid() string {
-	if x != nil {
-		return x.Tid
-	}
-	return ""
-}
-
-func (x *AssetPropertyResponse) GetHasErrors() bool {
-	if x != nil {
-		return x.HasErrors
-	}
-	return false
-}
-
-func (x *AssetPropertyResponse) GetProperty() *proto2.AssetPropertyProtoDTO {
-	if x != nil {
-		return x.Property
-	}
-	return nil
-}
-
-func (x *AssetPropertyResponse) GetError() *proto.GlobalErrorMessage {
-	if x != nil {
-		return x.Error
-	}
-	return nil
-}
-
-type AssetPropertyListResponse struct {
-	state         protoimpl.MessageState          `protogen:"open.v1"`
-	Tid           string                          `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
-	HasErrors     bool                            `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
-	Properties    []*proto2.AssetPropertyProtoDTO `protobuf:"bytes,3,rep,name=properties,proto3" json:"properties,omitempty"`
-	Error         *proto.GlobalErrorMessage       `protobuf:"bytes,4,opt,name=error,proto3,oneof" json:"error,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *AssetPropertyListResponse) Reset() {
-	*x = AssetPropertyListResponse{}
-	mi := &file_connector_proto_msgTypes[12]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *AssetPropertyListResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*AssetPropertyListResponse) ProtoMessage() {}
-
-func (x *AssetPropertyListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[12]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use AssetPropertyListResponse.ProtoReflect.Descriptor instead.
-func (*AssetPropertyListResponse) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{12}
-}
-
-func (x *AssetPropertyListResponse) GetTid() string {
-	if x != nil {
-		return x.Tid
-	}
-	return ""
-}
-
-func (x *AssetPropertyListResponse) GetHasErrors() bool {
-	if x != nil {
-		return x.HasErrors
-	}
-	return false
-}
-
-func (x *AssetPropertyListResponse) GetProperties() []*proto2.AssetPropertyProtoDTO {
-	if x != nil {
-		return x.Properties
-	}
-	return nil
-}
-
-func (x *AssetPropertyListResponse) GetError() *proto.GlobalErrorMessage {
-	if x != nil {
-		return x.Error
-	}
-	return nil
-}
-
-// A persisted Skill Registry entry — one row per (command_id, schema_version). Reuses the same
-// errors/events/requirements/source/provider shapes as the live Capability contract
-// (device-control-contracts.proto) so a registry entry and a live snapshot are directly comparable.
-type SkillContractProtoDTO struct {
-	state         protoimpl.MessageState              `protogen:"open.v1"`
-	Id            string                              `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	CommandId     string                              `protobuf:"bytes,2,opt,name=command_id,json=commandId,proto3" json:"command_id,omitempty"`
-	SkillId       string                              `protobuf:"bytes,3,opt,name=skill_id,json=skillId,proto3" json:"skill_id,omitempty"`
-	DisplayName   *string                             `protobuf:"bytes,4,opt,name=display_name,json=displayName,proto3,oneof" json:"display_name,omitempty"`
-	Description   *string                             `protobuf:"bytes,5,opt,name=description,proto3,oneof" json:"description,omitempty"`
-	SchemaVersion *string                             `protobuf:"bytes,6,opt,name=schema_version,json=schemaVersion,proto3,oneof" json:"schema_version,omitempty"`
-	InputSchema   *structpb.Struct                    `protobuf:"bytes,7,opt,name=input_schema,json=inputSchema,proto3" json:"input_schema,omitempty"`
-	OutputSchema  *structpb.Struct                    `protobuf:"bytes,8,opt,name=output_schema,json=outputSchema,proto3" json:"output_schema,omitempty"`
-	Errors        []*proto3.CapabilityErrorProto      `protobuf:"bytes,9,rep,name=errors,proto3" json:"errors,omitempty"`
-	Events        []*proto3.CapabilityEventProto      `protobuf:"bytes,10,rep,name=events,proto3" json:"events,omitempty"`
-	Requirements  *proto3.CapabilityRequirementsProto `protobuf:"bytes,11,opt,name=requirements,proto3,oneof" json:"requirements,omitempty"`
-	Source        *proto3.CapabilitySourceProto       `protobuf:"varint,12,opt,name=source,proto3,enum=zqnt.CapabilitySourceProto,oneof" json:"source,omitempty"`
-	Provider      *string                             `protobuf:"bytes,13,opt,name=provider,proto3,oneof" json:"provider,omitempty"`
-	Status        SkillContractStatus                 `protobuf:"varint,14,opt,name=status,proto3,enum=zqnt.SkillContractStatus" json:"status,omitempty"`
-	FirstSeenAt   *timestamppb.Timestamp              `protobuf:"bytes,15,opt,name=first_seen_at,json=firstSeenAt,proto3,oneof" json:"first_seen_at,omitempty"`
-	LastSeenAt    *timestamppb.Timestamp              `protobuf:"bytes,16,opt,name=last_seen_at,json=lastSeenAt,proto3,oneof" json:"last_seen_at,omitempty"`
-	// Version lineage: set whenever this schema_version isn't the first one observed for command_id.
-	PreviousSchemaVersion *string                     `protobuf:"bytes,17,opt,name=previous_schema_version,json=previousSchemaVersion,proto3,oneof" json:"previous_schema_version,omitempty"`
-	Compatibility         *SkillContractCompatibility `protobuf:"varint,18,opt,name=compatibility,proto3,enum=zqnt.SkillContractCompatibility,oneof" json:"compatibility,omitempty"`
-	// Human-readable reasons behind the compatibility verdict, e.g. "required field 'zoom' added",
-	// "property 'lens' type changed from string to number". Empty when compatibility is COMPATIBLE/NEW.
-	CompatibilityNotes []string `protobuf:"bytes,19,rep,name=compatibility_notes,json=compatibilityNotes,proto3" json:"compatibility_notes,omitempty"`
-	// Declarative only — no enforcement exists yet, since the platform has no user-level
-	// identity/role system today (only the installation-level license lease). System integrators set
-	// this via the console (SetSkillContractPermissions) as forward-prep for when one does; free-form
-	// strings by design (e.g. "mission.launch", "role:pilot") so no fixed permission vocabulary is
-	// baked in ahead of that decision.
-	RequiredPermissions []string `protobuf:"bytes,20,rep,name=required_permissions,json=requiredPermissions,proto3" json:"required_permissions,omitempty"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
-}
-
-func (x *SkillContractProtoDTO) Reset() {
-	*x = SkillContractProtoDTO{}
-	mi := &file_connector_proto_msgTypes[13]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SkillContractProtoDTO) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SkillContractProtoDTO) ProtoMessage() {}
-
-func (x *SkillContractProtoDTO) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[13]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SkillContractProtoDTO.ProtoReflect.Descriptor instead.
-func (*SkillContractProtoDTO) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{13}
-}
-
-func (x *SkillContractProtoDTO) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *SkillContractProtoDTO) GetCommandId() string {
-	if x != nil {
-		return x.CommandId
-	}
-	return ""
-}
-
-func (x *SkillContractProtoDTO) GetSkillId() string {
-	if x != nil {
-		return x.SkillId
-	}
-	return ""
-}
-
-func (x *SkillContractProtoDTO) GetDisplayName() string {
-	if x != nil && x.DisplayName != nil {
-		return *x.DisplayName
-	}
-	return ""
-}
-
-func (x *SkillContractProtoDTO) GetDescription() string {
-	if x != nil && x.Description != nil {
-		return *x.Description
-	}
-	return ""
-}
-
-func (x *SkillContractProtoDTO) GetSchemaVersion() string {
-	if x != nil && x.SchemaVersion != nil {
-		return *x.SchemaVersion
-	}
-	return ""
-}
-
-func (x *SkillContractProtoDTO) GetInputSchema() *structpb.Struct {
-	if x != nil {
-		return x.InputSchema
-	}
-	return nil
-}
-
-func (x *SkillContractProtoDTO) GetOutputSchema() *structpb.Struct {
-	if x != nil {
-		return x.OutputSchema
-	}
-	return nil
-}
-
-func (x *SkillContractProtoDTO) GetErrors() []*proto3.CapabilityErrorProto {
-	if x != nil {
-		return x.Errors
-	}
-	return nil
-}
-
-func (x *SkillContractProtoDTO) GetEvents() []*proto3.CapabilityEventProto {
-	if x != nil {
-		return x.Events
-	}
-	return nil
-}
-
-func (x *SkillContractProtoDTO) GetRequirements() *proto3.CapabilityRequirementsProto {
-	if x != nil {
-		return x.Requirements
-	}
-	return nil
-}
-
-func (x *SkillContractProtoDTO) GetSource() proto3.CapabilitySourceProto {
-	if x != nil && x.Source != nil {
-		return *x.Source
-	}
-	return proto3.CapabilitySourceProto(0)
-}
-
-func (x *SkillContractProtoDTO) GetProvider() string {
-	if x != nil && x.Provider != nil {
-		return *x.Provider
-	}
-	return ""
-}
-
-func (x *SkillContractProtoDTO) GetStatus() SkillContractStatus {
-	if x != nil {
-		return x.Status
-	}
-	return SkillContractStatus_SKILL_CONTRACT_STATUS_ACTIVE
-}
-
-func (x *SkillContractProtoDTO) GetFirstSeenAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.FirstSeenAt
-	}
-	return nil
-}
-
-func (x *SkillContractProtoDTO) GetLastSeenAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.LastSeenAt
-	}
-	return nil
-}
-
-func (x *SkillContractProtoDTO) GetPreviousSchemaVersion() string {
-	if x != nil && x.PreviousSchemaVersion != nil {
-		return *x.PreviousSchemaVersion
-	}
-	return ""
-}
-
-func (x *SkillContractProtoDTO) GetCompatibility() SkillContractCompatibility {
-	if x != nil && x.Compatibility != nil {
-		return *x.Compatibility
-	}
-	return SkillContractCompatibility_SKILL_CONTRACT_COMPATIBILITY_UNKNOWN
-}
-
-func (x *SkillContractProtoDTO) GetCompatibilityNotes() []string {
-	if x != nil {
-		return x.CompatibilityNotes
-	}
-	return nil
-}
-
-func (x *SkillContractProtoDTO) GetRequiredPermissions() []string {
-	if x != nil {
-		return x.RequiredPermissions
-	}
-	return nil
-}
-
-type UpsertSkillContractRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
-	Contract      *SkillContractProtoDTO `protobuf:"bytes,2,opt,name=contract,proto3" json:"contract,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UpsertSkillContractRequest) Reset() {
-	*x = UpsertSkillContractRequest{}
-	mi := &file_connector_proto_msgTypes[14]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UpsertSkillContractRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UpsertSkillContractRequest) ProtoMessage() {}
-
-func (x *UpsertSkillContractRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[14]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UpsertSkillContractRequest.ProtoReflect.Descriptor instead.
-func (*UpsertSkillContractRequest) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{14}
-}
-
-func (x *UpsertSkillContractRequest) GetBase() *proto.RequestBase {
-	if x != nil {
-		return x.Base
-	}
-	return nil
-}
-
-func (x *UpsertSkillContractRequest) GetContract() *SkillContractProtoDTO {
-	if x != nil {
-		return x.Contract
-	}
-	return nil
-}
-
-type ListSkillContractsRequest struct {
-	state  protoimpl.MessageState `protogen:"open.v1"`
-	Base   *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
-	Status *SkillContractStatus   `protobuf:"varint,2,opt,name=status,proto3,enum=zqnt.SkillContractStatus,oneof" json:"status,omitempty"`
-	// When set, lists every persisted version of this one command_id (its full version history)
-	// instead of the whole registry.
-	CommandId     *string `protobuf:"bytes,3,opt,name=command_id,json=commandId,proto3,oneof" json:"command_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ListSkillContractsRequest) Reset() {
-	*x = ListSkillContractsRequest{}
-	mi := &file_connector_proto_msgTypes[15]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListSkillContractsRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListSkillContractsRequest) ProtoMessage() {}
-
-func (x *ListSkillContractsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[15]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListSkillContractsRequest.ProtoReflect.Descriptor instead.
-func (*ListSkillContractsRequest) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{15}
-}
-
-func (x *ListSkillContractsRequest) GetBase() *proto.RequestBase {
-	if x != nil {
-		return x.Base
-	}
-	return nil
-}
-
-func (x *ListSkillContractsRequest) GetStatus() SkillContractStatus {
-	if x != nil && x.Status != nil {
-		return *x.Status
-	}
-	return SkillContractStatus_SKILL_CONTRACT_STATUS_ACTIVE
-}
-
-func (x *ListSkillContractsRequest) GetCommandId() string {
-	if x != nil && x.CommandId != nil {
-		return *x.CommandId
-	}
-	return ""
-}
-
-type SetSkillContractStatusRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
-	Id            string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
-	Status        SkillContractStatus    `protobuf:"varint,3,opt,name=status,proto3,enum=zqnt.SkillContractStatus" json:"status,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SetSkillContractStatusRequest) Reset() {
-	*x = SetSkillContractStatusRequest{}
-	mi := &file_connector_proto_msgTypes[16]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SetSkillContractStatusRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SetSkillContractStatusRequest) ProtoMessage() {}
-
-func (x *SetSkillContractStatusRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[16]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SetSkillContractStatusRequest.ProtoReflect.Descriptor instead.
-func (*SetSkillContractStatusRequest) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{16}
-}
-
-func (x *SetSkillContractStatusRequest) GetBase() *proto.RequestBase {
-	if x != nil {
-		return x.Base
-	}
-	return nil
-}
-
-func (x *SetSkillContractStatusRequest) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *SetSkillContractStatusRequest) GetStatus() SkillContractStatus {
-	if x != nil {
-		return x.Status
-	}
-	return SkillContractStatus_SKILL_CONTRACT_STATUS_ACTIVE
-}
-
-type SetSkillContractPermissionsRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	Base  *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
-	Id    string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
-	// Full replacement, not a merge — mirrors SetSkillContractStatus's replace-the-field semantics.
-	RequiredPermissions []string `protobuf:"bytes,3,rep,name=required_permissions,json=requiredPermissions,proto3" json:"required_permissions,omitempty"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
-}
-
-func (x *SetSkillContractPermissionsRequest) Reset() {
-	*x = SetSkillContractPermissionsRequest{}
-	mi := &file_connector_proto_msgTypes[17]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SetSkillContractPermissionsRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SetSkillContractPermissionsRequest) ProtoMessage() {}
-
-func (x *SetSkillContractPermissionsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[17]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SetSkillContractPermissionsRequest.ProtoReflect.Descriptor instead.
-func (*SetSkillContractPermissionsRequest) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{17}
-}
-
-func (x *SetSkillContractPermissionsRequest) GetBase() *proto.RequestBase {
-	if x != nil {
-		return x.Base
-	}
-	return nil
-}
-
-func (x *SetSkillContractPermissionsRequest) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *SetSkillContractPermissionsRequest) GetRequiredPermissions() []string {
-	if x != nil {
-		return x.RequiredPermissions
-	}
-	return nil
-}
-
-type SkillContractResponse struct {
-	state         protoimpl.MessageState    `protogen:"open.v1"`
-	Tid           string                    `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
-	HasErrors     bool                      `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
-	Contract      *SkillContractProtoDTO    `protobuf:"bytes,3,opt,name=contract,proto3,oneof" json:"contract,omitempty"`
-	Error         *proto.GlobalErrorMessage `protobuf:"bytes,4,opt,name=error,proto3,oneof" json:"error,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SkillContractResponse) Reset() {
-	*x = SkillContractResponse{}
-	mi := &file_connector_proto_msgTypes[18]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SkillContractResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SkillContractResponse) ProtoMessage() {}
-
-func (x *SkillContractResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[18]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SkillContractResponse.ProtoReflect.Descriptor instead.
-func (*SkillContractResponse) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{18}
-}
-
-func (x *SkillContractResponse) GetTid() string {
-	if x != nil {
-		return x.Tid
-	}
-	return ""
-}
-
-func (x *SkillContractResponse) GetHasErrors() bool {
-	if x != nil {
-		return x.HasErrors
-	}
-	return false
-}
-
-func (x *SkillContractResponse) GetContract() *SkillContractProtoDTO {
-	if x != nil {
-		return x.Contract
-	}
-	return nil
-}
-
-func (x *SkillContractResponse) GetError() *proto.GlobalErrorMessage {
-	if x != nil {
-		return x.Error
-	}
-	return nil
-}
-
-type SkillContractListResponse struct {
-	state         protoimpl.MessageState    `protogen:"open.v1"`
-	Tid           string                    `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
-	HasErrors     bool                      `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
-	Contracts     []*SkillContractProtoDTO  `protobuf:"bytes,3,rep,name=contracts,proto3" json:"contracts,omitempty"`
-	Error         *proto.GlobalErrorMessage `protobuf:"bytes,4,opt,name=error,proto3,oneof" json:"error,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SkillContractListResponse) Reset() {
-	*x = SkillContractListResponse{}
-	mi := &file_connector_proto_msgTypes[19]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SkillContractListResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SkillContractListResponse) ProtoMessage() {}
-
-func (x *SkillContractListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[19]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SkillContractListResponse.ProtoReflect.Descriptor instead.
-func (*SkillContractListResponse) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{19}
-}
-
-func (x *SkillContractListResponse) GetTid() string {
-	if x != nil {
-		return x.Tid
-	}
-	return ""
-}
-
-func (x *SkillContractListResponse) GetHasErrors() bool {
-	if x != nil {
-		return x.HasErrors
-	}
-	return false
-}
-
-func (x *SkillContractListResponse) GetContracts() []*SkillContractProtoDTO {
-	if x != nil {
-		return x.Contracts
-	}
-	return nil
-}
-
-func (x *SkillContractListResponse) GetError() *proto.GlobalErrorMessage {
 	if x != nil {
 		return x.Error
 	}
@@ -1616,7 +495,7 @@ type ConnectorGetAssetByIdRequest struct {
 
 func (x *ConnectorGetAssetByIdRequest) Reset() {
 	*x = ConnectorGetAssetByIdRequest{}
-	mi := &file_connector_proto_msgTypes[20]
+	mi := &file_connector_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1628,7 +507,7 @@ func (x *ConnectorGetAssetByIdRequest) String() string {
 func (*ConnectorGetAssetByIdRequest) ProtoMessage() {}
 
 func (x *ConnectorGetAssetByIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[20]
+	mi := &file_connector_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1641,7 +520,7 @@ func (x *ConnectorGetAssetByIdRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectorGetAssetByIdRequest.ProtoReflect.Descriptor instead.
 func (*ConnectorGetAssetByIdRequest) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{20}
+	return file_connector_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *ConnectorGetAssetByIdRequest) GetBase() *proto.RequestBase {
@@ -1660,14 +539,14 @@ func (x *ConnectorGetAssetByIdRequest) GetAssetId() string {
 
 type ConnectorAssetList struct {
 	state         protoimpl.MessageState  `protogen:"open.v1"`
-	Assets        []*proto2.AssetProtoDTO `protobuf:"bytes,1,rep,name=assets,proto3" json:"assets,omitempty"`
+	Assets        []*proto1.AssetProtoDTO `protobuf:"bytes,1,rep,name=assets,proto3" json:"assets,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ConnectorAssetList) Reset() {
 	*x = ConnectorAssetList{}
-	mi := &file_connector_proto_msgTypes[21]
+	mi := &file_connector_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1679,7 +558,7 @@ func (x *ConnectorAssetList) String() string {
 func (*ConnectorAssetList) ProtoMessage() {}
 
 func (x *ConnectorAssetList) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[21]
+	mi := &file_connector_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1692,10 +571,10 @@ func (x *ConnectorAssetList) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectorAssetList.ProtoReflect.Descriptor instead.
 func (*ConnectorAssetList) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{21}
+	return file_connector_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *ConnectorAssetList) GetAssets() []*proto2.AssetProtoDTO {
+func (x *ConnectorAssetList) GetAssets() []*proto1.AssetProtoDTO {
 	if x != nil {
 		return x.Assets
 	}
@@ -1705,14 +584,14 @@ func (x *ConnectorAssetList) GetAssets() []*proto2.AssetProtoDTO {
 type ConnectorRegisterAssetRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
-	Asset         *proto2.AssetProtoDTO  `protobuf:"bytes,2,opt,name=asset,proto3" json:"asset,omitempty"`
+	Asset         *proto1.AssetProtoDTO  `protobuf:"bytes,2,opt,name=asset,proto3" json:"asset,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ConnectorRegisterAssetRequest) Reset() {
 	*x = ConnectorRegisterAssetRequest{}
-	mi := &file_connector_proto_msgTypes[22]
+	mi := &file_connector_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1724,7 +603,7 @@ func (x *ConnectorRegisterAssetRequest) String() string {
 func (*ConnectorRegisterAssetRequest) ProtoMessage() {}
 
 func (x *ConnectorRegisterAssetRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[22]
+	mi := &file_connector_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1737,7 +616,7 @@ func (x *ConnectorRegisterAssetRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectorRegisterAssetRequest.ProtoReflect.Descriptor instead.
 func (*ConnectorRegisterAssetRequest) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{22}
+	return file_connector_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ConnectorRegisterAssetRequest) GetBase() *proto.RequestBase {
@@ -1747,7 +626,7 @@ func (x *ConnectorRegisterAssetRequest) GetBase() *proto.RequestBase {
 	return nil
 }
 
-func (x *ConnectorRegisterAssetRequest) GetAsset() *proto2.AssetProtoDTO {
+func (x *ConnectorRegisterAssetRequest) GetAsset() *proto1.AssetProtoDTO {
 	if x != nil {
 		return x.Asset
 	}
@@ -1757,7 +636,7 @@ func (x *ConnectorRegisterAssetRequest) GetAsset() *proto2.AssetProtoDTO {
 type ConnectorUpdateAssetRequest struct {
 	state   protoimpl.MessageState `protogen:"open.v1"`
 	Base    *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
-	Asset   *proto2.AssetProtoDTO  `protobuf:"bytes,2,opt,name=asset,proto3" json:"asset,omitempty"`
+	Asset   *proto1.AssetProtoDTO  `protobuf:"bytes,2,opt,name=asset,proto3" json:"asset,omitempty"`
 	AssetId string                 `protobuf:"bytes,3,opt,name=asset_id,json=assetId,proto3" json:"asset_id,omitempty"`
 	// Empty means replace all mutable fields; otherwise only listed paths change.
 	UpdateMask    *fieldmaskpb.FieldMask `protobuf:"bytes,4,opt,name=update_mask,json=updateMask,proto3" json:"update_mask,omitempty"`
@@ -1767,7 +646,7 @@ type ConnectorUpdateAssetRequest struct {
 
 func (x *ConnectorUpdateAssetRequest) Reset() {
 	*x = ConnectorUpdateAssetRequest{}
-	mi := &file_connector_proto_msgTypes[23]
+	mi := &file_connector_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1779,7 +658,7 @@ func (x *ConnectorUpdateAssetRequest) String() string {
 func (*ConnectorUpdateAssetRequest) ProtoMessage() {}
 
 func (x *ConnectorUpdateAssetRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[23]
+	mi := &file_connector_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1792,7 +671,7 @@ func (x *ConnectorUpdateAssetRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectorUpdateAssetRequest.ProtoReflect.Descriptor instead.
 func (*ConnectorUpdateAssetRequest) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{23}
+	return file_connector_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ConnectorUpdateAssetRequest) GetBase() *proto.RequestBase {
@@ -1802,7 +681,7 @@ func (x *ConnectorUpdateAssetRequest) GetBase() *proto.RequestBase {
 	return nil
 }
 
-func (x *ConnectorUpdateAssetRequest) GetAsset() *proto2.AssetProtoDTO {
+func (x *ConnectorUpdateAssetRequest) GetAsset() *proto1.AssetProtoDTO {
 	if x != nil {
 		return x.Asset
 	}
@@ -1826,7 +705,7 @@ func (x *ConnectorUpdateAssetRequest) GetUpdateMask() *fieldmaskpb.FieldMask {
 type ConnectorUpdateSubAssetRequest struct {
 	state      protoimpl.MessageState   `protogen:"open.v1"`
 	Base       *proto.RequestBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
-	SubAsset   *proto2.SubAssetProtoDTO `protobuf:"bytes,2,opt,name=sub_asset,json=subAsset,proto3" json:"sub_asset,omitempty"`
+	SubAsset   *proto1.SubAssetProtoDTO `protobuf:"bytes,2,opt,name=sub_asset,json=subAsset,proto3" json:"sub_asset,omitempty"`
 	SubAssetId string                   `protobuf:"bytes,3,opt,name=sub_asset_id,json=subAssetId,proto3" json:"sub_asset_id,omitempty"`
 	// Empty means replace all mutable fields; otherwise only listed paths change.
 	UpdateMask    *fieldmaskpb.FieldMask `protobuf:"bytes,4,opt,name=update_mask,json=updateMask,proto3" json:"update_mask,omitempty"`
@@ -1836,7 +715,7 @@ type ConnectorUpdateSubAssetRequest struct {
 
 func (x *ConnectorUpdateSubAssetRequest) Reset() {
 	*x = ConnectorUpdateSubAssetRequest{}
-	mi := &file_connector_proto_msgTypes[24]
+	mi := &file_connector_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1848,7 +727,7 @@ func (x *ConnectorUpdateSubAssetRequest) String() string {
 func (*ConnectorUpdateSubAssetRequest) ProtoMessage() {}
 
 func (x *ConnectorUpdateSubAssetRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[24]
+	mi := &file_connector_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1861,7 +740,7 @@ func (x *ConnectorUpdateSubAssetRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectorUpdateSubAssetRequest.ProtoReflect.Descriptor instead.
 func (*ConnectorUpdateSubAssetRequest) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{24}
+	return file_connector_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *ConnectorUpdateSubAssetRequest) GetBase() *proto.RequestBase {
@@ -1871,7 +750,7 @@ func (x *ConnectorUpdateSubAssetRequest) GetBase() *proto.RequestBase {
 	return nil
 }
 
-func (x *ConnectorUpdateSubAssetRequest) GetSubAsset() *proto2.SubAssetProtoDTO {
+func (x *ConnectorUpdateSubAssetRequest) GetSubAsset() *proto1.SubAssetProtoDTO {
 	if x != nil {
 		return x.SubAsset
 	}
@@ -1914,7 +793,7 @@ type ConnectorResponse struct {
 
 func (x *ConnectorResponse) Reset() {
 	*x = ConnectorResponse{}
-	mi := &file_connector_proto_msgTypes[25]
+	mi := &file_connector_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1926,7 +805,7 @@ func (x *ConnectorResponse) String() string {
 func (*ConnectorResponse) ProtoMessage() {}
 
 func (x *ConnectorResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[25]
+	mi := &file_connector_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1939,7 +818,7 @@ func (x *ConnectorResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectorResponse.ProtoReflect.Descriptor instead.
 func (*ConnectorResponse) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{25}
+	return file_connector_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *ConnectorResponse) GetTid() string {
@@ -2009,7 +888,7 @@ func (x *ConnectorResponse) GetError() *proto.GlobalErrorMessage {
 	return nil
 }
 
-func (x *ConnectorResponse) GetAsset() *proto2.AssetProtoDTO {
+func (x *ConnectorResponse) GetAsset() *proto1.AssetProtoDTO {
 	if x != nil {
 		if x, ok := x.Response.(*ConnectorResponse_Asset); ok {
 			return x.Asset
@@ -2018,7 +897,7 @@ func (x *ConnectorResponse) GetAsset() *proto2.AssetProtoDTO {
 	return nil
 }
 
-func (x *ConnectorResponse) GetSubAsset() *proto2.SubAssetProtoDTO {
+func (x *ConnectorResponse) GetSubAsset() *proto1.SubAssetProtoDTO {
 	if x != nil {
 		if x, ok := x.Response.(*ConnectorResponse_SubAsset); ok {
 			return x.SubAsset
@@ -2027,7 +906,7 @@ func (x *ConnectorResponse) GetSubAsset() *proto2.SubAssetProtoDTO {
 	return nil
 }
 
-func (x *ConnectorResponse) GetOrganization() *proto2.OrganizationProtoDTO {
+func (x *ConnectorResponse) GetOrganization() *proto1.OrganizationProtoDTO {
 	if x != nil {
 		if x, ok := x.Response.(*ConnectorResponse_Organization); ok {
 			return x.Organization
@@ -2049,15 +928,15 @@ type ConnectorResponse_Error struct {
 }
 
 type ConnectorResponse_Asset struct {
-	Asset *proto2.AssetProtoDTO `protobuf:"bytes,9,opt,name=asset,proto3,oneof"`
+	Asset *proto1.AssetProtoDTO `protobuf:"bytes,9,opt,name=asset,proto3,oneof"`
 }
 
 type ConnectorResponse_SubAsset struct {
-	SubAsset *proto2.SubAssetProtoDTO `protobuf:"bytes,10,opt,name=sub_asset,json=subAsset,proto3,oneof"`
+	SubAsset *proto1.SubAssetProtoDTO `protobuf:"bytes,10,opt,name=sub_asset,json=subAsset,proto3,oneof"`
 }
 
 type ConnectorResponse_Organization struct {
-	Organization *proto2.OrganizationProtoDTO `protobuf:"bytes,11,opt,name=organization,proto3,oneof"`
+	Organization *proto1.OrganizationProtoDTO `protobuf:"bytes,11,opt,name=organization,proto3,oneof"`
 }
 
 func (*ConnectorResponse_Empty) isConnectorResponse_Response() {}
@@ -2087,7 +966,7 @@ type AssetMonitoringResponse struct {
 
 func (x *AssetMonitoringResponse) Reset() {
 	*x = AssetMonitoringResponse{}
-	mi := &file_connector_proto_msgTypes[26]
+	mi := &file_connector_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2099,7 +978,7 @@ func (x *AssetMonitoringResponse) String() string {
 func (*AssetMonitoringResponse) ProtoMessage() {}
 
 func (x *AssetMonitoringResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[26]
+	mi := &file_connector_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2112,7 +991,7 @@ func (x *AssetMonitoringResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AssetMonitoringResponse.ProtoReflect.Descriptor instead.
 func (*AssetMonitoringResponse) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{26}
+	return file_connector_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *AssetMonitoringResponse) GetTid() string {
@@ -2202,7 +1081,7 @@ type ConnectorGetOrganizationRequest struct {
 
 func (x *ConnectorGetOrganizationRequest) Reset() {
 	*x = ConnectorGetOrganizationRequest{}
-	mi := &file_connector_proto_msgTypes[27]
+	mi := &file_connector_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2214,7 +1093,7 @@ func (x *ConnectorGetOrganizationRequest) String() string {
 func (*ConnectorGetOrganizationRequest) ProtoMessage() {}
 
 func (x *ConnectorGetOrganizationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[27]
+	mi := &file_connector_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2227,7 +1106,7 @@ func (x *ConnectorGetOrganizationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectorGetOrganizationRequest.ProtoReflect.Descriptor instead.
 func (*ConnectorGetOrganizationRequest) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{27}
+	return file_connector_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *ConnectorGetOrganizationRequest) GetBase() *proto.RequestBase {
@@ -2259,7 +1138,7 @@ type ConnectorStoreTelemetryRequest struct {
 
 func (x *ConnectorStoreTelemetryRequest) Reset() {
 	*x = ConnectorStoreTelemetryRequest{}
-	mi := &file_connector_proto_msgTypes[28]
+	mi := &file_connector_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2271,7 +1150,7 @@ func (x *ConnectorStoreTelemetryRequest) String() string {
 func (*ConnectorStoreTelemetryRequest) ProtoMessage() {}
 
 func (x *ConnectorStoreTelemetryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[28]
+	mi := &file_connector_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2284,7 +1163,7 @@ func (x *ConnectorStoreTelemetryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectorStoreTelemetryRequest.ProtoReflect.Descriptor instead.
 func (*ConnectorStoreTelemetryRequest) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{28}
+	return file_connector_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *ConnectorStoreTelemetryRequest) GetBase() *proto.RequestBase {
@@ -2364,7 +1243,7 @@ type ConnectorStoreDetectionRequest struct {
 
 func (x *ConnectorStoreDetectionRequest) Reset() {
 	*x = ConnectorStoreDetectionRequest{}
-	mi := &file_connector_proto_msgTypes[29]
+	mi := &file_connector_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2376,7 +1255,7 @@ func (x *ConnectorStoreDetectionRequest) String() string {
 func (*ConnectorStoreDetectionRequest) ProtoMessage() {}
 
 func (x *ConnectorStoreDetectionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[29]
+	mi := &file_connector_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2389,7 +1268,7 @@ func (x *ConnectorStoreDetectionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectorStoreDetectionRequest.ProtoReflect.Descriptor instead.
 func (*ConnectorStoreDetectionRequest) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{29}
+	return file_connector_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *ConnectorStoreDetectionRequest) GetBase() *proto.RequestBase {
@@ -2508,7 +1387,7 @@ type AssetTelemetryProto struct {
 
 func (x *AssetTelemetryProto) Reset() {
 	*x = AssetTelemetryProto{}
-	mi := &file_connector_proto_msgTypes[30]
+	mi := &file_connector_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2520,7 +1399,7 @@ func (x *AssetTelemetryProto) String() string {
 func (*AssetTelemetryProto) ProtoMessage() {}
 
 func (x *AssetTelemetryProto) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[30]
+	mi := &file_connector_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2533,7 +1412,7 @@ func (x *AssetTelemetryProto) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AssetTelemetryProto.ProtoReflect.Descriptor instead.
 func (*AssetTelemetryProto) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{30}
+	return file_connector_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *AssetTelemetryProto) GetAssetId() string {
@@ -2678,7 +1557,7 @@ type SubAssetTelemetryProto struct {
 
 func (x *SubAssetTelemetryProto) Reset() {
 	*x = SubAssetTelemetryProto{}
-	mi := &file_connector_proto_msgTypes[31]
+	mi := &file_connector_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2690,7 +1569,7 @@ func (x *SubAssetTelemetryProto) String() string {
 func (*SubAssetTelemetryProto) ProtoMessage() {}
 
 func (x *SubAssetTelemetryProto) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[31]
+	mi := &file_connector_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2703,7 +1582,7 @@ func (x *SubAssetTelemetryProto) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubAssetTelemetryProto.ProtoReflect.Descriptor instead.
 func (*SubAssetTelemetryProto) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{31}
+	return file_connector_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *SubAssetTelemetryProto) GetAssetId() string {
@@ -2831,7 +1710,7 @@ type PolicyProtoDTO struct {
 
 func (x *PolicyProtoDTO) Reset() {
 	*x = PolicyProtoDTO{}
-	mi := &file_connector_proto_msgTypes[32]
+	mi := &file_connector_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2843,7 +1722,7 @@ func (x *PolicyProtoDTO) String() string {
 func (*PolicyProtoDTO) ProtoMessage() {}
 
 func (x *PolicyProtoDTO) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[32]
+	mi := &file_connector_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2856,7 +1735,7 @@ func (x *PolicyProtoDTO) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PolicyProtoDTO.ProtoReflect.Descriptor instead.
 func (*PolicyProtoDTO) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{32}
+	return file_connector_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *PolicyProtoDTO) GetId() string {
@@ -2952,7 +1831,7 @@ type PolicyProtoDTOList struct {
 
 func (x *PolicyProtoDTOList) Reset() {
 	*x = PolicyProtoDTOList{}
-	mi := &file_connector_proto_msgTypes[33]
+	mi := &file_connector_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2964,7 +1843,7 @@ func (x *PolicyProtoDTOList) String() string {
 func (*PolicyProtoDTOList) ProtoMessage() {}
 
 func (x *PolicyProtoDTOList) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[33]
+	mi := &file_connector_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2977,7 +1856,7 @@ func (x *PolicyProtoDTOList) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PolicyProtoDTOList.ProtoReflect.Descriptor instead.
 func (*PolicyProtoDTOList) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{33}
+	return file_connector_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *PolicyProtoDTOList) GetPolicies() []*PolicyProtoDTO {
@@ -2997,7 +1876,7 @@ type ConnectorGetPoliciesRequest struct {
 
 func (x *ConnectorGetPoliciesRequest) Reset() {
 	*x = ConnectorGetPoliciesRequest{}
-	mi := &file_connector_proto_msgTypes[34]
+	mi := &file_connector_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3009,7 +1888,7 @@ func (x *ConnectorGetPoliciesRequest) String() string {
 func (*ConnectorGetPoliciesRequest) ProtoMessage() {}
 
 func (x *ConnectorGetPoliciesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[34]
+	mi := &file_connector_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3022,7 +1901,7 @@ func (x *ConnectorGetPoliciesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectorGetPoliciesRequest.ProtoReflect.Descriptor instead.
 func (*ConnectorGetPoliciesRequest) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{34}
+	return file_connector_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *ConnectorGetPoliciesRequest) GetBase() *proto.RequestBase {
@@ -3048,7 +1927,7 @@ type ConnectorGetAllPoliciesRequest struct {
 
 func (x *ConnectorGetAllPoliciesRequest) Reset() {
 	*x = ConnectorGetAllPoliciesRequest{}
-	mi := &file_connector_proto_msgTypes[35]
+	mi := &file_connector_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3060,7 +1939,7 @@ func (x *ConnectorGetAllPoliciesRequest) String() string {
 func (*ConnectorGetAllPoliciesRequest) ProtoMessage() {}
 
 func (x *ConnectorGetAllPoliciesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[35]
+	mi := &file_connector_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3073,7 +1952,7 @@ func (x *ConnectorGetAllPoliciesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectorGetAllPoliciesRequest.ProtoReflect.Descriptor instead.
 func (*ConnectorGetAllPoliciesRequest) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{35}
+	return file_connector_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *ConnectorGetAllPoliciesRequest) GetBase() *proto.RequestBase {
@@ -3099,7 +1978,7 @@ type ConnectorPolicyResponse struct {
 
 func (x *ConnectorPolicyResponse) Reset() {
 	*x = ConnectorPolicyResponse{}
-	mi := &file_connector_proto_msgTypes[36]
+	mi := &file_connector_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3111,7 +1990,7 @@ func (x *ConnectorPolicyResponse) String() string {
 func (*ConnectorPolicyResponse) ProtoMessage() {}
 
 func (x *ConnectorPolicyResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[36]
+	mi := &file_connector_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3124,7 +2003,7 @@ func (x *ConnectorPolicyResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectorPolicyResponse.ProtoReflect.Descriptor instead.
 func (*ConnectorPolicyResponse) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{36}
+	return file_connector_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *ConnectorPolicyResponse) GetTid() string {
@@ -3205,7 +2084,7 @@ type TechnicalConfigProtoDTO struct {
 
 func (x *TechnicalConfigProtoDTO) Reset() {
 	*x = TechnicalConfigProtoDTO{}
-	mi := &file_connector_proto_msgTypes[37]
+	mi := &file_connector_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3217,7 +2096,7 @@ func (x *TechnicalConfigProtoDTO) String() string {
 func (*TechnicalConfigProtoDTO) ProtoMessage() {}
 
 func (x *TechnicalConfigProtoDTO) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[37]
+	mi := &file_connector_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3230,7 +2109,7 @@ func (x *TechnicalConfigProtoDTO) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TechnicalConfigProtoDTO.ProtoReflect.Descriptor instead.
 func (*TechnicalConfigProtoDTO) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{37}
+	return file_connector_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *TechnicalConfigProtoDTO) GetId() string {
@@ -3298,7 +2177,7 @@ type TechnicalConfigProtoDTOList struct {
 
 func (x *TechnicalConfigProtoDTOList) Reset() {
 	*x = TechnicalConfigProtoDTOList{}
-	mi := &file_connector_proto_msgTypes[38]
+	mi := &file_connector_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3310,7 +2189,7 @@ func (x *TechnicalConfigProtoDTOList) String() string {
 func (*TechnicalConfigProtoDTOList) ProtoMessage() {}
 
 func (x *TechnicalConfigProtoDTOList) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[38]
+	mi := &file_connector_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3323,7 +2202,7 @@ func (x *TechnicalConfigProtoDTOList) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TechnicalConfigProtoDTOList.ProtoReflect.Descriptor instead.
 func (*TechnicalConfigProtoDTOList) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{38}
+	return file_connector_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *TechnicalConfigProtoDTOList) GetConfigs() []*TechnicalConfigProtoDTO {
@@ -3344,7 +2223,7 @@ type ConnectorGetConfigsRequest struct {
 
 func (x *ConnectorGetConfigsRequest) Reset() {
 	*x = ConnectorGetConfigsRequest{}
-	mi := &file_connector_proto_msgTypes[39]
+	mi := &file_connector_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3356,7 +2235,7 @@ func (x *ConnectorGetConfigsRequest) String() string {
 func (*ConnectorGetConfigsRequest) ProtoMessage() {}
 
 func (x *ConnectorGetConfigsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[39]
+	mi := &file_connector_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3369,7 +2248,7 @@ func (x *ConnectorGetConfigsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectorGetConfigsRequest.ProtoReflect.Descriptor instead.
 func (*ConnectorGetConfigsRequest) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{39}
+	return file_connector_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *ConnectorGetConfigsRequest) GetBase() *proto.RequestBase {
@@ -3409,7 +2288,7 @@ type ConnectorConfigResponse struct {
 
 func (x *ConnectorConfigResponse) Reset() {
 	*x = ConnectorConfigResponse{}
-	mi := &file_connector_proto_msgTypes[40]
+	mi := &file_connector_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3421,7 +2300,7 @@ func (x *ConnectorConfigResponse) String() string {
 func (*ConnectorConfigResponse) ProtoMessage() {}
 
 func (x *ConnectorConfigResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[40]
+	mi := &file_connector_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3434,7 +2313,7 @@ func (x *ConnectorConfigResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectorConfigResponse.ProtoReflect.Descriptor instead.
 func (*ConnectorConfigResponse) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{40}
+	return file_connector_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *ConnectorConfigResponse) GetTid() string {
@@ -3503,13 +2382,7 @@ var File_connector_proto protoreflect.FileDescriptor
 
 const file_connector_proto_rawDesc = "" +
 	"\n" +
-	"\x0fconnector.proto\x12\x04zqnt\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a google/protobuf/field_mask.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\fcommon.proto\x1a\fevents.proto\x1a mission-autonomy-contracts.proto\x1a$capability-execution-contracts.proto\x1a\x1ecapability-execution-dto.proto\x1a\x1edevice-control-contracts.proto\"\x81\x01\n" +
-	"\x1cPersistSkillExecutionRequest\x12%\n" +
-	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12:\n" +
-	"\texecution\x18\x02 \x01(\v2\x1c.zqnt.SkillExecutionProtoDTOR\texecution\"\x7f\n" +
-	" AppendSkillExecutionEventRequest\x12%\n" +
-	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x124\n" +
-	"\x05event\x18\x02 \x01(\v2\x1e.zqnt.SkillExecutionEventProtoR\x05event\"\xab\x02\n" +
+	"\x0fconnector.proto\x12\x04zqnt\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a google/protobuf/field_mask.proto\x1a\fcommon.proto\x1a\fevents.proto\x1a mission-autonomy-contracts.proto\"\xab\x02\n" +
 	"\x19UpsertAssetPayloadRequest\x12%\n" +
 	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x124\n" +
 	"\apayload\x18\x02 \x01(\v2\x1a.zqnt.AssetPayloadProtoDTOR\apayload\x12%\n" +
@@ -3547,104 +2420,6 @@ const file_connector_proto_rawDesc = "" +
 	"\n" +
 	"has_errors\x18\x02 \x01(\bR\thasErrors\x126\n" +
 	"\bpayloads\x18\x03 \x03(\v2\x1a.zqnt.AssetPayloadProtoDTOR\bpayloads\x123\n" +
-	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x88\x01\x01B\b\n" +
-	"\x06_error\"\xc7\x01\n" +
-	"\x17SetAssetPropertyRequest\x12%\n" +
-	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x0e\n" +
-	"\x02sn\x18\x02 \x01(\tR\x02sn\x12\x10\n" +
-	"\x03key\x18\x03 \x01(\tR\x03key\x12,\n" +
-	"\x05value\x18\x04 \x01(\v2\x16.google.protobuf.ValueR\x05value\x12%\n" +
-	"\vdescription\x18\x05 \x01(\tH\x00R\vdescription\x88\x01\x01B\x0e\n" +
-	"\f_description\"S\n" +
-	"\x1aListAssetPropertiesRequest\x12%\n" +
-	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x0e\n" +
-	"\x02sn\x18\x02 \x01(\tR\x02sn\"e\n" +
-	"\x1aDeleteAssetPropertyRequest\x12%\n" +
-	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x0e\n" +
-	"\x02sn\x18\x02 \x01(\tR\x02sn\x12\x10\n" +
-	"\x03key\x18\x03 \x01(\tR\x03key\"\xd2\x01\n" +
-	"\x15AssetPropertyResponse\x12\x10\n" +
-	"\x03tid\x18\x01 \x01(\tR\x03tid\x12\x1d\n" +
-	"\n" +
-	"has_errors\x18\x02 \x01(\bR\thasErrors\x12<\n" +
-	"\bproperty\x18\x03 \x01(\v2\x1b.zqnt.AssetPropertyProtoDTOH\x00R\bproperty\x88\x01\x01\x123\n" +
-	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x01R\x05error\x88\x01\x01B\v\n" +
-	"\t_propertyB\b\n" +
-	"\x06_error\"\xc8\x01\n" +
-	"\x19AssetPropertyListResponse\x12\x10\n" +
-	"\x03tid\x18\x01 \x01(\tR\x03tid\x12\x1d\n" +
-	"\n" +
-	"has_errors\x18\x02 \x01(\bR\thasErrors\x12;\n" +
-	"\n" +
-	"properties\x18\x03 \x03(\v2\x1b.zqnt.AssetPropertyProtoDTOR\n" +
-	"properties\x123\n" +
-	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x88\x01\x01B\b\n" +
-	"\x06_error\"\xbc\t\n" +
-	"\x15SkillContractProtoDTO\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
-	"\n" +
-	"command_id\x18\x02 \x01(\tR\tcommandId\x12\x19\n" +
-	"\bskill_id\x18\x03 \x01(\tR\askillId\x12&\n" +
-	"\fdisplay_name\x18\x04 \x01(\tH\x00R\vdisplayName\x88\x01\x01\x12%\n" +
-	"\vdescription\x18\x05 \x01(\tH\x01R\vdescription\x88\x01\x01\x12*\n" +
-	"\x0eschema_version\x18\x06 \x01(\tH\x02R\rschemaVersion\x88\x01\x01\x12:\n" +
-	"\finput_schema\x18\a \x01(\v2\x17.google.protobuf.StructR\vinputSchema\x12<\n" +
-	"\routput_schema\x18\b \x01(\v2\x17.google.protobuf.StructR\foutputSchema\x122\n" +
-	"\x06errors\x18\t \x03(\v2\x1a.zqnt.CapabilityErrorProtoR\x06errors\x122\n" +
-	"\x06events\x18\n" +
-	" \x03(\v2\x1a.zqnt.CapabilityEventProtoR\x06events\x12J\n" +
-	"\frequirements\x18\v \x01(\v2!.zqnt.CapabilityRequirementsProtoH\x03R\frequirements\x88\x01\x01\x128\n" +
-	"\x06source\x18\f \x01(\x0e2\x1b.zqnt.CapabilitySourceProtoH\x04R\x06source\x88\x01\x01\x12\x1f\n" +
-	"\bprovider\x18\r \x01(\tH\x05R\bprovider\x88\x01\x01\x121\n" +
-	"\x06status\x18\x0e \x01(\x0e2\x19.zqnt.SkillContractStatusR\x06status\x12C\n" +
-	"\rfirst_seen_at\x18\x0f \x01(\v2\x1a.google.protobuf.TimestampH\x06R\vfirstSeenAt\x88\x01\x01\x12A\n" +
-	"\flast_seen_at\x18\x10 \x01(\v2\x1a.google.protobuf.TimestampH\aR\n" +
-	"lastSeenAt\x88\x01\x01\x12;\n" +
-	"\x17previous_schema_version\x18\x11 \x01(\tH\bR\x15previousSchemaVersion\x88\x01\x01\x12K\n" +
-	"\rcompatibility\x18\x12 \x01(\x0e2 .zqnt.SkillContractCompatibilityH\tR\rcompatibility\x88\x01\x01\x12/\n" +
-	"\x13compatibility_notes\x18\x13 \x03(\tR\x12compatibilityNotes\x121\n" +
-	"\x14required_permissions\x18\x14 \x03(\tR\x13requiredPermissionsB\x0f\n" +
-	"\r_display_nameB\x0e\n" +
-	"\f_descriptionB\x11\n" +
-	"\x0f_schema_versionB\x0f\n" +
-	"\r_requirementsB\t\n" +
-	"\a_sourceB\v\n" +
-	"\t_providerB\x10\n" +
-	"\x0e_first_seen_atB\x0f\n" +
-	"\r_last_seen_atB\x1a\n" +
-	"\x18_previous_schema_versionB\x10\n" +
-	"\x0e_compatibility\"|\n" +
-	"\x1aUpsertSkillContractRequest\x12%\n" +
-	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x127\n" +
-	"\bcontract\x18\x02 \x01(\v2\x1b.zqnt.SkillContractProtoDTOR\bcontract\"\xb8\x01\n" +
-	"\x19ListSkillContractsRequest\x12%\n" +
-	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x126\n" +
-	"\x06status\x18\x02 \x01(\x0e2\x19.zqnt.SkillContractStatusH\x00R\x06status\x88\x01\x01\x12\"\n" +
-	"\n" +
-	"command_id\x18\x03 \x01(\tH\x01R\tcommandId\x88\x01\x01B\t\n" +
-	"\a_statusB\r\n" +
-	"\v_command_id\"\x89\x01\n" +
-	"\x1dSetSkillContractStatusRequest\x12%\n" +
-	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x0e\n" +
-	"\x02id\x18\x02 \x01(\tR\x02id\x121\n" +
-	"\x06status\x18\x03 \x01(\x0e2\x19.zqnt.SkillContractStatusR\x06status\"\x8e\x01\n" +
-	"\"SetSkillContractPermissionsRequest\x12%\n" +
-	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x0e\n" +
-	"\x02id\x18\x02 \x01(\tR\x02id\x121\n" +
-	"\x14required_permissions\x18\x03 \x03(\tR\x13requiredPermissions\"\xd2\x01\n" +
-	"\x15SkillContractResponse\x12\x10\n" +
-	"\x03tid\x18\x01 \x01(\tR\x03tid\x12\x1d\n" +
-	"\n" +
-	"has_errors\x18\x02 \x01(\bR\thasErrors\x12<\n" +
-	"\bcontract\x18\x03 \x01(\v2\x1b.zqnt.SkillContractProtoDTOH\x00R\bcontract\x88\x01\x01\x123\n" +
-	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x01R\x05error\x88\x01\x01B\v\n" +
-	"\t_contractB\b\n" +
-	"\x06_error\"\xc6\x01\n" +
-	"\x19SkillContractListResponse\x12\x10\n" +
-	"\x03tid\x18\x01 \x01(\tR\x03tid\x12\x1d\n" +
-	"\n" +
-	"has_errors\x18\x02 \x01(\bR\thasErrors\x129\n" +
-	"\tcontracts\x18\x03 \x03(\v2\x1b.zqnt.SkillContractProtoDTOR\tcontracts\x123\n" +
 	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x88\x01\x01B\b\n" +
 	"\x06_error\"`\n" +
 	"\x1cConnectorGetAssetByIdRequest\x12%\n" +
@@ -3886,21 +2661,11 @@ const file_connector_proto_rawDesc = "" +
 	"\vconfig_list\x18\x05 \x01(\v2!.zqnt.TechnicalConfigProtoDTOListH\x00R\n" +
 	"configListB\n" +
 	"\n" +
-	"\bresponse*\xa1\x01\n" +
-	"\x13SkillContractStatus\x12 \n" +
-	"\x1cSKILL_CONTRACT_STATUS_ACTIVE\x10\x00\x12\x1f\n" +
-	"\x1bSKILL_CONTRACT_STATUS_DRAFT\x10\x01\x12$\n" +
-	" SKILL_CONTRACT_STATUS_DEPRECATED\x10\x02\x12!\n" +
-	"\x1dSKILL_CONTRACT_STATUS_RETIRED\x10\x03*\xc4\x01\n" +
-	"\x1aSkillContractCompatibility\x12(\n" +
-	"$SKILL_CONTRACT_COMPATIBILITY_UNKNOWN\x10\x00\x12$\n" +
-	" SKILL_CONTRACT_COMPATIBILITY_NEW\x10\x01\x12+\n" +
-	"'SKILL_CONTRACT_COMPATIBILITY_COMPATIBLE\x10\x02\x12)\n" +
-	"%SKILL_CONTRACT_COMPATIBILITY_BREAKING\x10\x03*f\n" +
+	"\bresponse*f\n" +
 	"\rTelemetryType\x12\x1e\n" +
 	"\x1aTELEMETRY_TYPE_UNSPECIFIED\x10\x00\x12\x18\n" +
 	"\x14TELEMETRY_TYPE_ASSET\x10\x01\x12\x1b\n" +
-	"\x17TELEMETRY_TYPE_SUBASSET\x10\x022\xf5\x19\n" +
+	"\x17TELEMETRY_TYPE_SUBASSET\x10\x022\xa5\x15\n" +
 	"\x10ConnectorService\x12M\n" +
 	"\rRegisterAsset\x12#.zqnt.ConnectorRegisterAssetRequest\x1a\x17.zqnt.ConnectorResponse\x12=\n" +
 	"\x0fDeregisterAsset\x12\x11.zqnt.RequestBase\x1a\x17.zqnt.ConnectorResponse\x12E\n" +
@@ -3912,36 +2677,36 @@ const file_connector_proto_rawDesc = "" +
 	"\x0fGetSubAssetBySn\x12\x11.zqnt.RequestBase\x1a\x17.zqnt.ConnectorResponse\x12Q\n" +
 	"\x12UpsertAssetPayload\x12\x1f.zqnt.UpsertAssetPayloadRequest\x1a\x1a.zqnt.AssetPayloadResponse\x12S\n" +
 	"\x11ListAssetPayloads\x12\x1e.zqnt.ListAssetPayloadsRequest\x1a\x1e.zqnt.AssetPayloadListResponse\x12Q\n" +
-	"\x12DeleteAssetPayload\x12\x1f.zqnt.DeleteAssetPayloadRequest\x1a\x1a.zqnt.AssetPayloadResponse\x12N\n" +
-	"\x10SetAssetProperty\x12\x1d.zqnt.SetAssetPropertyRequest\x1a\x1b.zqnt.AssetPropertyResponse\x12X\n" +
-	"\x13ListAssetProperties\x12 .zqnt.ListAssetPropertiesRequest\x1a\x1f.zqnt.AssetPropertyListResponse\x12T\n" +
-	"\x13DeleteAssetProperty\x12 .zqnt.DeleteAssetPropertyRequest\x1a\x1b.zqnt.AssetPropertyResponse\x12Q\n" +
-	"\x0fGetOrganization\x12%.zqnt.ConnectorGetOrganizationRequest\x1a\x17.zqnt.ConnectorResponse\x12F\n" +
-	"\x0eListSchedulers\x12\x1b.zqnt.ListSchedulersRequest\x1a\x17.zqnt.SchedulerResponse\x12B\n" +
+	"\x12DeleteAssetPayload\x12\x1f.zqnt.DeleteAssetPayloadRequest\x1a\x1a.zqnt.AssetPayloadResponse\x12Q\n" +
+	"\x0fGetOrganization\x12%.zqnt.ConnectorGetOrganizationRequest\x1a\x17.zqnt.ConnectorResponse\x12<\n" +
+	"\n" +
+	"GetMission\x12\x17.zqnt.GetMissionRequest\x1a\x15.zqnt.MissionResponse\x12B\n" +
+	"\rCreateMission\x12\x1a.zqnt.CreateMissionRequest\x1a\x15.zqnt.MissionResponse\x12B\n" +
+	"\rUpdateMission\x12\x1a.zqnt.UpdateMissionRequest\x1a\x15.zqnt.MissionResponse\x12B\n" +
+	"\rDeleteMission\x12\x1a.zqnt.DeleteMissionRequest\x1a\x15.zqnt.MissionResponse\x12R\n" +
+	"\x15UploadMissionNfzZones\x12\".zqnt.UploadMissionNfzZonesRequest\x1a\x15.zqnt.MissionResponse\x123\n" +
+	"\aGetTask\x12\x14.zqnt.GetTaskRequest\x1a\x12.zqnt.TaskResponse\x12G\n" +
+	"\x11GetTaskByFlightId\x12\x1e.zqnt.GetTaskByFlightIdRequest\x1a\x12.zqnt.TaskResponse\x12R\n" +
+	"\x14GetWaypointsByTaskId\x12!.zqnt.GetWaypointsByTaskIdRequest\x1a\x17.zqnt.WaypointsResponse\x129\n" +
+	"\n" +
+	"CreateTask\x12\x17.zqnt.CreateTaskRequest\x1a\x12.zqnt.TaskResponse\x129\n" +
+	"\n" +
+	"UpdateTask\x12\x17.zqnt.UpdateTaskRequest\x1a\x12.zqnt.TaskResponse\x129\n" +
+	"\n" +
+	"DeleteTask\x12\x17.zqnt.DeleteTaskRequest\x1a\x12.zqnt.TaskResponse\x12B\n" +
 	"\fGetScheduler\x12\x19.zqnt.GetSchedulerRequest\x1a\x17.zqnt.SchedulerResponse\x12H\n" +
 	"\x0fCreateScheduler\x12\x1c.zqnt.CreateSchedulerRequest\x1a\x17.zqnt.SchedulerResponse\x12J\n" +
 	"\x10CreateSchedulers\x12\x1d.zqnt.CreateSchedulersRequest\x1a\x17.zqnt.SchedulerResponse\x12H\n" +
 	"\x0fUpdateScheduler\x12\x1c.zqnt.UpdateSchedulerRequest\x1a\x17.zqnt.SchedulerResponse\x12H\n" +
 	"\x0fDeleteScheduler\x12\x1c.zqnt.DeleteSchedulerRequest\x1a\x17.zqnt.SchedulerResponse\x12J\n" +
 	"\x10DeleteSchedulers\x12\x1d.zqnt.DeleteSchedulersRequest\x1a\x17.zqnt.SchedulerResponse\x12V\n" +
+	"\x16DeleteSchedulersByTask\x12#.zqnt.DeleteSchedulersByTaskRequest\x1a\x17.zqnt.SchedulerResponse\x12V\n" +
 	"\x13StoreTelemetryBatch\x12$.zqnt.ConnectorStoreTelemetryRequest\x1a\x17.zqnt.ConnectorResponse(\x01\x12V\n" +
 	"\x13StoreDetectionBatch\x12$.zqnt.ConnectorStoreDetectionRequest\x1a\x17.zqnt.ConnectorResponse(\x01\x12U\n" +
 	"\x16StoreNotificationBatch\x12 .zqnt.ProduceNotificationRequest\x1a\x17.zqnt.ConnectorResponse(\x01\x12[\n" +
 	"\x17GetActivePoliciesByType\x12!.zqnt.ConnectorGetPoliciesRequest\x1a\x1d.zqnt.ConnectorPolicyResponse\x12[\n" +
 	"\x14GetAllActivePolicies\x12$.zqnt.ConnectorGetAllPoliciesRequest\x1a\x1d.zqnt.ConnectorPolicyResponse\x12V\n" +
-	"\x13GetTechnicalConfigs\x12 .zqnt.ConnectorGetConfigsRequest\x1a\x1d.zqnt.ConnectorConfigResponse\x12O\n" +
-	"\x12PersistApplication\x12\x1e.zqnt.UpsertApplicationRequest\x1a\x19.zqnt.ApplicationResponse\x12Q\n" +
-	"\x17GetPersistedApplication\x12\x1b.zqnt.GetApplicationRequest\x1a\x19.zqnt.ApplicationResponse\x12Y\n" +
-	"\x19ListPersistedApplications\x12\x1d.zqnt.ListApplicationsRequest\x1a\x1d.zqnt.ApplicationListResponse\x12W\n" +
-	"\x1aDeletePersistedApplication\x12\x1e.zqnt.DeleteApplicationRequest\x1a\x19.zqnt.ApplicationResponse\x12Y\n" +
-	"\x15PersistSkillExecution\x12\".zqnt.PersistSkillExecutionRequest\x1a\x1c.zqnt.SkillExecutionResponse\x12Z\n" +
-	"\x1aGetPersistedSkillExecution\x12\x1e.zqnt.GetSkillExecutionRequest\x1a\x1c.zqnt.SkillExecutionResponse\x12b\n" +
-	"\x1cListPersistedSkillExecutions\x12 .zqnt.ListSkillExecutionsRequest\x1a .zqnt.SkillExecutionListResponse\x12[\n" +
-	"\x19AppendSkillExecutionEvent\x12&.zqnt.AppendSkillExecutionEventRequest\x1a\x16.google.protobuf.Empty\x12U\n" +
-	"\x14ObserveSkillContract\x12 .zqnt.UpsertSkillContractRequest\x1a\x1b.zqnt.SkillContractResponse\x12V\n" +
-	"\x12ListSkillContracts\x12\x1f.zqnt.ListSkillContractsRequest\x1a\x1f.zqnt.SkillContractListResponse\x12Z\n" +
-	"\x16SetSkillContractStatus\x12#.zqnt.SetSkillContractStatusRequest\x1a\x1b.zqnt.SkillContractResponse\x12d\n" +
-	"\x1bSetSkillContractPermissions\x12(.zqnt.SetSkillContractPermissionsRequest\x1a\x1b.zqnt.SkillContractResponseBG\n" +
+	"\x13GetTechnicalConfigs\x12 .zqnt.ConnectorGetConfigsRequest\x1a\x1d.zqnt.ConnectorConfigResponseBG\n" +
 	"\x1ecom.zqnt.utils.connector.protoB\x0eConnectorProtoP\x01Z\x13gen/connector/protob\x06proto3"
 
 var (
@@ -3956,266 +2721,204 @@ func file_connector_proto_rawDescGZIP() []byte {
 	return file_connector_proto_rawDescData
 }
 
-var file_connector_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_connector_proto_msgTypes = make([]protoimpl.MessageInfo, 43)
+var file_connector_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_connector_proto_msgTypes = make([]protoimpl.MessageInfo, 29)
 var file_connector_proto_goTypes = []any{
-	(SkillContractStatus)(0),                   // 0: zqnt.SkillContractStatus
-	(SkillContractCompatibility)(0),            // 1: zqnt.SkillContractCompatibility
-	(TelemetryType)(0),                         // 2: zqnt.TelemetryType
-	(*PersistSkillExecutionRequest)(nil),       // 3: zqnt.PersistSkillExecutionRequest
-	(*AppendSkillExecutionEventRequest)(nil),   // 4: zqnt.AppendSkillExecutionEventRequest
-	(*UpsertAssetPayloadRequest)(nil),          // 5: zqnt.UpsertAssetPayloadRequest
-	(*AssetPayloadOwner)(nil),                  // 6: zqnt.AssetPayloadOwner
-	(*ListAssetPayloadsRequest)(nil),           // 7: zqnt.ListAssetPayloadsRequest
-	(*DeleteAssetPayloadRequest)(nil),          // 8: zqnt.DeleteAssetPayloadRequest
-	(*AssetPayloadResponse)(nil),               // 9: zqnt.AssetPayloadResponse
-	(*AssetPayloadListResponse)(nil),           // 10: zqnt.AssetPayloadListResponse
-	(*SetAssetPropertyRequest)(nil),            // 11: zqnt.SetAssetPropertyRequest
-	(*ListAssetPropertiesRequest)(nil),         // 12: zqnt.ListAssetPropertiesRequest
-	(*DeleteAssetPropertyRequest)(nil),         // 13: zqnt.DeleteAssetPropertyRequest
-	(*AssetPropertyResponse)(nil),              // 14: zqnt.AssetPropertyResponse
-	(*AssetPropertyListResponse)(nil),          // 15: zqnt.AssetPropertyListResponse
-	(*SkillContractProtoDTO)(nil),              // 16: zqnt.SkillContractProtoDTO
-	(*UpsertSkillContractRequest)(nil),         // 17: zqnt.UpsertSkillContractRequest
-	(*ListSkillContractsRequest)(nil),          // 18: zqnt.ListSkillContractsRequest
-	(*SetSkillContractStatusRequest)(nil),      // 19: zqnt.SetSkillContractStatusRequest
-	(*SetSkillContractPermissionsRequest)(nil), // 20: zqnt.SetSkillContractPermissionsRequest
-	(*SkillContractResponse)(nil),              // 21: zqnt.SkillContractResponse
-	(*SkillContractListResponse)(nil),          // 22: zqnt.SkillContractListResponse
-	(*ConnectorGetAssetByIdRequest)(nil),       // 23: zqnt.ConnectorGetAssetByIdRequest
-	(*ConnectorAssetList)(nil),                 // 24: zqnt.ConnectorAssetList
-	(*ConnectorRegisterAssetRequest)(nil),      // 25: zqnt.ConnectorRegisterAssetRequest
-	(*ConnectorUpdateAssetRequest)(nil),        // 26: zqnt.ConnectorUpdateAssetRequest
-	(*ConnectorUpdateSubAssetRequest)(nil),     // 27: zqnt.ConnectorUpdateSubAssetRequest
-	(*ConnectorResponse)(nil),                  // 28: zqnt.ConnectorResponse
-	(*AssetMonitoringResponse)(nil),            // 29: zqnt.AssetMonitoringResponse
-	(*ConnectorGetOrganizationRequest)(nil),    // 30: zqnt.ConnectorGetOrganizationRequest
-	(*ConnectorStoreTelemetryRequest)(nil),     // 31: zqnt.ConnectorStoreTelemetryRequest
-	(*ConnectorStoreDetectionRequest)(nil),     // 32: zqnt.ConnectorStoreDetectionRequest
-	(*AssetTelemetryProto)(nil),                // 33: zqnt.AssetTelemetryProto
-	(*SubAssetTelemetryProto)(nil),             // 34: zqnt.SubAssetTelemetryProto
-	(*PolicyProtoDTO)(nil),                     // 35: zqnt.PolicyProtoDTO
-	(*PolicyProtoDTOList)(nil),                 // 36: zqnt.PolicyProtoDTOList
-	(*ConnectorGetPoliciesRequest)(nil),        // 37: zqnt.ConnectorGetPoliciesRequest
-	(*ConnectorGetAllPoliciesRequest)(nil),     // 38: zqnt.ConnectorGetAllPoliciesRequest
-	(*ConnectorPolicyResponse)(nil),            // 39: zqnt.ConnectorPolicyResponse
-	(*TechnicalConfigProtoDTO)(nil),            // 40: zqnt.TechnicalConfigProtoDTO
-	(*TechnicalConfigProtoDTOList)(nil),        // 41: zqnt.TechnicalConfigProtoDTOList
-	(*ConnectorGetConfigsRequest)(nil),         // 42: zqnt.ConnectorGetConfigsRequest
-	(*ConnectorConfigResponse)(nil),            // 43: zqnt.ConnectorConfigResponse
-	nil,                                        // 44: zqnt.AssetTelemetryProto.TelemetryDataEntry
-	nil,                                        // 45: zqnt.SubAssetTelemetryProto.TelemetryDataEntry
-	(*proto.RequestBase)(nil),                  // 46: zqnt.RequestBase
-	(*proto1.SkillExecutionProtoDTO)(nil),      // 47: zqnt.SkillExecutionProtoDTO
-	(*proto1.SkillExecutionEventProto)(nil),    // 48: zqnt.SkillExecutionEventProto
-	(*proto2.AssetPayloadProtoDTO)(nil),        // 49: zqnt.AssetPayloadProtoDTO
-	(*fieldmaskpb.FieldMask)(nil),              // 50: google.protobuf.FieldMask
-	(*proto.GlobalErrorMessage)(nil),           // 51: zqnt.GlobalErrorMessage
-	(*structpb.Value)(nil),                     // 52: google.protobuf.Value
-	(*proto2.AssetPropertyProtoDTO)(nil),       // 53: zqnt.AssetPropertyProtoDTO
-	(*structpb.Struct)(nil),                    // 54: google.protobuf.Struct
-	(*proto3.CapabilityErrorProto)(nil),        // 55: zqnt.CapabilityErrorProto
-	(*proto3.CapabilityEventProto)(nil),        // 56: zqnt.CapabilityEventProto
-	(*proto3.CapabilityRequirementsProto)(nil), // 57: zqnt.CapabilityRequirementsProto
-	(proto3.CapabilitySourceProto)(0),          // 58: zqnt.CapabilitySourceProto
-	(*timestamppb.Timestamp)(nil),              // 59: google.protobuf.Timestamp
-	(*proto2.AssetProtoDTO)(nil),               // 60: zqnt.AssetProtoDTO
-	(*proto2.SubAssetProtoDTO)(nil),            // 61: zqnt.SubAssetProtoDTO
-	(*emptypb.Empty)(nil),                      // 62: google.protobuf.Empty
-	(*proto2.OrganizationProtoDTO)(nil),        // 63: zqnt.OrganizationProtoDTO
-	(*proto4.ListSchedulersRequest)(nil),       // 64: zqnt.ListSchedulersRequest
-	(*proto4.GetSchedulerRequest)(nil),         // 65: zqnt.GetSchedulerRequest
-	(*proto4.CreateSchedulerRequest)(nil),      // 66: zqnt.CreateSchedulerRequest
-	(*proto4.CreateSchedulersRequest)(nil),     // 67: zqnt.CreateSchedulersRequest
-	(*proto4.UpdateSchedulerRequest)(nil),      // 68: zqnt.UpdateSchedulerRequest
-	(*proto4.DeleteSchedulerRequest)(nil),      // 69: zqnt.DeleteSchedulerRequest
-	(*proto4.DeleteSchedulersRequest)(nil),     // 70: zqnt.DeleteSchedulersRequest
-	(*proto5.ProduceNotificationRequest)(nil),  // 71: zqnt.ProduceNotificationRequest
-	(*proto6.UpsertApplicationRequest)(nil),    // 72: zqnt.UpsertApplicationRequest
-	(*proto6.GetApplicationRequest)(nil),       // 73: zqnt.GetApplicationRequest
-	(*proto6.ListApplicationsRequest)(nil),     // 74: zqnt.ListApplicationsRequest
-	(*proto6.DeleteApplicationRequest)(nil),    // 75: zqnt.DeleteApplicationRequest
-	(*proto6.GetSkillExecutionRequest)(nil),    // 76: zqnt.GetSkillExecutionRequest
-	(*proto6.ListSkillExecutionsRequest)(nil),  // 77: zqnt.ListSkillExecutionsRequest
-	(*proto4.SchedulerResponse)(nil),           // 78: zqnt.SchedulerResponse
-	(*proto6.ApplicationResponse)(nil),         // 79: zqnt.ApplicationResponse
-	(*proto6.ApplicationListResponse)(nil),     // 80: zqnt.ApplicationListResponse
-	(*proto6.SkillExecutionResponse)(nil),      // 81: zqnt.SkillExecutionResponse
-	(*proto6.SkillExecutionListResponse)(nil),  // 82: zqnt.SkillExecutionListResponse
+	(TelemetryType)(0),                           // 0: zqnt.TelemetryType
+	(*UpsertAssetPayloadRequest)(nil),            // 1: zqnt.UpsertAssetPayloadRequest
+	(*AssetPayloadOwner)(nil),                    // 2: zqnt.AssetPayloadOwner
+	(*ListAssetPayloadsRequest)(nil),             // 3: zqnt.ListAssetPayloadsRequest
+	(*DeleteAssetPayloadRequest)(nil),            // 4: zqnt.DeleteAssetPayloadRequest
+	(*AssetPayloadResponse)(nil),                 // 5: zqnt.AssetPayloadResponse
+	(*AssetPayloadListResponse)(nil),             // 6: zqnt.AssetPayloadListResponse
+	(*ConnectorGetAssetByIdRequest)(nil),         // 7: zqnt.ConnectorGetAssetByIdRequest
+	(*ConnectorAssetList)(nil),                   // 8: zqnt.ConnectorAssetList
+	(*ConnectorRegisterAssetRequest)(nil),        // 9: zqnt.ConnectorRegisterAssetRequest
+	(*ConnectorUpdateAssetRequest)(nil),          // 10: zqnt.ConnectorUpdateAssetRequest
+	(*ConnectorUpdateSubAssetRequest)(nil),       // 11: zqnt.ConnectorUpdateSubAssetRequest
+	(*ConnectorResponse)(nil),                    // 12: zqnt.ConnectorResponse
+	(*AssetMonitoringResponse)(nil),              // 13: zqnt.AssetMonitoringResponse
+	(*ConnectorGetOrganizationRequest)(nil),      // 14: zqnt.ConnectorGetOrganizationRequest
+	(*ConnectorStoreTelemetryRequest)(nil),       // 15: zqnt.ConnectorStoreTelemetryRequest
+	(*ConnectorStoreDetectionRequest)(nil),       // 16: zqnt.ConnectorStoreDetectionRequest
+	(*AssetTelemetryProto)(nil),                  // 17: zqnt.AssetTelemetryProto
+	(*SubAssetTelemetryProto)(nil),               // 18: zqnt.SubAssetTelemetryProto
+	(*PolicyProtoDTO)(nil),                       // 19: zqnt.PolicyProtoDTO
+	(*PolicyProtoDTOList)(nil),                   // 20: zqnt.PolicyProtoDTOList
+	(*ConnectorGetPoliciesRequest)(nil),          // 21: zqnt.ConnectorGetPoliciesRequest
+	(*ConnectorGetAllPoliciesRequest)(nil),       // 22: zqnt.ConnectorGetAllPoliciesRequest
+	(*ConnectorPolicyResponse)(nil),              // 23: zqnt.ConnectorPolicyResponse
+	(*TechnicalConfigProtoDTO)(nil),              // 24: zqnt.TechnicalConfigProtoDTO
+	(*TechnicalConfigProtoDTOList)(nil),          // 25: zqnt.TechnicalConfigProtoDTOList
+	(*ConnectorGetConfigsRequest)(nil),           // 26: zqnt.ConnectorGetConfigsRequest
+	(*ConnectorConfigResponse)(nil),              // 27: zqnt.ConnectorConfigResponse
+	nil,                                          // 28: zqnt.AssetTelemetryProto.TelemetryDataEntry
+	nil,                                          // 29: zqnt.SubAssetTelemetryProto.TelemetryDataEntry
+	(*proto.RequestBase)(nil),                    // 30: zqnt.RequestBase
+	(*proto1.AssetPayloadProtoDTO)(nil),          // 31: zqnt.AssetPayloadProtoDTO
+	(*fieldmaskpb.FieldMask)(nil),                // 32: google.protobuf.FieldMask
+	(*proto.GlobalErrorMessage)(nil),             // 33: zqnt.GlobalErrorMessage
+	(*proto1.AssetProtoDTO)(nil),                 // 34: zqnt.AssetProtoDTO
+	(*proto1.SubAssetProtoDTO)(nil),              // 35: zqnt.SubAssetProtoDTO
+	(*timestamppb.Timestamp)(nil),                // 36: google.protobuf.Timestamp
+	(*emptypb.Empty)(nil),                        // 37: google.protobuf.Empty
+	(*proto1.OrganizationProtoDTO)(nil),          // 38: zqnt.OrganizationProtoDTO
+	(*proto2.GetMissionRequest)(nil),             // 39: zqnt.GetMissionRequest
+	(*proto2.CreateMissionRequest)(nil),          // 40: zqnt.CreateMissionRequest
+	(*proto2.UpdateMissionRequest)(nil),          // 41: zqnt.UpdateMissionRequest
+	(*proto2.DeleteMissionRequest)(nil),          // 42: zqnt.DeleteMissionRequest
+	(*proto2.UploadMissionNfzZonesRequest)(nil),  // 43: zqnt.UploadMissionNfzZonesRequest
+	(*proto2.GetTaskRequest)(nil),                // 44: zqnt.GetTaskRequest
+	(*proto2.GetTaskByFlightIdRequest)(nil),      // 45: zqnt.GetTaskByFlightIdRequest
+	(*proto2.GetWaypointsByTaskIdRequest)(nil),   // 46: zqnt.GetWaypointsByTaskIdRequest
+	(*proto2.CreateTaskRequest)(nil),             // 47: zqnt.CreateTaskRequest
+	(*proto2.UpdateTaskRequest)(nil),             // 48: zqnt.UpdateTaskRequest
+	(*proto2.DeleteTaskRequest)(nil),             // 49: zqnt.DeleteTaskRequest
+	(*proto2.GetSchedulerRequest)(nil),           // 50: zqnt.GetSchedulerRequest
+	(*proto2.CreateSchedulerRequest)(nil),        // 51: zqnt.CreateSchedulerRequest
+	(*proto2.CreateSchedulersRequest)(nil),       // 52: zqnt.CreateSchedulersRequest
+	(*proto2.UpdateSchedulerRequest)(nil),        // 53: zqnt.UpdateSchedulerRequest
+	(*proto2.DeleteSchedulerRequest)(nil),        // 54: zqnt.DeleteSchedulerRequest
+	(*proto2.DeleteSchedulersRequest)(nil),       // 55: zqnt.DeleteSchedulersRequest
+	(*proto2.DeleteSchedulersByTaskRequest)(nil), // 56: zqnt.DeleteSchedulersByTaskRequest
+	(*proto3.ProduceNotificationRequest)(nil),    // 57: zqnt.ProduceNotificationRequest
+	(*proto2.MissionResponse)(nil),               // 58: zqnt.MissionResponse
+	(*proto2.TaskResponse)(nil),                  // 59: zqnt.TaskResponse
+	(*proto2.WaypointsResponse)(nil),             // 60: zqnt.WaypointsResponse
+	(*proto2.SchedulerResponse)(nil),             // 61: zqnt.SchedulerResponse
 }
 var file_connector_proto_depIdxs = []int32{
-	46,  // 0: zqnt.PersistSkillExecutionRequest.base:type_name -> zqnt.RequestBase
-	47,  // 1: zqnt.PersistSkillExecutionRequest.execution:type_name -> zqnt.SkillExecutionProtoDTO
-	46,  // 2: zqnt.AppendSkillExecutionEventRequest.base:type_name -> zqnt.RequestBase
-	48,  // 3: zqnt.AppendSkillExecutionEventRequest.event:type_name -> zqnt.SkillExecutionEventProto
-	46,  // 4: zqnt.UpsertAssetPayloadRequest.base:type_name -> zqnt.RequestBase
-	49,  // 5: zqnt.UpsertAssetPayloadRequest.payload:type_name -> zqnt.AssetPayloadProtoDTO
-	6,   // 6: zqnt.UpsertAssetPayloadRequest.owner:type_name -> zqnt.AssetPayloadOwner
-	50,  // 7: zqnt.UpsertAssetPayloadRequest.update_mask:type_name -> google.protobuf.FieldMask
-	46,  // 8: zqnt.ListAssetPayloadsRequest.base:type_name -> zqnt.RequestBase
-	6,   // 9: zqnt.ListAssetPayloadsRequest.owner:type_name -> zqnt.AssetPayloadOwner
-	46,  // 10: zqnt.DeleteAssetPayloadRequest.base:type_name -> zqnt.RequestBase
-	6,   // 11: zqnt.DeleteAssetPayloadRequest.owner:type_name -> zqnt.AssetPayloadOwner
-	49,  // 12: zqnt.AssetPayloadResponse.payload:type_name -> zqnt.AssetPayloadProtoDTO
-	51,  // 13: zqnt.AssetPayloadResponse.error:type_name -> zqnt.GlobalErrorMessage
-	49,  // 14: zqnt.AssetPayloadListResponse.payloads:type_name -> zqnt.AssetPayloadProtoDTO
-	51,  // 15: zqnt.AssetPayloadListResponse.error:type_name -> zqnt.GlobalErrorMessage
-	46,  // 16: zqnt.SetAssetPropertyRequest.base:type_name -> zqnt.RequestBase
-	52,  // 17: zqnt.SetAssetPropertyRequest.value:type_name -> google.protobuf.Value
-	46,  // 18: zqnt.ListAssetPropertiesRequest.base:type_name -> zqnt.RequestBase
-	46,  // 19: zqnt.DeleteAssetPropertyRequest.base:type_name -> zqnt.RequestBase
-	53,  // 20: zqnt.AssetPropertyResponse.property:type_name -> zqnt.AssetPropertyProtoDTO
-	51,  // 21: zqnt.AssetPropertyResponse.error:type_name -> zqnt.GlobalErrorMessage
-	53,  // 22: zqnt.AssetPropertyListResponse.properties:type_name -> zqnt.AssetPropertyProtoDTO
-	51,  // 23: zqnt.AssetPropertyListResponse.error:type_name -> zqnt.GlobalErrorMessage
-	54,  // 24: zqnt.SkillContractProtoDTO.input_schema:type_name -> google.protobuf.Struct
-	54,  // 25: zqnt.SkillContractProtoDTO.output_schema:type_name -> google.protobuf.Struct
-	55,  // 26: zqnt.SkillContractProtoDTO.errors:type_name -> zqnt.CapabilityErrorProto
-	56,  // 27: zqnt.SkillContractProtoDTO.events:type_name -> zqnt.CapabilityEventProto
-	57,  // 28: zqnt.SkillContractProtoDTO.requirements:type_name -> zqnt.CapabilityRequirementsProto
-	58,  // 29: zqnt.SkillContractProtoDTO.source:type_name -> zqnt.CapabilitySourceProto
-	0,   // 30: zqnt.SkillContractProtoDTO.status:type_name -> zqnt.SkillContractStatus
-	59,  // 31: zqnt.SkillContractProtoDTO.first_seen_at:type_name -> google.protobuf.Timestamp
-	59,  // 32: zqnt.SkillContractProtoDTO.last_seen_at:type_name -> google.protobuf.Timestamp
-	1,   // 33: zqnt.SkillContractProtoDTO.compatibility:type_name -> zqnt.SkillContractCompatibility
-	46,  // 34: zqnt.UpsertSkillContractRequest.base:type_name -> zqnt.RequestBase
-	16,  // 35: zqnt.UpsertSkillContractRequest.contract:type_name -> zqnt.SkillContractProtoDTO
-	46,  // 36: zqnt.ListSkillContractsRequest.base:type_name -> zqnt.RequestBase
-	0,   // 37: zqnt.ListSkillContractsRequest.status:type_name -> zqnt.SkillContractStatus
-	46,  // 38: zqnt.SetSkillContractStatusRequest.base:type_name -> zqnt.RequestBase
-	0,   // 39: zqnt.SetSkillContractStatusRequest.status:type_name -> zqnt.SkillContractStatus
-	46,  // 40: zqnt.SetSkillContractPermissionsRequest.base:type_name -> zqnt.RequestBase
-	16,  // 41: zqnt.SkillContractResponse.contract:type_name -> zqnt.SkillContractProtoDTO
-	51,  // 42: zqnt.SkillContractResponse.error:type_name -> zqnt.GlobalErrorMessage
-	16,  // 43: zqnt.SkillContractListResponse.contracts:type_name -> zqnt.SkillContractProtoDTO
-	51,  // 44: zqnt.SkillContractListResponse.error:type_name -> zqnt.GlobalErrorMessage
-	46,  // 45: zqnt.ConnectorGetAssetByIdRequest.base:type_name -> zqnt.RequestBase
-	60,  // 46: zqnt.ConnectorAssetList.assets:type_name -> zqnt.AssetProtoDTO
-	46,  // 47: zqnt.ConnectorRegisterAssetRequest.base:type_name -> zqnt.RequestBase
-	60,  // 48: zqnt.ConnectorRegisterAssetRequest.asset:type_name -> zqnt.AssetProtoDTO
-	46,  // 49: zqnt.ConnectorUpdateAssetRequest.base:type_name -> zqnt.RequestBase
-	60,  // 50: zqnt.ConnectorUpdateAssetRequest.asset:type_name -> zqnt.AssetProtoDTO
-	50,  // 51: zqnt.ConnectorUpdateAssetRequest.update_mask:type_name -> google.protobuf.FieldMask
-	46,  // 52: zqnt.ConnectorUpdateSubAssetRequest.base:type_name -> zqnt.RequestBase
-	61,  // 53: zqnt.ConnectorUpdateSubAssetRequest.sub_asset:type_name -> zqnt.SubAssetProtoDTO
-	50,  // 54: zqnt.ConnectorUpdateSubAssetRequest.update_mask:type_name -> google.protobuf.FieldMask
-	59,  // 55: zqnt.ConnectorResponse.timestamp:type_name -> google.protobuf.Timestamp
-	62,  // 56: zqnt.ConnectorResponse.empty:type_name -> google.protobuf.Empty
-	51,  // 57: zqnt.ConnectorResponse.error:type_name -> zqnt.GlobalErrorMessage
-	60,  // 58: zqnt.ConnectorResponse.asset:type_name -> zqnt.AssetProtoDTO
-	61,  // 59: zqnt.ConnectorResponse.sub_asset:type_name -> zqnt.SubAssetProtoDTO
-	63,  // 60: zqnt.ConnectorResponse.organization:type_name -> zqnt.OrganizationProtoDTO
-	59,  // 61: zqnt.AssetMonitoringResponse.timestamp:type_name -> google.protobuf.Timestamp
-	62,  // 62: zqnt.AssetMonitoringResponse.empty:type_name -> google.protobuf.Empty
-	51,  // 63: zqnt.AssetMonitoringResponse.error:type_name -> zqnt.GlobalErrorMessage
-	24,  // 64: zqnt.AssetMonitoringResponse.assets:type_name -> zqnt.ConnectorAssetList
-	46,  // 65: zqnt.ConnectorGetOrganizationRequest.base:type_name -> zqnt.RequestBase
-	46,  // 66: zqnt.ConnectorStoreTelemetryRequest.base:type_name -> zqnt.RequestBase
-	2,   // 67: zqnt.ConnectorStoreTelemetryRequest.type:type_name -> zqnt.TelemetryType
-	33,  // 68: zqnt.ConnectorStoreTelemetryRequest.asset_telemetry:type_name -> zqnt.AssetTelemetryProto
-	34,  // 69: zqnt.ConnectorStoreTelemetryRequest.sub_asset_telemetry:type_name -> zqnt.SubAssetTelemetryProto
-	46,  // 70: zqnt.ConnectorStoreDetectionRequest.base:type_name -> zqnt.RequestBase
-	59,  // 71: zqnt.ConnectorStoreDetectionRequest.detected_at:type_name -> google.protobuf.Timestamp
-	59,  // 72: zqnt.AssetTelemetryProto.timestamp:type_name -> google.protobuf.Timestamp
-	44,  // 73: zqnt.AssetTelemetryProto.telemetry_data:type_name -> zqnt.AssetTelemetryProto.TelemetryDataEntry
-	59,  // 74: zqnt.SubAssetTelemetryProto.timestamp:type_name -> google.protobuf.Timestamp
-	45,  // 75: zqnt.SubAssetTelemetryProto.telemetry_data:type_name -> zqnt.SubAssetTelemetryProto.TelemetryDataEntry
-	35,  // 76: zqnt.PolicyProtoDTOList.policies:type_name -> zqnt.PolicyProtoDTO
-	46,  // 77: zqnt.ConnectorGetPoliciesRequest.base:type_name -> zqnt.RequestBase
-	46,  // 78: zqnt.ConnectorGetAllPoliciesRequest.base:type_name -> zqnt.RequestBase
-	59,  // 79: zqnt.ConnectorPolicyResponse.timestamp:type_name -> google.protobuf.Timestamp
-	51,  // 80: zqnt.ConnectorPolicyResponse.error:type_name -> zqnt.GlobalErrorMessage
-	36,  // 81: zqnt.ConnectorPolicyResponse.policy_list:type_name -> zqnt.PolicyProtoDTOList
-	40,  // 82: zqnt.TechnicalConfigProtoDTOList.configs:type_name -> zqnt.TechnicalConfigProtoDTO
-	46,  // 83: zqnt.ConnectorGetConfigsRequest.base:type_name -> zqnt.RequestBase
-	59,  // 84: zqnt.ConnectorConfigResponse.timestamp:type_name -> google.protobuf.Timestamp
-	51,  // 85: zqnt.ConnectorConfigResponse.error:type_name -> zqnt.GlobalErrorMessage
-	41,  // 86: zqnt.ConnectorConfigResponse.config_list:type_name -> zqnt.TechnicalConfigProtoDTOList
-	25,  // 87: zqnt.ConnectorService.RegisterAsset:input_type -> zqnt.ConnectorRegisterAssetRequest
-	46,  // 88: zqnt.ConnectorService.DeregisterAsset:input_type -> zqnt.RequestBase
-	46,  // 89: zqnt.ConnectorService.AssetMonitoring:input_type -> zqnt.RequestBase
-	26,  // 90: zqnt.ConnectorService.UpdateAsset:input_type -> zqnt.ConnectorUpdateAssetRequest
-	27,  // 91: zqnt.ConnectorService.UpdateSubAsset:input_type -> zqnt.ConnectorUpdateSubAssetRequest
-	46,  // 92: zqnt.ConnectorService.GetAssetBySn:input_type -> zqnt.RequestBase
-	23,  // 93: zqnt.ConnectorService.GetAssetById:input_type -> zqnt.ConnectorGetAssetByIdRequest
-	46,  // 94: zqnt.ConnectorService.GetSubAssetBySn:input_type -> zqnt.RequestBase
-	5,   // 95: zqnt.ConnectorService.UpsertAssetPayload:input_type -> zqnt.UpsertAssetPayloadRequest
-	7,   // 96: zqnt.ConnectorService.ListAssetPayloads:input_type -> zqnt.ListAssetPayloadsRequest
-	8,   // 97: zqnt.ConnectorService.DeleteAssetPayload:input_type -> zqnt.DeleteAssetPayloadRequest
-	11,  // 98: zqnt.ConnectorService.SetAssetProperty:input_type -> zqnt.SetAssetPropertyRequest
-	12,  // 99: zqnt.ConnectorService.ListAssetProperties:input_type -> zqnt.ListAssetPropertiesRequest
-	13,  // 100: zqnt.ConnectorService.DeleteAssetProperty:input_type -> zqnt.DeleteAssetPropertyRequest
-	30,  // 101: zqnt.ConnectorService.GetOrganization:input_type -> zqnt.ConnectorGetOrganizationRequest
-	64,  // 102: zqnt.ConnectorService.ListSchedulers:input_type -> zqnt.ListSchedulersRequest
-	65,  // 103: zqnt.ConnectorService.GetScheduler:input_type -> zqnt.GetSchedulerRequest
-	66,  // 104: zqnt.ConnectorService.CreateScheduler:input_type -> zqnt.CreateSchedulerRequest
-	67,  // 105: zqnt.ConnectorService.CreateSchedulers:input_type -> zqnt.CreateSchedulersRequest
-	68,  // 106: zqnt.ConnectorService.UpdateScheduler:input_type -> zqnt.UpdateSchedulerRequest
-	69,  // 107: zqnt.ConnectorService.DeleteScheduler:input_type -> zqnt.DeleteSchedulerRequest
-	70,  // 108: zqnt.ConnectorService.DeleteSchedulers:input_type -> zqnt.DeleteSchedulersRequest
-	31,  // 109: zqnt.ConnectorService.StoreTelemetryBatch:input_type -> zqnt.ConnectorStoreTelemetryRequest
-	32,  // 110: zqnt.ConnectorService.StoreDetectionBatch:input_type -> zqnt.ConnectorStoreDetectionRequest
-	71,  // 111: zqnt.ConnectorService.StoreNotificationBatch:input_type -> zqnt.ProduceNotificationRequest
-	37,  // 112: zqnt.ConnectorService.GetActivePoliciesByType:input_type -> zqnt.ConnectorGetPoliciesRequest
-	38,  // 113: zqnt.ConnectorService.GetAllActivePolicies:input_type -> zqnt.ConnectorGetAllPoliciesRequest
-	42,  // 114: zqnt.ConnectorService.GetTechnicalConfigs:input_type -> zqnt.ConnectorGetConfigsRequest
-	72,  // 115: zqnt.ConnectorService.PersistApplication:input_type -> zqnt.UpsertApplicationRequest
-	73,  // 116: zqnt.ConnectorService.GetPersistedApplication:input_type -> zqnt.GetApplicationRequest
-	74,  // 117: zqnt.ConnectorService.ListPersistedApplications:input_type -> zqnt.ListApplicationsRequest
-	75,  // 118: zqnt.ConnectorService.DeletePersistedApplication:input_type -> zqnt.DeleteApplicationRequest
-	3,   // 119: zqnt.ConnectorService.PersistSkillExecution:input_type -> zqnt.PersistSkillExecutionRequest
-	76,  // 120: zqnt.ConnectorService.GetPersistedSkillExecution:input_type -> zqnt.GetSkillExecutionRequest
-	77,  // 121: zqnt.ConnectorService.ListPersistedSkillExecutions:input_type -> zqnt.ListSkillExecutionsRequest
-	4,   // 122: zqnt.ConnectorService.AppendSkillExecutionEvent:input_type -> zqnt.AppendSkillExecutionEventRequest
-	17,  // 123: zqnt.ConnectorService.ObserveSkillContract:input_type -> zqnt.UpsertSkillContractRequest
-	18,  // 124: zqnt.ConnectorService.ListSkillContracts:input_type -> zqnt.ListSkillContractsRequest
-	19,  // 125: zqnt.ConnectorService.SetSkillContractStatus:input_type -> zqnt.SetSkillContractStatusRequest
-	20,  // 126: zqnt.ConnectorService.SetSkillContractPermissions:input_type -> zqnt.SetSkillContractPermissionsRequest
-	28,  // 127: zqnt.ConnectorService.RegisterAsset:output_type -> zqnt.ConnectorResponse
-	28,  // 128: zqnt.ConnectorService.DeregisterAsset:output_type -> zqnt.ConnectorResponse
-	29,  // 129: zqnt.ConnectorService.AssetMonitoring:output_type -> zqnt.AssetMonitoringResponse
-	28,  // 130: zqnt.ConnectorService.UpdateAsset:output_type -> zqnt.ConnectorResponse
-	28,  // 131: zqnt.ConnectorService.UpdateSubAsset:output_type -> zqnt.ConnectorResponse
-	28,  // 132: zqnt.ConnectorService.GetAssetBySn:output_type -> zqnt.ConnectorResponse
-	28,  // 133: zqnt.ConnectorService.GetAssetById:output_type -> zqnt.ConnectorResponse
-	28,  // 134: zqnt.ConnectorService.GetSubAssetBySn:output_type -> zqnt.ConnectorResponse
-	9,   // 135: zqnt.ConnectorService.UpsertAssetPayload:output_type -> zqnt.AssetPayloadResponse
-	10,  // 136: zqnt.ConnectorService.ListAssetPayloads:output_type -> zqnt.AssetPayloadListResponse
-	9,   // 137: zqnt.ConnectorService.DeleteAssetPayload:output_type -> zqnt.AssetPayloadResponse
-	14,  // 138: zqnt.ConnectorService.SetAssetProperty:output_type -> zqnt.AssetPropertyResponse
-	15,  // 139: zqnt.ConnectorService.ListAssetProperties:output_type -> zqnt.AssetPropertyListResponse
-	14,  // 140: zqnt.ConnectorService.DeleteAssetProperty:output_type -> zqnt.AssetPropertyResponse
-	28,  // 141: zqnt.ConnectorService.GetOrganization:output_type -> zqnt.ConnectorResponse
-	78,  // 142: zqnt.ConnectorService.ListSchedulers:output_type -> zqnt.SchedulerResponse
-	78,  // 143: zqnt.ConnectorService.GetScheduler:output_type -> zqnt.SchedulerResponse
-	78,  // 144: zqnt.ConnectorService.CreateScheduler:output_type -> zqnt.SchedulerResponse
-	78,  // 145: zqnt.ConnectorService.CreateSchedulers:output_type -> zqnt.SchedulerResponse
-	78,  // 146: zqnt.ConnectorService.UpdateScheduler:output_type -> zqnt.SchedulerResponse
-	78,  // 147: zqnt.ConnectorService.DeleteScheduler:output_type -> zqnt.SchedulerResponse
-	78,  // 148: zqnt.ConnectorService.DeleteSchedulers:output_type -> zqnt.SchedulerResponse
-	28,  // 149: zqnt.ConnectorService.StoreTelemetryBatch:output_type -> zqnt.ConnectorResponse
-	28,  // 150: zqnt.ConnectorService.StoreDetectionBatch:output_type -> zqnt.ConnectorResponse
-	28,  // 151: zqnt.ConnectorService.StoreNotificationBatch:output_type -> zqnt.ConnectorResponse
-	39,  // 152: zqnt.ConnectorService.GetActivePoliciesByType:output_type -> zqnt.ConnectorPolicyResponse
-	39,  // 153: zqnt.ConnectorService.GetAllActivePolicies:output_type -> zqnt.ConnectorPolicyResponse
-	43,  // 154: zqnt.ConnectorService.GetTechnicalConfigs:output_type -> zqnt.ConnectorConfigResponse
-	79,  // 155: zqnt.ConnectorService.PersistApplication:output_type -> zqnt.ApplicationResponse
-	79,  // 156: zqnt.ConnectorService.GetPersistedApplication:output_type -> zqnt.ApplicationResponse
-	80,  // 157: zqnt.ConnectorService.ListPersistedApplications:output_type -> zqnt.ApplicationListResponse
-	79,  // 158: zqnt.ConnectorService.DeletePersistedApplication:output_type -> zqnt.ApplicationResponse
-	81,  // 159: zqnt.ConnectorService.PersistSkillExecution:output_type -> zqnt.SkillExecutionResponse
-	81,  // 160: zqnt.ConnectorService.GetPersistedSkillExecution:output_type -> zqnt.SkillExecutionResponse
-	82,  // 161: zqnt.ConnectorService.ListPersistedSkillExecutions:output_type -> zqnt.SkillExecutionListResponse
-	62,  // 162: zqnt.ConnectorService.AppendSkillExecutionEvent:output_type -> google.protobuf.Empty
-	21,  // 163: zqnt.ConnectorService.ObserveSkillContract:output_type -> zqnt.SkillContractResponse
-	22,  // 164: zqnt.ConnectorService.ListSkillContracts:output_type -> zqnt.SkillContractListResponse
-	21,  // 165: zqnt.ConnectorService.SetSkillContractStatus:output_type -> zqnt.SkillContractResponse
-	21,  // 166: zqnt.ConnectorService.SetSkillContractPermissions:output_type -> zqnt.SkillContractResponse
-	127, // [127:167] is the sub-list for method output_type
-	87,  // [87:127] is the sub-list for method input_type
-	87,  // [87:87] is the sub-list for extension type_name
-	87,  // [87:87] is the sub-list for extension extendee
-	0,   // [0:87] is the sub-list for field type_name
+	30, // 0: zqnt.UpsertAssetPayloadRequest.base:type_name -> zqnt.RequestBase
+	31, // 1: zqnt.UpsertAssetPayloadRequest.payload:type_name -> zqnt.AssetPayloadProtoDTO
+	2,  // 2: zqnt.UpsertAssetPayloadRequest.owner:type_name -> zqnt.AssetPayloadOwner
+	32, // 3: zqnt.UpsertAssetPayloadRequest.update_mask:type_name -> google.protobuf.FieldMask
+	30, // 4: zqnt.ListAssetPayloadsRequest.base:type_name -> zqnt.RequestBase
+	2,  // 5: zqnt.ListAssetPayloadsRequest.owner:type_name -> zqnt.AssetPayloadOwner
+	30, // 6: zqnt.DeleteAssetPayloadRequest.base:type_name -> zqnt.RequestBase
+	2,  // 7: zqnt.DeleteAssetPayloadRequest.owner:type_name -> zqnt.AssetPayloadOwner
+	31, // 8: zqnt.AssetPayloadResponse.payload:type_name -> zqnt.AssetPayloadProtoDTO
+	33, // 9: zqnt.AssetPayloadResponse.error:type_name -> zqnt.GlobalErrorMessage
+	31, // 10: zqnt.AssetPayloadListResponse.payloads:type_name -> zqnt.AssetPayloadProtoDTO
+	33, // 11: zqnt.AssetPayloadListResponse.error:type_name -> zqnt.GlobalErrorMessage
+	30, // 12: zqnt.ConnectorGetAssetByIdRequest.base:type_name -> zqnt.RequestBase
+	34, // 13: zqnt.ConnectorAssetList.assets:type_name -> zqnt.AssetProtoDTO
+	30, // 14: zqnt.ConnectorRegisterAssetRequest.base:type_name -> zqnt.RequestBase
+	34, // 15: zqnt.ConnectorRegisterAssetRequest.asset:type_name -> zqnt.AssetProtoDTO
+	30, // 16: zqnt.ConnectorUpdateAssetRequest.base:type_name -> zqnt.RequestBase
+	34, // 17: zqnt.ConnectorUpdateAssetRequest.asset:type_name -> zqnt.AssetProtoDTO
+	32, // 18: zqnt.ConnectorUpdateAssetRequest.update_mask:type_name -> google.protobuf.FieldMask
+	30, // 19: zqnt.ConnectorUpdateSubAssetRequest.base:type_name -> zqnt.RequestBase
+	35, // 20: zqnt.ConnectorUpdateSubAssetRequest.sub_asset:type_name -> zqnt.SubAssetProtoDTO
+	32, // 21: zqnt.ConnectorUpdateSubAssetRequest.update_mask:type_name -> google.protobuf.FieldMask
+	36, // 22: zqnt.ConnectorResponse.timestamp:type_name -> google.protobuf.Timestamp
+	37, // 23: zqnt.ConnectorResponse.empty:type_name -> google.protobuf.Empty
+	33, // 24: zqnt.ConnectorResponse.error:type_name -> zqnt.GlobalErrorMessage
+	34, // 25: zqnt.ConnectorResponse.asset:type_name -> zqnt.AssetProtoDTO
+	35, // 26: zqnt.ConnectorResponse.sub_asset:type_name -> zqnt.SubAssetProtoDTO
+	38, // 27: zqnt.ConnectorResponse.organization:type_name -> zqnt.OrganizationProtoDTO
+	36, // 28: zqnt.AssetMonitoringResponse.timestamp:type_name -> google.protobuf.Timestamp
+	37, // 29: zqnt.AssetMonitoringResponse.empty:type_name -> google.protobuf.Empty
+	33, // 30: zqnt.AssetMonitoringResponse.error:type_name -> zqnt.GlobalErrorMessage
+	8,  // 31: zqnt.AssetMonitoringResponse.assets:type_name -> zqnt.ConnectorAssetList
+	30, // 32: zqnt.ConnectorGetOrganizationRequest.base:type_name -> zqnt.RequestBase
+	30, // 33: zqnt.ConnectorStoreTelemetryRequest.base:type_name -> zqnt.RequestBase
+	0,  // 34: zqnt.ConnectorStoreTelemetryRequest.type:type_name -> zqnt.TelemetryType
+	17, // 35: zqnt.ConnectorStoreTelemetryRequest.asset_telemetry:type_name -> zqnt.AssetTelemetryProto
+	18, // 36: zqnt.ConnectorStoreTelemetryRequest.sub_asset_telemetry:type_name -> zqnt.SubAssetTelemetryProto
+	30, // 37: zqnt.ConnectorStoreDetectionRequest.base:type_name -> zqnt.RequestBase
+	36, // 38: zqnt.ConnectorStoreDetectionRequest.detected_at:type_name -> google.protobuf.Timestamp
+	36, // 39: zqnt.AssetTelemetryProto.timestamp:type_name -> google.protobuf.Timestamp
+	28, // 40: zqnt.AssetTelemetryProto.telemetry_data:type_name -> zqnt.AssetTelemetryProto.TelemetryDataEntry
+	36, // 41: zqnt.SubAssetTelemetryProto.timestamp:type_name -> google.protobuf.Timestamp
+	29, // 42: zqnt.SubAssetTelemetryProto.telemetry_data:type_name -> zqnt.SubAssetTelemetryProto.TelemetryDataEntry
+	19, // 43: zqnt.PolicyProtoDTOList.policies:type_name -> zqnt.PolicyProtoDTO
+	30, // 44: zqnt.ConnectorGetPoliciesRequest.base:type_name -> zqnt.RequestBase
+	30, // 45: zqnt.ConnectorGetAllPoliciesRequest.base:type_name -> zqnt.RequestBase
+	36, // 46: zqnt.ConnectorPolicyResponse.timestamp:type_name -> google.protobuf.Timestamp
+	33, // 47: zqnt.ConnectorPolicyResponse.error:type_name -> zqnt.GlobalErrorMessage
+	20, // 48: zqnt.ConnectorPolicyResponse.policy_list:type_name -> zqnt.PolicyProtoDTOList
+	24, // 49: zqnt.TechnicalConfigProtoDTOList.configs:type_name -> zqnt.TechnicalConfigProtoDTO
+	30, // 50: zqnt.ConnectorGetConfigsRequest.base:type_name -> zqnt.RequestBase
+	36, // 51: zqnt.ConnectorConfigResponse.timestamp:type_name -> google.protobuf.Timestamp
+	33, // 52: zqnt.ConnectorConfigResponse.error:type_name -> zqnt.GlobalErrorMessage
+	25, // 53: zqnt.ConnectorConfigResponse.config_list:type_name -> zqnt.TechnicalConfigProtoDTOList
+	9,  // 54: zqnt.ConnectorService.RegisterAsset:input_type -> zqnt.ConnectorRegisterAssetRequest
+	30, // 55: zqnt.ConnectorService.DeregisterAsset:input_type -> zqnt.RequestBase
+	30, // 56: zqnt.ConnectorService.AssetMonitoring:input_type -> zqnt.RequestBase
+	10, // 57: zqnt.ConnectorService.UpdateAsset:input_type -> zqnt.ConnectorUpdateAssetRequest
+	11, // 58: zqnt.ConnectorService.UpdateSubAsset:input_type -> zqnt.ConnectorUpdateSubAssetRequest
+	30, // 59: zqnt.ConnectorService.GetAssetBySn:input_type -> zqnt.RequestBase
+	7,  // 60: zqnt.ConnectorService.GetAssetById:input_type -> zqnt.ConnectorGetAssetByIdRequest
+	30, // 61: zqnt.ConnectorService.GetSubAssetBySn:input_type -> zqnt.RequestBase
+	1,  // 62: zqnt.ConnectorService.UpsertAssetPayload:input_type -> zqnt.UpsertAssetPayloadRequest
+	3,  // 63: zqnt.ConnectorService.ListAssetPayloads:input_type -> zqnt.ListAssetPayloadsRequest
+	4,  // 64: zqnt.ConnectorService.DeleteAssetPayload:input_type -> zqnt.DeleteAssetPayloadRequest
+	14, // 65: zqnt.ConnectorService.GetOrganization:input_type -> zqnt.ConnectorGetOrganizationRequest
+	39, // 66: zqnt.ConnectorService.GetMission:input_type -> zqnt.GetMissionRequest
+	40, // 67: zqnt.ConnectorService.CreateMission:input_type -> zqnt.CreateMissionRequest
+	41, // 68: zqnt.ConnectorService.UpdateMission:input_type -> zqnt.UpdateMissionRequest
+	42, // 69: zqnt.ConnectorService.DeleteMission:input_type -> zqnt.DeleteMissionRequest
+	43, // 70: zqnt.ConnectorService.UploadMissionNfzZones:input_type -> zqnt.UploadMissionNfzZonesRequest
+	44, // 71: zqnt.ConnectorService.GetTask:input_type -> zqnt.GetTaskRequest
+	45, // 72: zqnt.ConnectorService.GetTaskByFlightId:input_type -> zqnt.GetTaskByFlightIdRequest
+	46, // 73: zqnt.ConnectorService.GetWaypointsByTaskId:input_type -> zqnt.GetWaypointsByTaskIdRequest
+	47, // 74: zqnt.ConnectorService.CreateTask:input_type -> zqnt.CreateTaskRequest
+	48, // 75: zqnt.ConnectorService.UpdateTask:input_type -> zqnt.UpdateTaskRequest
+	49, // 76: zqnt.ConnectorService.DeleteTask:input_type -> zqnt.DeleteTaskRequest
+	50, // 77: zqnt.ConnectorService.GetScheduler:input_type -> zqnt.GetSchedulerRequest
+	51, // 78: zqnt.ConnectorService.CreateScheduler:input_type -> zqnt.CreateSchedulerRequest
+	52, // 79: zqnt.ConnectorService.CreateSchedulers:input_type -> zqnt.CreateSchedulersRequest
+	53, // 80: zqnt.ConnectorService.UpdateScheduler:input_type -> zqnt.UpdateSchedulerRequest
+	54, // 81: zqnt.ConnectorService.DeleteScheduler:input_type -> zqnt.DeleteSchedulerRequest
+	55, // 82: zqnt.ConnectorService.DeleteSchedulers:input_type -> zqnt.DeleteSchedulersRequest
+	56, // 83: zqnt.ConnectorService.DeleteSchedulersByTask:input_type -> zqnt.DeleteSchedulersByTaskRequest
+	15, // 84: zqnt.ConnectorService.StoreTelemetryBatch:input_type -> zqnt.ConnectorStoreTelemetryRequest
+	16, // 85: zqnt.ConnectorService.StoreDetectionBatch:input_type -> zqnt.ConnectorStoreDetectionRequest
+	57, // 86: zqnt.ConnectorService.StoreNotificationBatch:input_type -> zqnt.ProduceNotificationRequest
+	21, // 87: zqnt.ConnectorService.GetActivePoliciesByType:input_type -> zqnt.ConnectorGetPoliciesRequest
+	22, // 88: zqnt.ConnectorService.GetAllActivePolicies:input_type -> zqnt.ConnectorGetAllPoliciesRequest
+	26, // 89: zqnt.ConnectorService.GetTechnicalConfigs:input_type -> zqnt.ConnectorGetConfigsRequest
+	12, // 90: zqnt.ConnectorService.RegisterAsset:output_type -> zqnt.ConnectorResponse
+	12, // 91: zqnt.ConnectorService.DeregisterAsset:output_type -> zqnt.ConnectorResponse
+	13, // 92: zqnt.ConnectorService.AssetMonitoring:output_type -> zqnt.AssetMonitoringResponse
+	12, // 93: zqnt.ConnectorService.UpdateAsset:output_type -> zqnt.ConnectorResponse
+	12, // 94: zqnt.ConnectorService.UpdateSubAsset:output_type -> zqnt.ConnectorResponse
+	12, // 95: zqnt.ConnectorService.GetAssetBySn:output_type -> zqnt.ConnectorResponse
+	12, // 96: zqnt.ConnectorService.GetAssetById:output_type -> zqnt.ConnectorResponse
+	12, // 97: zqnt.ConnectorService.GetSubAssetBySn:output_type -> zqnt.ConnectorResponse
+	5,  // 98: zqnt.ConnectorService.UpsertAssetPayload:output_type -> zqnt.AssetPayloadResponse
+	6,  // 99: zqnt.ConnectorService.ListAssetPayloads:output_type -> zqnt.AssetPayloadListResponse
+	5,  // 100: zqnt.ConnectorService.DeleteAssetPayload:output_type -> zqnt.AssetPayloadResponse
+	12, // 101: zqnt.ConnectorService.GetOrganization:output_type -> zqnt.ConnectorResponse
+	58, // 102: zqnt.ConnectorService.GetMission:output_type -> zqnt.MissionResponse
+	58, // 103: zqnt.ConnectorService.CreateMission:output_type -> zqnt.MissionResponse
+	58, // 104: zqnt.ConnectorService.UpdateMission:output_type -> zqnt.MissionResponse
+	58, // 105: zqnt.ConnectorService.DeleteMission:output_type -> zqnt.MissionResponse
+	58, // 106: zqnt.ConnectorService.UploadMissionNfzZones:output_type -> zqnt.MissionResponse
+	59, // 107: zqnt.ConnectorService.GetTask:output_type -> zqnt.TaskResponse
+	59, // 108: zqnt.ConnectorService.GetTaskByFlightId:output_type -> zqnt.TaskResponse
+	60, // 109: zqnt.ConnectorService.GetWaypointsByTaskId:output_type -> zqnt.WaypointsResponse
+	59, // 110: zqnt.ConnectorService.CreateTask:output_type -> zqnt.TaskResponse
+	59, // 111: zqnt.ConnectorService.UpdateTask:output_type -> zqnt.TaskResponse
+	59, // 112: zqnt.ConnectorService.DeleteTask:output_type -> zqnt.TaskResponse
+	61, // 113: zqnt.ConnectorService.GetScheduler:output_type -> zqnt.SchedulerResponse
+	61, // 114: zqnt.ConnectorService.CreateScheduler:output_type -> zqnt.SchedulerResponse
+	61, // 115: zqnt.ConnectorService.CreateSchedulers:output_type -> zqnt.SchedulerResponse
+	61, // 116: zqnt.ConnectorService.UpdateScheduler:output_type -> zqnt.SchedulerResponse
+	61, // 117: zqnt.ConnectorService.DeleteScheduler:output_type -> zqnt.SchedulerResponse
+	61, // 118: zqnt.ConnectorService.DeleteSchedulers:output_type -> zqnt.SchedulerResponse
+	61, // 119: zqnt.ConnectorService.DeleteSchedulersByTask:output_type -> zqnt.SchedulerResponse
+	12, // 120: zqnt.ConnectorService.StoreTelemetryBatch:output_type -> zqnt.ConnectorResponse
+	12, // 121: zqnt.ConnectorService.StoreDetectionBatch:output_type -> zqnt.ConnectorResponse
+	12, // 122: zqnt.ConnectorService.StoreNotificationBatch:output_type -> zqnt.ConnectorResponse
+	23, // 123: zqnt.ConnectorService.GetActivePoliciesByType:output_type -> zqnt.ConnectorPolicyResponse
+	23, // 124: zqnt.ConnectorService.GetAllActivePolicies:output_type -> zqnt.ConnectorPolicyResponse
+	27, // 125: zqnt.ConnectorService.GetTechnicalConfigs:output_type -> zqnt.ConnectorConfigResponse
+	90, // [90:126] is the sub-list for method output_type
+	54, // [54:90] is the sub-list for method input_type
+	54, // [54:54] is the sub-list for extension type_name
+	54, // [54:54] is the sub-list for extension extendee
+	0,  // [0:54] is the sub-list for field type_name
 }
 
 func init() { file_connector_proto_init() }
@@ -4223,48 +2926,41 @@ func file_connector_proto_init() {
 	if File_connector_proto != nil {
 		return
 	}
-	file_connector_proto_msgTypes[2].OneofWrappers = []any{}
-	file_connector_proto_msgTypes[3].OneofWrappers = []any{
+	file_connector_proto_msgTypes[0].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[1].OneofWrappers = []any{
 		(*AssetPayloadOwner_AssetId)(nil),
 		(*AssetPayloadOwner_SubAssetId)(nil),
 	}
-	file_connector_proto_msgTypes[6].OneofWrappers = []any{}
-	file_connector_proto_msgTypes[7].OneofWrappers = []any{}
-	file_connector_proto_msgTypes[8].OneofWrappers = []any{}
-	file_connector_proto_msgTypes[11].OneofWrappers = []any{}
-	file_connector_proto_msgTypes[12].OneofWrappers = []any{}
-	file_connector_proto_msgTypes[13].OneofWrappers = []any{}
-	file_connector_proto_msgTypes[15].OneofWrappers = []any{}
-	file_connector_proto_msgTypes[18].OneofWrappers = []any{}
-	file_connector_proto_msgTypes[19].OneofWrappers = []any{}
-	file_connector_proto_msgTypes[25].OneofWrappers = []any{
+	file_connector_proto_msgTypes[4].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[5].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[11].OneofWrappers = []any{
 		(*ConnectorResponse_Empty)(nil),
 		(*ConnectorResponse_Error)(nil),
 		(*ConnectorResponse_Asset)(nil),
 		(*ConnectorResponse_SubAsset)(nil),
 		(*ConnectorResponse_Organization)(nil),
 	}
-	file_connector_proto_msgTypes[26].OneofWrappers = []any{
+	file_connector_proto_msgTypes[12].OneofWrappers = []any{
 		(*AssetMonitoringResponse_Empty)(nil),
 		(*AssetMonitoringResponse_Error)(nil),
 		(*AssetMonitoringResponse_Assets)(nil),
 	}
-	file_connector_proto_msgTypes[27].OneofWrappers = []any{}
-	file_connector_proto_msgTypes[28].OneofWrappers = []any{
+	file_connector_proto_msgTypes[13].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[14].OneofWrappers = []any{
 		(*ConnectorStoreTelemetryRequest_AssetTelemetry)(nil),
 		(*ConnectorStoreTelemetryRequest_SubAssetTelemetry)(nil),
 	}
-	file_connector_proto_msgTypes[29].OneofWrappers = []any{}
-	file_connector_proto_msgTypes[30].OneofWrappers = []any{}
-	file_connector_proto_msgTypes[31].OneofWrappers = []any{}
-	file_connector_proto_msgTypes[32].OneofWrappers = []any{}
-	file_connector_proto_msgTypes[36].OneofWrappers = []any{
+	file_connector_proto_msgTypes[15].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[16].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[17].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[18].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[22].OneofWrappers = []any{
 		(*ConnectorPolicyResponse_Error)(nil),
 		(*ConnectorPolicyResponse_PolicyList)(nil),
 	}
-	file_connector_proto_msgTypes[37].OneofWrappers = []any{}
-	file_connector_proto_msgTypes[39].OneofWrappers = []any{}
-	file_connector_proto_msgTypes[40].OneofWrappers = []any{
+	file_connector_proto_msgTypes[23].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[25].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[26].OneofWrappers = []any{
 		(*ConnectorConfigResponse_Error)(nil),
 		(*ConnectorConfigResponse_ConfigList)(nil),
 	}
@@ -4273,8 +2969,8 @@ func file_connector_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_connector_proto_rawDesc), len(file_connector_proto_rawDesc)),
-			NumEnums:      3,
-			NumMessages:   43,
+			NumEnums:      1,
+			NumMessages:   29,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

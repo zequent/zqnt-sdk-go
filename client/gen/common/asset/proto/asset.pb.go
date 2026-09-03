@@ -9,7 +9,6 @@ package proto
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	structpb "google.golang.org/protobuf/types/known/structpb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
@@ -613,9 +612,6 @@ const (
 	AssetVendor_ASSET_VENDOR_SAPIENT    AssetVendor = 5
 	AssetVendor_ASSET_VENDOR_BETAFLIGHT AssetVendor = 6
 	AssetVendor_ASSET_VENDOR_RNS        AssetVendor = 7
-	// Non-hardware bridge/integration assets (e.g. the Integration Hub platform bridge) that register
-	// themselves as an EdgeAdapterService endpoint without owning a physical vendor protocol.
-	AssetVendor_ASSET_VENDOR_ZQNT AssetVendor = 8
 )
 
 // Enum value maps for AssetVendor.
@@ -629,7 +625,6 @@ var (
 		5: "ASSET_VENDOR_SAPIENT",
 		6: "ASSET_VENDOR_BETAFLIGHT",
 		7: "ASSET_VENDOR_RNS",
-		8: "ASSET_VENDOR_ZQNT",
 	}
 	AssetVendor_value = map[string]int32{
 		"ASSET_VENDOR_DJI":        0,
@@ -640,7 +635,6 @@ var (
 		"ASSET_VENDOR_SAPIENT":    5,
 		"ASSET_VENDOR_BETAFLIGHT": 6,
 		"ASSET_VENDOR_RNS":        7,
-		"ASSET_VENDOR_ZQNT":       8,
 	}
 )
 
@@ -960,86 +954,6 @@ func (x *AssetProtoDTO) GetLiveStreamPullUrl() string {
 	return ""
 }
 
-// A single free-form key/value entry in an asset's dynamic property bag — for system-integrator
-// metadata that doesn't warrant a dedicated AssetProtoDTO field (no schema change needed to add a
-// new one). Distinct from TechnicalConfigProtoDTO: this is per-asset instance data ("this drone's
-// insurance policy number"), not scope-resolved runtime configuration.
-type AssetPropertyProtoDTO struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Key           string                 `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
-	Value         *structpb.Value        `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
-	Description   *string                `protobuf:"bytes,3,opt,name=description,proto3,oneof" json:"description,omitempty"`
-	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=created_at,json=createdAt,proto3,oneof" json:"created_at,omitempty"`
-	ModifiedAt    *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=modified_at,json=modifiedAt,proto3,oneof" json:"modified_at,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *AssetPropertyProtoDTO) Reset() {
-	*x = AssetPropertyProtoDTO{}
-	mi := &file_asset_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *AssetPropertyProtoDTO) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*AssetPropertyProtoDTO) ProtoMessage() {}
-
-func (x *AssetPropertyProtoDTO) ProtoReflect() protoreflect.Message {
-	mi := &file_asset_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use AssetPropertyProtoDTO.ProtoReflect.Descriptor instead.
-func (*AssetPropertyProtoDTO) Descriptor() ([]byte, []int) {
-	return file_asset_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *AssetPropertyProtoDTO) GetKey() string {
-	if x != nil {
-		return x.Key
-	}
-	return ""
-}
-
-func (x *AssetPropertyProtoDTO) GetValue() *structpb.Value {
-	if x != nil {
-		return x.Value
-	}
-	return nil
-}
-
-func (x *AssetPropertyProtoDTO) GetDescription() string {
-	if x != nil && x.Description != nil {
-		return *x.Description
-	}
-	return ""
-}
-
-func (x *AssetPropertyProtoDTO) GetCreatedAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.CreatedAt
-	}
-	return nil
-}
-
-func (x *AssetPropertyProtoDTO) GetModifiedAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.ModifiedAt
-	}
-	return nil
-}
-
 type SubAssetProtoDTO struct {
 	state                  protoimpl.MessageState  `protogen:"open.v1"`
 	Id                     *string                 `protobuf:"bytes,1,opt,name=id,proto3,oneof" json:"id,omitempty"`
@@ -1066,7 +980,7 @@ type SubAssetProtoDTO struct {
 
 func (x *SubAssetProtoDTO) Reset() {
 	*x = SubAssetProtoDTO{}
-	mi := &file_asset_proto_msgTypes[2]
+	mi := &file_asset_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1078,7 +992,7 @@ func (x *SubAssetProtoDTO) String() string {
 func (*SubAssetProtoDTO) ProtoMessage() {}
 
 func (x *SubAssetProtoDTO) ProtoReflect() protoreflect.Message {
-	mi := &file_asset_proto_msgTypes[2]
+	mi := &file_asset_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1091,7 +1005,7 @@ func (x *SubAssetProtoDTO) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubAssetProtoDTO.ProtoReflect.Descriptor instead.
 func (*SubAssetProtoDTO) Descriptor() ([]byte, []int) {
-	return file_asset_proto_rawDescGZIP(), []int{2}
+	return file_asset_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *SubAssetProtoDTO) GetId() string {
@@ -1247,7 +1161,7 @@ type AssetPayloadProtoDTO struct {
 
 func (x *AssetPayloadProtoDTO) Reset() {
 	*x = AssetPayloadProtoDTO{}
-	mi := &file_asset_proto_msgTypes[3]
+	mi := &file_asset_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1259,7 +1173,7 @@ func (x *AssetPayloadProtoDTO) String() string {
 func (*AssetPayloadProtoDTO) ProtoMessage() {}
 
 func (x *AssetPayloadProtoDTO) ProtoReflect() protoreflect.Message {
-	mi := &file_asset_proto_msgTypes[3]
+	mi := &file_asset_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1272,7 +1186,7 @@ func (x *AssetPayloadProtoDTO) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AssetPayloadProtoDTO.ProtoReflect.Descriptor instead.
 func (*AssetPayloadProtoDTO) Descriptor() ([]byte, []int) {
-	return file_asset_proto_rawDescGZIP(), []int{3}
+	return file_asset_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *AssetPayloadProtoDTO) GetId() string {
@@ -1413,7 +1327,7 @@ type OrganizationProtoDTO struct {
 
 func (x *OrganizationProtoDTO) Reset() {
 	*x = OrganizationProtoDTO{}
-	mi := &file_asset_proto_msgTypes[4]
+	mi := &file_asset_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1425,7 +1339,7 @@ func (x *OrganizationProtoDTO) String() string {
 func (*OrganizationProtoDTO) ProtoMessage() {}
 
 func (x *OrganizationProtoDTO) ProtoReflect() protoreflect.Message {
-	mi := &file_asset_proto_msgTypes[4]
+	mi := &file_asset_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1438,7 +1352,7 @@ func (x *OrganizationProtoDTO) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use OrganizationProtoDTO.ProtoReflect.Descriptor instead.
 func (*OrganizationProtoDTO) Descriptor() ([]byte, []int) {
-	return file_asset_proto_rawDescGZIP(), []int{4}
+	return file_asset_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *OrganizationProtoDTO) GetId() string {
@@ -1473,7 +1387,7 @@ var File_asset_proto protoreflect.FileDescriptor
 
 const file_asset_proto_rawDesc = "" +
 	"\n" +
-	"\vasset.proto\x12\x04zqnt\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1cgoogle/protobuf/struct.proto\"\x9b\n" +
+	"\vasset.proto\x12\x04zqnt\x1a\x1fgoogle/protobuf/timestamp.proto\"\x9b\n" +
 	"\n" +
 	"\rAssetProtoDTO\x12\x13\n" +
 	"\x02id\x18\x01 \x01(\tH\x00R\x02id\x88\x01\x01\x12\x13\n" +
@@ -1520,18 +1434,7 @@ const file_asset_proto_rawDesc = "" +
 	"\x15_live_stream_push_urlB\x17\n" +
 	"\x15_live_stream_pull_urlJ\x04\b\t\x10\n" +
 	"J\x04\b\n" +
-	"\x10\vJ\x04\b\x0e\x10\x0fJ\x04\b\x0f\x10\x10J\x04\b\x11\x10\x12R\x11connection_stringR\x04portR\x12live_stream_serverR\x06onlineR\rsub_asset_dtoR\vstream_type\"\xaf\x02\n" +
-	"\x15AssetPropertyProtoDTO\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12,\n" +
-	"\x05value\x18\x02 \x01(\v2\x16.google.protobuf.ValueR\x05value\x12%\n" +
-	"\vdescription\x18\x03 \x01(\tH\x00R\vdescription\x88\x01\x01\x12>\n" +
-	"\n" +
-	"created_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampH\x01R\tcreatedAt\x88\x01\x01\x12@\n" +
-	"\vmodified_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampH\x02R\n" +
-	"modifiedAt\x88\x01\x01B\x0e\n" +
-	"\f_descriptionB\r\n" +
-	"\v_created_atB\x0e\n" +
-	"\f_modified_at\"\xff\t\n" +
+	"\x10\vJ\x04\b\x0e\x10\x0fJ\x04\b\x0f\x10\x10J\x04\b\x11\x10\x12R\x11connection_stringR\x04portR\x12live_stream_serverR\x06onlineR\rsub_asset_dtoR\vstream_type\"\xff\t\n" +
 	"\x10SubAssetProtoDTO\x12\x13\n" +
 	"\x02id\x18\x01 \x01(\tH\x00R\x02id\x88\x01\x01\x12\x13\n" +
 	"\x02sn\x18\x02 \x01(\tH\x01R\x02sn\x88\x01\x01\x12\x17\n" +
@@ -1710,7 +1613,7 @@ const file_asset_proto_rawDesc = "" +
 	"\x11ASSET_TYPE_JAMMER\x10\x06\x12\x1b\n" +
 	"\x17ASSET_TYPE_CYBER_ATTACK\x10\a\x12\x16\n" +
 	"\x12ASSET_TYPE_SAPIENT\x10\b\x12\x12\n" +
-	"\x0eASSET_TYPE_RNS\x10\t*\xeb\x01\n" +
+	"\x0eASSET_TYPE_RNS\x10\t*\xd4\x01\n" +
 	"\vAssetVendor\x12\x14\n" +
 	"\x10ASSET_VENDOR_DJI\x10\x00\x12\x16\n" +
 	"\x12ASSET_VENDOR_AUTEL\x10\x01\x12\x14\n" +
@@ -1719,8 +1622,7 @@ const file_asset_proto_rawDesc = "" +
 	"\x16ASSET_VENDOR_RTMP_RTSP\x10\x04\x12\x18\n" +
 	"\x14ASSET_VENDOR_SAPIENT\x10\x05\x12\x1b\n" +
 	"\x17ASSET_VENDOR_BETAFLIGHT\x10\x06\x12\x14\n" +
-	"\x10ASSET_VENDOR_RNS\x10\a\x12\x15\n" +
-	"\x11ASSET_VENDOR_ZQNT\x10\b*0\n" +
+	"\x10ASSET_VENDOR_RNS\x10\a*0\n" +
 	"\x0fAssetConnection\x12\b\n" +
 	"\x04MQTT\x10\x00\x12\a\n" +
 	"\x03TCP\x10\x01\x12\n" +
@@ -1746,7 +1648,7 @@ func file_asset_proto_rawDescGZIP() []byte {
 }
 
 var file_asset_proto_enumTypes = make([]protoimpl.EnumInfo, 12)
-var file_asset_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_asset_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_asset_proto_goTypes = []any{
 	(ManualControlStateEnum)(0),       // 0: zqnt.ManualControlStateEnum
 	(RainfallEnum)(0),                 // 1: zqnt.RainfallEnum
@@ -1761,38 +1663,33 @@ var file_asset_proto_goTypes = []any{
 	(AssetConnection)(0),              // 10: zqnt.AssetConnection
 	(LiveStreamTypeEnum)(0),           // 11: zqnt.LiveStreamTypeEnum
 	(*AssetProtoDTO)(nil),             // 12: zqnt.AssetProtoDTO
-	(*AssetPropertyProtoDTO)(nil),     // 13: zqnt.AssetPropertyProtoDTO
-	(*SubAssetProtoDTO)(nil),          // 14: zqnt.SubAssetProtoDTO
-	(*AssetPayloadProtoDTO)(nil),      // 15: zqnt.AssetPayloadProtoDTO
-	(*OrganizationProtoDTO)(nil),      // 16: zqnt.OrganizationProtoDTO
-	(*timestamppb.Timestamp)(nil),     // 17: google.protobuf.Timestamp
-	(*structpb.Value)(nil),            // 18: google.protobuf.Value
+	(*SubAssetProtoDTO)(nil),          // 13: zqnt.SubAssetProtoDTO
+	(*AssetPayloadProtoDTO)(nil),      // 14: zqnt.AssetPayloadProtoDTO
+	(*OrganizationProtoDTO)(nil),      // 15: zqnt.OrganizationProtoDTO
+	(*timestamppb.Timestamp)(nil),     // 16: google.protobuf.Timestamp
 }
 var file_asset_proto_depIdxs = []int32{
 	8,  // 0: zqnt.AssetProtoDTO.type:type_name -> zqnt.AssetTypeEnum
 	9,  // 1: zqnt.AssetProtoDTO.vendor:type_name -> zqnt.AssetVendor
 	10, // 2: zqnt.AssetProtoDTO.connection:type_name -> zqnt.AssetConnection
-	15, // 3: zqnt.AssetProtoDTO.payloads:type_name -> zqnt.AssetPayloadProtoDTO
-	14, // 4: zqnt.AssetProtoDTO.sub_assets:type_name -> zqnt.SubAssetProtoDTO
-	17, // 5: zqnt.AssetProtoDTO.created_at:type_name -> google.protobuf.Timestamp
-	17, // 6: zqnt.AssetProtoDTO.modified_at:type_name -> google.protobuf.Timestamp
-	18, // 7: zqnt.AssetPropertyProtoDTO.value:type_name -> google.protobuf.Value
-	17, // 8: zqnt.AssetPropertyProtoDTO.created_at:type_name -> google.protobuf.Timestamp
-	17, // 9: zqnt.AssetPropertyProtoDTO.modified_at:type_name -> google.protobuf.Timestamp
-	8,  // 10: zqnt.SubAssetProtoDTO.type:type_name -> zqnt.AssetTypeEnum
-	9,  // 11: zqnt.SubAssetProtoDTO.vendor:type_name -> zqnt.AssetVendor
-	10, // 12: zqnt.SubAssetProtoDTO.connection:type_name -> zqnt.AssetConnection
-	15, // 13: zqnt.SubAssetProtoDTO.payloads:type_name -> zqnt.AssetPayloadProtoDTO
-	17, // 14: zqnt.SubAssetProtoDTO.created_at:type_name -> google.protobuf.Timestamp
-	17, // 15: zqnt.SubAssetProtoDTO.modified_at:type_name -> google.protobuf.Timestamp
-	17, // 16: zqnt.AssetPayloadProtoDTO.last_seen_at:type_name -> google.protobuf.Timestamp
-	17, // 17: zqnt.AssetPayloadProtoDTO.created_at:type_name -> google.protobuf.Timestamp
-	17, // 18: zqnt.AssetPayloadProtoDTO.modified_at:type_name -> google.protobuf.Timestamp
-	19, // [19:19] is the sub-list for method output_type
-	19, // [19:19] is the sub-list for method input_type
-	19, // [19:19] is the sub-list for extension type_name
-	19, // [19:19] is the sub-list for extension extendee
-	0,  // [0:19] is the sub-list for field type_name
+	14, // 3: zqnt.AssetProtoDTO.payloads:type_name -> zqnt.AssetPayloadProtoDTO
+	13, // 4: zqnt.AssetProtoDTO.sub_assets:type_name -> zqnt.SubAssetProtoDTO
+	16, // 5: zqnt.AssetProtoDTO.created_at:type_name -> google.protobuf.Timestamp
+	16, // 6: zqnt.AssetProtoDTO.modified_at:type_name -> google.protobuf.Timestamp
+	8,  // 7: zqnt.SubAssetProtoDTO.type:type_name -> zqnt.AssetTypeEnum
+	9,  // 8: zqnt.SubAssetProtoDTO.vendor:type_name -> zqnt.AssetVendor
+	10, // 9: zqnt.SubAssetProtoDTO.connection:type_name -> zqnt.AssetConnection
+	14, // 10: zqnt.SubAssetProtoDTO.payloads:type_name -> zqnt.AssetPayloadProtoDTO
+	16, // 11: zqnt.SubAssetProtoDTO.created_at:type_name -> google.protobuf.Timestamp
+	16, // 12: zqnt.SubAssetProtoDTO.modified_at:type_name -> google.protobuf.Timestamp
+	16, // 13: zqnt.AssetPayloadProtoDTO.last_seen_at:type_name -> google.protobuf.Timestamp
+	16, // 14: zqnt.AssetPayloadProtoDTO.created_at:type_name -> google.protobuf.Timestamp
+	16, // 15: zqnt.AssetPayloadProtoDTO.modified_at:type_name -> google.protobuf.Timestamp
+	16, // [16:16] is the sub-list for method output_type
+	16, // [16:16] is the sub-list for method input_type
+	16, // [16:16] is the sub-list for extension type_name
+	16, // [16:16] is the sub-list for extension extendee
+	0,  // [0:16] is the sub-list for field type_name
 }
 
 func init() { file_asset_proto_init() }
@@ -1804,14 +1701,13 @@ func file_asset_proto_init() {
 	file_asset_proto_msgTypes[1].OneofWrappers = []any{}
 	file_asset_proto_msgTypes[2].OneofWrappers = []any{}
 	file_asset_proto_msgTypes[3].OneofWrappers = []any{}
-	file_asset_proto_msgTypes[4].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_asset_proto_rawDesc), len(file_asset_proto_rawDesc)),
 			NumEnums:      12,
-			NumMessages:   5,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

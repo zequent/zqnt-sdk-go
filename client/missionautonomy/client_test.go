@@ -5,47 +5,60 @@ import (
 	"net"
 	"testing"
 
-	execdto "github.com/Zequent/zqnt-client-sdk-go/gen/execution/contracts/proto"
-	execution "github.com/Zequent/zqnt-client-sdk-go/gen/execution/dto/proto"
+	missionautonomycontracts "github.com/Zequent/zqnt-client-sdk-go/gen/missionautonomy/contracts/proto"
+	missionautonomydto "github.com/Zequent/zqnt-client-sdk-go/gen/missionautonomy/dto/proto"
 	missionautonomypb "github.com/Zequent/zqnt-client-sdk-go/gen/missionautonomy/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/protobuf/proto"
+	protobuf "google.golang.org/protobuf/proto"
 )
 
 type fakeService struct {
 	missionautonomypb.UnimplementedMissionAutonomyServiceServer
-	lastExecuteRequest   *execdto.ExecuteSkillRequest
-	lastLifecycleRequest *execdto.SkillExecutionLifecycleRequest
-	execution            *execution.SkillExecutionProtoDTO
+	lastCreateMission  *missionautonomycontracts.CreateMissionRequest
+	lastCreateTask     *missionautonomycontracts.CreateTaskRequest
+	lastLifecycle      *missionautonomycontracts.TaskLifecycleRequest
+	lastListSchedulers *missionautonomycontracts.ListSchedulersRequest
 }
 
-func (s *fakeService) ExecuteSkill(ctx context.Context, req *execdto.ExecuteSkillRequest) (*execdto.SkillExecutionResponse, error) {
-	s.lastExecuteRequest = req
-	exec := &execution.SkillExecutionProtoDTO{Id: "exec-1", AssetSn: req.GetBase().GetSn()}
-	return &execdto.SkillExecutionResponse{Response: &execdto.SkillExecutionResponse_Execution{Execution: exec}}, nil
+func (s *fakeService) CreateMission(ctx context.Context, req *missionautonomycontracts.CreateMissionRequest) (*missionautonomycontracts.MissionResponse, error) {
+	s.lastCreateMission = req
+	m := &missionautonomydto.MissionProtoDTO{Id: protobuf.String("m-1"), Name: req.GetMission().GetName()}
+	return &missionautonomycontracts.MissionResponse{Response: &missionautonomycontracts.MissionResponse_Mission{Mission: m}}, nil
 }
 
-func (s *fakeService) StartSkillExecution(ctx context.Context, req *execdto.SkillExecutionLifecycleRequest) (*execdto.SkillExecutionResponse, error) {
-	s.lastLifecycleRequest = req
-	return &execdto.SkillExecutionResponse{
-		Response: &execdto.SkillExecutionResponse_Execution{Execution: &execution.SkillExecutionProtoDTO{Id: req.GetExecutionId()}},
-	}, nil
+func (s *fakeService) GetMission(ctx context.Context, req *missionautonomycontracts.GetMissionRequest) (*missionautonomycontracts.MissionResponse, error) {
+	m := &missionautonomydto.MissionProtoDTO{Id: protobuf.String(req.GetMissionId()), Name: "Perimeter sweep"}
+	return &missionautonomycontracts.MissionResponse{Response: &missionautonomycontracts.MissionResponse_Mission{Mission: m}}, nil
 }
 
-func (s *fakeService) UpsertApplication(ctx context.Context, req *execdto.UpsertApplicationRequest) (*execdto.ApplicationResponse, error) {
-	return &execdto.ApplicationResponse{Response: &execdto.ApplicationResponse_Application{Application: req.GetApplication()}}, nil
+func (s *fakeService) CreateTask(ctx context.Context, req *missionautonomycontracts.CreateTaskRequest) (*missionautonomycontracts.TaskResponse, error) {
+	s.lastCreateTask = req
+	t := &missionautonomydto.TaskProtoDTO{Id: protobuf.String("t-1"), Name: protobuf.String(req.GetTask().GetName())}
+	return &missionautonomycontracts.TaskResponse{Response: &missionautonomycontracts.TaskResponse_Task{Task: t}}, nil
 }
 
-func (s *fakeService) ListApplications(ctx context.Context, req *execdto.ListApplicationsRequest) (*execdto.ApplicationListResponse, error) {
-	return &execdto.ApplicationListResponse{
-		Response: &execdto.ApplicationListResponse_Result{
-			Result: &execdto.ApplicationList{
-				Applications:  []*execution.ApplicationProtoDTO{{Id: "app-1"}},
-				NextPageToken: proto.String("page-2"),
-			},
-		},
-	}, nil
+func (s *fakeService) GetTaskByFlightId(ctx context.Context, req *missionautonomycontracts.GetTaskByFlightIdRequest) (*missionautonomycontracts.TaskResponse, error) {
+	t := &missionautonomydto.TaskProtoDTO{Id: protobuf.String("t-2"), ExternalTaskId: protobuf.String(req.GetFlightId())}
+	return &missionautonomycontracts.TaskResponse{Response: &missionautonomycontracts.TaskResponse_Task{Task: t}}, nil
+}
+
+func (s *fakeService) StartTask(ctx context.Context, req *missionautonomycontracts.TaskLifecycleRequest) (*missionautonomycontracts.TaskResponse, error) {
+	s.lastLifecycle = req
+	t := &missionautonomydto.TaskProtoDTO{Id: protobuf.String(req.GetTaskId())}
+	return &missionautonomycontracts.TaskResponse{Response: &missionautonomycontracts.TaskResponse_Task{Task: t}}, nil
+}
+
+func (s *fakeService) DeleteMission(ctx context.Context, req *missionautonomycontracts.DeleteMissionRequest) (*missionautonomycontracts.MissionResponse, error) {
+	return &missionautonomycontracts.MissionResponse{Response: &missionautonomycontracts.MissionResponse_Empty{}}, nil
+}
+
+func (s *fakeService) ListSchedulers(ctx context.Context, req *missionautonomycontracts.ListSchedulersRequest) (*missionautonomycontracts.SchedulerResponse, error) {
+	s.lastListSchedulers = req
+	list := &missionautonomydto.SchedulerProtoDTOList{
+		SchedulerDtoList: []*missionautonomydto.SchedulerProtoDTO{{Id: protobuf.String("s-1"), Name: "daily"}},
+	}
+	return &missionautonomycontracts.SchedulerResponse{Response: &missionautonomycontracts.SchedulerResponse_Schedulers{Schedulers: list}}, nil
 }
 
 func dialFake(t *testing.T, svc missionautonomypb.MissionAutonomyServiceServer) *Client {
@@ -67,87 +80,101 @@ func dialFake(t *testing.T, svc missionautonomypb.MissionAutonomyServiceServer) 
 	return New(conn)
 }
 
-func TestExecuteSimpleSendsASimpleSpecAndCarriesTheAssetSnThrough(t *testing.T) {
+func TestCreateMissionRoundTripsTheMission(t *testing.T) {
 	fake := &fakeService{}
 	client := dialFake(t, fake)
 
-	got, err := client.ExecuteSimple(context.Background(), "asset-1", "flight.takeoff", nil, "idem-1")
+	got, err := client.CreateMission(context.Background(), &missionautonomydto.MissionProtoDTO{Name: "Perimeter sweep"})
 	if err != nil {
-		t.Fatalf("ExecuteSimple: %v", err)
+		t.Fatalf("CreateMission: %v", err)
 	}
-	if got.GetId() != "exec-1" {
-		t.Fatalf("expected exec-1, got %q", got.GetId())
+	if got.GetName() != "Perimeter sweep" {
+		t.Fatalf("expected Perimeter sweep, got %q", got.GetName())
 	}
-	simple := fake.lastExecuteRequest.GetSpec().GetSimple()
-	if simple == nil || simple.GetCommandId() != "flight.takeoff" {
-		t.Fatalf("expected a simple spec for flight.takeoff, got %v", fake.lastExecuteRequest.GetSpec())
-	}
-	if fake.lastExecuteRequest.GetBase().GetSn() != "asset-1" {
-		t.Fatalf("expected the asset sn to be sent, got %q", fake.lastExecuteRequest.GetBase().GetSn())
+	if fake.lastCreateMission.GetMission().GetName() != "Perimeter sweep" {
+		t.Fatalf("expected the mission to be sent, got %v", fake.lastCreateMission)
 	}
 }
 
-func TestStartSkillExecutionSendsTheExecutionId(t *testing.T) {
+func TestGetMissionReturnsTheMission(t *testing.T) {
 	fake := &fakeService{}
 	client := dialFake(t, fake)
 
-	got, err := client.StartSkillExecution(context.Background(), "exec-42")
+	got, err := client.GetMission(context.Background(), "m-1")
 	if err != nil {
-		t.Fatalf("StartSkillExecution: %v", err)
+		t.Fatalf("GetMission: %v", err)
 	}
-	if got.GetId() != "exec-42" {
-		t.Fatalf("expected exec-42, got %q", got.GetId())
-	}
-	if fake.lastLifecycleRequest.GetExecutionId() != "exec-42" {
-		t.Fatalf("expected the execution id to be sent, got %q", fake.lastLifecycleRequest.GetExecutionId())
+	if got.GetId() != "m-1" {
+		t.Fatalf("expected m-1, got %q", got.GetId())
 	}
 }
 
-func TestExecuteApplicationSendsAnApplicationSpec(t *testing.T) {
+func TestDeleteMissionSucceeds(t *testing.T) {
 	fake := &fakeService{}
 	client := dialFake(t, fake)
 
-	got, err := client.ExecuteApplication(context.Background(), "asset-1", "app-1", "skill-1", "2", nil, "idem-2")
-	if err != nil {
-		t.Fatalf("ExecuteApplication: %v", err)
-	}
-	if got.GetId() != "exec-1" {
-		t.Fatalf("expected exec-1, got %q", got.GetId())
-	}
-	appSpec := fake.lastExecuteRequest.GetSpec().GetApplication()
-	if appSpec == nil || appSpec.GetApplicationId() != "app-1" || appSpec.GetSkillId() != "skill-1" {
-		t.Fatalf("expected an application spec for app-1/skill-1, got %v", fake.lastExecuteRequest.GetSpec())
-	}
-	if appSpec.GetApplicationVersion() != "2" {
-		t.Fatalf("expected version 2, got %q", appSpec.GetApplicationVersion())
+	if err := client.DeleteMission(context.Background(), "m-1"); err != nil {
+		t.Fatalf("DeleteMission: %v", err)
 	}
 }
 
-func TestListApplicationsReturnsThePageAndNextToken(t *testing.T) {
+func TestCreateTaskRoundTripsTheTask(t *testing.T) {
 	fake := &fakeService{}
 	client := dialFake(t, fake)
 
-	apps, nextPageToken, err := client.ListApplications(context.Background(), nil, false, 0, "")
+	got, err := client.CreateTask(context.Background(), &missionautonomydto.TaskProtoDTO{Name: protobuf.String("Waypoint run")})
 	if err != nil {
-		t.Fatalf("ListApplications: %v", err)
+		t.Fatalf("CreateTask: %v", err)
 	}
-	if len(apps) != 1 || apps[0].GetId() != "app-1" {
-		t.Fatalf("expected one app-1, got %v", apps)
+	if got.GetName() != "Waypoint run" {
+		t.Fatalf("expected Waypoint run, got %q", got.GetName())
 	}
-	if nextPageToken != "page-2" {
-		t.Fatalf("expected page-2, got %q", nextPageToken)
+	if fake.lastCreateTask.GetTask().GetName() != "Waypoint run" {
+		t.Fatalf("expected the task to be sent, got %v", fake.lastCreateTask)
 	}
 }
 
-func TestUpsertApplicationRoundTripsTheApplication(t *testing.T) {
+func TestGetTaskByFlightIdSendsTheFlightId(t *testing.T) {
 	fake := &fakeService{}
 	client := dialFake(t, fake)
 
-	got, err := client.UpsertApplication(context.Background(), &execution.ApplicationProtoDTO{Id: "app-1", Version: "1"}, "")
+	got, err := client.GetTaskByFlightID(context.Background(), "flight-42")
 	if err != nil {
-		t.Fatalf("UpsertApplication: %v", err)
+		t.Fatalf("GetTaskByFlightID: %v", err)
 	}
-	if got.GetId() != "app-1" {
-		t.Fatalf("expected app-1, got %q", got.GetId())
+	if got.GetExternalTaskId() != "flight-42" {
+		t.Fatalf("expected flight-42, got %q", got.GetExternalTaskId())
+	}
+}
+
+func TestListSchedulersFiltersByTaskId(t *testing.T) {
+	fake := &fakeService{}
+	client := dialFake(t, fake)
+
+	got, err := client.ListSchedulers(context.Background(), "t-1")
+	if err != nil {
+		t.Fatalf("ListSchedulers: %v", err)
+	}
+	if len(got) != 1 || got[0].GetId() != "s-1" {
+		t.Fatalf("expected one s-1 scheduler, got %v", got)
+	}
+	if fake.lastListSchedulers.GetTaskId() != "t-1" {
+		t.Fatalf("expected the task id to be sent, got %q", fake.lastListSchedulers.GetTaskId())
+	}
+}
+
+func TestStartTaskSendsTheTaskId(t *testing.T) {
+	fake := &fakeService{}
+	client := dialFake(t, fake)
+
+	got, err := client.StartTask(context.Background(), "t-42")
+	if err != nil {
+		t.Fatalf("StartTask: %v", err)
+	}
+	if got.GetId() != "t-42" {
+		t.Fatalf("expected t-42, got %q", got.GetId())
+	}
+	if fake.lastLifecycle.GetTaskId() != "t-42" {
+		t.Fatalf("expected the task id to be sent, got %q", fake.lastLifecycle.GetTaskId())
 	}
 }

@@ -207,7 +207,6 @@ var LiveStreamTypeEnum_name = proto1.LiveStreamTypeEnum_name
 var LiveStreamTypeEnum_value = proto1.LiveStreamTypeEnum_value
 
 type AssetProtoDTO = proto1.AssetProtoDTO
-type AssetPropertyProtoDTO = proto1.AssetPropertyProtoDTO
 type SubAssetProtoDTO = proto1.SubAssetProtoDTO
 type AssetPayloadProtoDTO = proto1.AssetPayloadProtoDTO
 type OrganizationProtoDTO = proto1.OrganizationProtoDTO
@@ -257,20 +256,6 @@ const CapabilityTargetType_CAPABILITY_TARGET_TYPE_COMPONENT = proto2.CapabilityT
 var CapabilityTargetType_name = proto2.CapabilityTargetType_name
 var CapabilityTargetType_value = proto2.CapabilityTargetType_value
 
-type CapabilitySourceProto = proto2.CapabilitySourceProto
-
-const CapabilitySourceProto_CAPABILITY_SOURCE_UNSPECIFIED = proto2.CapabilitySourceProto_CAPABILITY_SOURCE_UNSPECIFIED
-const CapabilitySourceProto_CAPABILITY_SOURCE_BUILT_IN = proto2.CapabilitySourceProto_CAPABILITY_SOURCE_BUILT_IN
-const CapabilitySourceProto_CAPABILITY_SOURCE_EDGE_ADAPTER = proto2.CapabilitySourceProto_CAPABILITY_SOURCE_EDGE_ADAPTER
-const CapabilitySourceProto_CAPABILITY_SOURCE_RUNTIME = proto2.CapabilitySourceProto_CAPABILITY_SOURCE_RUNTIME
-const CapabilitySourceProto_CAPABILITY_SOURCE_USER = proto2.CapabilitySourceProto_CAPABILITY_SOURCE_USER
-const CapabilitySourceProto_CAPABILITY_SOURCE_APPLICATION = proto2.CapabilitySourceProto_CAPABILITY_SOURCE_APPLICATION
-const CapabilitySourceProto_CAPABILITY_SOURCE_INTEGRATION = proto2.CapabilitySourceProto_CAPABILITY_SOURCE_INTEGRATION
-const CapabilitySourceProto_CAPABILITY_SOURCE_AI_GENERATED = proto2.CapabilitySourceProto_CAPABILITY_SOURCE_AI_GENERATED
-
-var CapabilitySourceProto_name = proto2.CapabilitySourceProto_name
-var CapabilitySourceProto_value = proto2.CapabilitySourceProto_value
-
 type CommandResponse = proto2.CommandResponse
 type CommandResponse_Empty = proto2.CommandResponse_Empty
 type CommandResponse_Error = proto2.CommandResponse_Error
@@ -283,9 +268,6 @@ type CustomCommandResponse_Empty = proto2.CustomCommandResponse_Empty
 type CustomCommandResponse_Error = proto2.CustomCommandResponse_Error
 type CustomCommandResponse_Progress = proto2.CustomCommandResponse_Progress
 type CapabilityTarget = proto2.CapabilityTarget
-type CapabilityErrorProto = proto2.CapabilityErrorProto
-type CapabilityEventProto = proto2.CapabilityEventProto
-type CapabilityRequirementsProto = proto2.CapabilityRequirementsProto
 type Capability = proto2.Capability
 type AssetCapabilities = proto2.AssetCapabilities
 type AssetCapabilitiesRequest = proto2.AssetCapabilitiesRequest

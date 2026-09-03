@@ -8,8 +8,7 @@ package proto
 
 import (
 	context "context"
-	proto "github.com/Zequent/zqnt-client-sdk-go/gen/execution/contracts/proto"
-	proto1 "github.com/Zequent/zqnt-client-sdk-go/gen/missionautonomy/contracts/proto"
+	proto "github.com/Zequent/zqnt-client-sdk-go/gen/missionautonomy/contracts/proto"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -21,20 +20,16 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	MissionAutonomyService_UpsertApplication_FullMethodName      = "/zqnt.MissionAutonomyService/UpsertApplication"
-	MissionAutonomyService_GetApplication_FullMethodName         = "/zqnt.MissionAutonomyService/GetApplication"
-	MissionAutonomyService_ListApplications_FullMethodName       = "/zqnt.MissionAutonomyService/ListApplications"
-	MissionAutonomyService_DeleteApplication_FullMethodName      = "/zqnt.MissionAutonomyService/DeleteApplication"
-	MissionAutonomyService_CreateSkillExecution_FullMethodName   = "/zqnt.MissionAutonomyService/CreateSkillExecution"
-	MissionAutonomyService_ExecuteSkill_FullMethodName           = "/zqnt.MissionAutonomyService/ExecuteSkill"
-	MissionAutonomyService_GetSkillExecution_FullMethodName      = "/zqnt.MissionAutonomyService/GetSkillExecution"
-	MissionAutonomyService_ListSkillExecutions_FullMethodName    = "/zqnt.MissionAutonomyService/ListSkillExecutions"
-	MissionAutonomyService_StartSkillExecution_FullMethodName    = "/zqnt.MissionAutonomyService/StartSkillExecution"
-	MissionAutonomyService_PauseSkillExecution_FullMethodName    = "/zqnt.MissionAutonomyService/PauseSkillExecution"
-	MissionAutonomyService_ResumeSkillExecution_FullMethodName   = "/zqnt.MissionAutonomyService/ResumeSkillExecution"
-	MissionAutonomyService_CancelSkillExecution_FullMethodName   = "/zqnt.MissionAutonomyService/CancelSkillExecution"
-	MissionAutonomyService_SignalSkillExecution_FullMethodName   = "/zqnt.MissionAutonomyService/SignalSkillExecution"
-	MissionAutonomyService_ResolveExecutionConfig_FullMethodName = "/zqnt.MissionAutonomyService/ResolveExecutionConfig"
+	MissionAutonomyService_GetMission_FullMethodName             = "/zqnt.MissionAutonomyService/GetMission"
+	MissionAutonomyService_CreateMission_FullMethodName          = "/zqnt.MissionAutonomyService/CreateMission"
+	MissionAutonomyService_UpdateMission_FullMethodName          = "/zqnt.MissionAutonomyService/UpdateMission"
+	MissionAutonomyService_DeleteMission_FullMethodName          = "/zqnt.MissionAutonomyService/DeleteMission"
+	MissionAutonomyService_UploadMissionNfzZones_FullMethodName  = "/zqnt.MissionAutonomyService/UploadMissionNfzZones"
+	MissionAutonomyService_GetTask_FullMethodName                = "/zqnt.MissionAutonomyService/GetTask"
+	MissionAutonomyService_GetTaskByFlightId_FullMethodName      = "/zqnt.MissionAutonomyService/GetTaskByFlightId"
+	MissionAutonomyService_CreateTask_FullMethodName             = "/zqnt.MissionAutonomyService/CreateTask"
+	MissionAutonomyService_UpdateTask_FullMethodName             = "/zqnt.MissionAutonomyService/UpdateTask"
+	MissionAutonomyService_DeleteTask_FullMethodName             = "/zqnt.MissionAutonomyService/DeleteTask"
 	MissionAutonomyService_ListSchedulers_FullMethodName         = "/zqnt.MissionAutonomyService/ListSchedulers"
 	MissionAutonomyService_GetScheduler_FullMethodName           = "/zqnt.MissionAutonomyService/GetScheduler"
 	MissionAutonomyService_CreateScheduler_FullMethodName        = "/zqnt.MissionAutonomyService/CreateScheduler"
@@ -42,6 +37,12 @@ const (
 	MissionAutonomyService_DeleteScheduler_FullMethodName        = "/zqnt.MissionAutonomyService/DeleteScheduler"
 	MissionAutonomyService_CreateSchedulers_FullMethodName       = "/zqnt.MissionAutonomyService/CreateSchedulers"
 	MissionAutonomyService_DeleteSchedulers_FullMethodName       = "/zqnt.MissionAutonomyService/DeleteSchedulers"
+	MissionAutonomyService_DeleteSchedulersByTask_FullMethodName = "/zqnt.MissionAutonomyService/DeleteSchedulersByTask"
+	MissionAutonomyService_StartTask_FullMethodName              = "/zqnt.MissionAutonomyService/StartTask"
+	MissionAutonomyService_StopTask_FullMethodName               = "/zqnt.MissionAutonomyService/StopTask"
+	MissionAutonomyService_PauseTask_FullMethodName              = "/zqnt.MissionAutonomyService/PauseTask"
+	MissionAutonomyService_ResumeTask_FullMethodName             = "/zqnt.MissionAutonomyService/ResumeTask"
+	MissionAutonomyService_EvaluateAutonomy_FullMethodName       = "/zqnt.MissionAutonomyService/EvaluateAutonomy"
 	MissionAutonomyService_EvaluateDetection_FullMethodName      = "/zqnt.MissionAutonomyService/EvaluateDetection"
 )
 
@@ -49,32 +50,33 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// MissionAutonomyService manages applications (skill packages), skill executions, schedules and decisions.
+// MissionAutonomyService provides RPC endpoints for managing missions, tasks,
+// schedulers, and mission autonomy.
 type MissionAutonomyServiceClient interface {
-	// Mission-free application administration. An Application is a deployable package of Skills
-	// (e.g. "takeoff", "goto", "look-at" — the simplest Application is one Skill wrapping one command).
-	UpsertApplication(ctx context.Context, in *proto.UpsertApplicationRequest, opts ...grpc.CallOption) (*proto.ApplicationResponse, error)
-	GetApplication(ctx context.Context, in *proto.GetApplicationRequest, opts ...grpc.CallOption) (*proto.ApplicationResponse, error)
-	ListApplications(ctx context.Context, in *proto.ListApplicationsRequest, opts ...grpc.CallOption) (*proto.ApplicationListResponse, error)
-	DeleteApplication(ctx context.Context, in *proto.DeleteApplicationRequest, opts ...grpc.CallOption) (*proto.ApplicationResponse, error)
-	// Unified execution API. ExecuteSkill is the low-friction entry point for simple commands.
-	CreateSkillExecution(ctx context.Context, in *proto.CreateSkillExecutionRequest, opts ...grpc.CallOption) (*proto.SkillExecutionResponse, error)
-	ExecuteSkill(ctx context.Context, in *proto.ExecuteSkillRequest, opts ...grpc.CallOption) (*proto.SkillExecutionResponse, error)
-	GetSkillExecution(ctx context.Context, in *proto.GetSkillExecutionRequest, opts ...grpc.CallOption) (*proto.SkillExecutionResponse, error)
-	ListSkillExecutions(ctx context.Context, in *proto.ListSkillExecutionsRequest, opts ...grpc.CallOption) (*proto.SkillExecutionListResponse, error)
-	StartSkillExecution(ctx context.Context, in *proto.SkillExecutionLifecycleRequest, opts ...grpc.CallOption) (*proto.SkillExecutionResponse, error)
-	PauseSkillExecution(ctx context.Context, in *proto.SkillExecutionLifecycleRequest, opts ...grpc.CallOption) (*proto.SkillExecutionResponse, error)
-	ResumeSkillExecution(ctx context.Context, in *proto.SkillExecutionLifecycleRequest, opts ...grpc.CallOption) (*proto.SkillExecutionResponse, error)
-	CancelSkillExecution(ctx context.Context, in *proto.SkillExecutionLifecycleRequest, opts ...grpc.CallOption) (*proto.SkillExecutionResponse, error)
-	SignalSkillExecution(ctx context.Context, in *proto.SignalSkillExecutionRequest, opts ...grpc.CallOption) (*proto.SkillExecutionResponse, error)
-	ResolveExecutionConfig(ctx context.Context, in *proto.ResolveExecutionConfigRequest, opts ...grpc.CallOption) (*proto.ResolveExecutionConfigResponse, error)
-	ListSchedulers(ctx context.Context, in *proto1.ListSchedulersRequest, opts ...grpc.CallOption) (*proto1.SchedulerResponse, error)
-	GetScheduler(ctx context.Context, in *proto1.GetSchedulerRequest, opts ...grpc.CallOption) (*proto1.SchedulerResponse, error)
-	CreateScheduler(ctx context.Context, in *proto1.CreateSchedulerRequest, opts ...grpc.CallOption) (*proto1.SchedulerResponse, error)
-	UpdateScheduler(ctx context.Context, in *proto1.UpdateSchedulerRequest, opts ...grpc.CallOption) (*proto1.SchedulerResponse, error)
-	DeleteScheduler(ctx context.Context, in *proto1.DeleteSchedulerRequest, opts ...grpc.CallOption) (*proto1.SchedulerResponse, error)
-	CreateSchedulers(ctx context.Context, in *proto1.CreateSchedulersRequest, opts ...grpc.CallOption) (*proto1.SchedulerResponse, error)
-	DeleteSchedulers(ctx context.Context, in *proto1.DeleteSchedulersRequest, opts ...grpc.CallOption) (*proto1.SchedulerResponse, error)
+	GetMission(ctx context.Context, in *proto.GetMissionRequest, opts ...grpc.CallOption) (*proto.MissionResponse, error)
+	CreateMission(ctx context.Context, in *proto.CreateMissionRequest, opts ...grpc.CallOption) (*proto.MissionResponse, error)
+	UpdateMission(ctx context.Context, in *proto.UpdateMissionRequest, opts ...grpc.CallOption) (*proto.MissionResponse, error)
+	DeleteMission(ctx context.Context, in *proto.DeleteMissionRequest, opts ...grpc.CallOption) (*proto.MissionResponse, error)
+	UploadMissionNfzZones(ctx context.Context, in *proto.UploadMissionNfzZonesRequest, opts ...grpc.CallOption) (*proto.MissionResponse, error)
+	GetTask(ctx context.Context, in *proto.GetTaskRequest, opts ...grpc.CallOption) (*proto.TaskResponse, error)
+	GetTaskByFlightId(ctx context.Context, in *proto.GetTaskByFlightIdRequest, opts ...grpc.CallOption) (*proto.TaskResponse, error)
+	CreateTask(ctx context.Context, in *proto.CreateTaskRequest, opts ...grpc.CallOption) (*proto.TaskResponse, error)
+	UpdateTask(ctx context.Context, in *proto.UpdateTaskRequest, opts ...grpc.CallOption) (*proto.TaskResponse, error)
+	DeleteTask(ctx context.Context, in *proto.DeleteTaskRequest, opts ...grpc.CallOption) (*proto.TaskResponse, error)
+	ListSchedulers(ctx context.Context, in *proto.ListSchedulersRequest, opts ...grpc.CallOption) (*proto.SchedulerResponse, error)
+	GetScheduler(ctx context.Context, in *proto.GetSchedulerRequest, opts ...grpc.CallOption) (*proto.SchedulerResponse, error)
+	CreateScheduler(ctx context.Context, in *proto.CreateSchedulerRequest, opts ...grpc.CallOption) (*proto.SchedulerResponse, error)
+	UpdateScheduler(ctx context.Context, in *proto.UpdateSchedulerRequest, opts ...grpc.CallOption) (*proto.SchedulerResponse, error)
+	DeleteScheduler(ctx context.Context, in *proto.DeleteSchedulerRequest, opts ...grpc.CallOption) (*proto.SchedulerResponse, error)
+	CreateSchedulers(ctx context.Context, in *proto.CreateSchedulersRequest, opts ...grpc.CallOption) (*proto.SchedulerResponse, error)
+	DeleteSchedulers(ctx context.Context, in *proto.DeleteSchedulersRequest, opts ...grpc.CallOption) (*proto.SchedulerResponse, error)
+	DeleteSchedulersByTask(ctx context.Context, in *proto.DeleteSchedulersByTaskRequest, opts ...grpc.CallOption) (*proto.SchedulerResponse, error)
+	StartTask(ctx context.Context, in *proto.TaskLifecycleRequest, opts ...grpc.CallOption) (*proto.TaskResponse, error)
+	StopTask(ctx context.Context, in *proto.TaskLifecycleRequest, opts ...grpc.CallOption) (*proto.TaskResponse, error)
+	PauseTask(ctx context.Context, in *proto.TaskLifecycleRequest, opts ...grpc.CallOption) (*proto.TaskResponse, error)
+	ResumeTask(ctx context.Context, in *proto.TaskLifecycleRequest, opts ...grpc.CallOption) (*proto.TaskResponse, error)
+	// Autonomy Layer - resolve dynamic configs and evaluate mission/task decisions.
+	EvaluateAutonomy(ctx context.Context, in *EvaluateAutonomyRequest, opts ...grpc.CallOption) (*AutonomyEvaluationResponse, error)
 	// Decision Engine - evaluate a detection event and return a tactical decision
 	EvaluateDetection(ctx context.Context, in *EvaluateDetectionRequest, opts ...grpc.CallOption) (*DecisionResponse, error)
 }
@@ -87,149 +89,109 @@ func NewMissionAutonomyServiceClient(cc grpc.ClientConnInterface) MissionAutonom
 	return &missionAutonomyServiceClient{cc}
 }
 
-func (c *missionAutonomyServiceClient) UpsertApplication(ctx context.Context, in *proto.UpsertApplicationRequest, opts ...grpc.CallOption) (*proto.ApplicationResponse, error) {
+func (c *missionAutonomyServiceClient) GetMission(ctx context.Context, in *proto.GetMissionRequest, opts ...grpc.CallOption) (*proto.MissionResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(proto.ApplicationResponse)
-	err := c.cc.Invoke(ctx, MissionAutonomyService_UpsertApplication_FullMethodName, in, out, cOpts...)
+	out := new(proto.MissionResponse)
+	err := c.cc.Invoke(ctx, MissionAutonomyService_GetMission_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *missionAutonomyServiceClient) GetApplication(ctx context.Context, in *proto.GetApplicationRequest, opts ...grpc.CallOption) (*proto.ApplicationResponse, error) {
+func (c *missionAutonomyServiceClient) CreateMission(ctx context.Context, in *proto.CreateMissionRequest, opts ...grpc.CallOption) (*proto.MissionResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(proto.ApplicationResponse)
-	err := c.cc.Invoke(ctx, MissionAutonomyService_GetApplication_FullMethodName, in, out, cOpts...)
+	out := new(proto.MissionResponse)
+	err := c.cc.Invoke(ctx, MissionAutonomyService_CreateMission_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *missionAutonomyServiceClient) ListApplications(ctx context.Context, in *proto.ListApplicationsRequest, opts ...grpc.CallOption) (*proto.ApplicationListResponse, error) {
+func (c *missionAutonomyServiceClient) UpdateMission(ctx context.Context, in *proto.UpdateMissionRequest, opts ...grpc.CallOption) (*proto.MissionResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(proto.ApplicationListResponse)
-	err := c.cc.Invoke(ctx, MissionAutonomyService_ListApplications_FullMethodName, in, out, cOpts...)
+	out := new(proto.MissionResponse)
+	err := c.cc.Invoke(ctx, MissionAutonomyService_UpdateMission_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *missionAutonomyServiceClient) DeleteApplication(ctx context.Context, in *proto.DeleteApplicationRequest, opts ...grpc.CallOption) (*proto.ApplicationResponse, error) {
+func (c *missionAutonomyServiceClient) DeleteMission(ctx context.Context, in *proto.DeleteMissionRequest, opts ...grpc.CallOption) (*proto.MissionResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(proto.ApplicationResponse)
-	err := c.cc.Invoke(ctx, MissionAutonomyService_DeleteApplication_FullMethodName, in, out, cOpts...)
+	out := new(proto.MissionResponse)
+	err := c.cc.Invoke(ctx, MissionAutonomyService_DeleteMission_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *missionAutonomyServiceClient) CreateSkillExecution(ctx context.Context, in *proto.CreateSkillExecutionRequest, opts ...grpc.CallOption) (*proto.SkillExecutionResponse, error) {
+func (c *missionAutonomyServiceClient) UploadMissionNfzZones(ctx context.Context, in *proto.UploadMissionNfzZonesRequest, opts ...grpc.CallOption) (*proto.MissionResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(proto.SkillExecutionResponse)
-	err := c.cc.Invoke(ctx, MissionAutonomyService_CreateSkillExecution_FullMethodName, in, out, cOpts...)
+	out := new(proto.MissionResponse)
+	err := c.cc.Invoke(ctx, MissionAutonomyService_UploadMissionNfzZones_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *missionAutonomyServiceClient) ExecuteSkill(ctx context.Context, in *proto.ExecuteSkillRequest, opts ...grpc.CallOption) (*proto.SkillExecutionResponse, error) {
+func (c *missionAutonomyServiceClient) GetTask(ctx context.Context, in *proto.GetTaskRequest, opts ...grpc.CallOption) (*proto.TaskResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(proto.SkillExecutionResponse)
-	err := c.cc.Invoke(ctx, MissionAutonomyService_ExecuteSkill_FullMethodName, in, out, cOpts...)
+	out := new(proto.TaskResponse)
+	err := c.cc.Invoke(ctx, MissionAutonomyService_GetTask_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *missionAutonomyServiceClient) GetSkillExecution(ctx context.Context, in *proto.GetSkillExecutionRequest, opts ...grpc.CallOption) (*proto.SkillExecutionResponse, error) {
+func (c *missionAutonomyServiceClient) GetTaskByFlightId(ctx context.Context, in *proto.GetTaskByFlightIdRequest, opts ...grpc.CallOption) (*proto.TaskResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(proto.SkillExecutionResponse)
-	err := c.cc.Invoke(ctx, MissionAutonomyService_GetSkillExecution_FullMethodName, in, out, cOpts...)
+	out := new(proto.TaskResponse)
+	err := c.cc.Invoke(ctx, MissionAutonomyService_GetTaskByFlightId_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *missionAutonomyServiceClient) ListSkillExecutions(ctx context.Context, in *proto.ListSkillExecutionsRequest, opts ...grpc.CallOption) (*proto.SkillExecutionListResponse, error) {
+func (c *missionAutonomyServiceClient) CreateTask(ctx context.Context, in *proto.CreateTaskRequest, opts ...grpc.CallOption) (*proto.TaskResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(proto.SkillExecutionListResponse)
-	err := c.cc.Invoke(ctx, MissionAutonomyService_ListSkillExecutions_FullMethodName, in, out, cOpts...)
+	out := new(proto.TaskResponse)
+	err := c.cc.Invoke(ctx, MissionAutonomyService_CreateTask_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *missionAutonomyServiceClient) StartSkillExecution(ctx context.Context, in *proto.SkillExecutionLifecycleRequest, opts ...grpc.CallOption) (*proto.SkillExecutionResponse, error) {
+func (c *missionAutonomyServiceClient) UpdateTask(ctx context.Context, in *proto.UpdateTaskRequest, opts ...grpc.CallOption) (*proto.TaskResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(proto.SkillExecutionResponse)
-	err := c.cc.Invoke(ctx, MissionAutonomyService_StartSkillExecution_FullMethodName, in, out, cOpts...)
+	out := new(proto.TaskResponse)
+	err := c.cc.Invoke(ctx, MissionAutonomyService_UpdateTask_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *missionAutonomyServiceClient) PauseSkillExecution(ctx context.Context, in *proto.SkillExecutionLifecycleRequest, opts ...grpc.CallOption) (*proto.SkillExecutionResponse, error) {
+func (c *missionAutonomyServiceClient) DeleteTask(ctx context.Context, in *proto.DeleteTaskRequest, opts ...grpc.CallOption) (*proto.TaskResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(proto.SkillExecutionResponse)
-	err := c.cc.Invoke(ctx, MissionAutonomyService_PauseSkillExecution_FullMethodName, in, out, cOpts...)
+	out := new(proto.TaskResponse)
+	err := c.cc.Invoke(ctx, MissionAutonomyService_DeleteTask_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *missionAutonomyServiceClient) ResumeSkillExecution(ctx context.Context, in *proto.SkillExecutionLifecycleRequest, opts ...grpc.CallOption) (*proto.SkillExecutionResponse, error) {
+func (c *missionAutonomyServiceClient) ListSchedulers(ctx context.Context, in *proto.ListSchedulersRequest, opts ...grpc.CallOption) (*proto.SchedulerResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(proto.SkillExecutionResponse)
-	err := c.cc.Invoke(ctx, MissionAutonomyService_ResumeSkillExecution_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *missionAutonomyServiceClient) CancelSkillExecution(ctx context.Context, in *proto.SkillExecutionLifecycleRequest, opts ...grpc.CallOption) (*proto.SkillExecutionResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(proto.SkillExecutionResponse)
-	err := c.cc.Invoke(ctx, MissionAutonomyService_CancelSkillExecution_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *missionAutonomyServiceClient) SignalSkillExecution(ctx context.Context, in *proto.SignalSkillExecutionRequest, opts ...grpc.CallOption) (*proto.SkillExecutionResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(proto.SkillExecutionResponse)
-	err := c.cc.Invoke(ctx, MissionAutonomyService_SignalSkillExecution_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *missionAutonomyServiceClient) ResolveExecutionConfig(ctx context.Context, in *proto.ResolveExecutionConfigRequest, opts ...grpc.CallOption) (*proto.ResolveExecutionConfigResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(proto.ResolveExecutionConfigResponse)
-	err := c.cc.Invoke(ctx, MissionAutonomyService_ResolveExecutionConfig_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *missionAutonomyServiceClient) ListSchedulers(ctx context.Context, in *proto1.ListSchedulersRequest, opts ...grpc.CallOption) (*proto1.SchedulerResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(proto1.SchedulerResponse)
+	out := new(proto.SchedulerResponse)
 	err := c.cc.Invoke(ctx, MissionAutonomyService_ListSchedulers_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -237,9 +199,9 @@ func (c *missionAutonomyServiceClient) ListSchedulers(ctx context.Context, in *p
 	return out, nil
 }
 
-func (c *missionAutonomyServiceClient) GetScheduler(ctx context.Context, in *proto1.GetSchedulerRequest, opts ...grpc.CallOption) (*proto1.SchedulerResponse, error) {
+func (c *missionAutonomyServiceClient) GetScheduler(ctx context.Context, in *proto.GetSchedulerRequest, opts ...grpc.CallOption) (*proto.SchedulerResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(proto1.SchedulerResponse)
+	out := new(proto.SchedulerResponse)
 	err := c.cc.Invoke(ctx, MissionAutonomyService_GetScheduler_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -247,9 +209,9 @@ func (c *missionAutonomyServiceClient) GetScheduler(ctx context.Context, in *pro
 	return out, nil
 }
 
-func (c *missionAutonomyServiceClient) CreateScheduler(ctx context.Context, in *proto1.CreateSchedulerRequest, opts ...grpc.CallOption) (*proto1.SchedulerResponse, error) {
+func (c *missionAutonomyServiceClient) CreateScheduler(ctx context.Context, in *proto.CreateSchedulerRequest, opts ...grpc.CallOption) (*proto.SchedulerResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(proto1.SchedulerResponse)
+	out := new(proto.SchedulerResponse)
 	err := c.cc.Invoke(ctx, MissionAutonomyService_CreateScheduler_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -257,9 +219,9 @@ func (c *missionAutonomyServiceClient) CreateScheduler(ctx context.Context, in *
 	return out, nil
 }
 
-func (c *missionAutonomyServiceClient) UpdateScheduler(ctx context.Context, in *proto1.UpdateSchedulerRequest, opts ...grpc.CallOption) (*proto1.SchedulerResponse, error) {
+func (c *missionAutonomyServiceClient) UpdateScheduler(ctx context.Context, in *proto.UpdateSchedulerRequest, opts ...grpc.CallOption) (*proto.SchedulerResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(proto1.SchedulerResponse)
+	out := new(proto.SchedulerResponse)
 	err := c.cc.Invoke(ctx, MissionAutonomyService_UpdateScheduler_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -267,9 +229,9 @@ func (c *missionAutonomyServiceClient) UpdateScheduler(ctx context.Context, in *
 	return out, nil
 }
 
-func (c *missionAutonomyServiceClient) DeleteScheduler(ctx context.Context, in *proto1.DeleteSchedulerRequest, opts ...grpc.CallOption) (*proto1.SchedulerResponse, error) {
+func (c *missionAutonomyServiceClient) DeleteScheduler(ctx context.Context, in *proto.DeleteSchedulerRequest, opts ...grpc.CallOption) (*proto.SchedulerResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(proto1.SchedulerResponse)
+	out := new(proto.SchedulerResponse)
 	err := c.cc.Invoke(ctx, MissionAutonomyService_DeleteScheduler_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -277,9 +239,9 @@ func (c *missionAutonomyServiceClient) DeleteScheduler(ctx context.Context, in *
 	return out, nil
 }
 
-func (c *missionAutonomyServiceClient) CreateSchedulers(ctx context.Context, in *proto1.CreateSchedulersRequest, opts ...grpc.CallOption) (*proto1.SchedulerResponse, error) {
+func (c *missionAutonomyServiceClient) CreateSchedulers(ctx context.Context, in *proto.CreateSchedulersRequest, opts ...grpc.CallOption) (*proto.SchedulerResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(proto1.SchedulerResponse)
+	out := new(proto.SchedulerResponse)
 	err := c.cc.Invoke(ctx, MissionAutonomyService_CreateSchedulers_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -287,10 +249,70 @@ func (c *missionAutonomyServiceClient) CreateSchedulers(ctx context.Context, in 
 	return out, nil
 }
 
-func (c *missionAutonomyServiceClient) DeleteSchedulers(ctx context.Context, in *proto1.DeleteSchedulersRequest, opts ...grpc.CallOption) (*proto1.SchedulerResponse, error) {
+func (c *missionAutonomyServiceClient) DeleteSchedulers(ctx context.Context, in *proto.DeleteSchedulersRequest, opts ...grpc.CallOption) (*proto.SchedulerResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(proto1.SchedulerResponse)
+	out := new(proto.SchedulerResponse)
 	err := c.cc.Invoke(ctx, MissionAutonomyService_DeleteSchedulers_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *missionAutonomyServiceClient) DeleteSchedulersByTask(ctx context.Context, in *proto.DeleteSchedulersByTaskRequest, opts ...grpc.CallOption) (*proto.SchedulerResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(proto.SchedulerResponse)
+	err := c.cc.Invoke(ctx, MissionAutonomyService_DeleteSchedulersByTask_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *missionAutonomyServiceClient) StartTask(ctx context.Context, in *proto.TaskLifecycleRequest, opts ...grpc.CallOption) (*proto.TaskResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(proto.TaskResponse)
+	err := c.cc.Invoke(ctx, MissionAutonomyService_StartTask_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *missionAutonomyServiceClient) StopTask(ctx context.Context, in *proto.TaskLifecycleRequest, opts ...grpc.CallOption) (*proto.TaskResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(proto.TaskResponse)
+	err := c.cc.Invoke(ctx, MissionAutonomyService_StopTask_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *missionAutonomyServiceClient) PauseTask(ctx context.Context, in *proto.TaskLifecycleRequest, opts ...grpc.CallOption) (*proto.TaskResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(proto.TaskResponse)
+	err := c.cc.Invoke(ctx, MissionAutonomyService_PauseTask_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *missionAutonomyServiceClient) ResumeTask(ctx context.Context, in *proto.TaskLifecycleRequest, opts ...grpc.CallOption) (*proto.TaskResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(proto.TaskResponse)
+	err := c.cc.Invoke(ctx, MissionAutonomyService_ResumeTask_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *missionAutonomyServiceClient) EvaluateAutonomy(ctx context.Context, in *EvaluateAutonomyRequest, opts ...grpc.CallOption) (*AutonomyEvaluationResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AutonomyEvaluationResponse)
+	err := c.cc.Invoke(ctx, MissionAutonomyService_EvaluateAutonomy_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -311,32 +333,33 @@ func (c *missionAutonomyServiceClient) EvaluateDetection(ctx context.Context, in
 // All implementations must embed UnimplementedMissionAutonomyServiceServer
 // for forward compatibility.
 //
-// MissionAutonomyService manages applications (skill packages), skill executions, schedules and decisions.
+// MissionAutonomyService provides RPC endpoints for managing missions, tasks,
+// schedulers, and mission autonomy.
 type MissionAutonomyServiceServer interface {
-	// Mission-free application administration. An Application is a deployable package of Skills
-	// (e.g. "takeoff", "goto", "look-at" — the simplest Application is one Skill wrapping one command).
-	UpsertApplication(context.Context, *proto.UpsertApplicationRequest) (*proto.ApplicationResponse, error)
-	GetApplication(context.Context, *proto.GetApplicationRequest) (*proto.ApplicationResponse, error)
-	ListApplications(context.Context, *proto.ListApplicationsRequest) (*proto.ApplicationListResponse, error)
-	DeleteApplication(context.Context, *proto.DeleteApplicationRequest) (*proto.ApplicationResponse, error)
-	// Unified execution API. ExecuteSkill is the low-friction entry point for simple commands.
-	CreateSkillExecution(context.Context, *proto.CreateSkillExecutionRequest) (*proto.SkillExecutionResponse, error)
-	ExecuteSkill(context.Context, *proto.ExecuteSkillRequest) (*proto.SkillExecutionResponse, error)
-	GetSkillExecution(context.Context, *proto.GetSkillExecutionRequest) (*proto.SkillExecutionResponse, error)
-	ListSkillExecutions(context.Context, *proto.ListSkillExecutionsRequest) (*proto.SkillExecutionListResponse, error)
-	StartSkillExecution(context.Context, *proto.SkillExecutionLifecycleRequest) (*proto.SkillExecutionResponse, error)
-	PauseSkillExecution(context.Context, *proto.SkillExecutionLifecycleRequest) (*proto.SkillExecutionResponse, error)
-	ResumeSkillExecution(context.Context, *proto.SkillExecutionLifecycleRequest) (*proto.SkillExecutionResponse, error)
-	CancelSkillExecution(context.Context, *proto.SkillExecutionLifecycleRequest) (*proto.SkillExecutionResponse, error)
-	SignalSkillExecution(context.Context, *proto.SignalSkillExecutionRequest) (*proto.SkillExecutionResponse, error)
-	ResolveExecutionConfig(context.Context, *proto.ResolveExecutionConfigRequest) (*proto.ResolveExecutionConfigResponse, error)
-	ListSchedulers(context.Context, *proto1.ListSchedulersRequest) (*proto1.SchedulerResponse, error)
-	GetScheduler(context.Context, *proto1.GetSchedulerRequest) (*proto1.SchedulerResponse, error)
-	CreateScheduler(context.Context, *proto1.CreateSchedulerRequest) (*proto1.SchedulerResponse, error)
-	UpdateScheduler(context.Context, *proto1.UpdateSchedulerRequest) (*proto1.SchedulerResponse, error)
-	DeleteScheduler(context.Context, *proto1.DeleteSchedulerRequest) (*proto1.SchedulerResponse, error)
-	CreateSchedulers(context.Context, *proto1.CreateSchedulersRequest) (*proto1.SchedulerResponse, error)
-	DeleteSchedulers(context.Context, *proto1.DeleteSchedulersRequest) (*proto1.SchedulerResponse, error)
+	GetMission(context.Context, *proto.GetMissionRequest) (*proto.MissionResponse, error)
+	CreateMission(context.Context, *proto.CreateMissionRequest) (*proto.MissionResponse, error)
+	UpdateMission(context.Context, *proto.UpdateMissionRequest) (*proto.MissionResponse, error)
+	DeleteMission(context.Context, *proto.DeleteMissionRequest) (*proto.MissionResponse, error)
+	UploadMissionNfzZones(context.Context, *proto.UploadMissionNfzZonesRequest) (*proto.MissionResponse, error)
+	GetTask(context.Context, *proto.GetTaskRequest) (*proto.TaskResponse, error)
+	GetTaskByFlightId(context.Context, *proto.GetTaskByFlightIdRequest) (*proto.TaskResponse, error)
+	CreateTask(context.Context, *proto.CreateTaskRequest) (*proto.TaskResponse, error)
+	UpdateTask(context.Context, *proto.UpdateTaskRequest) (*proto.TaskResponse, error)
+	DeleteTask(context.Context, *proto.DeleteTaskRequest) (*proto.TaskResponse, error)
+	ListSchedulers(context.Context, *proto.ListSchedulersRequest) (*proto.SchedulerResponse, error)
+	GetScheduler(context.Context, *proto.GetSchedulerRequest) (*proto.SchedulerResponse, error)
+	CreateScheduler(context.Context, *proto.CreateSchedulerRequest) (*proto.SchedulerResponse, error)
+	UpdateScheduler(context.Context, *proto.UpdateSchedulerRequest) (*proto.SchedulerResponse, error)
+	DeleteScheduler(context.Context, *proto.DeleteSchedulerRequest) (*proto.SchedulerResponse, error)
+	CreateSchedulers(context.Context, *proto.CreateSchedulersRequest) (*proto.SchedulerResponse, error)
+	DeleteSchedulers(context.Context, *proto.DeleteSchedulersRequest) (*proto.SchedulerResponse, error)
+	DeleteSchedulersByTask(context.Context, *proto.DeleteSchedulersByTaskRequest) (*proto.SchedulerResponse, error)
+	StartTask(context.Context, *proto.TaskLifecycleRequest) (*proto.TaskResponse, error)
+	StopTask(context.Context, *proto.TaskLifecycleRequest) (*proto.TaskResponse, error)
+	PauseTask(context.Context, *proto.TaskLifecycleRequest) (*proto.TaskResponse, error)
+	ResumeTask(context.Context, *proto.TaskLifecycleRequest) (*proto.TaskResponse, error)
+	// Autonomy Layer - resolve dynamic configs and evaluate mission/task decisions.
+	EvaluateAutonomy(context.Context, *EvaluateAutonomyRequest) (*AutonomyEvaluationResponse, error)
 	// Decision Engine - evaluate a detection event and return a tactical decision
 	EvaluateDetection(context.Context, *EvaluateDetectionRequest) (*DecisionResponse, error)
 	mustEmbedUnimplementedMissionAutonomyServiceServer()
@@ -349,68 +372,74 @@ type MissionAutonomyServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedMissionAutonomyServiceServer struct{}
 
-func (UnimplementedMissionAutonomyServiceServer) UpsertApplication(context.Context, *proto.UpsertApplicationRequest) (*proto.ApplicationResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method UpsertApplication not implemented")
+func (UnimplementedMissionAutonomyServiceServer) GetMission(context.Context, *proto.GetMissionRequest) (*proto.MissionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetMission not implemented")
 }
-func (UnimplementedMissionAutonomyServiceServer) GetApplication(context.Context, *proto.GetApplicationRequest) (*proto.ApplicationResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetApplication not implemented")
+func (UnimplementedMissionAutonomyServiceServer) CreateMission(context.Context, *proto.CreateMissionRequest) (*proto.MissionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateMission not implemented")
 }
-func (UnimplementedMissionAutonomyServiceServer) ListApplications(context.Context, *proto.ListApplicationsRequest) (*proto.ApplicationListResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method ListApplications not implemented")
+func (UnimplementedMissionAutonomyServiceServer) UpdateMission(context.Context, *proto.UpdateMissionRequest) (*proto.MissionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateMission not implemented")
 }
-func (UnimplementedMissionAutonomyServiceServer) DeleteApplication(context.Context, *proto.DeleteApplicationRequest) (*proto.ApplicationResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method DeleteApplication not implemented")
+func (UnimplementedMissionAutonomyServiceServer) DeleteMission(context.Context, *proto.DeleteMissionRequest) (*proto.MissionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteMission not implemented")
 }
-func (UnimplementedMissionAutonomyServiceServer) CreateSkillExecution(context.Context, *proto.CreateSkillExecutionRequest) (*proto.SkillExecutionResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method CreateSkillExecution not implemented")
+func (UnimplementedMissionAutonomyServiceServer) UploadMissionNfzZones(context.Context, *proto.UploadMissionNfzZonesRequest) (*proto.MissionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UploadMissionNfzZones not implemented")
 }
-func (UnimplementedMissionAutonomyServiceServer) ExecuteSkill(context.Context, *proto.ExecuteSkillRequest) (*proto.SkillExecutionResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method ExecuteSkill not implemented")
+func (UnimplementedMissionAutonomyServiceServer) GetTask(context.Context, *proto.GetTaskRequest) (*proto.TaskResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetTask not implemented")
 }
-func (UnimplementedMissionAutonomyServiceServer) GetSkillExecution(context.Context, *proto.GetSkillExecutionRequest) (*proto.SkillExecutionResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetSkillExecution not implemented")
+func (UnimplementedMissionAutonomyServiceServer) GetTaskByFlightId(context.Context, *proto.GetTaskByFlightIdRequest) (*proto.TaskResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetTaskByFlightId not implemented")
 }
-func (UnimplementedMissionAutonomyServiceServer) ListSkillExecutions(context.Context, *proto.ListSkillExecutionsRequest) (*proto.SkillExecutionListResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method ListSkillExecutions not implemented")
+func (UnimplementedMissionAutonomyServiceServer) CreateTask(context.Context, *proto.CreateTaskRequest) (*proto.TaskResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateTask not implemented")
 }
-func (UnimplementedMissionAutonomyServiceServer) StartSkillExecution(context.Context, *proto.SkillExecutionLifecycleRequest) (*proto.SkillExecutionResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method StartSkillExecution not implemented")
+func (UnimplementedMissionAutonomyServiceServer) UpdateTask(context.Context, *proto.UpdateTaskRequest) (*proto.TaskResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateTask not implemented")
 }
-func (UnimplementedMissionAutonomyServiceServer) PauseSkillExecution(context.Context, *proto.SkillExecutionLifecycleRequest) (*proto.SkillExecutionResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method PauseSkillExecution not implemented")
+func (UnimplementedMissionAutonomyServiceServer) DeleteTask(context.Context, *proto.DeleteTaskRequest) (*proto.TaskResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteTask not implemented")
 }
-func (UnimplementedMissionAutonomyServiceServer) ResumeSkillExecution(context.Context, *proto.SkillExecutionLifecycleRequest) (*proto.SkillExecutionResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method ResumeSkillExecution not implemented")
-}
-func (UnimplementedMissionAutonomyServiceServer) CancelSkillExecution(context.Context, *proto.SkillExecutionLifecycleRequest) (*proto.SkillExecutionResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method CancelSkillExecution not implemented")
-}
-func (UnimplementedMissionAutonomyServiceServer) SignalSkillExecution(context.Context, *proto.SignalSkillExecutionRequest) (*proto.SkillExecutionResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method SignalSkillExecution not implemented")
-}
-func (UnimplementedMissionAutonomyServiceServer) ResolveExecutionConfig(context.Context, *proto.ResolveExecutionConfigRequest) (*proto.ResolveExecutionConfigResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method ResolveExecutionConfig not implemented")
-}
-func (UnimplementedMissionAutonomyServiceServer) ListSchedulers(context.Context, *proto1.ListSchedulersRequest) (*proto1.SchedulerResponse, error) {
+func (UnimplementedMissionAutonomyServiceServer) ListSchedulers(context.Context, *proto.ListSchedulersRequest) (*proto.SchedulerResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListSchedulers not implemented")
 }
-func (UnimplementedMissionAutonomyServiceServer) GetScheduler(context.Context, *proto1.GetSchedulerRequest) (*proto1.SchedulerResponse, error) {
+func (UnimplementedMissionAutonomyServiceServer) GetScheduler(context.Context, *proto.GetSchedulerRequest) (*proto.SchedulerResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetScheduler not implemented")
 }
-func (UnimplementedMissionAutonomyServiceServer) CreateScheduler(context.Context, *proto1.CreateSchedulerRequest) (*proto1.SchedulerResponse, error) {
+func (UnimplementedMissionAutonomyServiceServer) CreateScheduler(context.Context, *proto.CreateSchedulerRequest) (*proto.SchedulerResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateScheduler not implemented")
 }
-func (UnimplementedMissionAutonomyServiceServer) UpdateScheduler(context.Context, *proto1.UpdateSchedulerRequest) (*proto1.SchedulerResponse, error) {
+func (UnimplementedMissionAutonomyServiceServer) UpdateScheduler(context.Context, *proto.UpdateSchedulerRequest) (*proto.SchedulerResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateScheduler not implemented")
 }
-func (UnimplementedMissionAutonomyServiceServer) DeleteScheduler(context.Context, *proto1.DeleteSchedulerRequest) (*proto1.SchedulerResponse, error) {
+func (UnimplementedMissionAutonomyServiceServer) DeleteScheduler(context.Context, *proto.DeleteSchedulerRequest) (*proto.SchedulerResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteScheduler not implemented")
 }
-func (UnimplementedMissionAutonomyServiceServer) CreateSchedulers(context.Context, *proto1.CreateSchedulersRequest) (*proto1.SchedulerResponse, error) {
+func (UnimplementedMissionAutonomyServiceServer) CreateSchedulers(context.Context, *proto.CreateSchedulersRequest) (*proto.SchedulerResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateSchedulers not implemented")
 }
-func (UnimplementedMissionAutonomyServiceServer) DeleteSchedulers(context.Context, *proto1.DeleteSchedulersRequest) (*proto1.SchedulerResponse, error) {
+func (UnimplementedMissionAutonomyServiceServer) DeleteSchedulers(context.Context, *proto.DeleteSchedulersRequest) (*proto.SchedulerResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteSchedulers not implemented")
+}
+func (UnimplementedMissionAutonomyServiceServer) DeleteSchedulersByTask(context.Context, *proto.DeleteSchedulersByTaskRequest) (*proto.SchedulerResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteSchedulersByTask not implemented")
+}
+func (UnimplementedMissionAutonomyServiceServer) StartTask(context.Context, *proto.TaskLifecycleRequest) (*proto.TaskResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method StartTask not implemented")
+}
+func (UnimplementedMissionAutonomyServiceServer) StopTask(context.Context, *proto.TaskLifecycleRequest) (*proto.TaskResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method StopTask not implemented")
+}
+func (UnimplementedMissionAutonomyServiceServer) PauseTask(context.Context, *proto.TaskLifecycleRequest) (*proto.TaskResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method PauseTask not implemented")
+}
+func (UnimplementedMissionAutonomyServiceServer) ResumeTask(context.Context, *proto.TaskLifecycleRequest) (*proto.TaskResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ResumeTask not implemented")
+}
+func (UnimplementedMissionAutonomyServiceServer) EvaluateAutonomy(context.Context, *EvaluateAutonomyRequest) (*AutonomyEvaluationResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method EvaluateAutonomy not implemented")
 }
 func (UnimplementedMissionAutonomyServiceServer) EvaluateDetection(context.Context, *EvaluateDetectionRequest) (*DecisionResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method EvaluateDetection not implemented")
@@ -437,260 +466,188 @@ func RegisterMissionAutonomyServiceServer(s grpc.ServiceRegistrar, srv MissionAu
 	s.RegisterService(&MissionAutonomyService_ServiceDesc, srv)
 }
 
-func _MissionAutonomyService_UpsertApplication_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(proto.UpsertApplicationRequest)
+func _MissionAutonomyService_GetMission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(proto.GetMissionRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MissionAutonomyServiceServer).UpsertApplication(ctx, in)
+		return srv.(MissionAutonomyServiceServer).GetMission(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: MissionAutonomyService_UpsertApplication_FullMethodName,
+		FullMethod: MissionAutonomyService_GetMission_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MissionAutonomyServiceServer).UpsertApplication(ctx, req.(*proto.UpsertApplicationRequest))
+		return srv.(MissionAutonomyServiceServer).GetMission(ctx, req.(*proto.GetMissionRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MissionAutonomyService_GetApplication_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(proto.GetApplicationRequest)
+func _MissionAutonomyService_CreateMission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(proto.CreateMissionRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MissionAutonomyServiceServer).GetApplication(ctx, in)
+		return srv.(MissionAutonomyServiceServer).CreateMission(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: MissionAutonomyService_GetApplication_FullMethodName,
+		FullMethod: MissionAutonomyService_CreateMission_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MissionAutonomyServiceServer).GetApplication(ctx, req.(*proto.GetApplicationRequest))
+		return srv.(MissionAutonomyServiceServer).CreateMission(ctx, req.(*proto.CreateMissionRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MissionAutonomyService_ListApplications_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(proto.ListApplicationsRequest)
+func _MissionAutonomyService_UpdateMission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(proto.UpdateMissionRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MissionAutonomyServiceServer).ListApplications(ctx, in)
+		return srv.(MissionAutonomyServiceServer).UpdateMission(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: MissionAutonomyService_ListApplications_FullMethodName,
+		FullMethod: MissionAutonomyService_UpdateMission_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MissionAutonomyServiceServer).ListApplications(ctx, req.(*proto.ListApplicationsRequest))
+		return srv.(MissionAutonomyServiceServer).UpdateMission(ctx, req.(*proto.UpdateMissionRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MissionAutonomyService_DeleteApplication_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(proto.DeleteApplicationRequest)
+func _MissionAutonomyService_DeleteMission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(proto.DeleteMissionRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MissionAutonomyServiceServer).DeleteApplication(ctx, in)
+		return srv.(MissionAutonomyServiceServer).DeleteMission(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: MissionAutonomyService_DeleteApplication_FullMethodName,
+		FullMethod: MissionAutonomyService_DeleteMission_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MissionAutonomyServiceServer).DeleteApplication(ctx, req.(*proto.DeleteApplicationRequest))
+		return srv.(MissionAutonomyServiceServer).DeleteMission(ctx, req.(*proto.DeleteMissionRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MissionAutonomyService_CreateSkillExecution_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(proto.CreateSkillExecutionRequest)
+func _MissionAutonomyService_UploadMissionNfzZones_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(proto.UploadMissionNfzZonesRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MissionAutonomyServiceServer).CreateSkillExecution(ctx, in)
+		return srv.(MissionAutonomyServiceServer).UploadMissionNfzZones(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: MissionAutonomyService_CreateSkillExecution_FullMethodName,
+		FullMethod: MissionAutonomyService_UploadMissionNfzZones_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MissionAutonomyServiceServer).CreateSkillExecution(ctx, req.(*proto.CreateSkillExecutionRequest))
+		return srv.(MissionAutonomyServiceServer).UploadMissionNfzZones(ctx, req.(*proto.UploadMissionNfzZonesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MissionAutonomyService_ExecuteSkill_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(proto.ExecuteSkillRequest)
+func _MissionAutonomyService_GetTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(proto.GetTaskRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MissionAutonomyServiceServer).ExecuteSkill(ctx, in)
+		return srv.(MissionAutonomyServiceServer).GetTask(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: MissionAutonomyService_ExecuteSkill_FullMethodName,
+		FullMethod: MissionAutonomyService_GetTask_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MissionAutonomyServiceServer).ExecuteSkill(ctx, req.(*proto.ExecuteSkillRequest))
+		return srv.(MissionAutonomyServiceServer).GetTask(ctx, req.(*proto.GetTaskRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MissionAutonomyService_GetSkillExecution_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(proto.GetSkillExecutionRequest)
+func _MissionAutonomyService_GetTaskByFlightId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(proto.GetTaskByFlightIdRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MissionAutonomyServiceServer).GetSkillExecution(ctx, in)
+		return srv.(MissionAutonomyServiceServer).GetTaskByFlightId(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: MissionAutonomyService_GetSkillExecution_FullMethodName,
+		FullMethod: MissionAutonomyService_GetTaskByFlightId_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MissionAutonomyServiceServer).GetSkillExecution(ctx, req.(*proto.GetSkillExecutionRequest))
+		return srv.(MissionAutonomyServiceServer).GetTaskByFlightId(ctx, req.(*proto.GetTaskByFlightIdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MissionAutonomyService_ListSkillExecutions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(proto.ListSkillExecutionsRequest)
+func _MissionAutonomyService_CreateTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(proto.CreateTaskRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MissionAutonomyServiceServer).ListSkillExecutions(ctx, in)
+		return srv.(MissionAutonomyServiceServer).CreateTask(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: MissionAutonomyService_ListSkillExecutions_FullMethodName,
+		FullMethod: MissionAutonomyService_CreateTask_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MissionAutonomyServiceServer).ListSkillExecutions(ctx, req.(*proto.ListSkillExecutionsRequest))
+		return srv.(MissionAutonomyServiceServer).CreateTask(ctx, req.(*proto.CreateTaskRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MissionAutonomyService_StartSkillExecution_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(proto.SkillExecutionLifecycleRequest)
+func _MissionAutonomyService_UpdateTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(proto.UpdateTaskRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MissionAutonomyServiceServer).StartSkillExecution(ctx, in)
+		return srv.(MissionAutonomyServiceServer).UpdateTask(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: MissionAutonomyService_StartSkillExecution_FullMethodName,
+		FullMethod: MissionAutonomyService_UpdateTask_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MissionAutonomyServiceServer).StartSkillExecution(ctx, req.(*proto.SkillExecutionLifecycleRequest))
+		return srv.(MissionAutonomyServiceServer).UpdateTask(ctx, req.(*proto.UpdateTaskRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MissionAutonomyService_PauseSkillExecution_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(proto.SkillExecutionLifecycleRequest)
+func _MissionAutonomyService_DeleteTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(proto.DeleteTaskRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MissionAutonomyServiceServer).PauseSkillExecution(ctx, in)
+		return srv.(MissionAutonomyServiceServer).DeleteTask(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: MissionAutonomyService_PauseSkillExecution_FullMethodName,
+		FullMethod: MissionAutonomyService_DeleteTask_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MissionAutonomyServiceServer).PauseSkillExecution(ctx, req.(*proto.SkillExecutionLifecycleRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _MissionAutonomyService_ResumeSkillExecution_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(proto.SkillExecutionLifecycleRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MissionAutonomyServiceServer).ResumeSkillExecution(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MissionAutonomyService_ResumeSkillExecution_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MissionAutonomyServiceServer).ResumeSkillExecution(ctx, req.(*proto.SkillExecutionLifecycleRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _MissionAutonomyService_CancelSkillExecution_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(proto.SkillExecutionLifecycleRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MissionAutonomyServiceServer).CancelSkillExecution(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MissionAutonomyService_CancelSkillExecution_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MissionAutonomyServiceServer).CancelSkillExecution(ctx, req.(*proto.SkillExecutionLifecycleRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _MissionAutonomyService_SignalSkillExecution_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(proto.SignalSkillExecutionRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MissionAutonomyServiceServer).SignalSkillExecution(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MissionAutonomyService_SignalSkillExecution_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MissionAutonomyServiceServer).SignalSkillExecution(ctx, req.(*proto.SignalSkillExecutionRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _MissionAutonomyService_ResolveExecutionConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(proto.ResolveExecutionConfigRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MissionAutonomyServiceServer).ResolveExecutionConfig(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MissionAutonomyService_ResolveExecutionConfig_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MissionAutonomyServiceServer).ResolveExecutionConfig(ctx, req.(*proto.ResolveExecutionConfigRequest))
+		return srv.(MissionAutonomyServiceServer).DeleteTask(ctx, req.(*proto.DeleteTaskRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _MissionAutonomyService_ListSchedulers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(proto1.ListSchedulersRequest)
+	in := new(proto.ListSchedulersRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -702,13 +659,13 @@ func _MissionAutonomyService_ListSchedulers_Handler(srv interface{}, ctx context
 		FullMethod: MissionAutonomyService_ListSchedulers_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MissionAutonomyServiceServer).ListSchedulers(ctx, req.(*proto1.ListSchedulersRequest))
+		return srv.(MissionAutonomyServiceServer).ListSchedulers(ctx, req.(*proto.ListSchedulersRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _MissionAutonomyService_GetScheduler_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(proto1.GetSchedulerRequest)
+	in := new(proto.GetSchedulerRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -720,13 +677,13 @@ func _MissionAutonomyService_GetScheduler_Handler(srv interface{}, ctx context.C
 		FullMethod: MissionAutonomyService_GetScheduler_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MissionAutonomyServiceServer).GetScheduler(ctx, req.(*proto1.GetSchedulerRequest))
+		return srv.(MissionAutonomyServiceServer).GetScheduler(ctx, req.(*proto.GetSchedulerRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _MissionAutonomyService_CreateScheduler_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(proto1.CreateSchedulerRequest)
+	in := new(proto.CreateSchedulerRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -738,13 +695,13 @@ func _MissionAutonomyService_CreateScheduler_Handler(srv interface{}, ctx contex
 		FullMethod: MissionAutonomyService_CreateScheduler_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MissionAutonomyServiceServer).CreateScheduler(ctx, req.(*proto1.CreateSchedulerRequest))
+		return srv.(MissionAutonomyServiceServer).CreateScheduler(ctx, req.(*proto.CreateSchedulerRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _MissionAutonomyService_UpdateScheduler_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(proto1.UpdateSchedulerRequest)
+	in := new(proto.UpdateSchedulerRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -756,13 +713,13 @@ func _MissionAutonomyService_UpdateScheduler_Handler(srv interface{}, ctx contex
 		FullMethod: MissionAutonomyService_UpdateScheduler_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MissionAutonomyServiceServer).UpdateScheduler(ctx, req.(*proto1.UpdateSchedulerRequest))
+		return srv.(MissionAutonomyServiceServer).UpdateScheduler(ctx, req.(*proto.UpdateSchedulerRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _MissionAutonomyService_DeleteScheduler_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(proto1.DeleteSchedulerRequest)
+	in := new(proto.DeleteSchedulerRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -774,13 +731,13 @@ func _MissionAutonomyService_DeleteScheduler_Handler(srv interface{}, ctx contex
 		FullMethod: MissionAutonomyService_DeleteScheduler_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MissionAutonomyServiceServer).DeleteScheduler(ctx, req.(*proto1.DeleteSchedulerRequest))
+		return srv.(MissionAutonomyServiceServer).DeleteScheduler(ctx, req.(*proto.DeleteSchedulerRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _MissionAutonomyService_CreateSchedulers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(proto1.CreateSchedulersRequest)
+	in := new(proto.CreateSchedulersRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -792,13 +749,13 @@ func _MissionAutonomyService_CreateSchedulers_Handler(srv interface{}, ctx conte
 		FullMethod: MissionAutonomyService_CreateSchedulers_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MissionAutonomyServiceServer).CreateSchedulers(ctx, req.(*proto1.CreateSchedulersRequest))
+		return srv.(MissionAutonomyServiceServer).CreateSchedulers(ctx, req.(*proto.CreateSchedulersRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _MissionAutonomyService_DeleteSchedulers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(proto1.DeleteSchedulersRequest)
+	in := new(proto.DeleteSchedulersRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -810,7 +767,115 @@ func _MissionAutonomyService_DeleteSchedulers_Handler(srv interface{}, ctx conte
 		FullMethod: MissionAutonomyService_DeleteSchedulers_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MissionAutonomyServiceServer).DeleteSchedulers(ctx, req.(*proto1.DeleteSchedulersRequest))
+		return srv.(MissionAutonomyServiceServer).DeleteSchedulers(ctx, req.(*proto.DeleteSchedulersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MissionAutonomyService_DeleteSchedulersByTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(proto.DeleteSchedulersByTaskRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MissionAutonomyServiceServer).DeleteSchedulersByTask(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MissionAutonomyService_DeleteSchedulersByTask_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MissionAutonomyServiceServer).DeleteSchedulersByTask(ctx, req.(*proto.DeleteSchedulersByTaskRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MissionAutonomyService_StartTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(proto.TaskLifecycleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MissionAutonomyServiceServer).StartTask(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MissionAutonomyService_StartTask_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MissionAutonomyServiceServer).StartTask(ctx, req.(*proto.TaskLifecycleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MissionAutonomyService_StopTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(proto.TaskLifecycleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MissionAutonomyServiceServer).StopTask(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MissionAutonomyService_StopTask_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MissionAutonomyServiceServer).StopTask(ctx, req.(*proto.TaskLifecycleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MissionAutonomyService_PauseTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(proto.TaskLifecycleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MissionAutonomyServiceServer).PauseTask(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MissionAutonomyService_PauseTask_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MissionAutonomyServiceServer).PauseTask(ctx, req.(*proto.TaskLifecycleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MissionAutonomyService_ResumeTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(proto.TaskLifecycleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MissionAutonomyServiceServer).ResumeTask(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MissionAutonomyService_ResumeTask_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MissionAutonomyServiceServer).ResumeTask(ctx, req.(*proto.TaskLifecycleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MissionAutonomyService_EvaluateAutonomy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EvaluateAutonomyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MissionAutonomyServiceServer).EvaluateAutonomy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MissionAutonomyService_EvaluateAutonomy_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MissionAutonomyServiceServer).EvaluateAutonomy(ctx, req.(*EvaluateAutonomyRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -841,60 +906,44 @@ var MissionAutonomyService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*MissionAutonomyServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "UpsertApplication",
-			Handler:    _MissionAutonomyService_UpsertApplication_Handler,
+			MethodName: "GetMission",
+			Handler:    _MissionAutonomyService_GetMission_Handler,
 		},
 		{
-			MethodName: "GetApplication",
-			Handler:    _MissionAutonomyService_GetApplication_Handler,
+			MethodName: "CreateMission",
+			Handler:    _MissionAutonomyService_CreateMission_Handler,
 		},
 		{
-			MethodName: "ListApplications",
-			Handler:    _MissionAutonomyService_ListApplications_Handler,
+			MethodName: "UpdateMission",
+			Handler:    _MissionAutonomyService_UpdateMission_Handler,
 		},
 		{
-			MethodName: "DeleteApplication",
-			Handler:    _MissionAutonomyService_DeleteApplication_Handler,
+			MethodName: "DeleteMission",
+			Handler:    _MissionAutonomyService_DeleteMission_Handler,
 		},
 		{
-			MethodName: "CreateSkillExecution",
-			Handler:    _MissionAutonomyService_CreateSkillExecution_Handler,
+			MethodName: "UploadMissionNfzZones",
+			Handler:    _MissionAutonomyService_UploadMissionNfzZones_Handler,
 		},
 		{
-			MethodName: "ExecuteSkill",
-			Handler:    _MissionAutonomyService_ExecuteSkill_Handler,
+			MethodName: "GetTask",
+			Handler:    _MissionAutonomyService_GetTask_Handler,
 		},
 		{
-			MethodName: "GetSkillExecution",
-			Handler:    _MissionAutonomyService_GetSkillExecution_Handler,
+			MethodName: "GetTaskByFlightId",
+			Handler:    _MissionAutonomyService_GetTaskByFlightId_Handler,
 		},
 		{
-			MethodName: "ListSkillExecutions",
-			Handler:    _MissionAutonomyService_ListSkillExecutions_Handler,
+			MethodName: "CreateTask",
+			Handler:    _MissionAutonomyService_CreateTask_Handler,
 		},
 		{
-			MethodName: "StartSkillExecution",
-			Handler:    _MissionAutonomyService_StartSkillExecution_Handler,
+			MethodName: "UpdateTask",
+			Handler:    _MissionAutonomyService_UpdateTask_Handler,
 		},
 		{
-			MethodName: "PauseSkillExecution",
-			Handler:    _MissionAutonomyService_PauseSkillExecution_Handler,
-		},
-		{
-			MethodName: "ResumeSkillExecution",
-			Handler:    _MissionAutonomyService_ResumeSkillExecution_Handler,
-		},
-		{
-			MethodName: "CancelSkillExecution",
-			Handler:    _MissionAutonomyService_CancelSkillExecution_Handler,
-		},
-		{
-			MethodName: "SignalSkillExecution",
-			Handler:    _MissionAutonomyService_SignalSkillExecution_Handler,
-		},
-		{
-			MethodName: "ResolveExecutionConfig",
-			Handler:    _MissionAutonomyService_ResolveExecutionConfig_Handler,
+			MethodName: "DeleteTask",
+			Handler:    _MissionAutonomyService_DeleteTask_Handler,
 		},
 		{
 			MethodName: "ListSchedulers",
@@ -923,6 +972,30 @@ var MissionAutonomyService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteSchedulers",
 			Handler:    _MissionAutonomyService_DeleteSchedulers_Handler,
+		},
+		{
+			MethodName: "DeleteSchedulersByTask",
+			Handler:    _MissionAutonomyService_DeleteSchedulersByTask_Handler,
+		},
+		{
+			MethodName: "StartTask",
+			Handler:    _MissionAutonomyService_StartTask_Handler,
+		},
+		{
+			MethodName: "StopTask",
+			Handler:    _MissionAutonomyService_StopTask_Handler,
+		},
+		{
+			MethodName: "PauseTask",
+			Handler:    _MissionAutonomyService_PauseTask_Handler,
+		},
+		{
+			MethodName: "ResumeTask",
+			Handler:    _MissionAutonomyService_ResumeTask_Handler,
+		},
+		{
+			MethodName: "EvaluateAutonomy",
+			Handler:    _MissionAutonomyService_EvaluateAutonomy_Handler,
 		},
 		{
 			MethodName: "EvaluateDetection",
