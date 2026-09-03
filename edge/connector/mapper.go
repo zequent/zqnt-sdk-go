@@ -128,6 +128,9 @@ func (m *Mapper) AssetToProto(dto *domains.AssetDTO) *assetpb.AssetProtoDTO {
 		Id:                     dto.ID,
 		Sn:                     dto.SN,
 		Name:                   dto.Name,
+		Type:                   parseEnum[assetpb.AssetTypeEnum](assetpb.AssetTypeEnum_value, dto.Type),
+		Vendor:                 parseEnum[assetpb.AssetVendor](assetpb.AssetVendor_value, dto.Vendor),
+		Connection:             parseEnum[assetpb.AssetConnection](assetpb.AssetConnection_value, dto.Connection),
 		SystemConnectionString: dto.SystemConnectionString,
 		Model:                  dto.Model,
 		ExternalDeviceType:     dto.ExternalDeviceType,
@@ -157,6 +160,9 @@ func (m *Mapper) SubAssetToProto(dto *domains.SubAssetDTO) *assetpb.SubAssetProt
 		Id:                     dto.ID,
 		Sn:                     dto.SN,
 		Name:                   dto.Name,
+		Type:                   parseEnum[assetpb.AssetTypeEnum](assetpb.AssetTypeEnum_value, dto.Type),
+		Vendor:                 parseEnum[assetpb.AssetVendor](assetpb.AssetVendor_value, dto.Vendor),
+		Connection:             parseEnum[assetpb.AssetConnection](assetpb.AssetConnection_value, dto.Connection),
 		SystemConnectionString: dto.SystemConnectionString,
 		Model:                  dto.Model,
 		ExternalDeviceType:     dto.ExternalDeviceType,
@@ -207,6 +213,26 @@ func enumString[T stringer](e *T) string {
 		return ""
 	}
 	return (*e).String()
+}
+
+// parseEnum resolves a domain enum-name string (e.g. "ASSET_VENDOR_ZQNT") back to its proto enum
+// pointer via protoc-gen-go's generated *_value name->number map, the inverse of enumString.
+//
+// AssetToProto/SubAssetToProto never set Type/Vendor/Connection before this: RegisterAsset and
+// UpdateAsset silently sent every asset with those three fields unset, which the backend reads as
+// the enum zero value (AssetTypeEnum_UNKNOWN / AssetVendor_DJI / AssetConnection's own zero) rather
+// than an error -- a real asset registered through this SDK would misreport as DJI regardless of
+// its actual vendor. Found while wiring the v1.3.0-compat simulator's own RegisterAsset call.
+func parseEnum[T ~int32](values map[string]int32, s string) *T {
+	if s == "" {
+		return nil
+	}
+	n, ok := values[s]
+	if !ok {
+		return nil
+	}
+	v := T(n)
+	return &v
 }
 
 func tPtr(ts *timestamppb.Timestamp) *time.Time {
