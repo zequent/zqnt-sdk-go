@@ -53,3 +53,40 @@ jobs:
 
       - name: Vet
         run: go vet ./...
+
+  # Tags and pre-releases every PR build so it's individually go get-able for review/testing --
+  # deliberately NOT a "v*"-shaped tag: the release workflow triggers on tags: ["v*"], and this
+  # must never accidentally fire that (a real production release is only ever an intentional
+  # `git tag vX.Y.Z && git push` by a maintainer). `go get .../zqnt-edge-sdk-go@pr-<n>-<sha>` still
+  # resolves fine -- Go accepts any git ref as a version query, converting non-semver tags to a
+  # pseudo-version automatically. Uses the built-in GITHUB_TOKEN, not GH_PAT: pushing a tag/
+  # creating a release needs repo write access, not private-module read access.
+  pr-preview:
+    name: Tag PR preview build
+    needs: [lint, build-and-test]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compute preview tag
+        id: tag
+        run: |
+          SHORT_SHA=$(git rev-parse --short=7 HEAD)
+          echo "tag=pr-${{ github.event.pull_request.number }}-${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+
+      - name: Create and push preview tag
+        run: |
+          git tag "${{ steps.tag.outputs.tag }}"
+          git push origin "${{ steps.tag.outputs.tag }}"
+
+      - name: Create GitHub pre-release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: "PR #${{ github.event.pull_request.number }} preview (${{ steps.tag.outputs.tag }})"
+          prerelease: true
+          generate_release_notes: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
