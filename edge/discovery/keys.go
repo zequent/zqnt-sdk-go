@@ -22,7 +22,7 @@ import "fmt"
 
 const (
 	edgeEndpointKeyPrefix = "zqnt:edge-endpoints:" // + {vendor}
-	edgeVendorKeyPrefix   = "zqnt:edge-vendor:"     // + {sn}
+	edgeVendorKeyPrefix   = "zqnt:edge-vendor:"    // + {sn}
 )
 
 // endpointKey returns the Redis key holding the EdgeEndpoint JSON blob for a vendor.

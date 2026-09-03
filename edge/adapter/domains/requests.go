@@ -105,9 +105,9 @@ type GetDetectionsRequest struct {
 
 // DetectionResult is a single object detection within a frame.
 type DetectionResult struct {
-	ObjectID   string
-	ObjectType string
-	Confidence float32
+	ObjectID    string
+	ObjectType  string
+	Confidence  float32
 	BoundingBox BoundingBox
 }
 
