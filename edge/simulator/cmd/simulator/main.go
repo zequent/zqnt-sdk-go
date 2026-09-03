@@ -9,6 +9,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"net"
 	"os"
@@ -29,7 +30,14 @@ import (
 func main() {
 	log := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
 
-	backendAddr := envOr("BACKEND_ADDR", "localhost:8010")     // connector's gRPC (multiplexed on its HTTP port)
+	// connector/live-data/mission-autonomy are three independent services on three independent
+	// ports in every real deployment topology (core/docker-compose.local.yml's *_SERVICE_HOST/
+	// *_SERVICE_PORT, every existing adapter's application.properties) -- there is no single
+	// unified "backend" address, despite NewEdgeClient's single positional endpoint arg. Passed
+	// as the connector address below; live-data and mission-autonomy are overridden separately.
+	connectorAddr := envOr("CONNECTOR_ADDR", "localhost:8010")
+	liveDataAddr := envOr("LIVE_DATA_ADDR", "localhost:8003")
+	missionAutonomyAddr := envOr("MISSION_AUTONOMY_ADDR", "localhost:8004")
 	listenAddr := envOr("LISTEN_ADDR", ":9190")                // this process's own EdgeAdapterService port
 	advertiseAddr := envOr("ADVERTISE_ADDR", "localhost:9190") // what remote-control dials -- must be reachable from wherever remote-control runs, not just from here
 	redisAddr := envOr("REDIS_ADDR", "localhost:6379")
@@ -43,13 +51,20 @@ func main() {
 
 	simAdapter := simulator.NewSimulatedAdapter(log)
 
-	client, err := edgesdk.NewEdgeClient(backendAddr, sn, simAdapter, edgesdk.WithLogger(log))
+	client, err := edgesdk.NewEdgeClient(connectorAddr, sn, simAdapter,
+		edgesdk.WithLogger(log),
+		edgesdk.WithLiveDataAddr(liveDataAddr),
+		edgesdk.WithMissionAutonomyAddr(missionAutonomyAddr),
+	)
 	if err != nil {
 		log.Error("failed to create EdgeClient", "error", err)
 		os.Exit(1)
 	}
 
-	// Register the device with Connector so it shows up as a real Asset.
+	// Register the device with Connector so it shows up as a real Asset. RegisterAsset isn't an
+	// upsert -- a restart against an sn that's already registered (the common case: this is a
+	// long-running process, not a one-shot script) fails with "Asset already exists" rather than
+	// returning the existing asset, so fall back to looking it up.
 	name := "Simulated Drone 001"
 	connString := advertiseAddr
 	registered, err := client.Connector().RegisterAsset(ctx, &domains.AssetDTO{
@@ -60,13 +75,13 @@ func main() {
 		Connection:             "TCP",
 		SystemConnectionString: &connString,
 	})
-	if err != nil {
-		log.Error("RegisterAsset failed", "sn", sn, "error", err)
-		os.Exit(1)
-	}
-	if registered == nil {
-		log.Error("RegisterAsset returned no asset -- check connector logs", "sn", sn)
-		os.Exit(1)
+	if err != nil || registered == nil {
+		log.Warn("RegisterAsset failed, checking whether it already exists", "sn", sn, "error", err)
+		registered, err = client.Connector().GetAssetBySN(ctx, sn)
+		if err != nil || registered == nil {
+			log.Error("RegisterAsset failed and no existing asset found", "sn", sn, "error", err)
+			os.Exit(1)
+		}
 	}
 	log.Info("asset registered with Connector", "sn", sn, "id", registered.ID)
 
@@ -98,21 +113,27 @@ func main() {
 		os.Exit(1)
 	}
 
-	go func() {
-		<-ctx.Done()
-		log.Info("shutting down...")
-		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
-		if err := registrar.DeregisterEndpoint(shutdownCtx, vendor); err != nil {
-			log.Error("DeregisterEndpoint failed", "vendor", vendor, "error", err)
-		}
-		if err := client.Shutdown(shutdownCtx); err != nil {
-			log.Error("shutdown error", "error", err)
-		}
-	}()
+	// StartServing's own ctx.Done() case (client.go) also fires GracefulStop() and returns the
+	// moment ctx is cancelled -- running deregistration in a separate goroutine racing that same
+	// signal let the process exit before the Redis write landed (caught live-verifying: the
+	// endpoint stayed "online":true in Redis after a clean shutdown). Serve in the background
+	// instead and run every shutdown step here, in order, before main returns.
+	serveErrCh := make(chan error, 1)
+	go func() { serveErrCh <- client.StartServing(ctx, lis) }()
 
-	log.Info("simulator started", "sn", sn, "backend", backendAddr, "listen", listenAddr, "advertise", advertiseAddr)
-	if err := client.StartServing(ctx, lis); err != nil {
+	log.Info("simulator started", "sn", sn, "connector", connectorAddr, "liveData", liveDataAddr, "missionAutonomy", missionAutonomyAddr, "listen", listenAddr, "advertise", advertiseAddr)
+
+	<-ctx.Done()
+	log.Info("shutting down...")
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := registrar.DeregisterEndpoint(shutdownCtx, vendor); err != nil {
+		log.Error("DeregisterEndpoint failed", "vendor", vendor, "error", err)
+	}
+	if err := client.Shutdown(shutdownCtx); err != nil {
+		log.Error("shutdown error", "error", err)
+	}
+	if err := <-serveErrCh; err != nil && !errors.Is(err, context.Canceled) {
 		log.Error("server exited", "error", err)
 	}
 }
