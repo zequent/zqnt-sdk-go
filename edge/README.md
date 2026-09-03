@@ -100,6 +100,23 @@ the `simulator/` against a real running connector/live-data/remote-control stack
 TakeOff/GoTo/ReturnToHome move it → live telemetry visible via `StreamTelemetry`), not by a test
 suite.
 
+**`simulator/` is its own Go module** (`simulator/go.mod`, module path
+`github.com/Zequent/zqnt-edge-sdk-go-simulator`), not part of this repo's own module — it depends
+on `github.com/Zequent/zqnt-edge-sdk-go@v1.3.0-compat` as a real tagged dependency, the same way an
+actual customer building against this release would, rather than sharing this module via
+same-module relative imports. Build/vet/run it from inside `simulator/`, not from the repo root
+(`go build ./...` at the root deliberately excludes it — that's what having its own `go.mod` does).
+A distinct module path was required: this repo's own already-tagged `v1.3.0-compat` release still
+contains the `simulator/` source tree from before it got its own `go.mod`, so reusing the SDK's own
+module path for it would be ambiguous — `go mod tidy` refuses with "ambiguous import" if the paths
+collide.
+
+```bash
+cd simulator
+go build ./...
+go run ./cmd/simulator
+```
+
 ---
 
 ## How It Works

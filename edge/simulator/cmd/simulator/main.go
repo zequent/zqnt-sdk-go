@@ -18,10 +18,10 @@ import (
 	"time"
 
 	edgesdk "github.com/Zequent/zqnt-edge-sdk-go"
+	"github.com/Zequent/zqnt-edge-sdk-go-simulator"
+	"github.com/Zequent/zqnt-edge-sdk-go-simulator/engine"
 	"github.com/Zequent/zqnt-edge-sdk-go/adapter/domains"
 	"github.com/Zequent/zqnt-edge-sdk-go/discovery"
-	"github.com/Zequent/zqnt-edge-sdk-go/simulator"
-	"github.com/Zequent/zqnt-edge-sdk-go/simulator/engine"
 	commonpb "github.com/zequent/zqnt-utils-golang/gen/common/proto"
 
 	"github.com/redis/go-redis/v9"

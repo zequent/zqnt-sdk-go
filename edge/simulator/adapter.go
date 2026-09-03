@@ -10,9 +10,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Zequent/zqnt-edge-sdk-go-simulator/engine"
 	"github.com/Zequent/zqnt-edge-sdk-go/adapter"
 	"github.com/Zequent/zqnt-edge-sdk-go/adapter/domains"
-	"github.com/Zequent/zqnt-edge-sdk-go/simulator/engine"
 )
 
 // SimulatedAdapter implements adapter.EdgeAdapter for many SN-keyed simulated devices behind one
