@@ -43,7 +43,8 @@ type EdgeClient struct {
 	liveData      *livedata.ServiceImpl
 	connectorSvc  *connector.ServiceImpl
 	missionSvc    *missionautonomy.ServiceImpl
-	backendConn   *grpc.ClientConn
+	backendConn   *grpc.ClientConn   // the main endpoint connection; always present, always closed on Shutdown
+	extraConns    []*grpc.ClientConn // additional connections opened by WithConnectorAddr/WithLiveDataAddr/WithMissionAutonomyAddr, closed alongside backendConn
 }
 
 // NewEdgeClient creates and configures an EdgeClient.
@@ -61,18 +62,56 @@ func NewEdgeClient(endpoint, sn string, edgeAdapter adapter.EdgeAdapter, opts ..
 		o(cfg)
 	}
 
-	// Dial the backend (live-data, connector, mission-autonomy).
+	// Dial the main endpoint. Whichever of connector/live-data/mission-autonomy wasn't given its
+	// own address via WithConnectorAddr/WithLiveDataAddr/WithMissionAutonomyAddr uses this
+	// connection -- correct only if something in front of endpoint multiplexes all three (see
+	// config.go's doc comment on connectorAddr/liveDataAddr/missionAutonomyAddr).
 	conn, err := grpc.NewClient(endpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, fmt.Errorf("edge-go-sdk: failed to connect to backend at %s: %w", endpoint, err)
 	}
 
 	log := cfg.logger
+	var extraConns []*grpc.ClientConn
+
+	dialOrShare := func(addr string) (*grpc.ClientConn, error) {
+		if addr == "" {
+			return conn, nil
+		}
+		c, dialErr := grpc.NewClient(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+		if dialErr != nil {
+			return nil, fmt.Errorf("edge-go-sdk: failed to connect to %s: %w", addr, dialErr)
+		}
+		extraConns = append(extraConns, c)
+		return c, nil
+	}
+
+	connectorConn, err := dialOrShare(cfg.connectorAddr)
+	if err != nil {
+		_ = conn.Close()
+		return nil, err
+	}
+	liveDataConn, err := dialOrShare(cfg.liveDataAddr)
+	if err != nil {
+		_ = conn.Close()
+		for _, c := range extraConns {
+			_ = c.Close()
+		}
+		return nil, err
+	}
+	missionConn, err := dialOrShare(cfg.missionAutonomyAddr)
+	if err != nil {
+		_ = conn.Close()
+		for _, c := range extraConns {
+			_ = c.Close()
+		}
+		return nil, err
+	}
 
 	// Build outbound service clients.
-	ldSvc := livedata.NewServiceImpl(livedatapb.NewLiveDataServiceClient(conn), log)
-	connSvc := connector.NewServiceImpl(connectorpb.NewConnectorServiceClient(conn), log)
-	maSvc := missionautonomy.NewServiceImpl(missionautonomypb.NewMissionAutonomyServiceClient(conn), log)
+	ldSvc := livedata.NewServiceImpl(livedatapb.NewLiveDataServiceClient(liveDataConn), log)
+	connSvc := connector.NewServiceImpl(connectorpb.NewConnectorServiceClient(connectorConn), log)
+	maSvc := missionautonomy.NewServiceImpl(missionautonomypb.NewMissionAutonomyServiceClient(missionConn), log)
 
 	// Build the inbound gRPC server for EdgeAdapterService.
 	grpcSrv := grpc.NewServer()
@@ -87,6 +126,7 @@ func NewEdgeClient(endpoint, sn string, edgeAdapter adapter.EdgeAdapter, opts ..
 		connectorSvc:  connSvc,
 		missionSvc:    maSvc,
 		backendConn:   conn,
+		extraConns:    extraConns,
 	}, nil
 }
 
@@ -131,5 +171,11 @@ func (c *EdgeClient) Shutdown(ctx context.Context) error {
 		c.cfg.logger.Error("error shutting down live-data service", "error", err)
 	}
 
-	return c.backendConn.Close()
+	err := c.backendConn.Close()
+	for _, extra := range c.extraConns {
+		if closeErr := extra.Close(); closeErr != nil && err == nil {
+			err = closeErr
+		}
+	}
+	return err
 }

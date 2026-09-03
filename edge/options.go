@@ -40,3 +40,23 @@ func WithAssetID(id string) Option {
 func WithLogger(l *slog.Logger) Option {
 	return func(c *config) { c.logger = l }
 }
+
+// WithConnectorAddr dials ConnectorService at addr instead of the main endpoint passed to
+// [NewEdgeClient]. Use this whenever connector isn't reachable at the same address as live-data/
+// mission-autonomy -- true of every real deployment topology in this monorepo (see config.go's
+// doc comment on why the single-endpoint default rarely applies as-is).
+func WithConnectorAddr(addr string) Option {
+	return func(c *config) { c.connectorAddr = addr }
+}
+
+// WithLiveDataAddr dials LiveDataService at addr instead of the main endpoint. See
+// WithConnectorAddr.
+func WithLiveDataAddr(addr string) Option {
+	return func(c *config) { c.liveDataAddr = addr }
+}
+
+// WithMissionAutonomyAddr dials MissionAutonomyService at addr instead of the main endpoint. See
+// WithConnectorAddr.
+func WithMissionAutonomyAddr(addr string) Option {
+	return func(c *config) { c.missionAutonomyAddr = addr }
+}
