@@ -9,10 +9,10 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
+      # No submodules in this repo anymore (removed in the Sept 2 migration) and self-checkout
+      # doesn't need GH_PAT -- the default GITHUB_TOKEN handles that. GH_PAT is only genuinely
+      # needed below, to fetch the private zqnt-utils-golang module during go build.
       - uses: actions/checkout@v4
-        with:
-          submodules: true
-          token: ${{ secrets.GH_PAT }}
 
       - uses: actions/setup-go@v5
         with:
@@ -35,9 +35,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: true
-          token: ${{ secrets.GH_PAT }}
 
       - uses: actions/setup-go@v5
         with:
