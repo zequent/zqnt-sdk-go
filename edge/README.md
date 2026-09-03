@@ -96,26 +96,16 @@ them). Everything else in the interface already matched v1.3.0 field-for-field.
 
 **This repo had zero test files before the `skillregistry` addition** (now removed on this
 branch); the rest of the SDK still doesn't — verified by `go build`/`go vet` plus live-verifying
-the `simulator/` against a real running connector/live-data/remote-control stack (register →
-TakeOff/GoTo/ReturnToHome move it → live telemetry visible via `StreamTelemetry`), not by a test
-suite.
+the v1.3.0-compat simulator built on this SDK against a real running connector/live-data/
+remote-control stack (register → TakeOff/GoTo/ReturnToHome move it → live telemetry visible via
+`StreamTelemetry`), not by a test suite.
 
-**`simulator/` is its own Go module** (`simulator/go.mod`, module path
-`github.com/Zequent/zqnt-edge-sdk-go-simulator`), not part of this repo's own module — it depends
-on `github.com/Zequent/zqnt-edge-sdk-go@v1.3.0-compat` as a real tagged dependency, the same way an
-actual customer building against this release would, rather than sharing this module via
-same-module relative imports. Build/vet/run it from inside `simulator/`, not from the repo root
-(`go build ./...` at the root deliberately excludes it — that's what having its own `go.mod` does).
-A distinct module path was required: this repo's own already-tagged `v1.3.0-compat` release still
-contains the `simulator/` source tree from before it got its own `go.mod`, so reusing the SDK's own
-module path for it would be ambiguous — `go mod tidy` refuses with "ambiguous import" if the paths
-collide.
-
-```bash
-cd simulator
-go build ./...
-go run ./cmd/simulator
-```
+**The v1.3.0-compat simulator built on this SDK lives in its own repo**,
+[`github.com/Zequent/zqnt-simulator`](https://github.com/Zequent/zqnt-simulator) — a standalone
+service depending on `github.com/Zequent/zqnt-edge-sdk-go@v1.3.0-compat` as a real tagged
+dependency, the same way any other adapter built on this SDK would. It used to live nested inside
+this repo (`simulator/`, as its own Go module to avoid sharing this repo's module path) before
+being moved to its real standalone home; see that repo's README for how to build and run it.
 
 ---
 

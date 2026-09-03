@@ -3,14 +3,13 @@
 # ── default ──────────────────────────────────────────────────────────────────
 help:
 	@echo "Available targets:"
-	@echo "  build   Compile the SDK and example (not simulator/ -- see below)"
+	@echo "  build   Compile the SDK and example"
 	@echo "  vet     Run go vet"
 	@echo "  tidy    go mod tidy"
 	@echo "  check   build + vet (what CI runs)"
 	@echo ""
-	@echo "simulator/ is its own Go module (depends on this repo's v1.3.0-compat tag as a real"
-	@echo "external dependency, not via this module) -- build/vet/run it from inside simulator/:"
-	@echo "  cd simulator && go build ./..."
+	@echo "The v1.3.0-compat simulator built on this SDK lives in its own repo:"
+	@echo "  github.com/Zequent/zqnt-simulator"
 
 # v1.3.0-compat branch: no local proto generation here anymore -- proto stubs come from
 # github.com/zequent/zqnt-utils-golang v1.3.0 (a dependency, not generated in this repo), pinned
