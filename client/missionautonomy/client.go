@@ -1,7 +1,16 @@
-// Package missionautonomy is a client for MissionAutonomyService's Application and SkillExecution
-// surface — capability package administration and the full execution lifecycle (create, start,
-// pause, resume, cancel, signal) — mirroring client-java-sdk's MissionAutonomy interface for the
-// same RPCs. Scheduler and the deprecated Mission/Task RPCs are intentionally not covered here.
+// Package missionautonomy is a client for MissionAutonomyService's Mission/Task/Scheduler
+// surface, as it exists at the 1.3.0 wire contract this branch tracks — mirroring
+// client-java-sdk's MissionAutonomy interface for the same RPCs.
+//
+// This branch is the mirror image of main: main's MissionAutonomyService surface is
+// Application/SkillExecution (capability-execution-*.proto, which doesn't exist at 1.3.0 at
+// all) and main explicitly does NOT cover Mission/Task ("There was nothing working to mirror,
+// so this package doesn't have them" — accurate for main, not for 1.3.0, where GetMission/
+// CreateMission/.../StartTask/StopTask/PauseTask/ResumeTask are all real RPCs). Scheduler CRUD
+// lives in connector.Client (identical wire messages on both services, at both contract
+// versions) — unchanged from main.
+//
+// See zqnt-protos' README "Versioning" section.
 package missionautonomy
 
 import (
@@ -10,11 +19,10 @@ import (
 	"time"
 
 	base "github.com/Zequent/zqnt-client-sdk-go/gen/common/base/proto"
-	execdto "github.com/Zequent/zqnt-client-sdk-go/gen/execution/contracts/proto"
-	execution "github.com/Zequent/zqnt-client-sdk-go/gen/execution/dto/proto"
+	missionautonomycontracts "github.com/Zequent/zqnt-client-sdk-go/gen/missionautonomy/contracts/proto"
+	missionautonomydto "github.com/Zequent/zqnt-client-sdk-go/gen/missionautonomy/dto/proto"
 	missionautonomypb "github.com/Zequent/zqnt-client-sdk-go/gen/missionautonomy/proto"
 	"google.golang.org/grpc"
-	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -29,266 +37,158 @@ func New(conn grpc.ClientConnInterface) *Client {
 	return &Client{grpc: missionautonomypb.NewMissionAutonomyServiceClient(conn)}
 }
 
-// UpsertApplication creates or updates a capability package. Set expectedRevision to guard
-// against a concurrent update (optimistic concurrency); leave it empty to skip the check.
-func (c *Client) UpsertApplication(ctx context.Context, app *execution.ApplicationProtoDTO, expectedRevision string) (*execution.ApplicationProtoDTO, error) {
-	req := &execdto.UpsertApplicationRequest{Base: requestBase(), Application: app}
-	if expectedRevision != "" {
-		req.ExpectedRevision = &expectedRevision
-	}
-	resp, err := c.grpc.UpsertApplication(ctx, req)
+// CreateMission creates a mission.
+func (c *Client) CreateMission(ctx context.Context, mission *missionautonomydto.MissionProtoDTO) (*missionautonomydto.MissionProtoDTO, error) {
+	resp, err := c.grpc.CreateMission(ctx, &missionautonomycontracts.CreateMissionRequest{Base: requestBase(), Mission: mission})
 	if err != nil {
-		return nil, fmt.Errorf("missionautonomy: UpsertApplication(%s): %w", app.GetId(), err)
+		return nil, fmt.Errorf("missionautonomy: CreateMission(%s): %w", mission.GetName(), err)
 	}
 	if resp.GetHasErrors() {
-		return nil, fmt.Errorf("missionautonomy: UpsertApplication(%s): %s", app.GetId(), resp.GetError().GetErrorMessage())
+		return nil, fmt.Errorf("missionautonomy: CreateMission(%s): %s", mission.GetName(), resp.GetError().GetErrorMessage())
 	}
-	return resp.GetApplication(), nil
+	return resp.GetMission(), nil
 }
 
-// GetApplication fetches a capability package by ID. version is optional — omit it (empty
-// string) for the latest version.
-func (c *Client) GetApplication(ctx context.Context, applicationID, version string) (*execution.ApplicationProtoDTO, error) {
-	req := &execdto.GetApplicationRequest{Base: requestBase(), ApplicationId: applicationID}
-	if version != "" {
-		req.Version = &version
-	}
-	resp, err := c.grpc.GetApplication(ctx, req)
+// UpdateMission updates a mission by ID.
+func (c *Client) UpdateMission(ctx context.Context, missionID string, mission *missionautonomydto.MissionProtoDTO) (*missionautonomydto.MissionProtoDTO, error) {
+	resp, err := c.grpc.UpdateMission(ctx, &missionautonomycontracts.UpdateMissionRequest{Base: requestBase(), MissionId: missionID, Mission: mission})
 	if err != nil {
-		return nil, fmt.Errorf("missionautonomy: GetApplication(%s): %w", applicationID, err)
+		return nil, fmt.Errorf("missionautonomy: UpdateMission(%s): %w", missionID, err)
 	}
 	if resp.GetHasErrors() {
-		return nil, fmt.Errorf("missionautonomy: GetApplication(%s): %s", applicationID, resp.GetError().GetErrorMessage())
+		return nil, fmt.Errorf("missionautonomy: UpdateMission(%s): %s", missionID, resp.GetError().GetErrorMessage())
 	}
-	return resp.GetApplication(), nil
+	return resp.GetMission(), nil
 }
 
-// DeleteApplication deletes a capability package. version and expectedRevision are both
-// optional — pass "" to omit either.
-func (c *Client) DeleteApplication(ctx context.Context, applicationID, version, expectedRevision string) error {
-	req := &execdto.DeleteApplicationRequest{Base: requestBase(), ApplicationId: applicationID}
-	if version != "" {
-		req.Version = &version
-	}
-	if expectedRevision != "" {
-		req.ExpectedRevision = &expectedRevision
-	}
-	resp, err := c.grpc.DeleteApplication(ctx, req)
+// GetMission fetches a mission by ID.
+func (c *Client) GetMission(ctx context.Context, missionID string) (*missionautonomydto.MissionProtoDTO, error) {
+	resp, err := c.grpc.GetMission(ctx, &missionautonomycontracts.GetMissionRequest{Base: requestBase(), MissionId: missionID})
 	if err != nil {
-		return fmt.Errorf("missionautonomy: DeleteApplication(%s): %w", applicationID, err)
+		return nil, fmt.Errorf("missionautonomy: GetMission(%s): %w", missionID, err)
 	}
 	if resp.GetHasErrors() {
-		return fmt.Errorf("missionautonomy: DeleteApplication(%s): %s", applicationID, resp.GetError().GetErrorMessage())
+		return nil, fmt.Errorf("missionautonomy: GetMission(%s): %s", missionID, resp.GetError().GetErrorMessage())
+	}
+	return resp.GetMission(), nil
+}
+
+// DeleteMission deletes a mission by ID.
+func (c *Client) DeleteMission(ctx context.Context, missionID string) error {
+	resp, err := c.grpc.DeleteMission(ctx, &missionautonomycontracts.DeleteMissionRequest{Base: requestBase(), MissionId: missionID})
+	if err != nil {
+		return fmt.Errorf("missionautonomy: DeleteMission(%s): %w", missionID, err)
+	}
+	if resp.GetHasErrors() {
+		return fmt.Errorf("missionautonomy: DeleteMission(%s): %s", missionID, resp.GetError().GetErrorMessage())
 	}
 	return nil
 }
 
-// CreateSimpleExecution creates (but does not start) a single-command execution — call Start to
-// actually dispatch it, or use ExecuteSimple to do both atomically. idempotencyKey makes repeated
-// calls with the same asset SN + key return the original execution instead of creating a new one.
-func (c *Client) CreateSimpleExecution(ctx context.Context, assetSn, commandID string, parameters *structpb.Struct, idempotencyKey string) (*execution.SkillExecutionProtoDTO, error) {
-	req := &execdto.CreateSkillExecutionRequest{
-		Base:           &base.RequestBase{Tid: newTid(), Sn: assetSn, Timestamp: timestamppb.Now()},
-		Spec:           simpleSpec(commandID, parameters),
-		IdempotencyKey: idempotencyKey,
-	}
-	resp, err := c.grpc.CreateSkillExecution(ctx, req)
+// CreateTask creates a task.
+func (c *Client) CreateTask(ctx context.Context, task *missionautonomydto.TaskProtoDTO) (*missionautonomydto.TaskProtoDTO, error) {
+	resp, err := c.grpc.CreateTask(ctx, &missionautonomycontracts.CreateTaskRequest{Base: requestBase(), Task: task})
 	if err != nil {
-		return nil, fmt.Errorf("missionautonomy: CreateSkillExecution(%s): %w", commandID, err)
+		return nil, fmt.Errorf("missionautonomy: CreateTask(%s): %w", task.GetName(), err)
 	}
 	if resp.GetHasErrors() {
-		return nil, fmt.Errorf("missionautonomy: CreateSkillExecution(%s): %s", commandID, resp.GetError().GetErrorMessage())
+		return nil, fmt.Errorf("missionautonomy: CreateTask(%s): %s", task.GetName(), resp.GetError().GetErrorMessage())
 	}
-	return resp.GetExecution(), nil
+	return resp.GetTask(), nil
 }
 
-// ExecuteSimple creates and atomically starts a single-command execution (the "auto_start"
-// convenience RPC) — the common case when you just want the command to run immediately.
-func (c *Client) ExecuteSimple(ctx context.Context, assetSn, commandID string, parameters *structpb.Struct, idempotencyKey string) (*execution.SkillExecutionProtoDTO, error) {
-	req := &execdto.ExecuteSkillRequest{
-		Base:           &base.RequestBase{Tid: newTid(), Sn: assetSn, Timestamp: timestamppb.Now()},
-		Spec:           simpleSpec(commandID, parameters),
-		IdempotencyKey: idempotencyKey,
-	}
-	resp, err := c.grpc.ExecuteSkill(ctx, req)
+// UpdateTask updates a task by ID.
+func (c *Client) UpdateTask(ctx context.Context, taskID string, task *missionautonomydto.TaskProtoDTO) (*missionautonomydto.TaskProtoDTO, error) {
+	resp, err := c.grpc.UpdateTask(ctx, &missionautonomycontracts.UpdateTaskRequest{Base: requestBase(), TaskId: taskID, Task: task})
 	if err != nil {
-		return nil, fmt.Errorf("missionautonomy: ExecuteSkill(%s): %w", commandID, err)
+		return nil, fmt.Errorf("missionautonomy: UpdateTask(%s): %w", taskID, err)
 	}
 	if resp.GetHasErrors() {
-		return nil, fmt.Errorf("missionautonomy: ExecuteSkill(%s): %s", commandID, resp.GetError().GetErrorMessage())
+		return nil, fmt.Errorf("missionautonomy: UpdateTask(%s): %s", taskID, resp.GetError().GetErrorMessage())
 	}
-	return resp.GetExecution(), nil
+	return resp.GetTask(), nil
 }
 
-// GetSkillExecution fetches an execution by ID.
-func (c *Client) GetSkillExecution(ctx context.Context, executionID string) (*execution.SkillExecutionProtoDTO, error) {
-	resp, err := c.grpc.GetSkillExecution(ctx, &execdto.GetSkillExecutionRequest{Base: requestBase(), ExecutionId: executionID})
+// GetTask fetches a task by ID.
+func (c *Client) GetTask(ctx context.Context, taskID string) (*missionautonomydto.TaskProtoDTO, error) {
+	resp, err := c.grpc.GetTask(ctx, &missionautonomycontracts.GetTaskRequest{Base: requestBase(), TaskId: taskID})
 	if err != nil {
-		return nil, fmt.Errorf("missionautonomy: GetSkillExecution(%s): %w", executionID, err)
+		return nil, fmt.Errorf("missionautonomy: GetTask(%s): %w", taskID, err)
 	}
 	if resp.GetHasErrors() {
-		return nil, fmt.Errorf("missionautonomy: GetSkillExecution(%s): %s", executionID, resp.GetError().GetErrorMessage())
+		return nil, fmt.Errorf("missionautonomy: GetTask(%s): %s", taskID, resp.GetError().GetErrorMessage())
 	}
-	return resp.GetExecution(), nil
+	return resp.GetTask(), nil
 }
 
-// Start/Pause/Resume/Cancel drive an execution's lifecycle.
-func (c *Client) StartSkillExecution(ctx context.Context, executionID string) (*execution.SkillExecutionProtoDTO, error) {
-	return c.lifecycle(ctx, "StartSkillExecution", executionID, c.grpc.StartSkillExecution)
-}
-func (c *Client) PauseSkillExecution(ctx context.Context, executionID string) (*execution.SkillExecutionProtoDTO, error) {
-	return c.lifecycle(ctx, "PauseSkillExecution", executionID, c.grpc.PauseSkillExecution)
-}
-func (c *Client) ResumeSkillExecution(ctx context.Context, executionID string) (*execution.SkillExecutionProtoDTO, error) {
-	return c.lifecycle(ctx, "ResumeSkillExecution", executionID, c.grpc.ResumeSkillExecution)
-}
-func (c *Client) CancelSkillExecution(ctx context.Context, executionID string) (*execution.SkillExecutionProtoDTO, error) {
-	return c.lifecycle(ctx, "CancelSkillExecution", executionID, c.grpc.CancelSkillExecution)
-}
-
-type lifecycleRPC func(context.Context, *execdto.SkillExecutionLifecycleRequest, ...grpc.CallOption) (*execdto.SkillExecutionResponse, error)
-
-func (c *Client) lifecycle(ctx context.Context, op, executionID string, rpc lifecycleRPC) (*execution.SkillExecutionProtoDTO, error) {
-	resp, err := rpc(ctx, &execdto.SkillExecutionLifecycleRequest{Base: requestBase(), ExecutionId: executionID})
+// GetTaskByFlightID fetches a task by its flight ID (waypoint config flightId, e.g. a DJI/
+// Mavlink external mission identifier).
+func (c *Client) GetTaskByFlightID(ctx context.Context, flightID string) (*missionautonomydto.TaskProtoDTO, error) {
+	resp, err := c.grpc.GetTaskByFlightId(ctx, &missionautonomycontracts.GetTaskByFlightIdRequest{Base: requestBase(), FlightId: flightID})
 	if err != nil {
-		return nil, fmt.Errorf("missionautonomy: %s(%s): %w", op, executionID, err)
+		return nil, fmt.Errorf("missionautonomy: GetTaskByFlightId(%s): %w", flightID, err)
 	}
 	if resp.GetHasErrors() {
-		return nil, fmt.Errorf("missionautonomy: %s(%s): %s", op, executionID, resp.GetError().GetErrorMessage())
+		return nil, fmt.Errorf("missionautonomy: GetTaskByFlightId(%s): %s", flightID, resp.GetError().GetErrorMessage())
 	}
-	return resp.GetExecution(), nil
+	return resp.GetTask(), nil
 }
 
-// SignalSkillExecution delivers an external event or a human-approval decision to a waiting node.
-// nodeID and eventType are optional (pass "" to omit); approved is only meaningful for a
-// HUMAN_APPROVAL node.
-func (c *Client) SignalSkillExecution(ctx context.Context, executionID, nodeID, eventType string, data *structpb.Struct, approved *bool) (*execution.SkillExecutionProtoDTO, error) {
-	req := &execdto.SignalSkillExecutionRequest{Base: requestBase(), ExecutionId: executionID, Data: data, Approved: approved}
-	if nodeID != "" {
-		req.NodeId = &nodeID
-	}
-	if eventType != "" {
-		req.EventType = &eventType
-	}
-	resp, err := c.grpc.SignalSkillExecution(ctx, req)
+// DeleteTask deletes a task by ID.
+func (c *Client) DeleteTask(ctx context.Context, taskID string) error {
+	resp, err := c.grpc.DeleteTask(ctx, &missionautonomycontracts.DeleteTaskRequest{Base: requestBase(), TaskId: taskID})
 	if err != nil {
-		return nil, fmt.Errorf("missionautonomy: SignalSkillExecution(%s): %w", executionID, err)
+		return fmt.Errorf("missionautonomy: DeleteTask(%s): %w", taskID, err)
 	}
 	if resp.GetHasErrors() {
-		return nil, fmt.Errorf("missionautonomy: SignalSkillExecution(%s): %s", executionID, resp.GetError().GetErrorMessage())
+		return fmt.Errorf("missionautonomy: DeleteTask(%s): %s", taskID, resp.GetError().GetErrorMessage())
 	}
-	return resp.GetExecution(), nil
+	return nil
 }
 
-func simpleSpec(commandID string, parameters *structpb.Struct) *execution.SkillExecutionSpecProto {
-	return &execution.SkillExecutionSpecProto{
-		Execution: &execution.SkillExecutionSpecProto_Simple{
-			Simple: &execution.SimpleExecutionSpecProto{CommandId: commandID, Parameters: parameters},
-		},
+// ListSchedulers lists every scheduler, optionally filtered to one task's. taskID="" means no
+// filter. Lives here, not on connector.Client, because ConnectorService has no ListSchedulers RPC
+// at the 1.3.0 wire contract this branch tracks -- see connector/scheduler.go's own note.
+func (c *Client) ListSchedulers(ctx context.Context, taskID string) ([]*missionautonomydto.SchedulerProtoDTO, error) {
+	req := &missionautonomycontracts.ListSchedulersRequest{Base: requestBase()}
+	if taskID != "" {
+		req.TaskId = &taskID
 	}
-}
-
-// applicationSpec builds a SkillExecutionSpecProto that runs a named Skill out of a deployed
-// Application, instead of a single ad-hoc command — the ApplicationExecutionSpecProto branch of
-// the execution spec's oneof. applicationVersion is optional ("" runs the latest version).
-func applicationSpec(applicationID, skillID, applicationVersion string, parameters *structpb.Struct) *execution.SkillExecutionSpecProto {
-	spec := &execution.ApplicationExecutionSpecProto{ApplicationId: applicationID, SkillId: skillID, Parameters: parameters}
-	if applicationVersion != "" {
-		spec.ApplicationVersion = &applicationVersion
-	}
-	return &execution.SkillExecutionSpecProto{
-		Execution: &execution.SkillExecutionSpecProto_Application{Application: spec},
-	}
-}
-
-// CreateApplicationExecution creates (but does not start) an execution of one Skill from a
-// deployed Application — the counterpart to CreateSimpleExecution for named, versioned Skills
-// rather than single ad-hoc commands.
-func (c *Client) CreateApplicationExecution(ctx context.Context, assetSn, applicationID, skillID, applicationVersion string, parameters *structpb.Struct, idempotencyKey string) (*execution.SkillExecutionProtoDTO, error) {
-	req := &execdto.CreateSkillExecutionRequest{
-		Base:           &base.RequestBase{Tid: newTid(), Sn: assetSn, Timestamp: timestamppb.Now()},
-		Spec:           applicationSpec(applicationID, skillID, applicationVersion, parameters),
-		IdempotencyKey: idempotencyKey,
-	}
-	resp, err := c.grpc.CreateSkillExecution(ctx, req)
+	resp, err := c.grpc.ListSchedulers(ctx, req)
 	if err != nil {
-		return nil, fmt.Errorf("missionautonomy: CreateSkillExecution(%s/%s): %w", applicationID, skillID, err)
+		return nil, fmt.Errorf("missionautonomy: ListSchedulers: %w", err)
 	}
 	if resp.GetHasErrors() {
-		return nil, fmt.Errorf("missionautonomy: CreateSkillExecution(%s/%s): %s", applicationID, skillID, resp.GetError().GetErrorMessage())
+		return nil, fmt.Errorf("missionautonomy: ListSchedulers: %s", resp.GetError().GetErrorMessage())
 	}
-	return resp.GetExecution(), nil
+	return resp.GetSchedulers().GetSchedulerDtoList(), nil
 }
 
-// ExecuteApplication creates and atomically starts an execution of one Skill from a deployed
-// Application — the counterpart to ExecuteSimple for named, versioned Skills.
-func (c *Client) ExecuteApplication(ctx context.Context, assetSn, applicationID, skillID, applicationVersion string, parameters *structpb.Struct, idempotencyKey string) (*execution.SkillExecutionProtoDTO, error) {
-	req := &execdto.ExecuteSkillRequest{
-		Base:           &base.RequestBase{Tid: newTid(), Sn: assetSn, Timestamp: timestamppb.Now()},
-		Spec:           applicationSpec(applicationID, skillID, applicationVersion, parameters),
-		IdempotencyKey: idempotencyKey,
-	}
-	resp, err := c.grpc.ExecuteSkill(ctx, req)
-	if err != nil {
-		return nil, fmt.Errorf("missionautonomy: ExecuteSkill(%s/%s): %w", applicationID, skillID, err)
-	}
-	if resp.GetHasErrors() {
-		return nil, fmt.Errorf("missionautonomy: ExecuteSkill(%s/%s): %s", applicationID, skillID, resp.GetError().GetErrorMessage())
-	}
-	return resp.GetExecution(), nil
+// Start/Stop/Pause/Resume drive a task's lifecycle.
+func (c *Client) StartTask(ctx context.Context, taskID string) (*missionautonomydto.TaskProtoDTO, error) {
+	return c.taskLifecycle(ctx, "StartTask", taskID, c.grpc.StartTask)
+}
+func (c *Client) StopTask(ctx context.Context, taskID string) (*missionautonomydto.TaskProtoDTO, error) {
+	return c.taskLifecycle(ctx, "StopTask", taskID, c.grpc.StopTask)
+}
+func (c *Client) PauseTask(ctx context.Context, taskID string) (*missionautonomydto.TaskProtoDTO, error) {
+	return c.taskLifecycle(ctx, "PauseTask", taskID, c.grpc.PauseTask)
+}
+func (c *Client) ResumeTask(ctx context.Context, taskID string) (*missionautonomydto.TaskProtoDTO, error) {
+	return c.taskLifecycle(ctx, "ResumeTask", taskID, c.grpc.ResumeTask)
 }
 
-// ListApplications lists deployed capability packages, optionally scoped and/or filtered to
-// enabled-only. Pass scope=nil for every scope; pageSize=0/pageToken="" to use RPC defaults.
-func (c *Client) ListApplications(ctx context.Context, scope *execution.ApplicationScopeProtoDTO, enabledOnly bool, pageSize int32, pageToken string) (apps []*execution.ApplicationProtoDTO, nextPageToken string, err error) {
-	req := &execdto.ListApplicationsRequest{Base: requestBase(), Scope: scope}
-	if enabledOnly {
-		req.EnabledOnly = &enabledOnly
-	}
-	if pageSize != 0 {
-		req.PageSize = &pageSize
-	}
-	if pageToken != "" {
-		req.PageToken = &pageToken
-	}
-	resp, err := c.grpc.ListApplications(ctx, req)
-	if err != nil {
-		return nil, "", fmt.Errorf("missionautonomy: ListApplications: %w", err)
-	}
-	if resp.GetHasErrors() {
-		return nil, "", fmt.Errorf("missionautonomy: ListApplications: %s", resp.GetError().GetErrorMessage())
-	}
-	return resp.GetResult().GetApplications(), resp.GetResult().GetNextPageToken(), nil
-}
+type taskLifecycleRPC func(context.Context, *missionautonomycontracts.TaskLifecycleRequest, ...grpc.CallOption) (*missionautonomycontracts.TaskResponse, error)
 
-// ListSkillExecutions lists executions, filtered by any combination of the optional fields on
-// query (pass "" / nil to omit a filter).
-func (c *Client) ListSkillExecutions(ctx context.Context, query *execdto.ListSkillExecutionsRequest) (executions []*execution.SkillExecutionProtoDTO, nextPageToken string, err error) {
-	if query == nil {
-		query = &execdto.ListSkillExecutionsRequest{}
-	}
-	query.Base = requestBase()
-	resp, err := c.grpc.ListSkillExecutions(ctx, query)
+func (c *Client) taskLifecycle(ctx context.Context, op, taskID string, rpc taskLifecycleRPC) (*missionautonomydto.TaskProtoDTO, error) {
+	resp, err := rpc(ctx, &missionautonomycontracts.TaskLifecycleRequest{Base: requestBase(), TaskId: taskID})
 	if err != nil {
-		return nil, "", fmt.Errorf("missionautonomy: ListSkillExecutions: %w", err)
+		return nil, fmt.Errorf("missionautonomy: %s(%s): %w", op, taskID, err)
 	}
 	if resp.GetHasErrors() {
-		return nil, "", fmt.Errorf("missionautonomy: ListSkillExecutions: %s", resp.GetError().GetErrorMessage())
+		return nil, fmt.Errorf("missionautonomy: %s(%s): %s", op, taskID, resp.GetError().GetErrorMessage())
 	}
-	return resp.GetResult().GetExecutions(), resp.GetResult().GetNextPageToken(), nil
-}
-
-// ResolveExecutionConfig resolves effective config values for context, restricted to keys when
-// non-empty (pass nil/empty to resolve every known key).
-func (c *Client) ResolveExecutionConfig(ctx context.Context, execContext *execution.ExecutionConfigContextProto, keys []string) (*execution.ResolvedExecutionConfigProtoDTO, error) {
-	resp, err := c.grpc.ResolveExecutionConfig(ctx, &execdto.ResolveExecutionConfigRequest{Base: requestBase(), Context: execContext, Keys: keys})
-	if err != nil {
-		return nil, fmt.Errorf("missionautonomy: ResolveExecutionConfig: %w", err)
-	}
-	if resp.GetHasErrors() {
-		return nil, fmt.Errorf("missionautonomy: ResolveExecutionConfig: %s", resp.GetError().GetErrorMessage())
-	}
-	return resp.GetConfig(), nil
+	return resp.GetTask(), nil
 }
 
 func requestBase() *base.RequestBase {

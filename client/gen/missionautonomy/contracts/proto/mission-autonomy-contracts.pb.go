@@ -687,6 +687,7 @@ func (x *GetSchedulerRequest) GetSchedulerId() string {
 type ListSchedulersRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	TaskId        *string                `protobuf:"bytes,2,opt,name=task_id,json=taskId,proto3,oneof" json:"task_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -726,6 +727,13 @@ func (x *ListSchedulersRequest) GetBase() *proto.RequestBase {
 		return x.Base
 	}
 	return nil
+}
+
+func (x *ListSchedulersRequest) GetTaskId() string {
+	if x != nil && x.TaskId != nil {
+		return *x.TaskId
+	}
+	return ""
 }
 
 type CreateSchedulerRequest struct {
@@ -996,6 +1004,58 @@ func (x *DeleteSchedulersRequest) GetSchedulerIds() []string {
 	return nil
 }
 
+type DeleteSchedulersByTaskRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	TaskId        string                 `protobuf:"bytes,2,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteSchedulersByTaskRequest) Reset() {
+	*x = DeleteSchedulersByTaskRequest{}
+	mi := &file_mission_autonomy_contracts_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteSchedulersByTaskRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteSchedulersByTaskRequest) ProtoMessage() {}
+
+func (x *DeleteSchedulersByTaskRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_mission_autonomy_contracts_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteSchedulersByTaskRequest.ProtoReflect.Descriptor instead.
+func (*DeleteSchedulersByTaskRequest) Descriptor() ([]byte, []int) {
+	return file_mission_autonomy_contracts_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *DeleteSchedulersByTaskRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *DeleteSchedulersByTaskRequest) GetTaskId() string {
+	if x != nil {
+		return x.TaskId
+	}
+	return ""
+}
+
 type GetWaypointsByTaskIdRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
@@ -1006,7 +1066,7 @@ type GetWaypointsByTaskIdRequest struct {
 
 func (x *GetWaypointsByTaskIdRequest) Reset() {
 	*x = GetWaypointsByTaskIdRequest{}
-	mi := &file_mission_autonomy_contracts_proto_msgTypes[18]
+	mi := &file_mission_autonomy_contracts_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1018,7 +1078,7 @@ func (x *GetWaypointsByTaskIdRequest) String() string {
 func (*GetWaypointsByTaskIdRequest) ProtoMessage() {}
 
 func (x *GetWaypointsByTaskIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_mission_autonomy_contracts_proto_msgTypes[18]
+	mi := &file_mission_autonomy_contracts_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1031,7 +1091,7 @@ func (x *GetWaypointsByTaskIdRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetWaypointsByTaskIdRequest.ProtoReflect.Descriptor instead.
 func (*GetWaypointsByTaskIdRequest) Descriptor() ([]byte, []int) {
-	return file_mission_autonomy_contracts_proto_rawDescGZIP(), []int{18}
+	return file_mission_autonomy_contracts_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *GetWaypointsByTaskIdRequest) GetBase() *proto.RequestBase {
@@ -1057,7 +1117,7 @@ type WaypointsList struct {
 
 func (x *WaypointsList) Reset() {
 	*x = WaypointsList{}
-	mi := &file_mission_autonomy_contracts_proto_msgTypes[19]
+	mi := &file_mission_autonomy_contracts_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1069,7 +1129,7 @@ func (x *WaypointsList) String() string {
 func (*WaypointsList) ProtoMessage() {}
 
 func (x *WaypointsList) ProtoReflect() protoreflect.Message {
-	mi := &file_mission_autonomy_contracts_proto_msgTypes[19]
+	mi := &file_mission_autonomy_contracts_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1082,7 +1142,7 @@ func (x *WaypointsList) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WaypointsList.ProtoReflect.Descriptor instead.
 func (*WaypointsList) Descriptor() ([]byte, []int) {
-	return file_mission_autonomy_contracts_proto_rawDescGZIP(), []int{19}
+	return file_mission_autonomy_contracts_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *WaypointsList) GetWaypoints() []*proto2.WaypointProtoDTO {
@@ -1111,7 +1171,7 @@ type MissionResponse struct {
 
 func (x *MissionResponse) Reset() {
 	*x = MissionResponse{}
-	mi := &file_mission_autonomy_contracts_proto_msgTypes[20]
+	mi := &file_mission_autonomy_contracts_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1123,7 +1183,7 @@ func (x *MissionResponse) String() string {
 func (*MissionResponse) ProtoMessage() {}
 
 func (x *MissionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_mission_autonomy_contracts_proto_msgTypes[20]
+	mi := &file_mission_autonomy_contracts_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1136,7 +1196,7 @@ func (x *MissionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MissionResponse.ProtoReflect.Descriptor instead.
 func (*MissionResponse) Descriptor() ([]byte, []int) {
-	return file_mission_autonomy_contracts_proto_rawDescGZIP(), []int{20}
+	return file_mission_autonomy_contracts_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *MissionResponse) GetHasErrors() bool {
@@ -1257,7 +1317,7 @@ type TaskResponse struct {
 
 func (x *TaskResponse) Reset() {
 	*x = TaskResponse{}
-	mi := &file_mission_autonomy_contracts_proto_msgTypes[21]
+	mi := &file_mission_autonomy_contracts_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1269,7 +1329,7 @@ func (x *TaskResponse) String() string {
 func (*TaskResponse) ProtoMessage() {}
 
 func (x *TaskResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_mission_autonomy_contracts_proto_msgTypes[21]
+	mi := &file_mission_autonomy_contracts_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1282,7 +1342,7 @@ func (x *TaskResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TaskResponse.ProtoReflect.Descriptor instead.
 func (*TaskResponse) Descriptor() ([]byte, []int) {
-	return file_mission_autonomy_contracts_proto_rawDescGZIP(), []int{21}
+	return file_mission_autonomy_contracts_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *TaskResponse) GetHasErrors() bool {
@@ -1404,7 +1464,7 @@ type SchedulerResponse struct {
 
 func (x *SchedulerResponse) Reset() {
 	*x = SchedulerResponse{}
-	mi := &file_mission_autonomy_contracts_proto_msgTypes[22]
+	mi := &file_mission_autonomy_contracts_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1416,7 +1476,7 @@ func (x *SchedulerResponse) String() string {
 func (*SchedulerResponse) ProtoMessage() {}
 
 func (x *SchedulerResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_mission_autonomy_contracts_proto_msgTypes[22]
+	mi := &file_mission_autonomy_contracts_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1429,7 +1489,7 @@ func (x *SchedulerResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SchedulerResponse.ProtoReflect.Descriptor instead.
 func (*SchedulerResponse) Descriptor() ([]byte, []int) {
-	return file_mission_autonomy_contracts_proto_rawDescGZIP(), []int{22}
+	return file_mission_autonomy_contracts_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *SchedulerResponse) GetHasErrors() bool {
@@ -1564,7 +1624,7 @@ type WaypointsResponse struct {
 
 func (x *WaypointsResponse) Reset() {
 	*x = WaypointsResponse{}
-	mi := &file_mission_autonomy_contracts_proto_msgTypes[23]
+	mi := &file_mission_autonomy_contracts_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1576,7 +1636,7 @@ func (x *WaypointsResponse) String() string {
 func (*WaypointsResponse) ProtoMessage() {}
 
 func (x *WaypointsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_mission_autonomy_contracts_proto_msgTypes[23]
+	mi := &file_mission_autonomy_contracts_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1589,7 +1649,7 @@ func (x *WaypointsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WaypointsResponse.ProtoReflect.Descriptor instead.
 func (*WaypointsResponse) Descriptor() ([]byte, []int) {
-	return file_mission_autonomy_contracts_proto_rawDescGZIP(), []int{23}
+	return file_mission_autonomy_contracts_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *WaypointsResponse) GetHasErrors() bool {
@@ -1725,9 +1785,12 @@ const file_mission_autonomy_contracts_proto_rawDesc = "" +
 	"\x13GetSchedulerRequest\x12%\n" +
 	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12&\n" +
 	"\fscheduler_id\x18\x02 \x01(\tH\x00R\vschedulerId\x88\x01\x01B\x0f\n" +
-	"\r_scheduler_id\"M\n" +
+	"\r_scheduler_id\"h\n" +
 	"\x15ListSchedulersRequest\x12%\n" +
-	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04baseJ\x04\b\x02\x10\x03R\atask_id\"v\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x1c\n" +
+	"\atask_id\x18\x02 \x01(\tH\x00R\x06taskId\x88\x01\x01B\n" +
+	"\n" +
+	"\b_task_id\"v\n" +
 	"\x16CreateSchedulerRequest\x12%\n" +
 	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x125\n" +
 	"\tscheduler\x18\x02 \x01(\v2\x17.zqnt.SchedulerProtoDTOR\tscheduler\"y\n" +
@@ -1745,7 +1808,10 @@ const file_mission_autonomy_contracts_proto_rawDesc = "" +
 	"\fscheduler_id\x18\x02 \x01(\tR\vschedulerId\"e\n" +
 	"\x17DeleteSchedulersRequest\x12%\n" +
 	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12#\n" +
-	"\rscheduler_ids\x18\x02 \x03(\tR\fschedulerIds\"]\n" +
+	"\rscheduler_ids\x18\x02 \x03(\tR\fschedulerIds\"_\n" +
+	"\x1dDeleteSchedulersByTaskRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x17\n" +
+	"\atask_id\x18\x02 \x01(\tR\x06taskId\"]\n" +
 	"\x1bGetWaypointsByTaskIdRequest\x12%\n" +
 	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x17\n" +
 	"\atask_id\x18\x02 \x01(\tR\x06taskId\"E\n" +
@@ -1820,98 +1886,100 @@ func file_mission_autonomy_contracts_proto_rawDescGZIP() []byte {
 	return file_mission_autonomy_contracts_proto_rawDescData
 }
 
-var file_mission_autonomy_contracts_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
+var file_mission_autonomy_contracts_proto_msgTypes = make([]protoimpl.MessageInfo, 25)
 var file_mission_autonomy_contracts_proto_goTypes = []any{
-	(*GetMissionRequest)(nil),            // 0: zqnt.GetMissionRequest
-	(*CreateMissionRequest)(nil),         // 1: zqnt.CreateMissionRequest
-	(*UpdateMissionRequest)(nil),         // 2: zqnt.UpdateMissionRequest
-	(*DeleteMissionRequest)(nil),         // 3: zqnt.DeleteMissionRequest
-	(*UploadMissionNfzZonesRequest)(nil), // 4: zqnt.UploadMissionNfzZonesRequest
-	(*GetTaskRequest)(nil),               // 5: zqnt.GetTaskRequest
-	(*GetTaskByFlightIdRequest)(nil),     // 6: zqnt.GetTaskByFlightIdRequest
-	(*CreateTaskRequest)(nil),            // 7: zqnt.CreateTaskRequest
-	(*UpdateTaskRequest)(nil),            // 8: zqnt.UpdateTaskRequest
-	(*DeleteTaskRequest)(nil),            // 9: zqnt.DeleteTaskRequest
-	(*TaskLifecycleRequest)(nil),         // 10: zqnt.TaskLifecycleRequest
-	(*GetSchedulerRequest)(nil),          // 11: zqnt.GetSchedulerRequest
-	(*ListSchedulersRequest)(nil),        // 12: zqnt.ListSchedulersRequest
-	(*CreateSchedulerRequest)(nil),       // 13: zqnt.CreateSchedulerRequest
-	(*CreateSchedulersRequest)(nil),      // 14: zqnt.CreateSchedulersRequest
-	(*UpdateSchedulerRequest)(nil),       // 15: zqnt.UpdateSchedulerRequest
-	(*DeleteSchedulerRequest)(nil),       // 16: zqnt.DeleteSchedulerRequest
-	(*DeleteSchedulersRequest)(nil),      // 17: zqnt.DeleteSchedulersRequest
-	(*GetWaypointsByTaskIdRequest)(nil),  // 18: zqnt.GetWaypointsByTaskIdRequest
-	(*WaypointsList)(nil),                // 19: zqnt.WaypointsList
-	(*MissionResponse)(nil),              // 20: zqnt.MissionResponse
-	(*TaskResponse)(nil),                 // 21: zqnt.TaskResponse
-	(*SchedulerResponse)(nil),            // 22: zqnt.SchedulerResponse
-	(*WaypointsResponse)(nil),            // 23: zqnt.WaypointsResponse
-	(*proto.RequestBase)(nil),            // 24: zqnt.RequestBase
-	(*proto1.MissionProtoDTO)(nil),       // 25: zqnt.MissionProtoDTO
-	(*proto1.MissionZoneProtoDTO)(nil),   // 26: zqnt.MissionZoneProtoDTO
-	(*proto1.TaskProtoDTO)(nil),          // 27: zqnt.TaskProtoDTO
-	(*proto1.SchedulerProtoDTO)(nil),     // 28: zqnt.SchedulerProtoDTO
-	(*proto2.WaypointProtoDTO)(nil),      // 29: zqnt.WaypointProtoDTO
-	(*timestamppb.Timestamp)(nil),        // 30: google.protobuf.Timestamp
-	(*emptypb.Empty)(nil),                // 31: google.protobuf.Empty
-	(*proto.GlobalErrorMessage)(nil),     // 32: zqnt.GlobalErrorMessage
-	(*proto.CommandProgress)(nil),        // 33: zqnt.CommandProgress
-	(*proto1.SchedulerProtoDTOList)(nil), // 34: zqnt.SchedulerProtoDTOList
+	(*GetMissionRequest)(nil),             // 0: zqnt.GetMissionRequest
+	(*CreateMissionRequest)(nil),          // 1: zqnt.CreateMissionRequest
+	(*UpdateMissionRequest)(nil),          // 2: zqnt.UpdateMissionRequest
+	(*DeleteMissionRequest)(nil),          // 3: zqnt.DeleteMissionRequest
+	(*UploadMissionNfzZonesRequest)(nil),  // 4: zqnt.UploadMissionNfzZonesRequest
+	(*GetTaskRequest)(nil),                // 5: zqnt.GetTaskRequest
+	(*GetTaskByFlightIdRequest)(nil),      // 6: zqnt.GetTaskByFlightIdRequest
+	(*CreateTaskRequest)(nil),             // 7: zqnt.CreateTaskRequest
+	(*UpdateTaskRequest)(nil),             // 8: zqnt.UpdateTaskRequest
+	(*DeleteTaskRequest)(nil),             // 9: zqnt.DeleteTaskRequest
+	(*TaskLifecycleRequest)(nil),          // 10: zqnt.TaskLifecycleRequest
+	(*GetSchedulerRequest)(nil),           // 11: zqnt.GetSchedulerRequest
+	(*ListSchedulersRequest)(nil),         // 12: zqnt.ListSchedulersRequest
+	(*CreateSchedulerRequest)(nil),        // 13: zqnt.CreateSchedulerRequest
+	(*CreateSchedulersRequest)(nil),       // 14: zqnt.CreateSchedulersRequest
+	(*UpdateSchedulerRequest)(nil),        // 15: zqnt.UpdateSchedulerRequest
+	(*DeleteSchedulerRequest)(nil),        // 16: zqnt.DeleteSchedulerRequest
+	(*DeleteSchedulersRequest)(nil),       // 17: zqnt.DeleteSchedulersRequest
+	(*DeleteSchedulersByTaskRequest)(nil), // 18: zqnt.DeleteSchedulersByTaskRequest
+	(*GetWaypointsByTaskIdRequest)(nil),   // 19: zqnt.GetWaypointsByTaskIdRequest
+	(*WaypointsList)(nil),                 // 20: zqnt.WaypointsList
+	(*MissionResponse)(nil),               // 21: zqnt.MissionResponse
+	(*TaskResponse)(nil),                  // 22: zqnt.TaskResponse
+	(*SchedulerResponse)(nil),             // 23: zqnt.SchedulerResponse
+	(*WaypointsResponse)(nil),             // 24: zqnt.WaypointsResponse
+	(*proto.RequestBase)(nil),             // 25: zqnt.RequestBase
+	(*proto1.MissionProtoDTO)(nil),        // 26: zqnt.MissionProtoDTO
+	(*proto1.MissionZoneProtoDTO)(nil),    // 27: zqnt.MissionZoneProtoDTO
+	(*proto1.TaskProtoDTO)(nil),           // 28: zqnt.TaskProtoDTO
+	(*proto1.SchedulerProtoDTO)(nil),      // 29: zqnt.SchedulerProtoDTO
+	(*proto2.WaypointProtoDTO)(nil),       // 30: zqnt.WaypointProtoDTO
+	(*timestamppb.Timestamp)(nil),         // 31: google.protobuf.Timestamp
+	(*emptypb.Empty)(nil),                 // 32: google.protobuf.Empty
+	(*proto.GlobalErrorMessage)(nil),      // 33: zqnt.GlobalErrorMessage
+	(*proto.CommandProgress)(nil),         // 34: zqnt.CommandProgress
+	(*proto1.SchedulerProtoDTOList)(nil),  // 35: zqnt.SchedulerProtoDTOList
 }
 var file_mission_autonomy_contracts_proto_depIdxs = []int32{
-	24, // 0: zqnt.GetMissionRequest.base:type_name -> zqnt.RequestBase
-	24, // 1: zqnt.CreateMissionRequest.base:type_name -> zqnt.RequestBase
-	25, // 2: zqnt.CreateMissionRequest.mission:type_name -> zqnt.MissionProtoDTO
-	24, // 3: zqnt.UpdateMissionRequest.base:type_name -> zqnt.RequestBase
-	25, // 4: zqnt.UpdateMissionRequest.mission:type_name -> zqnt.MissionProtoDTO
-	24, // 5: zqnt.DeleteMissionRequest.base:type_name -> zqnt.RequestBase
-	24, // 6: zqnt.UploadMissionNfzZonesRequest.base:type_name -> zqnt.RequestBase
-	26, // 7: zqnt.UploadMissionNfzZonesRequest.zones:type_name -> zqnt.MissionZoneProtoDTO
-	24, // 8: zqnt.GetTaskRequest.base:type_name -> zqnt.RequestBase
-	24, // 9: zqnt.GetTaskByFlightIdRequest.base:type_name -> zqnt.RequestBase
-	24, // 10: zqnt.CreateTaskRequest.base:type_name -> zqnt.RequestBase
-	27, // 11: zqnt.CreateTaskRequest.task:type_name -> zqnt.TaskProtoDTO
-	24, // 12: zqnt.UpdateTaskRequest.base:type_name -> zqnt.RequestBase
-	27, // 13: zqnt.UpdateTaskRequest.task:type_name -> zqnt.TaskProtoDTO
-	24, // 14: zqnt.DeleteTaskRequest.base:type_name -> zqnt.RequestBase
-	24, // 15: zqnt.TaskLifecycleRequest.base:type_name -> zqnt.RequestBase
-	24, // 16: zqnt.GetSchedulerRequest.base:type_name -> zqnt.RequestBase
-	24, // 17: zqnt.ListSchedulersRequest.base:type_name -> zqnt.RequestBase
-	24, // 18: zqnt.CreateSchedulerRequest.base:type_name -> zqnt.RequestBase
-	28, // 19: zqnt.CreateSchedulerRequest.scheduler:type_name -> zqnt.SchedulerProtoDTO
-	24, // 20: zqnt.CreateSchedulersRequest.base:type_name -> zqnt.RequestBase
-	28, // 21: zqnt.CreateSchedulersRequest.schedulers:type_name -> zqnt.SchedulerProtoDTO
-	24, // 22: zqnt.UpdateSchedulerRequest.base:type_name -> zqnt.RequestBase
-	28, // 23: zqnt.UpdateSchedulerRequest.scheduler:type_name -> zqnt.SchedulerProtoDTO
-	24, // 24: zqnt.DeleteSchedulerRequest.base:type_name -> zqnt.RequestBase
-	24, // 25: zqnt.DeleteSchedulersRequest.base:type_name -> zqnt.RequestBase
-	24, // 26: zqnt.GetWaypointsByTaskIdRequest.base:type_name -> zqnt.RequestBase
-	29, // 27: zqnt.WaypointsList.waypoints:type_name -> zqnt.WaypointProtoDTO
-	30, // 28: zqnt.MissionResponse.timestamp:type_name -> google.protobuf.Timestamp
-	31, // 29: zqnt.MissionResponse.empty:type_name -> google.protobuf.Empty
-	32, // 30: zqnt.MissionResponse.error:type_name -> zqnt.GlobalErrorMessage
-	33, // 31: zqnt.MissionResponse.progress:type_name -> zqnt.CommandProgress
-	25, // 32: zqnt.MissionResponse.mission:type_name -> zqnt.MissionProtoDTO
-	30, // 33: zqnt.TaskResponse.timestamp:type_name -> google.protobuf.Timestamp
-	31, // 34: zqnt.TaskResponse.empty:type_name -> google.protobuf.Empty
-	32, // 35: zqnt.TaskResponse.error:type_name -> zqnt.GlobalErrorMessage
-	33, // 36: zqnt.TaskResponse.progress:type_name -> zqnt.CommandProgress
-	27, // 37: zqnt.TaskResponse.task:type_name -> zqnt.TaskProtoDTO
-	30, // 38: zqnt.SchedulerResponse.timestamp:type_name -> google.protobuf.Timestamp
-	31, // 39: zqnt.SchedulerResponse.empty:type_name -> google.protobuf.Empty
-	32, // 40: zqnt.SchedulerResponse.error:type_name -> zqnt.GlobalErrorMessage
-	33, // 41: zqnt.SchedulerResponse.progress:type_name -> zqnt.CommandProgress
-	28, // 42: zqnt.SchedulerResponse.scheduler:type_name -> zqnt.SchedulerProtoDTO
-	34, // 43: zqnt.SchedulerResponse.schedulers:type_name -> zqnt.SchedulerProtoDTOList
-	30, // 44: zqnt.WaypointsResponse.timestamp:type_name -> google.protobuf.Timestamp
-	31, // 45: zqnt.WaypointsResponse.empty:type_name -> google.protobuf.Empty
-	32, // 46: zqnt.WaypointsResponse.error:type_name -> zqnt.GlobalErrorMessage
-	19, // 47: zqnt.WaypointsResponse.waypoints:type_name -> zqnt.WaypointsList
-	48, // [48:48] is the sub-list for method output_type
-	48, // [48:48] is the sub-list for method input_type
-	48, // [48:48] is the sub-list for extension type_name
-	48, // [48:48] is the sub-list for extension extendee
-	0,  // [0:48] is the sub-list for field type_name
+	25, // 0: zqnt.GetMissionRequest.base:type_name -> zqnt.RequestBase
+	25, // 1: zqnt.CreateMissionRequest.base:type_name -> zqnt.RequestBase
+	26, // 2: zqnt.CreateMissionRequest.mission:type_name -> zqnt.MissionProtoDTO
+	25, // 3: zqnt.UpdateMissionRequest.base:type_name -> zqnt.RequestBase
+	26, // 4: zqnt.UpdateMissionRequest.mission:type_name -> zqnt.MissionProtoDTO
+	25, // 5: zqnt.DeleteMissionRequest.base:type_name -> zqnt.RequestBase
+	25, // 6: zqnt.UploadMissionNfzZonesRequest.base:type_name -> zqnt.RequestBase
+	27, // 7: zqnt.UploadMissionNfzZonesRequest.zones:type_name -> zqnt.MissionZoneProtoDTO
+	25, // 8: zqnt.GetTaskRequest.base:type_name -> zqnt.RequestBase
+	25, // 9: zqnt.GetTaskByFlightIdRequest.base:type_name -> zqnt.RequestBase
+	25, // 10: zqnt.CreateTaskRequest.base:type_name -> zqnt.RequestBase
+	28, // 11: zqnt.CreateTaskRequest.task:type_name -> zqnt.TaskProtoDTO
+	25, // 12: zqnt.UpdateTaskRequest.base:type_name -> zqnt.RequestBase
+	28, // 13: zqnt.UpdateTaskRequest.task:type_name -> zqnt.TaskProtoDTO
+	25, // 14: zqnt.DeleteTaskRequest.base:type_name -> zqnt.RequestBase
+	25, // 15: zqnt.TaskLifecycleRequest.base:type_name -> zqnt.RequestBase
+	25, // 16: zqnt.GetSchedulerRequest.base:type_name -> zqnt.RequestBase
+	25, // 17: zqnt.ListSchedulersRequest.base:type_name -> zqnt.RequestBase
+	25, // 18: zqnt.CreateSchedulerRequest.base:type_name -> zqnt.RequestBase
+	29, // 19: zqnt.CreateSchedulerRequest.scheduler:type_name -> zqnt.SchedulerProtoDTO
+	25, // 20: zqnt.CreateSchedulersRequest.base:type_name -> zqnt.RequestBase
+	29, // 21: zqnt.CreateSchedulersRequest.schedulers:type_name -> zqnt.SchedulerProtoDTO
+	25, // 22: zqnt.UpdateSchedulerRequest.base:type_name -> zqnt.RequestBase
+	29, // 23: zqnt.UpdateSchedulerRequest.scheduler:type_name -> zqnt.SchedulerProtoDTO
+	25, // 24: zqnt.DeleteSchedulerRequest.base:type_name -> zqnt.RequestBase
+	25, // 25: zqnt.DeleteSchedulersRequest.base:type_name -> zqnt.RequestBase
+	25, // 26: zqnt.DeleteSchedulersByTaskRequest.base:type_name -> zqnt.RequestBase
+	25, // 27: zqnt.GetWaypointsByTaskIdRequest.base:type_name -> zqnt.RequestBase
+	30, // 28: zqnt.WaypointsList.waypoints:type_name -> zqnt.WaypointProtoDTO
+	31, // 29: zqnt.MissionResponse.timestamp:type_name -> google.protobuf.Timestamp
+	32, // 30: zqnt.MissionResponse.empty:type_name -> google.protobuf.Empty
+	33, // 31: zqnt.MissionResponse.error:type_name -> zqnt.GlobalErrorMessage
+	34, // 32: zqnt.MissionResponse.progress:type_name -> zqnt.CommandProgress
+	26, // 33: zqnt.MissionResponse.mission:type_name -> zqnt.MissionProtoDTO
+	31, // 34: zqnt.TaskResponse.timestamp:type_name -> google.protobuf.Timestamp
+	32, // 35: zqnt.TaskResponse.empty:type_name -> google.protobuf.Empty
+	33, // 36: zqnt.TaskResponse.error:type_name -> zqnt.GlobalErrorMessage
+	34, // 37: zqnt.TaskResponse.progress:type_name -> zqnt.CommandProgress
+	28, // 38: zqnt.TaskResponse.task:type_name -> zqnt.TaskProtoDTO
+	31, // 39: zqnt.SchedulerResponse.timestamp:type_name -> google.protobuf.Timestamp
+	32, // 40: zqnt.SchedulerResponse.empty:type_name -> google.protobuf.Empty
+	33, // 41: zqnt.SchedulerResponse.error:type_name -> zqnt.GlobalErrorMessage
+	34, // 42: zqnt.SchedulerResponse.progress:type_name -> zqnt.CommandProgress
+	29, // 43: zqnt.SchedulerResponse.scheduler:type_name -> zqnt.SchedulerProtoDTO
+	35, // 44: zqnt.SchedulerResponse.schedulers:type_name -> zqnt.SchedulerProtoDTOList
+	31, // 45: zqnt.WaypointsResponse.timestamp:type_name -> google.protobuf.Timestamp
+	32, // 46: zqnt.WaypointsResponse.empty:type_name -> google.protobuf.Empty
+	33, // 47: zqnt.WaypointsResponse.error:type_name -> zqnt.GlobalErrorMessage
+	20, // 48: zqnt.WaypointsResponse.waypoints:type_name -> zqnt.WaypointsList
+	49, // [49:49] is the sub-list for method output_type
+	49, // [49:49] is the sub-list for method input_type
+	49, // [49:49] is the sub-list for extension type_name
+	49, // [49:49] is the sub-list for extension extendee
+	0,  // [0:49] is the sub-list for field type_name
 }
 
 func init() { file_mission_autonomy_contracts_proto_init() }
@@ -1920,26 +1988,27 @@ func file_mission_autonomy_contracts_proto_init() {
 		return
 	}
 	file_mission_autonomy_contracts_proto_msgTypes[11].OneofWrappers = []any{}
-	file_mission_autonomy_contracts_proto_msgTypes[20].OneofWrappers = []any{
+	file_mission_autonomy_contracts_proto_msgTypes[12].OneofWrappers = []any{}
+	file_mission_autonomy_contracts_proto_msgTypes[21].OneofWrappers = []any{
 		(*MissionResponse_Empty)(nil),
 		(*MissionResponse_Error)(nil),
 		(*MissionResponse_Progress)(nil),
 		(*MissionResponse_Mission)(nil),
 	}
-	file_mission_autonomy_contracts_proto_msgTypes[21].OneofWrappers = []any{
+	file_mission_autonomy_contracts_proto_msgTypes[22].OneofWrappers = []any{
 		(*TaskResponse_Empty)(nil),
 		(*TaskResponse_Error)(nil),
 		(*TaskResponse_Progress)(nil),
 		(*TaskResponse_Task)(nil),
 	}
-	file_mission_autonomy_contracts_proto_msgTypes[22].OneofWrappers = []any{
+	file_mission_autonomy_contracts_proto_msgTypes[23].OneofWrappers = []any{
 		(*SchedulerResponse_Empty)(nil),
 		(*SchedulerResponse_Error)(nil),
 		(*SchedulerResponse_Progress)(nil),
 		(*SchedulerResponse_Scheduler)(nil),
 		(*SchedulerResponse_Schedulers)(nil),
 	}
-	file_mission_autonomy_contracts_proto_msgTypes[23].OneofWrappers = []any{
+	file_mission_autonomy_contracts_proto_msgTypes[24].OneofWrappers = []any{
 		(*WaypointsResponse_Empty)(nil),
 		(*WaypointsResponse_Error)(nil),
 		(*WaypointsResponse_Waypoints)(nil),
@@ -1950,7 +2019,7 @@ func file_mission_autonomy_contracts_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_mission_autonomy_contracts_proto_rawDesc), len(file_mission_autonomy_contracts_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   24,
+			NumMessages:   25,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

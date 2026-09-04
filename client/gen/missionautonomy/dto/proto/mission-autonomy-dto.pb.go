@@ -10,7 +10,6 @@ import (
 	proto "github.com/Zequent/zqnt-client-sdk-go/gen/missionautonomy/domain/types/proto"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	structpb "google.golang.org/protobuf/types/known/structpb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
@@ -1092,22 +1091,16 @@ type SchedulerProtoDTO struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	Id             *string                `protobuf:"bytes,1,opt,name=id,proto3,oneof" json:"id,omitempty"`
 	Name           string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	MissionId      *string                `protobuf:"bytes,3,opt,name=mission_id,json=missionId,proto3,oneof" json:"mission_id,omitempty"`
+	TaskId         *string                `protobuf:"bytes,4,opt,name=task_id,json=taskId,proto3,oneof" json:"task_id,omitempty"`
 	CronExpression string                 `protobuf:"bytes,5,opt,name=cron_expression,json=cronExpression,proto3" json:"cron_expression,omitempty"`
 	Active         *bool                  `protobuf:"varint,6,opt,name=active,proto3,oneof" json:"active,omitempty"`
 	Type           proto.SchedulerType    `protobuf:"varint,7,opt,name=type,proto3,enum=zqnt.SchedulerType" json:"type,omitempty"`
 	ClientTimeZone *string                `protobuf:"bytes,8,opt,name=client_time_zone,json=clientTimeZone,proto3,oneof" json:"client_time_zone,omitempty"`
 	CreatedAt      *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3,oneof" json:"created_at,omitempty"`
 	ModifiedAt     *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=modified_at,json=modifiedAt,proto3,oneof" json:"modified_at,omitempty"`
-	// Mission-free scheduler target. Exactly one of command_id or
-	// application_id + skill_id is expected for new schedules.
-	AssetSn             *string          `protobuf:"bytes,12,opt,name=asset_sn,json=assetSn,proto3,oneof" json:"asset_sn,omitempty"`
-	CommandId           *string          `protobuf:"bytes,13,opt,name=command_id,json=commandId,proto3,oneof" json:"command_id,omitempty"`
-	ApplicationId       *string          `protobuf:"bytes,14,opt,name=application_id,json=applicationId,proto3,oneof" json:"application_id,omitempty"`
-	SkillId             *string          `protobuf:"bytes,15,opt,name=skill_id,json=skillId,proto3,oneof" json:"skill_id,omitempty"`
-	ExecutionParameters *structpb.Struct `protobuf:"bytes,16,opt,name=execution_parameters,json=executionParameters,proto3" json:"execution_parameters,omitempty"`
-	AutoStart           *bool            `protobuf:"varint,17,opt,name=auto_start,json=autoStart,proto3,oneof" json:"auto_start,omitempty"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *SchedulerProtoDTO) Reset() {
@@ -1154,6 +1147,20 @@ func (x *SchedulerProtoDTO) GetName() string {
 	return ""
 }
 
+func (x *SchedulerProtoDTO) GetMissionId() string {
+	if x != nil && x.MissionId != nil {
+		return *x.MissionId
+	}
+	return ""
+}
+
+func (x *SchedulerProtoDTO) GetTaskId() string {
+	if x != nil && x.TaskId != nil {
+		return *x.TaskId
+	}
+	return ""
+}
+
 func (x *SchedulerProtoDTO) GetCronExpression() string {
 	if x != nil {
 		return x.CronExpression
@@ -1194,48 +1201,6 @@ func (x *SchedulerProtoDTO) GetModifiedAt() *timestamppb.Timestamp {
 		return x.ModifiedAt
 	}
 	return nil
-}
-
-func (x *SchedulerProtoDTO) GetAssetSn() string {
-	if x != nil && x.AssetSn != nil {
-		return *x.AssetSn
-	}
-	return ""
-}
-
-func (x *SchedulerProtoDTO) GetCommandId() string {
-	if x != nil && x.CommandId != nil {
-		return *x.CommandId
-	}
-	return ""
-}
-
-func (x *SchedulerProtoDTO) GetApplicationId() string {
-	if x != nil && x.ApplicationId != nil {
-		return *x.ApplicationId
-	}
-	return ""
-}
-
-func (x *SchedulerProtoDTO) GetSkillId() string {
-	if x != nil && x.SkillId != nil {
-		return *x.SkillId
-	}
-	return ""
-}
-
-func (x *SchedulerProtoDTO) GetExecutionParameters() *structpb.Struct {
-	if x != nil {
-		return x.ExecutionParameters
-	}
-	return nil
-}
-
-func (x *SchedulerProtoDTO) GetAutoStart() bool {
-	if x != nil && x.AutoStart != nil {
-		return *x.AutoStart
-	}
-	return false
 }
 
 type SchedulerProtoDTOList struct {
@@ -1286,7 +1251,7 @@ var File_mission_autonomy_dto_proto protoreflect.FileDescriptor
 
 const file_mission_autonomy_dto_proto_rawDesc = "" +
 	"\n" +
-	"\x1amission-autonomy-dto.proto\x12\x04zqnt\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1cmission-autonomy-types.proto\"z\n" +
+	"\x1amission-autonomy-dto.proto\x12\x04zqnt\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1cmission-autonomy-types.proto\"z\n" +
 	"\x10GeoPointProtoDTO\x12\x1a\n" +
 	"\blatitude\x18\x01 \x01(\x01R\blatitude\x12\x1c\n" +
 	"\tlongitude\x18\x02 \x01(\x01R\tlongitude\x12\x1f\n" +
@@ -1445,38 +1410,30 @@ const file_mission_autonomy_dto_proto_rawDesc = "" +
 	"\x10_execution_orderB\x1a\n" +
 	"\x18_decision_engine_enabledB\v\n" +
 	"\t_priorityB\x12\n" +
-	"\x10_timeout_seconds\"\x94\x06\n" +
+	"\x10_timeout_seconds\"\x85\x04\n" +
 	"\x11SchedulerProtoDTO\x12\x13\n" +
 	"\x02id\x18\x01 \x01(\tH\x00R\x02id\x88\x01\x01\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12'\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\"\n" +
+	"\n" +
+	"mission_id\x18\x03 \x01(\tH\x01R\tmissionId\x88\x01\x01\x12\x1c\n" +
+	"\atask_id\x18\x04 \x01(\tH\x02R\x06taskId\x88\x01\x01\x12'\n" +
 	"\x0fcron_expression\x18\x05 \x01(\tR\x0ecronExpression\x12\x1b\n" +
-	"\x06active\x18\x06 \x01(\bH\x01R\x06active\x88\x01\x01\x12'\n" +
+	"\x06active\x18\x06 \x01(\bH\x03R\x06active\x88\x01\x01\x12'\n" +
 	"\x04type\x18\a \x01(\x0e2\x13.zqnt.SchedulerTypeR\x04type\x12-\n" +
-	"\x10client_time_zone\x18\b \x01(\tH\x02R\x0eclientTimeZone\x88\x01\x01\x12>\n" +
+	"\x10client_time_zone\x18\b \x01(\tH\x04R\x0eclientTimeZone\x88\x01\x01\x12>\n" +
 	"\n" +
-	"created_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampH\x03R\tcreatedAt\x88\x01\x01\x12@\n" +
+	"created_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampH\x05R\tcreatedAt\x88\x01\x01\x12@\n" +
 	"\vmodified_at\x18\n" +
-	" \x01(\v2\x1a.google.protobuf.TimestampH\x04R\n" +
-	"modifiedAt\x88\x01\x01\x12\x1e\n" +
-	"\basset_sn\x18\f \x01(\tH\x05R\aassetSn\x88\x01\x01\x12\"\n" +
+	" \x01(\v2\x1a.google.protobuf.TimestampH\x06R\n" +
+	"modifiedAt\x88\x01\x01B\x05\n" +
+	"\x03_idB\r\n" +
+	"\v_mission_idB\n" +
 	"\n" +
-	"command_id\x18\r \x01(\tH\x06R\tcommandId\x88\x01\x01\x12*\n" +
-	"\x0eapplication_id\x18\x0e \x01(\tH\aR\rapplicationId\x88\x01\x01\x12\x1e\n" +
-	"\bskill_id\x18\x0f \x01(\tH\bR\askillId\x88\x01\x01\x12J\n" +
-	"\x14execution_parameters\x18\x10 \x01(\v2\x17.google.protobuf.StructR\x13executionParameters\x12\"\n" +
-	"\n" +
-	"auto_start\x18\x11 \x01(\bH\tR\tautoStart\x88\x01\x01B\x05\n" +
-	"\x03_idB\t\n" +
+	"\b_task_idB\t\n" +
 	"\a_activeB\x13\n" +
 	"\x11_client_time_zoneB\r\n" +
 	"\v_created_atB\x0e\n" +
-	"\f_modified_atB\v\n" +
-	"\t_asset_snB\r\n" +
-	"\v_command_idB\x11\n" +
-	"\x0f_application_idB\v\n" +
-	"\t_skill_idB\r\n" +
-	"\v_auto_startJ\x04\b\x03\x10\x04J\x04\b\x04\x10\x05J\x04\b\v\x10\fR\n" +
-	"mission_idR\atask_id\"^\n" +
+	"\f_modified_atJ\x04\b\v\x10\f\"^\n" +
 	"\x15SchedulerProtoDTOList\x12E\n" +
 	"\x12scheduler_dto_list\x18\x01 \x03(\v2\x17.zqnt.SchedulerProtoDTOR\x10schedulerDtoListBX\n" +
 	"\x1ccom.zqnt.utils.mission.protoB\x17MissionAutonomyDtoProtoP\x01Z\x1dgen/missionautonomy/dto/protob\x06proto3"
@@ -1528,7 +1485,6 @@ var file_mission_autonomy_dto_proto_goTypes = []any{
 	(*proto.TrackTaskConfigProto)(nil),          // 30: zqnt.TrackTaskConfigProto
 	(*proto.DynamicCommandTaskConfigProto)(nil), // 31: zqnt.DynamicCommandTaskConfigProto
 	(proto.SchedulerType)(0),                    // 32: zqnt.SchedulerType
-	(*structpb.Struct)(nil),                     // 33: google.protobuf.Struct
 }
 var file_mission_autonomy_dto_proto_depIdxs = []int32{
 	10, // 0: zqnt.GeoAreaProtoDTO.type:type_name -> zqnt.GeoAreaType
@@ -1575,13 +1531,12 @@ var file_mission_autonomy_dto_proto_depIdxs = []int32{
 	32, // 41: zqnt.SchedulerProtoDTO.type:type_name -> zqnt.SchedulerType
 	20, // 42: zqnt.SchedulerProtoDTO.created_at:type_name -> google.protobuf.Timestamp
 	20, // 43: zqnt.SchedulerProtoDTO.modified_at:type_name -> google.protobuf.Timestamp
-	33, // 44: zqnt.SchedulerProtoDTO.execution_parameters:type_name -> google.protobuf.Struct
-	8,  // 45: zqnt.SchedulerProtoDTOList.scheduler_dto_list:type_name -> zqnt.SchedulerProtoDTO
-	46, // [46:46] is the sub-list for method output_type
-	46, // [46:46] is the sub-list for method input_type
-	46, // [46:46] is the sub-list for extension type_name
-	46, // [46:46] is the sub-list for extension extendee
-	0,  // [0:46] is the sub-list for field type_name
+	8,  // 44: zqnt.SchedulerProtoDTOList.scheduler_dto_list:type_name -> zqnt.SchedulerProtoDTO
+	45, // [45:45] is the sub-list for method output_type
+	45, // [45:45] is the sub-list for method input_type
+	45, // [45:45] is the sub-list for extension type_name
+	45, // [45:45] is the sub-list for extension extendee
+	0,  // [0:45] is the sub-list for field type_name
 }
 
 func init() { file_mission_autonomy_dto_proto_init() }

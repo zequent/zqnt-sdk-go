@@ -20,17 +20,9 @@ func (c *Client) GetScheduler(ctx context.Context, schedulerID string) (*schedul
 	return resp.GetScheduler(), nil
 }
 
-// ListSchedulers lists every scheduler.
-func (c *Client) ListSchedulers(ctx context.Context) ([]*schedulerdto.SchedulerProtoDTO, error) {
-	resp, err := c.grpc.ListSchedulers(ctx, &schedulerpb.ListSchedulersRequest{Base: requestBase()})
-	if err != nil {
-		return nil, fmt.Errorf("connector: ListSchedulers: %w", err)
-	}
-	if resp.GetHasErrors() {
-		return nil, fmt.Errorf("connector: ListSchedulers: %s", resp.GetError().GetErrorMessage())
-	}
-	return resp.GetSchedulers().GetSchedulerDtoList(), nil
-}
+// ListSchedulers isn't here on this branch -- ConnectorService has no ListSchedulers RPC at the
+// 1.3.0 wire contract this branch tracks (verified against zqnt-protos' own 1.3.0 tag); it only
+// exists on MissionAutonomyService -- see missionautonomy.Client.ListSchedulers.
 
 // CreateScheduler creates one scheduler.
 func (c *Client) CreateScheduler(ctx context.Context, scheduler *schedulerdto.SchedulerProtoDTO) (*schedulerdto.SchedulerProtoDTO, error) {
@@ -88,6 +80,19 @@ func (c *Client) DeleteSchedulers(ctx context.Context, schedulerIDs []string) er
 	}
 	if resp.GetHasErrors() {
 		return fmt.Errorf("connector: DeleteSchedulers: %s", resp.GetError().GetErrorMessage())
+	}
+	return nil
+}
+
+// DeleteSchedulersByTask deletes every scheduler attached to taskID. 1.3.0-only -- retired from
+// ConnectorService on main/2.0.0 along with the rest of the Mission/Task model.
+func (c *Client) DeleteSchedulersByTask(ctx context.Context, taskID string) error {
+	resp, err := c.grpc.DeleteSchedulersByTask(ctx, &schedulerpb.DeleteSchedulersByTaskRequest{Base: requestBase(), TaskId: taskID})
+	if err != nil {
+		return fmt.Errorf("connector: DeleteSchedulersByTask(%s): %w", taskID, err)
+	}
+	if resp.GetHasErrors() {
+		return fmt.Errorf("connector: DeleteSchedulersByTask(%s): %s", taskID, resp.GetError().GetErrorMessage())
 	}
 	return nil
 }

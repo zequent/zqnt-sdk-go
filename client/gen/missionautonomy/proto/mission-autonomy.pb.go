@@ -9,11 +9,12 @@ package proto
 import (
 	proto "github.com/Zequent/zqnt-client-sdk-go/gen/common/base/proto"
 	_ "github.com/Zequent/zqnt-client-sdk-go/gen/common/proto"
-	proto2 "github.com/Zequent/zqnt-client-sdk-go/gen/execution/contracts/proto"
 	proto3 "github.com/Zequent/zqnt-client-sdk-go/gen/missionautonomy/contracts/proto"
-	proto1 "github.com/Zequent/zqnt-client-sdk-go/gen/missionautonomy/domain/types/proto"
+	proto2 "github.com/Zequent/zqnt-client-sdk-go/gen/missionautonomy/domain/types/proto"
+	proto1 "github.com/Zequent/zqnt-client-sdk-go/gen/missionautonomy/dto/proto"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	structpb "google.golang.org/protobuf/types/known/structpb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
@@ -27,6 +28,98 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type EvaluateAutonomyRequest struct {
+	state          protoimpl.MessageState       `protogen:"open.v1"`
+	Base           *proto.RequestBase           `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	MissionId      *string                      `protobuf:"bytes,3,opt,name=mission_id,json=missionId,proto3,oneof" json:"mission_id,omitempty"`
+	MissionContext *proto1.MissionProtoDTO      `protobuf:"bytes,5,opt,name=mission_context,json=missionContext,proto3" json:"mission_context,omitempty"`
+	CandidateTasks []*proto1.TaskProtoDTO       `protobuf:"bytes,6,rep,name=candidate_tasks,json=candidateTasks,proto3" json:"candidate_tasks,omitempty"`
+	Trigger        *proto2.DecisionTriggerProto `protobuf:"bytes,7,opt,name=trigger,proto3" json:"trigger,omitempty"`
+	RuntimeConfig  *proto2.DynamicConfigProto   `protobuf:"bytes,8,opt,name=runtime_config,json=runtimeConfig,proto3" json:"runtime_config,omitempty"`
+	RuntimeContext *structpb.Struct             `protobuf:"bytes,9,opt,name=runtime_context,json=runtimeContext,proto3" json:"runtime_context,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *EvaluateAutonomyRequest) Reset() {
+	*x = EvaluateAutonomyRequest{}
+	mi := &file_mission_autonomy_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EvaluateAutonomyRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EvaluateAutonomyRequest) ProtoMessage() {}
+
+func (x *EvaluateAutonomyRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_mission_autonomy_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EvaluateAutonomyRequest.ProtoReflect.Descriptor instead.
+func (*EvaluateAutonomyRequest) Descriptor() ([]byte, []int) {
+	return file_mission_autonomy_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *EvaluateAutonomyRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *EvaluateAutonomyRequest) GetMissionId() string {
+	if x != nil && x.MissionId != nil {
+		return *x.MissionId
+	}
+	return ""
+}
+
+func (x *EvaluateAutonomyRequest) GetMissionContext() *proto1.MissionProtoDTO {
+	if x != nil {
+		return x.MissionContext
+	}
+	return nil
+}
+
+func (x *EvaluateAutonomyRequest) GetCandidateTasks() []*proto1.TaskProtoDTO {
+	if x != nil {
+		return x.CandidateTasks
+	}
+	return nil
+}
+
+func (x *EvaluateAutonomyRequest) GetTrigger() *proto2.DecisionTriggerProto {
+	if x != nil {
+		return x.Trigger
+	}
+	return nil
+}
+
+func (x *EvaluateAutonomyRequest) GetRuntimeConfig() *proto2.DynamicConfigProto {
+	if x != nil {
+		return x.RuntimeConfig
+	}
+	return nil
+}
+
+func (x *EvaluateAutonomyRequest) GetRuntimeContext() *structpb.Struct {
+	if x != nil {
+		return x.RuntimeContext
+	}
+	return nil
+}
+
 type EvaluateDetectionRequest struct {
 	state              protoimpl.MessageState     `protogen:"open.v1"`
 	Base               *proto.RequestBase         `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
@@ -37,17 +130,18 @@ type EvaluateDetectionRequest struct {
 	DetectionLatitude  float64                    `protobuf:"fixed64,6,opt,name=detection_latitude,json=detectionLatitude,proto3" json:"detection_latitude,omitempty"`
 	DetectionLongitude float64                    `protobuf:"fixed64,7,opt,name=detection_longitude,json=detectionLongitude,proto3" json:"detection_longitude,omitempty"`
 	DetectionAltitude  float64                    `protobuf:"fixed64,8,opt,name=detection_altitude,json=detectionAltitude,proto3" json:"detection_altitude,omitempty"`
+	MissionId          *string                    `protobuf:"bytes,9,opt,name=mission_id,json=missionId,proto3,oneof" json:"mission_id,omitempty"`
 	OrganizationId     *string                    `protobuf:"bytes,10,opt,name=organization_id,json=organizationId,proto3,oneof" json:"organization_id,omitempty"`
-	RuntimeConfig      *proto1.DynamicConfigProto `protobuf:"bytes,15,opt,name=runtime_config,json=runtimeConfig,proto3" json:"runtime_config,omitempty"`
-	TheatreId          *string                    `protobuf:"bytes,16,opt,name=theatre_id,json=theatreId,proto3,oneof" json:"theatre_id,omitempty"`
-	CapabilityId       *string                    `protobuf:"bytes,17,opt,name=capability_id,json=capabilityId,proto3,oneof" json:"capability_id,omitempty"`
+	MissionContext     *proto1.MissionProtoDTO    `protobuf:"bytes,13,opt,name=mission_context,json=missionContext,proto3" json:"mission_context,omitempty"`
+	TaskContext        *proto1.TaskProtoDTO       `protobuf:"bytes,14,opt,name=task_context,json=taskContext,proto3" json:"task_context,omitempty"`
+	RuntimeConfig      *proto2.DynamicConfigProto `protobuf:"bytes,15,opt,name=runtime_config,json=runtimeConfig,proto3" json:"runtime_config,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
 
 func (x *EvaluateDetectionRequest) Reset() {
 	*x = EvaluateDetectionRequest{}
-	mi := &file_mission_autonomy_proto_msgTypes[0]
+	mi := &file_mission_autonomy_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -59,7 +153,7 @@ func (x *EvaluateDetectionRequest) String() string {
 func (*EvaluateDetectionRequest) ProtoMessage() {}
 
 func (x *EvaluateDetectionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_mission_autonomy_proto_msgTypes[0]
+	mi := &file_mission_autonomy_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -72,7 +166,7 @@ func (x *EvaluateDetectionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EvaluateDetectionRequest.ProtoReflect.Descriptor instead.
 func (*EvaluateDetectionRequest) Descriptor() ([]byte, []int) {
-	return file_mission_autonomy_proto_rawDescGZIP(), []int{0}
+	return file_mission_autonomy_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *EvaluateDetectionRequest) GetBase() *proto.RequestBase {
@@ -131,6 +225,13 @@ func (x *EvaluateDetectionRequest) GetDetectionAltitude() float64 {
 	return 0
 }
 
+func (x *EvaluateDetectionRequest) GetMissionId() string {
+	if x != nil && x.MissionId != nil {
+		return *x.MissionId
+	}
+	return ""
+}
+
 func (x *EvaluateDetectionRequest) GetOrganizationId() string {
 	if x != nil && x.OrganizationId != nil {
 		return *x.OrganizationId
@@ -138,25 +239,141 @@ func (x *EvaluateDetectionRequest) GetOrganizationId() string {
 	return ""
 }
 
-func (x *EvaluateDetectionRequest) GetRuntimeConfig() *proto1.DynamicConfigProto {
+func (x *EvaluateDetectionRequest) GetMissionContext() *proto1.MissionProtoDTO {
+	if x != nil {
+		return x.MissionContext
+	}
+	return nil
+}
+
+func (x *EvaluateDetectionRequest) GetTaskContext() *proto1.TaskProtoDTO {
+	if x != nil {
+		return x.TaskContext
+	}
+	return nil
+}
+
+func (x *EvaluateDetectionRequest) GetRuntimeConfig() *proto2.DynamicConfigProto {
 	if x != nil {
 		return x.RuntimeConfig
 	}
 	return nil
 }
 
-func (x *EvaluateDetectionRequest) GetTheatreId() string {
-	if x != nil && x.TheatreId != nil {
-		return *x.TheatreId
+type AutonomyEvaluationResultProto struct {
+	state                 protoimpl.MessageState        `protogen:"open.v1"`
+	EvaluationId          string                        `protobuf:"bytes,1,opt,name=evaluation_id,json=evaluationId,proto3" json:"evaluation_id,omitempty"`
+	MissionId             *string                       `protobuf:"bytes,3,opt,name=mission_id,json=missionId,proto3,oneof" json:"mission_id,omitempty"`
+	SelectedTaskId        *string                       `protobuf:"bytes,4,opt,name=selected_task_id,json=selectedTaskId,proto3,oneof" json:"selected_task_id,omitempty"`
+	SelectedActions       []*proto2.DecisionActionProto `protobuf:"bytes,5,rep,name=selected_actions,json=selectedActions,proto3" json:"selected_actions,omitempty"`
+	ResolvedMissionConfig *proto2.DynamicConfigProto    `protobuf:"bytes,7,opt,name=resolved_mission_config,json=resolvedMissionConfig,proto3" json:"resolved_mission_config,omitempty"`
+	ResolvedTaskConfig    *proto2.DynamicConfigProto    `protobuf:"bytes,8,opt,name=resolved_task_config,json=resolvedTaskConfig,proto3" json:"resolved_task_config,omitempty"`
+	MatchedRuleIds        []string                      `protobuf:"bytes,9,rep,name=matched_rule_ids,json=matchedRuleIds,proto3" json:"matched_rule_ids,omitempty"`
+	StrategyUsed          *string                       `protobuf:"bytes,10,opt,name=strategy_used,json=strategyUsed,proto3,oneof" json:"strategy_used,omitempty"`
+	Status                string                        `protobuf:"bytes,11,opt,name=status,proto3" json:"status,omitempty"`
+	EvaluatedAt           *timestamppb.Timestamp        `protobuf:"bytes,12,opt,name=evaluated_at,json=evaluatedAt,proto3" json:"evaluated_at,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
+}
+
+func (x *AutonomyEvaluationResultProto) Reset() {
+	*x = AutonomyEvaluationResultProto{}
+	mi := &file_mission_autonomy_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AutonomyEvaluationResultProto) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AutonomyEvaluationResultProto) ProtoMessage() {}
+
+func (x *AutonomyEvaluationResultProto) ProtoReflect() protoreflect.Message {
+	mi := &file_mission_autonomy_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AutonomyEvaluationResultProto.ProtoReflect.Descriptor instead.
+func (*AutonomyEvaluationResultProto) Descriptor() ([]byte, []int) {
+	return file_mission_autonomy_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *AutonomyEvaluationResultProto) GetEvaluationId() string {
+	if x != nil {
+		return x.EvaluationId
 	}
 	return ""
 }
 
-func (x *EvaluateDetectionRequest) GetCapabilityId() string {
-	if x != nil && x.CapabilityId != nil {
-		return *x.CapabilityId
+func (x *AutonomyEvaluationResultProto) GetMissionId() string {
+	if x != nil && x.MissionId != nil {
+		return *x.MissionId
 	}
 	return ""
+}
+
+func (x *AutonomyEvaluationResultProto) GetSelectedTaskId() string {
+	if x != nil && x.SelectedTaskId != nil {
+		return *x.SelectedTaskId
+	}
+	return ""
+}
+
+func (x *AutonomyEvaluationResultProto) GetSelectedActions() []*proto2.DecisionActionProto {
+	if x != nil {
+		return x.SelectedActions
+	}
+	return nil
+}
+
+func (x *AutonomyEvaluationResultProto) GetResolvedMissionConfig() *proto2.DynamicConfigProto {
+	if x != nil {
+		return x.ResolvedMissionConfig
+	}
+	return nil
+}
+
+func (x *AutonomyEvaluationResultProto) GetResolvedTaskConfig() *proto2.DynamicConfigProto {
+	if x != nil {
+		return x.ResolvedTaskConfig
+	}
+	return nil
+}
+
+func (x *AutonomyEvaluationResultProto) GetMatchedRuleIds() []string {
+	if x != nil {
+		return x.MatchedRuleIds
+	}
+	return nil
+}
+
+func (x *AutonomyEvaluationResultProto) GetStrategyUsed() string {
+	if x != nil && x.StrategyUsed != nil {
+		return *x.StrategyUsed
+	}
+	return ""
+}
+
+func (x *AutonomyEvaluationResultProto) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *AutonomyEvaluationResultProto) GetEvaluatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.EvaluatedAt
+	}
+	return nil
 }
 
 type DecisionResultProto struct {
@@ -169,15 +386,17 @@ type DecisionResultProto struct {
 	ConsideredAssetSns []string                      `protobuf:"bytes,6,rep,name=considered_asset_sns,json=consideredAssetSns,proto3" json:"considered_asset_sns,omitempty"`
 	RejectionReasons   map[string]string             `protobuf:"bytes,7,rep,name=rejection_reasons,json=rejectionReasons,proto3" json:"rejection_reasons,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	DecidedAt          *timestamppb.Timestamp        `protobuf:"bytes,8,opt,name=decided_at,json=decidedAt,proto3" json:"decided_at,omitempty"`
-	ResolvedConfig     *proto1.DynamicConfigProto    `protobuf:"bytes,12,opt,name=resolved_config,json=resolvedConfig,proto3" json:"resolved_config,omitempty"`
-	SelectedActions    []*proto1.DecisionActionProto `protobuf:"bytes,13,rep,name=selected_actions,json=selectedActions,proto3" json:"selected_actions,omitempty"`
+	SelectedMissionId  *string                       `protobuf:"bytes,10,opt,name=selected_mission_id,json=selectedMissionId,proto3,oneof" json:"selected_mission_id,omitempty"`
+	SelectedTaskId     *string                       `protobuf:"bytes,11,opt,name=selected_task_id,json=selectedTaskId,proto3,oneof" json:"selected_task_id,omitempty"`
+	ResolvedConfig     *proto2.DynamicConfigProto    `protobuf:"bytes,12,opt,name=resolved_config,json=resolvedConfig,proto3" json:"resolved_config,omitempty"`
+	SelectedActions    []*proto2.DecisionActionProto `protobuf:"bytes,13,rep,name=selected_actions,json=selectedActions,proto3" json:"selected_actions,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
 
 func (x *DecisionResultProto) Reset() {
 	*x = DecisionResultProto{}
-	mi := &file_mission_autonomy_proto_msgTypes[1]
+	mi := &file_mission_autonomy_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -189,7 +408,7 @@ func (x *DecisionResultProto) String() string {
 func (*DecisionResultProto) ProtoMessage() {}
 
 func (x *DecisionResultProto) ProtoReflect() protoreflect.Message {
-	mi := &file_mission_autonomy_proto_msgTypes[1]
+	mi := &file_mission_autonomy_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -202,7 +421,7 @@ func (x *DecisionResultProto) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DecisionResultProto.ProtoReflect.Descriptor instead.
 func (*DecisionResultProto) Descriptor() ([]byte, []int) {
-	return file_mission_autonomy_proto_rawDescGZIP(), []int{1}
+	return file_mission_autonomy_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *DecisionResultProto) GetDecisionId() string {
@@ -261,19 +480,139 @@ func (x *DecisionResultProto) GetDecidedAt() *timestamppb.Timestamp {
 	return nil
 }
 
-func (x *DecisionResultProto) GetResolvedConfig() *proto1.DynamicConfigProto {
+func (x *DecisionResultProto) GetSelectedMissionId() string {
+	if x != nil && x.SelectedMissionId != nil {
+		return *x.SelectedMissionId
+	}
+	return ""
+}
+
+func (x *DecisionResultProto) GetSelectedTaskId() string {
+	if x != nil && x.SelectedTaskId != nil {
+		return *x.SelectedTaskId
+	}
+	return ""
+}
+
+func (x *DecisionResultProto) GetResolvedConfig() *proto2.DynamicConfigProto {
 	if x != nil {
 		return x.ResolvedConfig
 	}
 	return nil
 }
 
-func (x *DecisionResultProto) GetSelectedActions() []*proto1.DecisionActionProto {
+func (x *DecisionResultProto) GetSelectedActions() []*proto2.DecisionActionProto {
 	if x != nil {
 		return x.SelectedActions
 	}
 	return nil
 }
+
+type AutonomyEvaluationResponse struct {
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	HasErrors bool                   `protobuf:"varint,1,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Tid       string                 `protobuf:"bytes,2,opt,name=tid,proto3" json:"tid,omitempty"`
+	Timestamp *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	// Types that are valid to be assigned to Response:
+	//
+	//	*AutonomyEvaluationResponse_Error
+	//	*AutonomyEvaluationResponse_EvaluationResult
+	Response      isAutonomyEvaluationResponse_Response `protobuf_oneof:"response"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AutonomyEvaluationResponse) Reset() {
+	*x = AutonomyEvaluationResponse{}
+	mi := &file_mission_autonomy_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AutonomyEvaluationResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AutonomyEvaluationResponse) ProtoMessage() {}
+
+func (x *AutonomyEvaluationResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_mission_autonomy_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AutonomyEvaluationResponse.ProtoReflect.Descriptor instead.
+func (*AutonomyEvaluationResponse) Descriptor() ([]byte, []int) {
+	return file_mission_autonomy_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *AutonomyEvaluationResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *AutonomyEvaluationResponse) GetTid() string {
+	if x != nil {
+		return x.Tid
+	}
+	return ""
+}
+
+func (x *AutonomyEvaluationResponse) GetTimestamp() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Timestamp
+	}
+	return nil
+}
+
+func (x *AutonomyEvaluationResponse) GetResponse() isAutonomyEvaluationResponse_Response {
+	if x != nil {
+		return x.Response
+	}
+	return nil
+}
+
+func (x *AutonomyEvaluationResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		if x, ok := x.Response.(*AutonomyEvaluationResponse_Error); ok {
+			return x.Error
+		}
+	}
+	return nil
+}
+
+func (x *AutonomyEvaluationResponse) GetEvaluationResult() *AutonomyEvaluationResultProto {
+	if x != nil {
+		if x, ok := x.Response.(*AutonomyEvaluationResponse_EvaluationResult); ok {
+			return x.EvaluationResult
+		}
+	}
+	return nil
+}
+
+type isAutonomyEvaluationResponse_Response interface {
+	isAutonomyEvaluationResponse_Response()
+}
+
+type AutonomyEvaluationResponse_Error struct {
+	Error *proto.GlobalErrorMessage `protobuf:"bytes,4,opt,name=error,proto3,oneof"`
+}
+
+type AutonomyEvaluationResponse_EvaluationResult struct {
+	EvaluationResult *AutonomyEvaluationResultProto `protobuf:"bytes,5,opt,name=evaluation_result,json=evaluationResult,proto3,oneof"`
+}
+
+func (*AutonomyEvaluationResponse_Error) isAutonomyEvaluationResponse_Response() {}
+
+func (*AutonomyEvaluationResponse_EvaluationResult) isAutonomyEvaluationResponse_Response() {}
 
 type DecisionResponse struct {
 	state     protoimpl.MessageState `protogen:"open.v1"`
@@ -291,7 +630,7 @@ type DecisionResponse struct {
 
 func (x *DecisionResponse) Reset() {
 	*x = DecisionResponse{}
-	mi := &file_mission_autonomy_proto_msgTypes[2]
+	mi := &file_mission_autonomy_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -303,7 +642,7 @@ func (x *DecisionResponse) String() string {
 func (*DecisionResponse) ProtoMessage() {}
 
 func (x *DecisionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_mission_autonomy_proto_msgTypes[2]
+	mi := &file_mission_autonomy_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -316,7 +655,7 @@ func (x *DecisionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DecisionResponse.ProtoReflect.Descriptor instead.
 func (*DecisionResponse) Descriptor() ([]byte, []int) {
-	return file_mission_autonomy_proto_rawDescGZIP(), []int{2}
+	return file_mission_autonomy_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *DecisionResponse) GetHasErrors() bool {
@@ -385,7 +724,17 @@ var File_mission_autonomy_proto protoreflect.FileDescriptor
 
 const file_mission_autonomy_proto_rawDesc = "" +
 	"\n" +
-	"\x16mission-autonomy.proto\x12\x04zqnt\x1a\fcommon.proto\x1a$capability-execution-contracts.proto\x1a mission-autonomy-contracts.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x8a\x05\n" +
+	"\x16mission-autonomy.proto\x12\x04zqnt\x1a\fcommon.proto\x1a mission-autonomy-contracts.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xb5\x03\n" +
+	"\x17EvaluateAutonomyRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\"\n" +
+	"\n" +
+	"mission_id\x18\x03 \x01(\tH\x00R\tmissionId\x88\x01\x01\x12>\n" +
+	"\x0fmission_context\x18\x05 \x01(\v2\x15.zqnt.MissionProtoDTOR\x0emissionContext\x12;\n" +
+	"\x0fcandidate_tasks\x18\x06 \x03(\v2\x12.zqnt.TaskProtoDTOR\x0ecandidateTasks\x124\n" +
+	"\atrigger\x18\a \x01(\v2\x1a.zqnt.DecisionTriggerProtoR\atrigger\x12?\n" +
+	"\x0eruntime_config\x18\b \x01(\v2\x18.zqnt.DynamicConfigProtoR\rruntimeConfig\x12@\n" +
+	"\x0fruntime_context\x18\t \x01(\v2\x17.google.protobuf.StructR\x0eruntimeContextB\r\n" +
+	"\v_mission_idJ\x04\b\x02\x10\x03J\x04\b\x04\x10\x05\"\x88\x05\n" +
 	"\x18EvaluateDetectionRequest\x12%\n" +
 	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12!\n" +
 	"\fdetection_id\x18\x02 \x01(\tR\vdetectionId\x12\x19\n" +
@@ -397,18 +746,32 @@ const file_mission_autonomy_proto_rawDesc = "" +
 	"confidence\x12-\n" +
 	"\x12detection_latitude\x18\x06 \x01(\x01R\x11detectionLatitude\x12/\n" +
 	"\x13detection_longitude\x18\a \x01(\x01R\x12detectionLongitude\x12-\n" +
-	"\x12detection_altitude\x18\b \x01(\x01R\x11detectionAltitude\x12,\n" +
-	"\x0forganization_id\x18\n" +
-	" \x01(\tH\x00R\x0eorganizationId\x88\x01\x01\x12?\n" +
-	"\x0eruntime_config\x18\x0f \x01(\v2\x18.zqnt.DynamicConfigProtoR\rruntimeConfig\x12\"\n" +
+	"\x12detection_altitude\x18\b \x01(\x01R\x11detectionAltitude\x12\"\n" +
 	"\n" +
-	"theatre_id\x18\x10 \x01(\tH\x01R\ttheatreId\x88\x01\x01\x12(\n" +
-	"\rcapability_id\x18\x11 \x01(\tH\x02R\fcapabilityId\x88\x01\x01B\x12\n" +
-	"\x10_organization_idB\r\n" +
-	"\v_theatre_idB\x10\n" +
-	"\x0e_capability_idJ\x04\b\t\x10\n" +
-	"J\x04\b\v\x10\fJ\x04\b\f\x10\rJ\x04\b\r\x10\x0eJ\x04\b\x0e\x10\x0fR\n" +
-	"mission_idR\x0fmission_contextR\ftask_context\"\xc6\x05\n" +
+	"mission_id\x18\t \x01(\tH\x00R\tmissionId\x88\x01\x01\x12,\n" +
+	"\x0forganization_id\x18\n" +
+	" \x01(\tH\x01R\x0eorganizationId\x88\x01\x01\x12>\n" +
+	"\x0fmission_context\x18\r \x01(\v2\x15.zqnt.MissionProtoDTOR\x0emissionContext\x125\n" +
+	"\ftask_context\x18\x0e \x01(\v2\x12.zqnt.TaskProtoDTOR\vtaskContext\x12?\n" +
+	"\x0eruntime_config\x18\x0f \x01(\v2\x18.zqnt.DynamicConfigProtoR\rruntimeConfigB\r\n" +
+	"\v_mission_idB\x12\n" +
+	"\x10_organization_idJ\x04\b\v\x10\fJ\x04\b\f\x10\r\"\xe8\x04\n" +
+	"\x1dAutonomyEvaluationResultProto\x12#\n" +
+	"\revaluation_id\x18\x01 \x01(\tR\fevaluationId\x12\"\n" +
+	"\n" +
+	"mission_id\x18\x03 \x01(\tH\x00R\tmissionId\x88\x01\x01\x12-\n" +
+	"\x10selected_task_id\x18\x04 \x01(\tH\x01R\x0eselectedTaskId\x88\x01\x01\x12D\n" +
+	"\x10selected_actions\x18\x05 \x03(\v2\x19.zqnt.DecisionActionProtoR\x0fselectedActions\x12P\n" +
+	"\x17resolved_mission_config\x18\a \x01(\v2\x18.zqnt.DynamicConfigProtoR\x15resolvedMissionConfig\x12J\n" +
+	"\x14resolved_task_config\x18\b \x01(\v2\x18.zqnt.DynamicConfigProtoR\x12resolvedTaskConfig\x12(\n" +
+	"\x10matched_rule_ids\x18\t \x03(\tR\x0ematchedRuleIds\x12(\n" +
+	"\rstrategy_used\x18\n" +
+	" \x01(\tH\x02R\fstrategyUsed\x88\x01\x01\x12\x16\n" +
+	"\x06status\x18\v \x01(\tR\x06status\x12=\n" +
+	"\fevaluated_at\x18\f \x01(\v2\x1a.google.protobuf.TimestampR\vevaluatedAtB\r\n" +
+	"\v_mission_idB\x13\n" +
+	"\x11_selected_task_idB\x10\n" +
+	"\x0e_strategy_usedJ\x04\b\x02\x10\x03J\x04\b\x06\x10\a\"\xa4\x06\n" +
 	"\x13DecisionResultProto\x12\x1f\n" +
 	"\vdecision_id\x18\x01 \x01(\tR\n" +
 	"decisionId\x12!\n" +
@@ -419,16 +782,29 @@ const file_mission_autonomy_proto_rawDesc = "" +
 	"\x14considered_asset_sns\x18\x06 \x03(\tR\x12consideredAssetSns\x12\\\n" +
 	"\x11rejection_reasons\x18\a \x03(\v2/.zqnt.DecisionResultProto.RejectionReasonsEntryR\x10rejectionReasons\x129\n" +
 	"\n" +
-	"decided_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\tdecidedAt\x12A\n" +
+	"decided_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\tdecidedAt\x123\n" +
+	"\x13selected_mission_id\x18\n" +
+	" \x01(\tH\x02R\x11selectedMissionId\x88\x01\x01\x12-\n" +
+	"\x10selected_task_id\x18\v \x01(\tH\x03R\x0eselectedTaskId\x88\x01\x01\x12A\n" +
 	"\x0fresolved_config\x18\f \x01(\v2\x18.zqnt.DynamicConfigProtoR\x0eresolvedConfig\x12D\n" +
 	"\x10selected_actions\x18\r \x03(\v2\x19.zqnt.DecisionActionProtoR\x0fselectedActions\x1aC\n" +
 	"\x15RejectionReasonsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\x14\n" +
 	"\x12_selected_asset_snB\x10\n" +
-	"\x0e_strategy_usedJ\x04\b\t\x10\n" +
-	"J\x04\b\n" +
-	"\x10\vJ\x04\b\v\x10\fR\x13selected_mission_idR\x10selected_task_id\"\x81\x02\n" +
+	"\x0e_strategy_usedB\x16\n" +
+	"\x14_selected_mission_idB\x13\n" +
+	"\x11_selected_task_idJ\x04\b\t\x10\n" +
+	"\"\x99\x02\n" +
+	"\x1aAutonomyEvaluationResponse\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x01 \x01(\bR\thasErrors\x12\x10\n" +
+	"\x03tid\x18\x02 \x01(\tR\x03tid\x128\n" +
+	"\ttimestamp\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x120\n" +
+	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x12R\n" +
+	"\x11evaluation_result\x18\x05 \x01(\v2#.zqnt.AutonomyEvaluationResultProtoH\x00R\x10evaluationResultB\n" +
+	"\n" +
+	"\bresponse\"\x81\x02\n" +
 	"\x10DecisionResponse\x12\x1d\n" +
 	"\n" +
 	"has_errors\x18\x01 \x01(\bR\thasErrors\x12\x10\n" +
@@ -437,29 +813,36 @@ const file_mission_autonomy_proto_rawDesc = "" +
 	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x12D\n" +
 	"\x0fdecision_result\x18\x05 \x01(\v2\x19.zqnt.DecisionResultProtoH\x00R\x0edecisionResultB\n" +
 	"\n" +
-	"\bresponse2\x9f\x0e\n" +
-	"\x16MissionAutonomyService\x12N\n" +
-	"\x11UpsertApplication\x12\x1e.zqnt.UpsertApplicationRequest\x1a\x19.zqnt.ApplicationResponse\x12H\n" +
-	"\x0eGetApplication\x12\x1b.zqnt.GetApplicationRequest\x1a\x19.zqnt.ApplicationResponse\x12P\n" +
-	"\x10ListApplications\x12\x1d.zqnt.ListApplicationsRequest\x1a\x1d.zqnt.ApplicationListResponse\x12N\n" +
-	"\x11DeleteApplication\x12\x1e.zqnt.DeleteApplicationRequest\x1a\x19.zqnt.ApplicationResponse\x12W\n" +
-	"\x14CreateSkillExecution\x12!.zqnt.CreateSkillExecutionRequest\x1a\x1c.zqnt.SkillExecutionResponse\x12G\n" +
-	"\fExecuteSkill\x12\x19.zqnt.ExecuteSkillRequest\x1a\x1c.zqnt.SkillExecutionResponse\x12Q\n" +
-	"\x11GetSkillExecution\x12\x1e.zqnt.GetSkillExecutionRequest\x1a\x1c.zqnt.SkillExecutionResponse\x12Y\n" +
-	"\x13ListSkillExecutions\x12 .zqnt.ListSkillExecutionsRequest\x1a .zqnt.SkillExecutionListResponse\x12Y\n" +
-	"\x13StartSkillExecution\x12$.zqnt.SkillExecutionLifecycleRequest\x1a\x1c.zqnt.SkillExecutionResponse\x12Y\n" +
-	"\x13PauseSkillExecution\x12$.zqnt.SkillExecutionLifecycleRequest\x1a\x1c.zqnt.SkillExecutionResponse\x12Z\n" +
-	"\x14ResumeSkillExecution\x12$.zqnt.SkillExecutionLifecycleRequest\x1a\x1c.zqnt.SkillExecutionResponse\x12Z\n" +
-	"\x14CancelSkillExecution\x12$.zqnt.SkillExecutionLifecycleRequest\x1a\x1c.zqnt.SkillExecutionResponse\x12W\n" +
-	"\x14SignalSkillExecution\x12!.zqnt.SignalSkillExecutionRequest\x1a\x1c.zqnt.SkillExecutionResponse\x12c\n" +
-	"\x16ResolveExecutionConfig\x12#.zqnt.ResolveExecutionConfigRequest\x1a$.zqnt.ResolveExecutionConfigResponse\x12F\n" +
+	"\bresponse2\x95\r\n" +
+	"\x16MissionAutonomyService\x12<\n" +
+	"\n" +
+	"GetMission\x12\x17.zqnt.GetMissionRequest\x1a\x15.zqnt.MissionResponse\x12B\n" +
+	"\rCreateMission\x12\x1a.zqnt.CreateMissionRequest\x1a\x15.zqnt.MissionResponse\x12B\n" +
+	"\rUpdateMission\x12\x1a.zqnt.UpdateMissionRequest\x1a\x15.zqnt.MissionResponse\x12B\n" +
+	"\rDeleteMission\x12\x1a.zqnt.DeleteMissionRequest\x1a\x15.zqnt.MissionResponse\x12R\n" +
+	"\x15UploadMissionNfzZones\x12\".zqnt.UploadMissionNfzZonesRequest\x1a\x15.zqnt.MissionResponse\x123\n" +
+	"\aGetTask\x12\x14.zqnt.GetTaskRequest\x1a\x12.zqnt.TaskResponse\x12G\n" +
+	"\x11GetTaskByFlightId\x12\x1e.zqnt.GetTaskByFlightIdRequest\x1a\x12.zqnt.TaskResponse\x129\n" +
+	"\n" +
+	"CreateTask\x12\x17.zqnt.CreateTaskRequest\x1a\x12.zqnt.TaskResponse\x129\n" +
+	"\n" +
+	"UpdateTask\x12\x17.zqnt.UpdateTaskRequest\x1a\x12.zqnt.TaskResponse\x129\n" +
+	"\n" +
+	"DeleteTask\x12\x17.zqnt.DeleteTaskRequest\x1a\x12.zqnt.TaskResponse\x12F\n" +
 	"\x0eListSchedulers\x12\x1b.zqnt.ListSchedulersRequest\x1a\x17.zqnt.SchedulerResponse\x12B\n" +
 	"\fGetScheduler\x12\x19.zqnt.GetSchedulerRequest\x1a\x17.zqnt.SchedulerResponse\x12H\n" +
 	"\x0fCreateScheduler\x12\x1c.zqnt.CreateSchedulerRequest\x1a\x17.zqnt.SchedulerResponse\x12H\n" +
 	"\x0fUpdateScheduler\x12\x1c.zqnt.UpdateSchedulerRequest\x1a\x17.zqnt.SchedulerResponse\x12H\n" +
 	"\x0fDeleteScheduler\x12\x1c.zqnt.DeleteSchedulerRequest\x1a\x17.zqnt.SchedulerResponse\x12J\n" +
 	"\x10CreateSchedulers\x12\x1d.zqnt.CreateSchedulersRequest\x1a\x17.zqnt.SchedulerResponse\x12J\n" +
-	"\x10DeleteSchedulers\x12\x1d.zqnt.DeleteSchedulersRequest\x1a\x17.zqnt.SchedulerResponse\x12K\n" +
+	"\x10DeleteSchedulers\x12\x1d.zqnt.DeleteSchedulersRequest\x1a\x17.zqnt.SchedulerResponse\x12V\n" +
+	"\x16DeleteSchedulersByTask\x12#.zqnt.DeleteSchedulersByTaskRequest\x1a\x17.zqnt.SchedulerResponse\x12;\n" +
+	"\tStartTask\x12\x1a.zqnt.TaskLifecycleRequest\x1a\x12.zqnt.TaskResponse\x12:\n" +
+	"\bStopTask\x12\x1a.zqnt.TaskLifecycleRequest\x1a\x12.zqnt.TaskResponse\x12;\n" +
+	"\tPauseTask\x12\x1a.zqnt.TaskLifecycleRequest\x1a\x12.zqnt.TaskResponse\x12<\n" +
+	"\n" +
+	"ResumeTask\x12\x1a.zqnt.TaskLifecycleRequest\x1a\x12.zqnt.TaskResponse\x12S\n" +
+	"\x10EvaluateAutonomy\x12\x1d.zqnt.EvaluateAutonomyRequest\x1a .zqnt.AutonomyEvaluationResponse\x12K\n" +
 	"\x11EvaluateDetection\x12\x1e.zqnt.EvaluateDetectionRequest\x1a\x16.zqnt.DecisionResponseBQ\n" +
 	"\x1ccom.zqnt.utils.mission.protoB\x14MissionAutonomyProtoP\x01Z\x19gen/missionautonomy/protob\x06proto3"
 
@@ -475,101 +858,125 @@ func file_mission_autonomy_proto_rawDescGZIP() []byte {
 	return file_mission_autonomy_proto_rawDescData
 }
 
-var file_mission_autonomy_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_mission_autonomy_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_mission_autonomy_proto_goTypes = []any{
-	(*EvaluateDetectionRequest)(nil),              // 0: zqnt.EvaluateDetectionRequest
-	(*DecisionResultProto)(nil),                   // 1: zqnt.DecisionResultProto
-	(*DecisionResponse)(nil),                      // 2: zqnt.DecisionResponse
-	nil,                                           // 3: zqnt.DecisionResultProto.RejectionReasonsEntry
-	(*proto.RequestBase)(nil),                     // 4: zqnt.RequestBase
-	(*proto1.DynamicConfigProto)(nil),             // 5: zqnt.DynamicConfigProto
-	(*timestamppb.Timestamp)(nil),                 // 6: google.protobuf.Timestamp
-	(*proto1.DecisionActionProto)(nil),            // 7: zqnt.DecisionActionProto
-	(*proto.GlobalErrorMessage)(nil),              // 8: zqnt.GlobalErrorMessage
-	(*proto2.UpsertApplicationRequest)(nil),       // 9: zqnt.UpsertApplicationRequest
-	(*proto2.GetApplicationRequest)(nil),          // 10: zqnt.GetApplicationRequest
-	(*proto2.ListApplicationsRequest)(nil),        // 11: zqnt.ListApplicationsRequest
-	(*proto2.DeleteApplicationRequest)(nil),       // 12: zqnt.DeleteApplicationRequest
-	(*proto2.CreateSkillExecutionRequest)(nil),    // 13: zqnt.CreateSkillExecutionRequest
-	(*proto2.ExecuteSkillRequest)(nil),            // 14: zqnt.ExecuteSkillRequest
-	(*proto2.GetSkillExecutionRequest)(nil),       // 15: zqnt.GetSkillExecutionRequest
-	(*proto2.ListSkillExecutionsRequest)(nil),     // 16: zqnt.ListSkillExecutionsRequest
-	(*proto2.SkillExecutionLifecycleRequest)(nil), // 17: zqnt.SkillExecutionLifecycleRequest
-	(*proto2.SignalSkillExecutionRequest)(nil),    // 18: zqnt.SignalSkillExecutionRequest
-	(*proto2.ResolveExecutionConfigRequest)(nil),  // 19: zqnt.ResolveExecutionConfigRequest
-	(*proto3.ListSchedulersRequest)(nil),          // 20: zqnt.ListSchedulersRequest
-	(*proto3.GetSchedulerRequest)(nil),            // 21: zqnt.GetSchedulerRequest
-	(*proto3.CreateSchedulerRequest)(nil),         // 22: zqnt.CreateSchedulerRequest
-	(*proto3.UpdateSchedulerRequest)(nil),         // 23: zqnt.UpdateSchedulerRequest
-	(*proto3.DeleteSchedulerRequest)(nil),         // 24: zqnt.DeleteSchedulerRequest
-	(*proto3.CreateSchedulersRequest)(nil),        // 25: zqnt.CreateSchedulersRequest
-	(*proto3.DeleteSchedulersRequest)(nil),        // 26: zqnt.DeleteSchedulersRequest
-	(*proto2.ApplicationResponse)(nil),            // 27: zqnt.ApplicationResponse
-	(*proto2.ApplicationListResponse)(nil),        // 28: zqnt.ApplicationListResponse
-	(*proto2.SkillExecutionResponse)(nil),         // 29: zqnt.SkillExecutionResponse
-	(*proto2.SkillExecutionListResponse)(nil),     // 30: zqnt.SkillExecutionListResponse
-	(*proto2.ResolveExecutionConfigResponse)(nil), // 31: zqnt.ResolveExecutionConfigResponse
-	(*proto3.SchedulerResponse)(nil),              // 32: zqnt.SchedulerResponse
+	(*EvaluateAutonomyRequest)(nil),              // 0: zqnt.EvaluateAutonomyRequest
+	(*EvaluateDetectionRequest)(nil),             // 1: zqnt.EvaluateDetectionRequest
+	(*AutonomyEvaluationResultProto)(nil),        // 2: zqnt.AutonomyEvaluationResultProto
+	(*DecisionResultProto)(nil),                  // 3: zqnt.DecisionResultProto
+	(*AutonomyEvaluationResponse)(nil),           // 4: zqnt.AutonomyEvaluationResponse
+	(*DecisionResponse)(nil),                     // 5: zqnt.DecisionResponse
+	nil,                                          // 6: zqnt.DecisionResultProto.RejectionReasonsEntry
+	(*proto.RequestBase)(nil),                    // 7: zqnt.RequestBase
+	(*proto1.MissionProtoDTO)(nil),               // 8: zqnt.MissionProtoDTO
+	(*proto1.TaskProtoDTO)(nil),                  // 9: zqnt.TaskProtoDTO
+	(*proto2.DecisionTriggerProto)(nil),          // 10: zqnt.DecisionTriggerProto
+	(*proto2.DynamicConfigProto)(nil),            // 11: zqnt.DynamicConfigProto
+	(*structpb.Struct)(nil),                      // 12: google.protobuf.Struct
+	(*proto2.DecisionActionProto)(nil),           // 13: zqnt.DecisionActionProto
+	(*timestamppb.Timestamp)(nil),                // 14: google.protobuf.Timestamp
+	(*proto.GlobalErrorMessage)(nil),             // 15: zqnt.GlobalErrorMessage
+	(*proto3.GetMissionRequest)(nil),             // 16: zqnt.GetMissionRequest
+	(*proto3.CreateMissionRequest)(nil),          // 17: zqnt.CreateMissionRequest
+	(*proto3.UpdateMissionRequest)(nil),          // 18: zqnt.UpdateMissionRequest
+	(*proto3.DeleteMissionRequest)(nil),          // 19: zqnt.DeleteMissionRequest
+	(*proto3.UploadMissionNfzZonesRequest)(nil),  // 20: zqnt.UploadMissionNfzZonesRequest
+	(*proto3.GetTaskRequest)(nil),                // 21: zqnt.GetTaskRequest
+	(*proto3.GetTaskByFlightIdRequest)(nil),      // 22: zqnt.GetTaskByFlightIdRequest
+	(*proto3.CreateTaskRequest)(nil),             // 23: zqnt.CreateTaskRequest
+	(*proto3.UpdateTaskRequest)(nil),             // 24: zqnt.UpdateTaskRequest
+	(*proto3.DeleteTaskRequest)(nil),             // 25: zqnt.DeleteTaskRequest
+	(*proto3.ListSchedulersRequest)(nil),         // 26: zqnt.ListSchedulersRequest
+	(*proto3.GetSchedulerRequest)(nil),           // 27: zqnt.GetSchedulerRequest
+	(*proto3.CreateSchedulerRequest)(nil),        // 28: zqnt.CreateSchedulerRequest
+	(*proto3.UpdateSchedulerRequest)(nil),        // 29: zqnt.UpdateSchedulerRequest
+	(*proto3.DeleteSchedulerRequest)(nil),        // 30: zqnt.DeleteSchedulerRequest
+	(*proto3.CreateSchedulersRequest)(nil),       // 31: zqnt.CreateSchedulersRequest
+	(*proto3.DeleteSchedulersRequest)(nil),       // 32: zqnt.DeleteSchedulersRequest
+	(*proto3.DeleteSchedulersByTaskRequest)(nil), // 33: zqnt.DeleteSchedulersByTaskRequest
+	(*proto3.TaskLifecycleRequest)(nil),          // 34: zqnt.TaskLifecycleRequest
+	(*proto3.MissionResponse)(nil),               // 35: zqnt.MissionResponse
+	(*proto3.TaskResponse)(nil),                  // 36: zqnt.TaskResponse
+	(*proto3.SchedulerResponse)(nil),             // 37: zqnt.SchedulerResponse
 }
 var file_mission_autonomy_proto_depIdxs = []int32{
-	4,  // 0: zqnt.EvaluateDetectionRequest.base:type_name -> zqnt.RequestBase
-	5,  // 1: zqnt.EvaluateDetectionRequest.runtime_config:type_name -> zqnt.DynamicConfigProto
-	3,  // 2: zqnt.DecisionResultProto.rejection_reasons:type_name -> zqnt.DecisionResultProto.RejectionReasonsEntry
-	6,  // 3: zqnt.DecisionResultProto.decided_at:type_name -> google.protobuf.Timestamp
-	5,  // 4: zqnt.DecisionResultProto.resolved_config:type_name -> zqnt.DynamicConfigProto
-	7,  // 5: zqnt.DecisionResultProto.selected_actions:type_name -> zqnt.DecisionActionProto
-	6,  // 6: zqnt.DecisionResponse.timestamp:type_name -> google.protobuf.Timestamp
-	8,  // 7: zqnt.DecisionResponse.error:type_name -> zqnt.GlobalErrorMessage
-	1,  // 8: zqnt.DecisionResponse.decision_result:type_name -> zqnt.DecisionResultProto
-	9,  // 9: zqnt.MissionAutonomyService.UpsertApplication:input_type -> zqnt.UpsertApplicationRequest
-	10, // 10: zqnt.MissionAutonomyService.GetApplication:input_type -> zqnt.GetApplicationRequest
-	11, // 11: zqnt.MissionAutonomyService.ListApplications:input_type -> zqnt.ListApplicationsRequest
-	12, // 12: zqnt.MissionAutonomyService.DeleteApplication:input_type -> zqnt.DeleteApplicationRequest
-	13, // 13: zqnt.MissionAutonomyService.CreateSkillExecution:input_type -> zqnt.CreateSkillExecutionRequest
-	14, // 14: zqnt.MissionAutonomyService.ExecuteSkill:input_type -> zqnt.ExecuteSkillRequest
-	15, // 15: zqnt.MissionAutonomyService.GetSkillExecution:input_type -> zqnt.GetSkillExecutionRequest
-	16, // 16: zqnt.MissionAutonomyService.ListSkillExecutions:input_type -> zqnt.ListSkillExecutionsRequest
-	17, // 17: zqnt.MissionAutonomyService.StartSkillExecution:input_type -> zqnt.SkillExecutionLifecycleRequest
-	17, // 18: zqnt.MissionAutonomyService.PauseSkillExecution:input_type -> zqnt.SkillExecutionLifecycleRequest
-	17, // 19: zqnt.MissionAutonomyService.ResumeSkillExecution:input_type -> zqnt.SkillExecutionLifecycleRequest
-	17, // 20: zqnt.MissionAutonomyService.CancelSkillExecution:input_type -> zqnt.SkillExecutionLifecycleRequest
-	18, // 21: zqnt.MissionAutonomyService.SignalSkillExecution:input_type -> zqnt.SignalSkillExecutionRequest
-	19, // 22: zqnt.MissionAutonomyService.ResolveExecutionConfig:input_type -> zqnt.ResolveExecutionConfigRequest
-	20, // 23: zqnt.MissionAutonomyService.ListSchedulers:input_type -> zqnt.ListSchedulersRequest
-	21, // 24: zqnt.MissionAutonomyService.GetScheduler:input_type -> zqnt.GetSchedulerRequest
-	22, // 25: zqnt.MissionAutonomyService.CreateScheduler:input_type -> zqnt.CreateSchedulerRequest
-	23, // 26: zqnt.MissionAutonomyService.UpdateScheduler:input_type -> zqnt.UpdateSchedulerRequest
-	24, // 27: zqnt.MissionAutonomyService.DeleteScheduler:input_type -> zqnt.DeleteSchedulerRequest
-	25, // 28: zqnt.MissionAutonomyService.CreateSchedulers:input_type -> zqnt.CreateSchedulersRequest
-	26, // 29: zqnt.MissionAutonomyService.DeleteSchedulers:input_type -> zqnt.DeleteSchedulersRequest
-	0,  // 30: zqnt.MissionAutonomyService.EvaluateDetection:input_type -> zqnt.EvaluateDetectionRequest
-	27, // 31: zqnt.MissionAutonomyService.UpsertApplication:output_type -> zqnt.ApplicationResponse
-	27, // 32: zqnt.MissionAutonomyService.GetApplication:output_type -> zqnt.ApplicationResponse
-	28, // 33: zqnt.MissionAutonomyService.ListApplications:output_type -> zqnt.ApplicationListResponse
-	27, // 34: zqnt.MissionAutonomyService.DeleteApplication:output_type -> zqnt.ApplicationResponse
-	29, // 35: zqnt.MissionAutonomyService.CreateSkillExecution:output_type -> zqnt.SkillExecutionResponse
-	29, // 36: zqnt.MissionAutonomyService.ExecuteSkill:output_type -> zqnt.SkillExecutionResponse
-	29, // 37: zqnt.MissionAutonomyService.GetSkillExecution:output_type -> zqnt.SkillExecutionResponse
-	30, // 38: zqnt.MissionAutonomyService.ListSkillExecutions:output_type -> zqnt.SkillExecutionListResponse
-	29, // 39: zqnt.MissionAutonomyService.StartSkillExecution:output_type -> zqnt.SkillExecutionResponse
-	29, // 40: zqnt.MissionAutonomyService.PauseSkillExecution:output_type -> zqnt.SkillExecutionResponse
-	29, // 41: zqnt.MissionAutonomyService.ResumeSkillExecution:output_type -> zqnt.SkillExecutionResponse
-	29, // 42: zqnt.MissionAutonomyService.CancelSkillExecution:output_type -> zqnt.SkillExecutionResponse
-	29, // 43: zqnt.MissionAutonomyService.SignalSkillExecution:output_type -> zqnt.SkillExecutionResponse
-	31, // 44: zqnt.MissionAutonomyService.ResolveExecutionConfig:output_type -> zqnt.ResolveExecutionConfigResponse
-	32, // 45: zqnt.MissionAutonomyService.ListSchedulers:output_type -> zqnt.SchedulerResponse
-	32, // 46: zqnt.MissionAutonomyService.GetScheduler:output_type -> zqnt.SchedulerResponse
-	32, // 47: zqnt.MissionAutonomyService.CreateScheduler:output_type -> zqnt.SchedulerResponse
-	32, // 48: zqnt.MissionAutonomyService.UpdateScheduler:output_type -> zqnt.SchedulerResponse
-	32, // 49: zqnt.MissionAutonomyService.DeleteScheduler:output_type -> zqnt.SchedulerResponse
-	32, // 50: zqnt.MissionAutonomyService.CreateSchedulers:output_type -> zqnt.SchedulerResponse
-	32, // 51: zqnt.MissionAutonomyService.DeleteSchedulers:output_type -> zqnt.SchedulerResponse
-	2,  // 52: zqnt.MissionAutonomyService.EvaluateDetection:output_type -> zqnt.DecisionResponse
-	31, // [31:53] is the sub-list for method output_type
-	9,  // [9:31] is the sub-list for method input_type
-	9,  // [9:9] is the sub-list for extension type_name
-	9,  // [9:9] is the sub-list for extension extendee
-	0,  // [0:9] is the sub-list for field type_name
+	7,  // 0: zqnt.EvaluateAutonomyRequest.base:type_name -> zqnt.RequestBase
+	8,  // 1: zqnt.EvaluateAutonomyRequest.mission_context:type_name -> zqnt.MissionProtoDTO
+	9,  // 2: zqnt.EvaluateAutonomyRequest.candidate_tasks:type_name -> zqnt.TaskProtoDTO
+	10, // 3: zqnt.EvaluateAutonomyRequest.trigger:type_name -> zqnt.DecisionTriggerProto
+	11, // 4: zqnt.EvaluateAutonomyRequest.runtime_config:type_name -> zqnt.DynamicConfigProto
+	12, // 5: zqnt.EvaluateAutonomyRequest.runtime_context:type_name -> google.protobuf.Struct
+	7,  // 6: zqnt.EvaluateDetectionRequest.base:type_name -> zqnt.RequestBase
+	8,  // 7: zqnt.EvaluateDetectionRequest.mission_context:type_name -> zqnt.MissionProtoDTO
+	9,  // 8: zqnt.EvaluateDetectionRequest.task_context:type_name -> zqnt.TaskProtoDTO
+	11, // 9: zqnt.EvaluateDetectionRequest.runtime_config:type_name -> zqnt.DynamicConfigProto
+	13, // 10: zqnt.AutonomyEvaluationResultProto.selected_actions:type_name -> zqnt.DecisionActionProto
+	11, // 11: zqnt.AutonomyEvaluationResultProto.resolved_mission_config:type_name -> zqnt.DynamicConfigProto
+	11, // 12: zqnt.AutonomyEvaluationResultProto.resolved_task_config:type_name -> zqnt.DynamicConfigProto
+	14, // 13: zqnt.AutonomyEvaluationResultProto.evaluated_at:type_name -> google.protobuf.Timestamp
+	6,  // 14: zqnt.DecisionResultProto.rejection_reasons:type_name -> zqnt.DecisionResultProto.RejectionReasonsEntry
+	14, // 15: zqnt.DecisionResultProto.decided_at:type_name -> google.protobuf.Timestamp
+	11, // 16: zqnt.DecisionResultProto.resolved_config:type_name -> zqnt.DynamicConfigProto
+	13, // 17: zqnt.DecisionResultProto.selected_actions:type_name -> zqnt.DecisionActionProto
+	14, // 18: zqnt.AutonomyEvaluationResponse.timestamp:type_name -> google.protobuf.Timestamp
+	15, // 19: zqnt.AutonomyEvaluationResponse.error:type_name -> zqnt.GlobalErrorMessage
+	2,  // 20: zqnt.AutonomyEvaluationResponse.evaluation_result:type_name -> zqnt.AutonomyEvaluationResultProto
+	14, // 21: zqnt.DecisionResponse.timestamp:type_name -> google.protobuf.Timestamp
+	15, // 22: zqnt.DecisionResponse.error:type_name -> zqnt.GlobalErrorMessage
+	3,  // 23: zqnt.DecisionResponse.decision_result:type_name -> zqnt.DecisionResultProto
+	16, // 24: zqnt.MissionAutonomyService.GetMission:input_type -> zqnt.GetMissionRequest
+	17, // 25: zqnt.MissionAutonomyService.CreateMission:input_type -> zqnt.CreateMissionRequest
+	18, // 26: zqnt.MissionAutonomyService.UpdateMission:input_type -> zqnt.UpdateMissionRequest
+	19, // 27: zqnt.MissionAutonomyService.DeleteMission:input_type -> zqnt.DeleteMissionRequest
+	20, // 28: zqnt.MissionAutonomyService.UploadMissionNfzZones:input_type -> zqnt.UploadMissionNfzZonesRequest
+	21, // 29: zqnt.MissionAutonomyService.GetTask:input_type -> zqnt.GetTaskRequest
+	22, // 30: zqnt.MissionAutonomyService.GetTaskByFlightId:input_type -> zqnt.GetTaskByFlightIdRequest
+	23, // 31: zqnt.MissionAutonomyService.CreateTask:input_type -> zqnt.CreateTaskRequest
+	24, // 32: zqnt.MissionAutonomyService.UpdateTask:input_type -> zqnt.UpdateTaskRequest
+	25, // 33: zqnt.MissionAutonomyService.DeleteTask:input_type -> zqnt.DeleteTaskRequest
+	26, // 34: zqnt.MissionAutonomyService.ListSchedulers:input_type -> zqnt.ListSchedulersRequest
+	27, // 35: zqnt.MissionAutonomyService.GetScheduler:input_type -> zqnt.GetSchedulerRequest
+	28, // 36: zqnt.MissionAutonomyService.CreateScheduler:input_type -> zqnt.CreateSchedulerRequest
+	29, // 37: zqnt.MissionAutonomyService.UpdateScheduler:input_type -> zqnt.UpdateSchedulerRequest
+	30, // 38: zqnt.MissionAutonomyService.DeleteScheduler:input_type -> zqnt.DeleteSchedulerRequest
+	31, // 39: zqnt.MissionAutonomyService.CreateSchedulers:input_type -> zqnt.CreateSchedulersRequest
+	32, // 40: zqnt.MissionAutonomyService.DeleteSchedulers:input_type -> zqnt.DeleteSchedulersRequest
+	33, // 41: zqnt.MissionAutonomyService.DeleteSchedulersByTask:input_type -> zqnt.DeleteSchedulersByTaskRequest
+	34, // 42: zqnt.MissionAutonomyService.StartTask:input_type -> zqnt.TaskLifecycleRequest
+	34, // 43: zqnt.MissionAutonomyService.StopTask:input_type -> zqnt.TaskLifecycleRequest
+	34, // 44: zqnt.MissionAutonomyService.PauseTask:input_type -> zqnt.TaskLifecycleRequest
+	34, // 45: zqnt.MissionAutonomyService.ResumeTask:input_type -> zqnt.TaskLifecycleRequest
+	0,  // 46: zqnt.MissionAutonomyService.EvaluateAutonomy:input_type -> zqnt.EvaluateAutonomyRequest
+	1,  // 47: zqnt.MissionAutonomyService.EvaluateDetection:input_type -> zqnt.EvaluateDetectionRequest
+	35, // 48: zqnt.MissionAutonomyService.GetMission:output_type -> zqnt.MissionResponse
+	35, // 49: zqnt.MissionAutonomyService.CreateMission:output_type -> zqnt.MissionResponse
+	35, // 50: zqnt.MissionAutonomyService.UpdateMission:output_type -> zqnt.MissionResponse
+	35, // 51: zqnt.MissionAutonomyService.DeleteMission:output_type -> zqnt.MissionResponse
+	35, // 52: zqnt.MissionAutonomyService.UploadMissionNfzZones:output_type -> zqnt.MissionResponse
+	36, // 53: zqnt.MissionAutonomyService.GetTask:output_type -> zqnt.TaskResponse
+	36, // 54: zqnt.MissionAutonomyService.GetTaskByFlightId:output_type -> zqnt.TaskResponse
+	36, // 55: zqnt.MissionAutonomyService.CreateTask:output_type -> zqnt.TaskResponse
+	36, // 56: zqnt.MissionAutonomyService.UpdateTask:output_type -> zqnt.TaskResponse
+	36, // 57: zqnt.MissionAutonomyService.DeleteTask:output_type -> zqnt.TaskResponse
+	37, // 58: zqnt.MissionAutonomyService.ListSchedulers:output_type -> zqnt.SchedulerResponse
+	37, // 59: zqnt.MissionAutonomyService.GetScheduler:output_type -> zqnt.SchedulerResponse
+	37, // 60: zqnt.MissionAutonomyService.CreateScheduler:output_type -> zqnt.SchedulerResponse
+	37, // 61: zqnt.MissionAutonomyService.UpdateScheduler:output_type -> zqnt.SchedulerResponse
+	37, // 62: zqnt.MissionAutonomyService.DeleteScheduler:output_type -> zqnt.SchedulerResponse
+	37, // 63: zqnt.MissionAutonomyService.CreateSchedulers:output_type -> zqnt.SchedulerResponse
+	37, // 64: zqnt.MissionAutonomyService.DeleteSchedulers:output_type -> zqnt.SchedulerResponse
+	37, // 65: zqnt.MissionAutonomyService.DeleteSchedulersByTask:output_type -> zqnt.SchedulerResponse
+	36, // 66: zqnt.MissionAutonomyService.StartTask:output_type -> zqnt.TaskResponse
+	36, // 67: zqnt.MissionAutonomyService.StopTask:output_type -> zqnt.TaskResponse
+	36, // 68: zqnt.MissionAutonomyService.PauseTask:output_type -> zqnt.TaskResponse
+	36, // 69: zqnt.MissionAutonomyService.ResumeTask:output_type -> zqnt.TaskResponse
+	4,  // 70: zqnt.MissionAutonomyService.EvaluateAutonomy:output_type -> zqnt.AutonomyEvaluationResponse
+	5,  // 71: zqnt.MissionAutonomyService.EvaluateDetection:output_type -> zqnt.DecisionResponse
+	48, // [48:72] is the sub-list for method output_type
+	24, // [24:48] is the sub-list for method input_type
+	24, // [24:24] is the sub-list for extension type_name
+	24, // [24:24] is the sub-list for extension extendee
+	0,  // [0:24] is the sub-list for field type_name
 }
 
 func init() { file_mission_autonomy_proto_init() }
@@ -579,7 +986,13 @@ func file_mission_autonomy_proto_init() {
 	}
 	file_mission_autonomy_proto_msgTypes[0].OneofWrappers = []any{}
 	file_mission_autonomy_proto_msgTypes[1].OneofWrappers = []any{}
-	file_mission_autonomy_proto_msgTypes[2].OneofWrappers = []any{
+	file_mission_autonomy_proto_msgTypes[2].OneofWrappers = []any{}
+	file_mission_autonomy_proto_msgTypes[3].OneofWrappers = []any{}
+	file_mission_autonomy_proto_msgTypes[4].OneofWrappers = []any{
+		(*AutonomyEvaluationResponse_Error)(nil),
+		(*AutonomyEvaluationResponse_EvaluationResult)(nil),
+	}
+	file_mission_autonomy_proto_msgTypes[5].OneofWrappers = []any{
 		(*DecisionResponse_Error)(nil),
 		(*DecisionResponse_DecisionResult)(nil),
 	}
@@ -589,7 +1002,7 @@ func file_mission_autonomy_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_mission_autonomy_proto_rawDesc), len(file_mission_autonomy_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
