@@ -21,18 +21,21 @@ package discovery
 import "fmt"
 
 const (
-	edgeEndpointKeyPrefix = "zqnt:edge-endpoints:" // + {vendor}
-	edgeVendorKeyPrefix   = "zqnt:edge-vendor:"    // + {sn}
+	edgeEndpointKeyPrefix = "edge-endpoints:" // + {vendor}
+	edgeVendorKeyPrefix   = "edge-vendor:"    // + {sn}
 )
 
 // endpointKey returns the Redis key holding the EdgeEndpoint JSON blob for a vendor.
-// Mirrors CacheKeys.EDGE_ENDPOINTS ("zqnt:edge-endpoints:{vendor}").
+// Mirrors CacheKeys.EDGE_ENDPOINTS ("edge-endpoints:{vendor}") -- no "zqnt:" prefix; that was
+// wrong here (fixed alongside this comment) and never matched the real Java-side key CacheKeys
+// actually produces.
 func endpointKey(vendor string) string {
 	return fmt.Sprintf("%s%s", edgeEndpointKeyPrefix, vendor)
 }
 
 // vendorKey returns the Redis key mapping one SN to its vendor.
-// Mirrors CacheKeys.EDGE_VENDOR ("zqnt:edge-vendor:{sn}").
+// Mirrors CacheKeys.EDGE_VENDOR ("edge-vendor:{sn}") -- no "zqnt:" prefix, same correction as
+// endpointKey above.
 func vendorKey(sn string) string {
 	return fmt.Sprintf("%s%s", edgeVendorKeyPrefix, sn)
 }
