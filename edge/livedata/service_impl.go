@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/Zequent/zqnt-edge-sdk-go/adapter/domains"
-	proto "github.com/Zequent/zqnt-edge-sdk-go/gen/proto"
+	livedatapb "github.com/zequent/zqnt-utils-golang/gen/livedata/proto"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -23,7 +23,7 @@ const (
 
 // streamEntry holds a single active client-streaming connection.
 type streamEntry struct {
-	stream proto.LiveDataService_ProduceTelemetryClient
+	stream livedatapb.LiveDataService_ProduceTelemetryClient
 	cancel context.CancelFunc
 }
 
@@ -31,7 +31,7 @@ type streamEntry struct {
 // It maintains one persistent bidirectional stream per device SN and
 // reconnects automatically on transient failures.
 type ServiceImpl struct {
-	stub         proto.LiveDataServiceClient
+	stub         livedatapb.LiveDataServiceClient
 	mapper       *Mapper
 	log          *slog.Logger
 	mu           sync.RWMutex
@@ -41,7 +41,7 @@ type ServiceImpl struct {
 }
 
 // NewServiceImpl creates a new LiveDataService implementation.
-func NewServiceImpl(stub proto.LiveDataServiceClient, log *slog.Logger) *ServiceImpl {
+func NewServiceImpl(stub livedatapb.LiveDataServiceClient, log *slog.Logger) *ServiceImpl {
 	return &ServiceImpl{
 		stub:     stub,
 		mapper:   &Mapper{},
@@ -59,7 +59,7 @@ func (s *ServiceImpl) ProduceTelemetryData(ctx context.Context, data *domains.Te
 	return s.ProduceTelemetry(ctx, data.SN, req)
 }
 
-func (s *ServiceImpl) ProduceTelemetry(ctx context.Context, deviceSN string, req *proto.ProduceTelemetryRequest) error {
+func (s *ServiceImpl) ProduceTelemetry(ctx context.Context, deviceSN string, req *livedatapb.ProduceTelemetryRequest) error {
 	if s.shuttingDown.Load() {
 		s.log.Warn("cannot produce telemetry: service is shutting down", "sn", deviceSN)
 		return nil
@@ -73,6 +73,7 @@ func (s *ServiceImpl) ProduceTelemetry(ctx context.Context, deviceSN string, req
 	if sendErr := entry.stream.Send(req); sendErr != nil {
 		s.log.Error("error sending telemetry", "sn", deviceSN, "error", sendErr)
 		s.removeStream(deviceSN)
+		go s.handleStreamFailure(deviceSN, entry.stream)
 		return sendErr
 	}
 	return nil
@@ -161,22 +162,28 @@ func (s *ServiceImpl) createStream(ctx context.Context, deviceSN string) (*strea
 	s.attempts[deviceSN] = 0
 	s.mu.Unlock()
 
-	// Monitor the stream in the background for server-side errors.
-	go s.monitorStream(ctx, deviceSN, entry, stream)
-
 	return entry, nil
 }
 
-func (s *ServiceImpl) monitorStream(_ context.Context, deviceSN string, entry *streamEntry, stream proto.LiveDataService_ProduceTelemetryClient) {
+// handleStreamFailure runs after a Send on this device's stream has already failed (see
+// ProduceTelemetry) -- it retrieves the RPC's real terminal error via CloseAndRecv and, if the
+// failure looks transient, schedules a reconnect.
+//
+// This must never run before a Send failure: for a client-streaming RPC, CloseAndRecv is how the
+// client signals "I'm done sending" -- calling it eagerly (as this code used to, from a
+// background goroutine started the moment the stream opened) half-closes the stream's send side
+// immediately, racing the caller's very first Send. That raced every telemetry tick into
+// recreating the stream from scratch instead of reusing the persistent one this cache exists for
+// -- found live-verifying the v1.3.0-compat simulator's telemetry publishing, which never
+// actually got a sample through before this fix.
+func (s *ServiceImpl) handleStreamFailure(deviceSN string, stream livedatapb.LiveDataService_ProduceTelemetryClient) {
 	_, err := stream.CloseAndRecv()
 	if err == nil {
 		s.log.Info("telemetry stream completed normally", "sn", deviceSN)
-		s.removeStream(deviceSN)
 		return
 	}
 
 	s.log.Error("telemetry stream error", "sn", deviceSN, "error", err)
-	s.removeStream(deviceSN)
 
 	if s.shuttingDown.Load() || !s.shouldReconnect(err) {
 		return

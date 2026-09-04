@@ -9,24 +9,20 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
+      # No submodules in this repo anymore (removed in the Sept 2 migration) and self-checkout
+      # doesn't need GH_PAT -- the default GITHUB_TOKEN handles that. GH_PAT is only genuinely
+      # needed below, to fetch the private zqnt-utils-golang module during go build.
       - uses: actions/checkout@v4
-        with:
-          submodules: true
-          token: ${{ secrets.GH_PAT }}
 
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
           cache: false
 
-      - name: Install protoc tools
+      - name: Configure private module access
         run: |
-          go install github.com/bufbuild/buf/cmd/buf@latest
-          go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-
-      - name: Generate protos
-        run: make proto
+          go env -w GOPRIVATE="github.com/Zequent/*,github.com/zequent/*"
+          git config --global url."https://x-access-token:${{ secrets.GH_PAT }}@github.com/".insteadOf "https://github.com/"
 
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v6
@@ -39,22 +35,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: true
-          token: ${{ secrets.GH_PAT }}
 
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
 
-      - name: Install protoc tools
+      - name: Configure private module access
         run: |
-          go install github.com/bufbuild/buf/cmd/buf@latest
-          go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-
-      - name: Generate protos
-        run: make proto
+          go env -w GOPRIVATE="github.com/Zequent/*,github.com/zequent/*"
+          git config --global url."https://x-access-token:${{ secrets.GH_PAT }}@github.com/".insteadOf "https://github.com/"
 
       - name: Build
         run: go build ./...
@@ -64,3 +53,40 @@ jobs:
 
       - name: Vet
         run: go vet ./...
+
+  # Tags and pre-releases every PR build so it's individually go get-able for review/testing --
+  # deliberately NOT a "v*"-shaped tag: the release workflow triggers on tags: ["v*"], and this
+  # must never accidentally fire that (a real production release is only ever an intentional
+  # `git tag vX.Y.Z && git push` by a maintainer). `go get .../zqnt-edge-sdk-go@pr-<n>-<sha>` still
+  # resolves fine -- Go accepts any git ref as a version query, converting non-semver tags to a
+  # pseudo-version automatically. Uses the built-in GITHUB_TOKEN, not GH_PAT: pushing a tag/
+  # creating a release needs repo write access, not private-module read access.
+  pr-preview:
+    name: Tag PR preview build
+    needs: [lint, build-and-test]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compute preview tag
+        id: tag
+        run: |
+          SHORT_SHA=$(git rev-parse --short=7 HEAD)
+          echo "tag=pr-${{ github.event.pull_request.number }}-${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+
+      - name: Create and push preview tag
+        run: |
+          git tag "${{ steps.tag.outputs.tag }}"
+          git push origin "${{ steps.tag.outputs.tag }}"
+
+      - name: Create GitHub pre-release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: "PR #${{ github.event.pull_request.number }} preview (${{ steps.tag.outputs.tag }})"
+          prerelease: true
+          generate_release_notes: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

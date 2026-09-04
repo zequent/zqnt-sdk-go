@@ -1,47 +1,46 @@
 // Package adaptergrpc provides the gRPC server implementation that bridges
 // incoming EdgeAdapterService RPC calls to the user-provided EdgeAdapter interface.
-//
-// This package requires proto code generation. Run `make proto` before building.
 package adaptergrpc
 
 import (
 	"github.com/Zequent/zqnt-edge-sdk-go/adapter/domains"
-	proto "github.com/Zequent/zqnt-edge-sdk-go/gen/proto"
+	detectionpb "github.com/zequent/zqnt-utils-golang/gen/common/detection/proto"
+	devicecontrolpb "github.com/zequent/zqnt-utils-golang/gen/devicecontrol/contracts/proto"
 )
 
 // Mapper converts between proto request/response messages and domain structs.
 type Mapper struct{}
 
-func (m *Mapper) MapCoordinates(p *proto.Coordinates) domains.Coordinates {
+func (m *Mapper) MapCoordinates(p *devicecontrolpb.GeoCoordinate) domains.Coordinates {
 	if p == nil {
 		return domains.Coordinates{}
 	}
 	return domains.Coordinates{Lat: p.Latitude, Lon: p.Longitude, Alt: p.Altitude}
 }
 
-func (m *Mapper) MapTakeOffRequest(r *proto.EdgeTakeOffRequest) *domains.TakeOffRequest {
+func (m *Mapper) MapTakeOffRequest(r *devicecontrolpb.CoordinateCommandRequest) *domains.TakeOffRequest {
 	if r == nil {
 		return nil
 	}
 	return &domains.TakeOffRequest{
 		SN:          r.Base.GetSn(),
 		TID:         r.Base.GetTid(),
-		Coordinates: m.MapCoordinates(r.Request),
+		Coordinates: m.MapCoordinates(r.Coordinate),
 	}
 }
 
-func (m *Mapper) MapGoToRequest(r *proto.EdgeGoToRequest) *domains.GoToRequest {
+func (m *Mapper) MapGoToRequest(r *devicecontrolpb.CoordinateCommandRequest) *domains.GoToRequest {
 	if r == nil {
 		return nil
 	}
 	return &domains.GoToRequest{
 		SN:          r.Base.GetSn(),
 		TID:         r.Base.GetTid(),
-		Coordinates: m.MapCoordinates(r.Request),
+		Coordinates: m.MapCoordinates(r.Coordinate),
 	}
 }
 
-func (m *Mapper) MapReturnToHomeRequest(r *proto.EdgeReturnToHomeRequest) *domains.ReturnToHomeRequest {
+func (m *Mapper) MapReturnToHomeRequest(r *devicecontrolpb.ReturnToHomeCommandRequest) *domains.ReturnToHomeRequest {
 	if r == nil {
 		return nil
 	}
@@ -56,7 +55,7 @@ func (m *Mapper) MapReturnToHomeRequest(r *proto.EdgeReturnToHomeRequest) *domai
 	return req
 }
 
-func (m *Mapper) MapLookAtRequest(r *proto.EdgeLookAtRequest) *domains.LookAtRequest {
+func (m *Mapper) MapLookAtRequest(r *devicecontrolpb.LookAtCommandRequest) *domains.LookAtRequest {
 	if r == nil {
 		return nil
 	}
@@ -64,10 +63,10 @@ func (m *Mapper) MapLookAtRequest(r *proto.EdgeLookAtRequest) *domains.LookAtReq
 		SN:  r.Base.GetSn(),
 		TID: r.Base.GetTid(),
 	}
-	if r.Request != nil {
-		req.Lat = r.Request.Latitude
-		req.Lon = r.Request.Longitude
-		req.Alt = float32(r.Request.Altitude)
+	if r.Coordinate != nil {
+		req.Lat = r.Coordinate.Latitude
+		req.Lon = r.Coordinate.Longitude
+		req.Alt = float32(r.Coordinate.Altitude)
 	}
 	if r.PayloadIndex != nil {
 		v := r.GetPayloadIndex()
@@ -80,7 +79,7 @@ func (m *Mapper) MapLookAtRequest(r *proto.EdgeLookAtRequest) *domains.LookAtReq
 	return req
 }
 
-func (m *Mapper) MapTakePhotoRequest(r *proto.EdgeTakePhotoRequest) *domains.TakePhotoRequest {
+func (m *Mapper) MapTakePhotoRequest(r *devicecontrolpb.EmptyCommandRequest) *domains.TakePhotoRequest {
 	if r == nil {
 		return nil
 	}
@@ -90,7 +89,7 @@ func (m *Mapper) MapTakePhotoRequest(r *proto.EdgeTakePhotoRequest) *domains.Tak
 	}
 }
 
-func (m *Mapper) MapManualControlInput(r *proto.EdgeManualControlInputRequest) *domains.ManualControlInput {
+func (m *Mapper) MapManualControlInput(r *devicecontrolpb.ManualControlInputCommandRequest) *domains.ManualControlInput {
 	if r == nil {
 		return nil
 	}
@@ -120,7 +119,7 @@ func (m *Mapper) MapManualControlInput(r *proto.EdgeManualControlInputRequest) *
 	return input
 }
 
-func (m *Mapper) MapChangeLensRequest(r *proto.EdgeChangeCameraLensRequest) *domains.ChangeLensRequest {
+func (m *Mapper) MapChangeLensRequest(r *devicecontrolpb.ChangeCameraLensCommandRequest) *domains.ChangeLensRequest {
 	if r == nil {
 		return nil
 	}
@@ -135,7 +134,7 @@ func (m *Mapper) MapChangeLensRequest(r *proto.EdgeChangeCameraLensRequest) *dom
 	return req
 }
 
-func (m *Mapper) MapChangeZoomRequest(r *proto.EdgeChangeCameraZoomRequest) *domains.ChangeZoomRequest {
+func (m *Mapper) MapChangeZoomRequest(r *devicecontrolpb.ChangeCameraZoomCommandRequest) *domains.ChangeZoomRequest {
 	if r == nil {
 		return nil
 	}
@@ -156,7 +155,7 @@ func (m *Mapper) MapChangeZoomRequest(r *proto.EdgeChangeCameraZoomRequest) *dom
 	return req
 }
 
-func (m *Mapper) MapStartLiveStreamRequest(r *proto.EdgeStartLiveStreamRequest) *domains.LiveStreamStartRequest {
+func (m *Mapper) MapStartLiveStreamRequest(r *devicecontrolpb.LiveStreamStartCommandRequest) *domains.LiveStreamStartRequest {
 	if r == nil {
 		return nil
 	}
@@ -172,7 +171,7 @@ func (m *Mapper) MapStartLiveStreamRequest(r *proto.EdgeStartLiveStreamRequest) 
 	return req
 }
 
-func (m *Mapper) MapStopLiveStreamRequest(r *proto.EdgeStopLiveStreamRequest) *domains.LiveStreamStopRequest {
+func (m *Mapper) MapStopLiveStreamRequest(r *devicecontrolpb.LiveStreamStopCommandRequest) *domains.LiveStreamStopRequest {
 	if r == nil {
 		return nil
 	}
@@ -186,7 +185,26 @@ func (m *Mapper) MapStopLiveStreamRequest(r *proto.EdgeStopLiveStreamRequest) *d
 	return req
 }
 
-func (m *Mapper) MapGetDetectionsRequest(r *proto.EdgeGetDetectionsRequest) *domains.GetDetectionsRequest {
+func (m *Mapper) MapCustomCommandRequest(r *devicecontrolpb.CustomCommandRequest) *domains.CustomCommandRequest {
+	if r == nil {
+		return nil
+	}
+	req := &domains.CustomCommandRequest{
+		SN:        r.Base.GetSn(),
+		TID:       r.Base.GetTid(),
+		CommandID: r.CommandId,
+	}
+	if r.Target != nil && r.Target.TargetRef != nil {
+		v := r.Target.GetTargetRef()
+		req.TargetRef = &v
+	}
+	if r.Params != nil {
+		req.Params = r.Params.AsMap()
+	}
+	return req
+}
+
+func (m *Mapper) MapGetDetectionsRequest(r *detectionpb.DetectionStreamRequest) *domains.GetDetectionsRequest {
 	if r == nil {
 		return nil
 	}

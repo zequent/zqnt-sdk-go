@@ -1,5 +1,11 @@
 // Package connector provides the ConnectorService interface and its gRPC-backed
-// implementation for managing assets, missions, tasks, schedulers, and organizations.
+// implementation for managing assets and organizations.
+//
+// Mission/Task/Scheduler CRUD was removed from this interface 2026-09-02: the platform's
+// Skill/Application migration deleted the corresponding RPCs from connector.proto entirely (the
+// backend no longer has Mission/Task/Scheduler CRUD at all -- that model was replaced by
+// MissionAutonomyService's Application/Skill-execution API). See missionautonomy/ for the current
+// equivalent.
 package connector
 
 import (
@@ -18,25 +24,6 @@ type ConnectorService interface {
 	UpdateAsset(ctx context.Context, id string, asset *domains.AssetDTO) (*domains.AssetDTO, error)
 	RegisterAsset(ctx context.Context, asset *domains.AssetDTO) (*domains.AssetDTO, error)
 	DeRegisterAsset(ctx context.Context, id string) (bool, error)
-
-	// Mission operations
-	GetMissionByID(ctx context.Context, id string) (*domains.MissionDTO, error)
-	CreateMission(ctx context.Context, mission *domains.MissionDTO) (*domains.MissionDTO, error)
-	UpdateMission(ctx context.Context, id string, mission *domains.MissionDTO) (*domains.MissionDTO, error)
-	DeleteMission(ctx context.Context, id string) (bool, error)
-
-	// Task operations
-	GetTaskByID(ctx context.Context, id string) (*domains.TaskDTO, error)
-	GetTaskByFlightID(ctx context.Context, flightID string) (*domains.TaskDTO, error)
-	CreateTask(ctx context.Context, task *domains.TaskDTO) (*domains.TaskDTO, error)
-	UpdateTask(ctx context.Context, id string, task *domains.TaskDTO) (*domains.TaskDTO, error)
-	DeleteTask(ctx context.Context, id string) (bool, error)
-
-	// Scheduler operations
-	GetSchedulerByID(ctx context.Context, id string) (*domains.SchedulerDTO, error)
-	CreateScheduler(ctx context.Context, s *domains.SchedulerDTO) (*domains.SchedulerDTO, error)
-	UpdateScheduler(ctx context.Context, id string, s *domains.SchedulerDTO) (*domains.SchedulerDTO, error)
-	DeleteScheduler(ctx context.Context, id string) (bool, error)
 
 	// Organization operations
 	GetOrganizationByID(ctx context.Context, id string) (*domains.OrganizationDTO, error)

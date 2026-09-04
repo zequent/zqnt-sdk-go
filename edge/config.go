@@ -18,6 +18,18 @@ type config struct {
 	assetVendor string
 	assetID     string
 	logger      *slog.Logger
+
+	// connectorAddr/liveDataAddr/missionAutonomyAddr override endpoint for that one backend
+	// service's own connection. Empty means "dial endpoint" (the original single-address
+	// behavior, correct only when something in front of endpoint actually multiplexes all three
+	// services -- connector, live-data and mission-autonomy are three independent Quarkus
+	// services on three independent ports in every real deployment topology this monorepo has
+	// (see core/docker-compose.local.yml's *_SERVICE_HOST/*_SERVICE_PORT env vars, and every
+	// existing adapter's application.properties), so a real integrator almost always needs these
+	// three set explicitly via WithConnectorAddr/WithLiveDataAddr/WithMissionAutonomyAddr.
+	connectorAddr       string
+	liveDataAddr        string
+	missionAutonomyAddr string
 }
 
 func defaultConfig(endpoint, sn string) *config {
