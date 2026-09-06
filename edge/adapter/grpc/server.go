@@ -417,14 +417,22 @@ func (s *Server) GetCapabilities(ctx context.Context, req *devicecontrolpb.Asset
 		if c.Available {
 			state = devicecontrolpb.CapabilityState_CAPABILITY_STATE_AVAILABLE
 		}
-		protoCaps = append(protoCaps, &devicecontrolpb.Capability{
+		protoCap := &devicecontrolpb.Capability{
 			CommandId:         c.Command,
 			DisplayName:       c.Command,
 			Description:       &c.Description,
 			UnavailableReason: c.UnavailableReason,
 			Metadata:          c.Metadata,
 			State:             state,
-		})
+			Target: &devicecontrolpb.CapabilityTarget{
+				Type:      capabilityTargetTypeToProto(c.TargetType),
+				TargetRef: c.TargetRef,
+			},
+		}
+		if c.SchemaVersion != "" {
+			protoCap.SchemaVersion = &c.SchemaVersion
+		}
+		protoCaps = append(protoCaps, protoCap)
 	}
 
 	return &devicecontrolpb.AssetCapabilitiesResponse{
@@ -435,6 +443,25 @@ func (s *Server) GetCapabilities(ctx context.Context, req *devicecontrolpb.Asset
 			Timestamp:    protohelpers.Now(),
 		},
 	}, nil
+}
+
+// capabilityTargetTypeToProto maps domains.CapabilityTargetType to its wire enum -- a plain
+// 1:1 correspondence (both are defined in terms of the same device-control-contracts.proto
+// enum), kept as an explicit switch rather than a numeric cast so a future addition to either
+// enum fails to compile here instead of silently mismapping.
+func capabilityTargetTypeToProto(t domains.CapabilityTargetType) devicecontrolpb.CapabilityTargetType {
+	switch t {
+	case domains.CapabilityTargetAsset:
+		return devicecontrolpb.CapabilityTargetType_CAPABILITY_TARGET_TYPE_ASSET
+	case domains.CapabilityTargetSubAsset:
+		return devicecontrolpb.CapabilityTargetType_CAPABILITY_TARGET_TYPE_SUB_ASSET
+	case domains.CapabilityTargetPayload:
+		return devicecontrolpb.CapabilityTargetType_CAPABILITY_TARGET_TYPE_PAYLOAD
+	case domains.CapabilityTargetComponent:
+		return devicecontrolpb.CapabilityTargetType_CAPABILITY_TARGET_TYPE_COMPONENT
+	default:
+		return devicecontrolpb.CapabilityTargetType_CAPABILITY_TARGET_TYPE_UNSPECIFIED
+	}
 }
 
 func (s *Server) PrepareTask(ctx context.Context, req *devicecontrolpb.TaskCommandRequest) (*devicecontrolpb.CommandResponse, error) {
