@@ -95,6 +95,13 @@ the wire message a pre-2.0.0 adapter did. They are worth setting: admin-console'
 Registry, and derives a console form's `ui:schema` from `InputSchema`, so a command advertised
 without one can only be called by guessing its params.
 
+**Redis discovery keys carry the `zqnt:` prefix again** (`discovery`): `CacheKeys` has it on the
+2.0.0 line and didn't on 1.3.x, where this package correctly dropped it. The keys must match the
+platform line being deployed against exactly — with the wrong ones an adapter registers with
+Connector and streams telemetry perfectly happily while every command comes back
+`Asset not connected: <sn>`, because `GrpcEndpointRouter`'s sn → vendor → endpoint lookup reads
+keys nothing wrote to. Verified against a running 2.0.0 stack.
+
 **Task-lifecycle commands carry the asset sn** (`StartTask`/`StopTask`/`PrepareTask`/
 `PauseTask`/`ResumeTask` — breaking): one adapter process serves a whole vendor's fleet behind one
 endpoint, so without the sn a multi-device adapter can't tell which device a `StopTask` is for.
