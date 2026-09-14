@@ -4,11 +4,11 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/Zequent/zqnt-edge-sdk-go/adapter/domains"
-	"github.com/Zequent/zqnt-edge-sdk-go/internal/protohelpers"
-	"github.com/Zequent/zqnt-edge-sdk-go/internal/retry"
-	commonpb "github.com/zequent/zqnt-utils-golang/gen/common/proto"
-	connectorpb "github.com/zequent/zqnt-utils-golang/gen/connector/proto"
+	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter/domains"
+	"github.com/Zequent/zqnt-edge-sdk-go/v2/internal/protohelpers"
+	"github.com/Zequent/zqnt-edge-sdk-go/v2/internal/retry"
+	commonpb "github.com/zequent/zqnt-utils-golang/v2/gen/common/proto"
+	connectorpb "github.com/zequent/zqnt-utils-golang/v2/gen/connector/proto"
 )
 
 // ServiceImpl is the gRPC-backed ConnectorService implementation.

@@ -8,8 +8,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/Zequent/zqnt-edge-sdk-go/adapter/domains"
-	livedatapb "github.com/zequent/zqnt-utils-golang/gen/livedata/proto"
+	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter/domains"
+	livedatapb "github.com/zequent/zqnt-utils-golang/v2/gen/livedata/proto"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

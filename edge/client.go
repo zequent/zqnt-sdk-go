@@ -5,18 +5,18 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/Zequent/zqnt-edge-sdk-go/adapter"
-	adaptergrpc "github.com/Zequent/zqnt-edge-sdk-go/adapter/grpc"
-	"github.com/Zequent/zqnt-edge-sdk-go/connector"
-	"github.com/Zequent/zqnt-edge-sdk-go/livedata"
-	"github.com/Zequent/zqnt-edge-sdk-go/missionautonomy"
+	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter"
+	adaptergrpc "github.com/Zequent/zqnt-edge-sdk-go/v2/adapter/grpc"
+	"github.com/Zequent/zqnt-edge-sdk-go/v2/connector"
+	"github.com/Zequent/zqnt-edge-sdk-go/v2/livedata"
+	"github.com/Zequent/zqnt-edge-sdk-go/v2/missionautonomy"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	connectorpb "github.com/zequent/zqnt-utils-golang/gen/connector/proto"
-	livedatapb "github.com/zequent/zqnt-utils-golang/gen/livedata/proto"
-	missionautonomypb "github.com/zequent/zqnt-utils-golang/gen/missionautonomy/proto"
+	connectorpb "github.com/zequent/zqnt-utils-golang/v2/gen/connector/proto"
+	livedatapb "github.com/zequent/zqnt-utils-golang/v2/gen/livedata/proto"
+	missionautonomypb "github.com/zequent/zqnt-utils-golang/v2/gen/missionautonomy/proto"
 )
 
 // EdgeClient is the main entry point of the edge-go-sdk.

@@ -1,11 +1,11 @@
-module github.com/Zequent/zqnt-edge-sdk-go
+module github.com/Zequent/zqnt-edge-sdk-go/v2
 
 go 1.24.0
 
 require (
 	github.com/google/uuid v1.6.0
 	github.com/redis/go-redis/v9 v9.22.0
-	github.com/zequent/zqnt-utils-golang v1.3.0
+	github.com/zequent/zqnt-utils-golang/v2 v2.0.0
 	google.golang.org/grpc v1.78.0
 	google.golang.org/protobuf v1.36.11
 )
@@ -18,3 +18,7 @@ require (
 	golang.org/x/text v0.31.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251029180050-ab9386a59fda // indirect
 )
+
+// Local development against the sibling monorepo checkout until zqnt-utils-golang v2.0.0 is
+// tagged and pushed -- drop this line once it is (see README, "Local development").
+replace github.com/zequent/zqnt-utils-golang/v2 => ../../../utils/zqnt-utils-golang

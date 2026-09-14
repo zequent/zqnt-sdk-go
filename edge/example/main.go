@@ -17,9 +17,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	edgesdk "github.com/Zequent/zqnt-edge-sdk-go"
-	"github.com/Zequent/zqnt-edge-sdk-go/adapter"
-	"github.com/Zequent/zqnt-edge-sdk-go/adapter/domains"
+	edgesdk "github.com/Zequent/zqnt-edge-sdk-go/v2"
+	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter"
+	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter/domains"
 )
 
 // MyDroneAdapter is a minimal EdgeAdapter implementation.
