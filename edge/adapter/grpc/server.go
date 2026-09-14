@@ -557,7 +557,7 @@ func capabilityTargetTypeToProto(t domains.CapabilityTargetType) devicecontrolpb
 
 func (s *Server) PrepareTask(ctx context.Context, req *devicecontrolpb.TaskCommandRequest) (*devicecontrolpb.CommandResponse, error) {
 	s.log.Info("PrepareTask", "sn", req.Base.GetSn(), "taskId", req.TaskId)
-	result, err := s.adapter.PrepareTask(ctx, req.TaskId, req.Base.GetTid())
+	result, err := s.adapter.PrepareTask(ctx, req.Base.GetSn(), req.TaskId, req.Base.GetTid())
 	if err != nil {
 		return s.toErrorResponse(req.Base, err), nil
 	}
@@ -566,7 +566,7 @@ func (s *Server) PrepareTask(ctx context.Context, req *devicecontrolpb.TaskComma
 
 func (s *Server) StartTask(ctx context.Context, req *devicecontrolpb.TaskCommandRequest) (*devicecontrolpb.CommandResponse, error) {
 	s.log.Info("StartTask", "sn", req.Base.GetSn(), "taskId", req.TaskId)
-	result, err := s.adapter.StartTask(ctx, req.TaskId, req.Base.GetTid())
+	result, err := s.adapter.StartTask(ctx, req.Base.GetSn(), req.TaskId, req.Base.GetTid())
 	if err != nil {
 		return s.toErrorResponse(req.Base, err), nil
 	}
@@ -575,7 +575,7 @@ func (s *Server) StartTask(ctx context.Context, req *devicecontrolpb.TaskCommand
 
 func (s *Server) StopTask(ctx context.Context, req *devicecontrolpb.TaskCommandRequest) (*devicecontrolpb.CommandResponse, error) {
 	s.log.Warn("StopTask", "sn", req.Base.GetSn(), "taskId", req.TaskId)
-	result, err := s.adapter.StopTask(ctx, req.TaskId)
+	result, err := s.adapter.StopTask(ctx, req.Base.GetSn(), req.TaskId, req.Base.GetTid())
 	if err != nil {
 		return s.toErrorResponse(req.Base, err), nil
 	}
@@ -584,7 +584,7 @@ func (s *Server) StopTask(ctx context.Context, req *devicecontrolpb.TaskCommandR
 
 func (s *Server) PauseTask(ctx context.Context, req *devicecontrolpb.TaskCommandRequest) (*devicecontrolpb.CommandResponse, error) {
 	s.log.Info("PauseTask", "sn", req.Base.GetSn(), "taskId", req.TaskId)
-	result, err := s.adapter.PauseTask(ctx, req.TaskId, req.Base.GetTid())
+	result, err := s.adapter.PauseTask(ctx, req.Base.GetSn(), req.TaskId, req.Base.GetTid())
 	if err != nil {
 		return s.toErrorResponse(req.Base, err), nil
 	}
@@ -593,7 +593,7 @@ func (s *Server) PauseTask(ctx context.Context, req *devicecontrolpb.TaskCommand
 
 func (s *Server) ResumeTask(ctx context.Context, req *devicecontrolpb.TaskCommandRequest) (*devicecontrolpb.CommandResponse, error) {
 	s.log.Info("ResumeTask", "sn", req.Base.GetSn(), "taskId", req.TaskId)
-	result, err := s.adapter.ResumeTask(ctx, req.TaskId, req.Base.GetTid())
+	result, err := s.adapter.ResumeTask(ctx, req.Base.GetSn(), req.TaskId, req.Base.GetTid())
 	if err != nil {
 		return s.toErrorResponse(req.Base, err), nil
 	}

@@ -95,6 +95,13 @@ the wire message a pre-2.0.0 adapter did. They are worth setting: admin-console'
 Registry, and derives a console form's `ui:schema` from `InputSchema`, so a command advertised
 without one can only be called by guessing its params.
 
+**Task-lifecycle commands carry the asset sn** (`StartTask`/`StopTask`/`PrepareTask`/
+`PauseTask`/`ResumeTask` — breaking): one adapter process serves a whole vendor's fleet behind one
+endpoint, so without the sn a multi-device adapter can't tell which device a `StopTask` is for.
+`TaskCommandRequest.base.sn` always carried it; it just wasn't passed through. `StopTask` is the
+one that matters on this contract — `EdgeExecutionNodeDispatcher#cancel` uses it to physically
+cancel a running command.
+
 **Not implemented here**: `StartRecording`/`StopRecording`/`RegisterAsset`/`DeregisterAsset` have
 wire RPCs but no `adapter.EdgeAdapter` method, so they inherit a clean `codes.Unimplemented` —
 the SDK's standing convention ("only the commands a device supports need to be overridden").
