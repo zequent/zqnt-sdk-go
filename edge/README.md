@@ -127,25 +127,22 @@ way any other adapter built on this SDK would.
 
 ### Local development
 
-`go.mod` names the real `v2.0.0` release, so a clone resolves the published module and the Docker
-build and CI work unchanged. To develop against the sibling `zqnt-utils-golang` checkout instead,
-use a Go workspace rather than editing `go.mod` — a `go.work` here is git-ignored:
+`go.mod` names the real `v2.0.0` release of `zqnt-utils-golang`, so a clone and CI resolve the
+published module. To build against the sibling monorepo checkout instead, use a **Go workspace** —
+never a committed `replace`, which would break every consumer outside a full `zqnt-platform` tree:
 
-```
-go 1.24.0
-
-use (
-	.
-	../../../utils/zqnt-utils-golang
-)
-
-// `use` alone isn't enough while v2.0.0 is unpublished — go.mod requires that version, so pin it:
-replace github.com/zequent/zqnt-utils-golang/v2 v2.0.0 => ../../../utils/zqnt-utils-golang
+```bash
+cp go.work.example go.work   # git-ignored, along with go.work.sum
 ```
 
-`GOWORK=off` builds exactly as CI does.
+The `replace` line in it is required, not decorative: `use` alone still lets the build try to
+resolve the `v2.0.0` that `go.mod` requires, and that tag doesn't exist yet. It has to name that
+exact version — an unversioned replace is rejected for a module already listed in `use`. Keep the
+file free of comments: GoLand derives the module name from it and will build a package path out of
+a leading comment block, failing with `malformed import path … invalid char ':'`.
 
----
+`GOWORK=off` builds exactly as CI does. Delete `go.work` once the tag is published.
+
 
 ## How It Works
 
