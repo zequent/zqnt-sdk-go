@@ -127,22 +127,21 @@ way any other adapter built on this SDK would.
 
 ### Local development
 
-`go.mod` names the real `v2.0.0` release of `zqnt-utils-golang`, so a clone and CI resolve the
-published module. To build against the sibling monorepo checkout instead, use a **Go workspace** —
-never a committed `replace`, which would break every consumer outside a full `zqnt-platform` tree:
+`go.mod` points at a published version of `zqnt-utils-golang/v2`, so a clone and CI resolve it
+without any local setup. While the v2 line is still in review that's the PR preview build
+(`pr-<n>-<sha>`, resolved as a pseudo-version); it becomes `v2.0.0` when that release is cut.
+
+To build against the sibling monorepo checkout instead, use a **Go workspace** — never a committed
+`replace`, which would break every consumer outside a full `zqnt-platform` tree:
 
 ```bash
 cp go.work.example go.work   # git-ignored, along with go.work.sum
 ```
 
-The `replace` line in it is required, not decorative: `use` alone still lets the build try to
-resolve the `v2.0.0` that `go.mod` requires, and that tag doesn't exist yet. It has to name that
-exact version — an unversioned replace is rejected for a module already listed in `use`. Keep the
-file free of comments: GoLand derives the module name from it and will build a package path out of
-a leading comment block, failing with `malformed import path … invalid char ':'`.
+Keep that file free of comments: GoLand derives the module name from it and will build a package
+path out of a leading comment block, failing with `malformed import path … invalid char ':'`.
 
-`GOWORK=off` builds exactly as CI does. Delete `go.work` once the tag is published.
-
+`GOWORK=off` builds exactly as CI does. Delete `go.work` when you're done.
 
 ## How It Works
 

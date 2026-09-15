@@ -4,5 +4,3 @@ use (
 	.
 	../../../utils/zqnt-utils-golang
 )
-
-replace github.com/zequent/zqnt-utils-golang/v2 v2.0.0 => ../../../utils/zqnt-utils-golang
