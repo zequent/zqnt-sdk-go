@@ -127,9 +127,23 @@ way any other adapter built on this SDK would.
 
 ### Local development
 
-`go.mod` carries a `replace` pointing `zqnt-utils-golang/v2` at the sibling monorepo checkout while
-the two move together. Drop it once the dependency's own tag is published, so a consumer resolves
-the real module.
+`go.mod` names the real `v2.0.0` release, so a clone resolves the published module and the Docker
+build and CI work unchanged. To develop against the sibling `zqnt-utils-golang` checkout instead,
+use a Go workspace rather than editing `go.mod` — a `go.work` here is git-ignored:
+
+```
+go 1.24.0
+
+use (
+	.
+	../../../utils/zqnt-utils-golang
+)
+
+// `use` alone isn't enough while v2.0.0 is unpublished — go.mod requires that version, so pin it:
+replace github.com/zequent/zqnt-utils-golang/v2 v2.0.0 => ../../../utils/zqnt-utils-golang
+```
+
+`GOWORK=off` builds exactly as CI does.
 
 ---
 

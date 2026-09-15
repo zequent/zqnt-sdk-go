@@ -11,3 +11,7 @@ gen/proto_tmp/
 .idea/
 *.iml
 .vscode/
+
+# Go workspace -- local multi-module development against the sibling utils checkout
+go.work
+go.work.sum

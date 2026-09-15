@@ -18,7 +18,3 @@ require (
 	golang.org/x/text v0.31.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251029180050-ab9386a59fda // indirect
 )
-
-// Local development against the sibling monorepo checkout until zqnt-utils-golang v2.0.0 is
-// tagged and pushed -- drop this line once it is (see README, "Local development").
-replace github.com/zequent/zqnt-utils-golang/v2 => ../../../utils/zqnt-utils-golang
