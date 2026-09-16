@@ -27,6 +27,13 @@ type streamEntry struct {
 	cancel context.CancelFunc
 }
 
+// notificationStream holds the process-wide notification stream (see notifications.go for why
+// notifications share one stream where telemetry keys them per device).
+type notificationStream struct {
+	stream livedatapb.LiveDataService_ProduceNotificationClient
+	cancel context.CancelFunc
+}
+
 // ServiceImpl is the gRPC-backed implementation of LiveDataService.
 // It maintains one persistent bidirectional stream per device SN and
 // reconnects automatically on transient failures.
@@ -38,6 +45,10 @@ type ServiceImpl struct {
 	streams      map[string]*streamEntry
 	attempts     map[string]int
 	shuttingDown atomic.Bool
+
+	notifyMu       sync.RWMutex
+	notifyStream   *notificationStream
+	notifyAttempts int
 }
 
 // NewServiceImpl creates a new LiveDataService implementation.
@@ -119,10 +130,15 @@ func (s *ServiceImpl) CloseAllStreams(_ context.Context) error {
 	return nil
 }
 
-// Shutdown sets the shutting-down flag and closes all streams.
+// Shutdown sets the shutting-down flag and closes all streams, telemetry and notification alike.
 func (s *ServiceImpl) Shutdown(ctx context.Context) error {
 	s.log.Info("LiveDataService shutdown initiated")
 	s.shuttingDown.Store(true)
+	// Close notifications first, and keep going if it fails: a half-closed notification stream
+	// must not leave telemetry streams open behind it.
+	if err := s.CloseNotificationStream(ctx); err != nil {
+		s.log.Warn("error closing notification stream during shutdown", "error", err)
+	}
 	return s.CloseAllStreams(ctx)
 }
 

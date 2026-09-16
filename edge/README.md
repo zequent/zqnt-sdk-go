@@ -95,6 +95,28 @@ the wire message a pre-2.0.0 adapter did. They are worth setting: admin-console'
 Registry, and derives a console form's `ui:schema` from `InputSchema`, so a command advertised
 without one can only be called by guessing its params.
 
+**`LiveDataService` publishes command-execution events** (`livedata`):
+`PublishCommandExecutionEvent` reports one stage of a physical command's lifecycle — accepted,
+running with progress, succeeded, failed, cancelled — over `ProduceNotification`. This is not
+optional bookkeeping for an adapter that runs capability executions. mission-autonomy's
+`EdgeExecutionNodeDispatcher` dispatches the typed flight commands (`flight.takeoff`,
+`navigation.go_to`, `gimbal.look_at`, `flight.return_to_home`) and *every* custom command
+asynchronously: the skill node goes to ACCEPTED and waits for an event carrying the execution id
+the platform sent, which arrives at the adapter as the request's `TID`
+(`capexec:<executionId>:<nodeId>`). An adapter whose RPC answers success but which publishes no
+event leaves its node running until the whole execution times out. `edge-python-sdk`'s
+`NotificationPublisher` has done this since 1.3.x — see `adapters/mavlink-adapter`'s arrival
+watchers for the reference shape — and this is the Go equivalent.
+
+`SN`, `ExternalExecutionID` and `OccurredAt` are all required on the wire: live-data's
+`CommandExecutionEventPublisher` drops an event missing any of them, and because notifications are
+streamed fire-and-forget the publish still succeeds, so the adapter sees nothing. The SDK validates
+the first two and defaults the third rather than letting that happen.
+
+Notifications share one stream per process, unlike telemetry's per-SN streams: they are occasional,
+already name their asset in the event body, and one stream keeps a command's RUNNING and SUCCEEDED
+in order.
+
 **Redis discovery keys carry the `zqnt:` prefix again** (`discovery`): `CacheKeys` has it on the
 2.0.0 line and didn't on 1.3.x, where this package correctly dropped it. The keys must match the
 platform line being deployed against exactly — with the wrong ones an adapter registers with
@@ -116,7 +138,7 @@ the SDK's standing convention ("only the commands a device supports need to be o
 the platform populates that registry itself from the capability snapshots it already collects, so
 an adapter has nothing to publish into it.
 
-**Testing**: `adapter/grpc` and `discovery` have unit tests; the rest of the SDK is verified by
+**Testing**: `adapter/grpc`, `discovery` and `livedata` have unit tests; the rest of the SDK is verified by
 `go build`/`go vet` plus live-verifying the simulator built on it against a real running
 connector/live-data/remote-control/mission-autonomy stack.
 
