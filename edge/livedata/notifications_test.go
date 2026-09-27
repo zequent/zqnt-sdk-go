@@ -4,6 +4,7 @@ import (
 	"context"
 	"io"
 	"log/slog"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -22,11 +23,16 @@ type fakeNotificationStream struct {
 	grpc.ClientStream
 	mu   sync.Mutex
 	sent []*eventspb.ProduceNotificationRequest
+	// broken makes every Send fail the way a stream does after the server went away.
+	broken bool
 }
 
 func (f *fakeNotificationStream) Send(req *eventspb.ProduceNotificationRequest) error {
 	f.mu.Lock()
 	defer f.mu.Unlock()
+	if f.broken {
+		return io.EOF
+	}
 	f.sent = append(f.sent, req)
 	return nil
 }
@@ -49,6 +55,8 @@ type fakeStub struct {
 	stream  *fakeNotificationStream
 	opened  int
 	openErr error
+	// alwaysBroken hands out a broken stream on every open.
+	alwaysBroken bool
 }
 
 func (f *fakeStub) ProduceNotification(_ context.Context, _ ...grpc.CallOption) (grpc.ClientStreamingClient[eventspb.ProduceNotificationRequest, livedatapb.LiveDataResponse], error) {
@@ -57,6 +65,9 @@ func (f *fakeStub) ProduceNotification(_ context.Context, _ ...grpc.CallOption) 
 	f.opened++
 	if f.openErr != nil {
 		return nil, f.openErr
+	}
+	if f.alwaysBroken {
+		f.stream = &fakeNotificationStream{broken: true}
 	}
 	if f.stream == nil {
 		f.stream = &fakeNotificationStream{}
@@ -268,3 +279,58 @@ func TestPublishCommandExecutionEvent_SilentAfterShutdown(t *testing.T) {
 
 // The interface is what adapters program against, so the implementation has to satisfy it.
 var _ LiveDataService = (*ServiceImpl)(nil)
+
+// A live-data restart breaks the long-lived stream; the first Send after it gets io.EOF. That
+// message used to be dropped -- in practice a command's SUCCEEDED, leaving its skill node RUNNING
+// forever. It now goes out again on a fresh stream.
+func TestPublishCommandExecutionEvent_ResendsOnAFreshStreamAfterTheOldOneBroke(t *testing.T) {
+	s, stub := newTestService()
+	if err := s.PublishCommandExecutionEvent(context.Background(), &domains.CommandExecutionEvent{
+		SN: "SIM-1", ExternalExecutionID: "capexec:e1:n1", Status: domains.CommandExecutionAccepted,
+	}); err != nil {
+		t.Fatalf("first event: %v", err)
+	}
+
+	// live-data restarts: the open stream is dead, the next open gets a working one.
+	stub.mu.Lock()
+	stub.stream.mu.Lock()
+	stub.stream.broken = true
+	stub.stream.mu.Unlock()
+	dead := stub.stream
+	stub.stream = nil
+	stub.mu.Unlock()
+
+	if err := s.PublishCommandExecutionEvent(context.Background(), &domains.CommandExecutionEvent{
+		SN: "SIM-1", ExternalExecutionID: "capexec:e1:n1", Status: domains.CommandExecutionSucceeded,
+	}); err != nil {
+		t.Fatalf("event after the restart: %v", err)
+	}
+
+	if stub.opens() != 2 {
+		t.Errorf("opened %d streams, want 2 (the original and one after the break)", stub.opens())
+	}
+	if len(dead.requests()) != 1 {
+		t.Errorf("dead stream holds %d events, want only the one sent before the break", len(dead.requests()))
+	}
+	got := stub.stream.requests()
+	if len(got) != 1 || !strings.HasSuffix(got[0].GetEvent().GetCommandExecution().GetStatus().String(), "SUCCEEDED") {
+		t.Fatalf("fresh stream holds %d events, want the resent SUCCEEDED", len(got))
+	}
+}
+
+// When the fresh stream fails too, the error reaches the caller instead of being swallowed.
+func TestPublishCommandExecutionEvent_ReportsAFailureOnBothStreams(t *testing.T) {
+	s, stub := newTestService()
+	stub.stream = &fakeNotificationStream{broken: true}
+	stub.alwaysBroken = true
+
+	err := s.PublishCommandExecutionEvent(context.Background(), &domains.CommandExecutionEvent{
+		SN: "SIM-1", ExternalExecutionID: "capexec:e1:n1", Status: domains.CommandExecutionSucceeded,
+	})
+	if err == nil {
+		t.Fatal("want an error when neither stream accepts the event")
+	}
+	if stub.opens() != 2 {
+		t.Errorf("opened %d streams, want 2", stub.opens())
+	}
+}

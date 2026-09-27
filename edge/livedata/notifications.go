@@ -55,18 +55,26 @@ func (s *ServiceImpl) ProduceNotification(ctx context.Context, req *eventspb.Pro
 		return nil
 	}
 
-	stream, err := s.getOrCreateNotificationStream(ctx)
-	if err != nil || stream == nil {
-		return err
-	}
-
-	if sendErr := stream.Send(req); sendErr != nil {
-		s.log.Error("error sending notification", "error", sendErr)
+	// Two attempts: the stream is long-lived, so when live-data restarts the first Send after it
+	// is the one that finds the connection gone (io.EOF). Dropping that message lost exactly the
+	// events that matter -- a command's SUCCEEDED -- and left its skill node RUNNING for good. A
+	// second attempt goes out on a freshly opened stream; a message that fails there too is
+	// reported to the caller.
+	var sendErr error
+	for attempt := 0; attempt < 2; attempt++ {
+		stream, err := s.getOrCreateNotificationStream(ctx)
+		if err != nil || stream == nil {
+			return err
+		}
+		if sendErr = stream.Send(req); sendErr == nil {
+			return nil
+		}
+		s.log.Warn("error sending notification", "attempt", attempt+1, "error", sendErr)
 		s.removeNotificationStream()
 		go s.handleNotificationStreamFailure(stream)
-		return sendErr
 	}
-	return nil
+	s.log.Error("notification not delivered", "error", sendErr)
+	return sendErr
 }
 
 // CloseNotificationStream closes the notification stream if one is open. Safe to call when none is.
