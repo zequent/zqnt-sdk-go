@@ -2,6 +2,8 @@ package connector
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"log/slog"
 
 	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter/domains"
@@ -127,8 +129,14 @@ func (s *ServiceImpl) RegisterAsset(ctx context.Context, asset *domains.AssetDTO
 	return s.mapper.AssetFromProto(resp.GetAsset()), nil
 }
 
-func (s *ServiceImpl) DeRegisterAsset(ctx context.Context, _ string) (bool, error) {
-	req := newBase("")
+// DeRegisterAsset deletes the asset with this sn. Connector deletes by the request's own sn, so it
+// must be sent: it used to be dropped, every call asked to delete sn "", nothing was ever deleted,
+// and the refusal came back as (false, nil) -- a removal that looked like it had worked.
+func (s *ServiceImpl) DeRegisterAsset(ctx context.Context, sn string) (bool, error) {
+	if sn == "" {
+		return false, errors.New("DeRegisterAsset: sn is required")
+	}
+	req := newBase(sn)
 	resp, err := retry.Do(ctx, func(c context.Context) (*connectorpb.ConnectorResponse, error) {
 		return s.stub.DeregisterAsset(c, req)
 	})
@@ -136,8 +144,7 @@ func (s *ServiceImpl) DeRegisterAsset(ctx context.Context, _ string) (bool, erro
 		return false, err
 	}
 	if resp.GetHasErrors() {
-		s.log.Error("DeRegisterAsset error", "error", resp.GetError())
-		return false, nil
+		return false, fmt.Errorf("DeRegisterAsset %s: %s", sn, resp.GetError().GetErrorMessage())
 	}
 	return true, nil
 }
