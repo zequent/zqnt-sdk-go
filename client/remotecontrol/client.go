@@ -140,11 +140,6 @@ func (c *Client) CapturePhoto(ctx context.Context, sn string) (*devicecontrol.Co
 	return unwrap("CapturePhoto", resp, err)
 }
 
-func (c *Client) PlayTTSAudio(ctx context.Context, req *devicecontrol.TextToSpeechCommandRequest) (*devicecontrol.CommandResponse, error) {
-	resp, err := c.grpc.PlayTTSAudio(ctx, req)
-	return unwrap("PlayTTSAudio", resp, err)
-}
-
 func (c *Client) LiveStreamSplitScreen(ctx context.Context, sn string, enabled bool) (*devicecontrol.CommandResponse, error) {
 	resp, err := c.grpc.LiveStreamSplitScreen(ctx, &devicecontrol.ToggleCommandRequest{Base: requestBase(sn), Enabled: enabled})
 	return unwrap("LiveStreamSplitScreen", resp, err)
@@ -217,6 +212,11 @@ func (c *Client) ChangeZoom(ctx context.Context, req *devicecontrol.ChangeCamera
 
 // ---- Custom / integrator-defined commands ----------------------------------------------
 
+// SendCustomCommand runs a command a device publishes as its own capability rather than as a typed
+// RPC -- vendor- and payload-specific ones above all. A loudspeaker is one: there is no typed
+// text-to-speech call any more, a DJI speaker payload publishes speaker.volume.set,
+// speaker.audio.play and speaker.audio.stop instead. GetCapabilities lists the command ids a device
+// offers, with the parameter schema of each.
 func (c *Client) SendCustomCommand(ctx context.Context, sn, commandID string, params *structpb.Struct, target *devicecontrol.CapabilityTarget) (*devicecontrol.CustomCommandResponse, error) {
 	req := &devicecontrol.CustomCommandRequest{Base: requestBase(sn), CommandId: commandID, Params: params, Target: target}
 	resp, err := c.grpc.SendCustomCommand(ctx, req)
