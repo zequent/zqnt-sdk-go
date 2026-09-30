@@ -5,6 +5,8 @@ package edgesdk
 import (
 	"log/slog"
 	"time"
+
+	"github.com/Zequent/zqnt-edge-sdk-go/v2/auth"
 )
 
 // config holds the resolved configuration for an EdgeClient.
@@ -30,6 +32,10 @@ type config struct {
 	connectorAddr       string
 	liveDataAddr        string
 	missionAutonomyAddr string
+
+	// auth: the edge credential for calls into the platform, and how the platform's commands are
+	// verified. Defaults from the environment (see package auth).
+	auth auth.Config
 }
 
 func defaultConfig(endpoint, sn string) *config {
@@ -39,5 +45,6 @@ func defaultConfig(endpoint, sn string) *config {
 		timeout:    30 * time.Second,
 		maxRetries: 3,
 		logger:     slog.Default(),
+		auth:       auth.FromEnv(),
 	}
 }

@@ -210,6 +210,19 @@ client, err := edgesdk.NewEdgeClient(
 )
 ```
 
+### Authentication
+
+Both directions are authenticated (package `auth`):
+
+- `ZQNT_EDGE_TOKEN` / `WithEdgeToken` -- the adapter's edge credential, sent on every call into the
+  platform. Issue one in the console (Edge Credentials, `POST /api/admin-console/edge-credentials`)
+  or with `core/scripts/mint-edge-credential.py`. The platform refuses calls without it.
+- `ZQNT_PLATFORM_PUBLIC_KEY` (alias `SERVICE_AUTH_PUBLIC_KEY`) / `WithPlatformPublicKey` -- the
+  platform's service public key. The adapter's server refuses every command not signed with it;
+  without the key it refuses everything.
+- `ZQNT_EDGE_AUTH_DISABLED=true` / `WithoutPlatformAuth()` -- accept unauthenticated commands. Local
+  SITL/simulators only.
+
 ---
 
 ## Troubleshooting
