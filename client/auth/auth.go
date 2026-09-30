@@ -14,6 +14,11 @@
 //	assets := connector.New(conn)
 //
 // It is sent as "authorization: Bearer <token>" on every call, unary and streaming.
+//
+// A service whose credential is not one fixed token (it forwards its own caller's token, or
+// rotates a short-lived one of its own) sets it per call with WithToken, or registers its own
+// interceptors BEFORE DialOptions (grpc-go runs chained interceptors in the order given). An
+// authorization header already on the call wins; the dial-time token is then not sent.
 package auth
 
 import (
@@ -77,8 +82,20 @@ func DialOptions(token string) []grpc.DialOption {
 	}
 }
 
+// WithToken returns a context whose calls carry token instead of the connection's client
+// credential — for a service calling the platform on behalf of its own caller. A blank token
+// leaves ctx unchanged.
+func WithToken(ctx context.Context, token string) context.Context {
+	if t := strings.TrimSpace(token); t != "" {
+		return withAuthorization(ctx, "Bearer "+t)
+	}
+	return ctx
+}
+
 func withBearer(ctx context.Context, c Credentials) context.Context {
-	if c.token == "" {
+	// A credential already on the call (WithToken, or a host interceptor that ran first) wins:
+	// two authorization values would leave the platform reading whichever came last.
+	if c.token == "" || hasAuthorization(ctx) {
 		return ctx
 	}
 	return withAuthorization(ctx, "Bearer "+c.token)

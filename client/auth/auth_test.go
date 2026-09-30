@@ -170,3 +170,64 @@ func errorsUnwrap(err error) error {
 	}
 	return err
 }
+
+func TestAPerCallTokenWinsOverTheConnectionsCredential(t *testing.T) {
+	t.Setenv(auth.EnvVar, "")
+	r := &recorder{}
+	client := connector.New(serve(t, r, "fixed-token"))
+	if _, err := client.GetAssetBySn(auth.WithToken(context.Background(), "forwarded"), "DOCK-1"); err != nil {
+		t.Fatalf("GetAssetBySn: %v", err)
+	}
+	if _, err := client.GetAssetBySn(auth.WithToken(context.Background(), "  "), "DOCK-1"); err != nil {
+		t.Fatalf("GetAssetBySn: %v", err)
+	}
+	if got := strings.Join(r.headers, "|"); got != "Bearer forwarded|Bearer fixed-token" {
+		t.Fatalf("headers = %q (a per-call token is the only one; a blank one changes nothing)", got)
+	}
+}
+
+func TestAHostInterceptorRegisteredFirstWinsOnUnaryAndStreamingCalls(t *testing.T) {
+	t.Setenv(auth.EnvVar, "")
+	r := &recorder{}
+	lis, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatalf("listen: %v", err)
+	}
+	server := grpc.NewServer()
+	connectorpb.RegisterConnectorServiceServer(server, r)
+	go func() { _ = server.Serve(lis) }()
+	t.Cleanup(server.Stop)
+
+	unary := func(ctx context.Context, method string, req, reply any, cc *grpc.ClientConn,
+		invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+		return invoker(auth.WithToken(ctx, "caller-token"), method, req, reply, cc, opts...)
+	}
+	stream := func(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string,
+		streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error) {
+		return streamer(auth.WithToken(ctx, "caller-token"), desc, cc, method, opts...)
+	}
+	opts := append([]grpc.DialOption{
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithChainUnaryInterceptor(unary),
+		grpc.WithChainStreamInterceptor(stream),
+	}, auth.DialOptions("fixed-token")...)
+	conn, err := grpc.NewClient(lis.Addr().String(), opts...)
+	if err != nil {
+		t.Fatalf("dial: %v", err)
+	}
+	t.Cleanup(func() { _ = conn.Close() })
+
+	if _, err := connector.New(conn).GetAssetBySn(context.Background(), "DOCK-1"); err != nil {
+		t.Fatalf("GetAssetBySn: %v", err)
+	}
+	s, err := connectorpb.NewConnectorServiceClient(conn).AssetMonitoring(context.Background(), &base.RequestBase{Sn: "DOCK-1"})
+	if err != nil {
+		t.Fatalf("AssetMonitoring: %v", err)
+	}
+	if _, err := s.Recv(); err != nil {
+		t.Fatalf("Recv: %v", err)
+	}
+	if got := strings.Join(r.headers, "|"); got != "Bearer caller-token|Bearer caller-token" {
+		t.Fatalf("headers = %q", got)
+	}
+}

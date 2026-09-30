@@ -67,6 +67,37 @@ or an expired/revoked one) or `PermissionDenied` (an asset of another organizati
 administrative call). `auth.Credentials` is the same token as a `grpc.WithPerRPCCredentials` value
 for code that prefers that (wrap its errors with `auth.Explain`).
 
+### Local development and deployment: `config`
+
+`config.FromEnv()` reads the variables every Zequent client SDK (Java, Python, Go) reads, so one
+`.env` works for every language; nothing set is the local development stack (`quarkus:dev` or
+`docker-compose.local.yml`):
+
+| Variable | Local default (nothing set) |
+|---|---|
+| `CONNECTOR_SERVICE_HOST` / `_PORT` / `_USE_PLAINTEXT` | `localhost` / `8010` / `true` |
+| `REMOTE_CONTROL_SERVICE_HOST` / `_PORT` / `_USE_PLAINTEXT` | `localhost` / `8002` / `true` |
+| `LIVE_DATA_SERVICE_HOST` / `_PORT` / `_USE_PLAINTEXT` | `localhost` / `8003` / `true` |
+| `MISSION_AUTONOMY_SERVICE_HOST` / `_PORT` / `_USE_PLAINTEXT` | `localhost` / `8004` / `true` |
+| `ZQNT_CLIENT_TOKEN` | none — issue one in your local console too |
+
+```go
+cfg, err := config.FromEnv()
+conn, err := cfg.Dial(cfg.Connector) // TLS unless _USE_PLAINTEXT, plus the client credential
+assets := connector.New(conn)
+```
+
+A deployment sets the hosts, `_USE_PLAINTEXT=false` for TLS whenever traffic leaves a private
+network, and `ZQNT_CLIENT_TOKEN` from its secret store — never from a committed file. There is
+deliberately no built-in development credential. Printing a `config.Config` never prints the token.
+
+### A credential that is not one fixed token
+
+A service that forwards its own caller's token sets it per call — `auth.WithToken(ctx, token)` — or
+registers its own interceptors ahead of the SDK's (`cfg.Dial(endpoint, grpc.WithChainUnaryInterceptor(...))`,
+or before `auth.DialOptions` when dialing yourself; grpc-go runs chained interceptors in the order
+given). An `authorization` header already on the call wins and the connection's token is then not sent.
+
 ## Requirements
 
 Go 1.24+. `go build ./...` / `go vet ./...` / `go test ./...` all pass as of this commit.
