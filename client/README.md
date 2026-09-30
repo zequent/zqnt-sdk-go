@@ -45,6 +45,28 @@ RPCs).
 - A shared proto module: `gen/` is vendored directly into this repo rather than pulled from one
   common `zqnt-utils-go`.
 
+## Authentication
+
+The platform refuses every call that carries no credential. An organization administrator issues a
+**client credential** in the console under **Deploy → Access & Integrations → Credentials** (kind
+**client**). It is shown once, belongs to that one organization, and reaches only that
+organization's assets, Applications and runs — never users, organizations or other administration.
+
+The clients here wrap a connection you dial, so the credential is a set of dial options:
+
+```go
+opts := append(auth.DialOptions(""), // "" reads ZQNT_CLIENT_TOKEN; or pass the token itself
+	grpc.WithTransportCredentials(insecure.NewCredentials()))
+conn, err := grpc.NewClient("core.example.com:8010", opts...)
+assets := connector.New(conn)
+```
+
+It is sent as `authorization: Bearer <token>` on every call, unary and streaming. A refusal keeps its
+gRPC code (`status.Code(err)`) with a message that says what to do: `Unauthenticated` (no credential,
+or an expired/revoked one) or `PermissionDenied` (an asset of another organization, or an
+administrative call). `auth.Credentials` is the same token as a `grpc.WithPerRPCCredentials` value
+for code that prefers that (wrap its errors with `auth.Explain`).
+
 ## Requirements
 
 Go 1.24+. `go build ./...` / `go vet ./...` / `go test ./...` all pass as of this commit.
