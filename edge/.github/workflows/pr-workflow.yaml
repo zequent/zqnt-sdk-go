@@ -13,16 +13,24 @@ jobs:
       # doesn't need GH_PAT -- the default GITHUB_TOKEN handles that. GH_PAT is only genuinely
       # needed below, to fetch the private zqnt-utils-golang module during go build.
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
           cache: false
 
-      - name: Configure private module access
+      # The private modules are downloaded here, with the token only in this step's environment;
+      # lint, build and test then run from the module cache without it.
+      - name: Download modules (private ones with GH_PAT)
+        env:
+          GIT_CONFIG_COUNT: "1"
+          GIT_CONFIG_KEY_0: url.https://x-access-token:${{ secrets.GH_PAT }}@github.com/.insteadOf
+          GIT_CONFIG_VALUE_0: https://github.com/
         run: |
           go env -w GOPRIVATE="github.com/Zequent/*,github.com/zequent/*"
-          git config --global url."https://x-access-token:${{ secrets.GH_PAT }}@github.com/".insteadOf "https://github.com/"
+          go mod download
 
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v6
@@ -35,15 +43,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
 
-      - name: Configure private module access
+      # The private modules are downloaded here, with the token only in this step's environment;
+      # lint, build and test then run from the module cache without it.
+      - name: Download modules (private ones with GH_PAT)
+        env:
+          GIT_CONFIG_COUNT: "1"
+          GIT_CONFIG_KEY_0: url.https://x-access-token:${{ secrets.GH_PAT }}@github.com/.insteadOf
+          GIT_CONFIG_VALUE_0: https://github.com/
         run: |
           go env -w GOPRIVATE="github.com/Zequent/*,github.com/zequent/*"
-          git config --global url."https://x-access-token:${{ secrets.GH_PAT }}@github.com/".insteadOf "https://github.com/"
+          go mod download
 
       - name: Build
         run: go build ./...
@@ -69,6 +85,8 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Compute preview tag
         id: tag
@@ -76,10 +94,13 @@ jobs:
           SHORT_SHA=$(git rev-parse --short=7 HEAD)
           echo "tag=pr-${{ github.event.pull_request.number }}-${SHORT_SHA}" >> "$GITHUB_OUTPUT"
 
+      # The checkout keeps no credentials; the push authenticates in this step only.
       - name: Create and push preview tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git tag "${{ steps.tag.outputs.tag }}"
-          git push origin "${{ steps.tag.outputs.tag }}"
+          git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "${{ steps.tag.outputs.tag }}"
 
       - name: Create GitHub pre-release
         uses: softprops/action-gh-release@v2

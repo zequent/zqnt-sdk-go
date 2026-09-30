@@ -15,3 +15,10 @@ gen/proto_tmp/
 # Go workspace -- local multi-module development against the sibling utils checkout
 go.work
 go.work.sum
+
+# Secrets and local credentials: never committed (SEC-3). .env.example is the template.
+.env*
+!.env.example
+*.zqnt
+kubeconfig*
+*.pem
