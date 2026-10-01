@@ -10,16 +10,23 @@ import (
 	remotecontrolpb "github.com/Zequent/zqnt-client-sdk-go/gen/remotecontrol/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/protobuf/encoding/protowire"
 )
 
 type fakeService struct {
 	remotecontrolpb.UnimplementedRemoteControlServiceServer
 	lastTakeOff    *devicecontrol.CoordinateCommandRequest
+	lastGoTo       *devicecontrol.CoordinateCommandRequest
 	lastCloseCover *devicecontrol.CloseCoverCommandRequest
 }
 
 func (s *fakeService) TakeOff(ctx context.Context, req *devicecontrol.CoordinateCommandRequest) (*devicecontrol.CommandResponse, error) {
 	s.lastTakeOff = req
+	return &devicecontrol.CommandResponse{Response: &devicecontrol.CommandResponse_Empty{}}, nil
+}
+
+func (s *fakeService) GoTo(ctx context.Context, req *devicecontrol.CoordinateCommandRequest) (*devicecontrol.CommandResponse, error) {
+	s.lastGoTo = req
 	return &devicecontrol.CommandResponse{Response: &devicecontrol.CommandResponse_Empty{}}, nil
 }
 
@@ -89,5 +96,62 @@ func TestGetCapabilitiesReturnsAnErrorOnAServerReportedFailure(t *testing.T) {
 	_, err := client.GetCapabilities(context.Background(), "drone-offline")
 	if err == nil {
 		t.Fatalf("expected an error, got none")
+	}
+}
+
+// overrideOnTheWire reads CoordinateCommandRequest.no_fly_zone_override (field 3) the way the
+// platform does: from the bytes the server received.
+func overrideOnTheWire(t *testing.T, req *devicecontrol.CoordinateCommandRequest) (value, present bool) {
+	t.Helper()
+	raw := req.ProtoReflect().GetUnknown()
+	for len(raw) > 0 {
+		number, kind, n := protowire.ConsumeTag(raw)
+		if n < 0 {
+			t.Fatalf("malformed unknown fields")
+		}
+		raw = raw[n:]
+		if number == 3 && kind == protowire.VarintType {
+			v, m := protowire.ConsumeVarint(raw)
+			if m < 0 {
+				t.Fatalf("malformed varint")
+			}
+			return protowire.DecodeBool(v), true
+		}
+		m := protowire.ConsumeFieldValue(number, kind, raw)
+		raw = raw[m:]
+	}
+	return false, false
+}
+
+func TestGoToSendsNoOverrideUnlessAsked(t *testing.T) {
+	fake := &fakeService{}
+	client := dialFake(t, fake)
+
+	if _, err := client.GoTo(context.Background(), "drone-1", &devicecontrol.GeoCoordinate{Latitude: 52.5, Longitude: 13.4, Altitude: 30}); err != nil {
+		t.Fatalf("GoTo: %v", err)
+	}
+	if _, present := overrideOnTheWire(t, fake.lastGoTo); present {
+		t.Fatalf("a plain GoTo must not send the override")
+	}
+	if fake.lastGoTo.GetCoordinate().GetLatitude() != 52.5 {
+		t.Fatalf("expected latitude 52.5, got %v", fake.lastGoTo.GetCoordinate().GetLatitude())
+	}
+}
+
+func TestGoToWithOptionsSendsTheOverride(t *testing.T) {
+	fake := &fakeService{}
+	client := dialFake(t, fake)
+
+	if _, err := client.GoToWithOptions(context.Background(), "drone-1",
+		&devicecontrol.GeoCoordinate{Latitude: 52.5, Longitude: 13.4, Altitude: 30},
+		GoToOptions{NoFlyZoneOverride: true}); err != nil {
+		t.Fatalf("GoToWithOptions: %v", err)
+	}
+	value, present := overrideOnTheWire(t, fake.lastGoTo)
+	if !present || !value {
+		t.Fatalf("expected no_fly_zone_override=true on the wire, got present=%v value=%v", present, value)
+	}
+	if fake.lastGoTo.GetBase().GetSn() != "drone-1" {
+		t.Fatalf("expected sn drone-1, got %q", fake.lastGoTo.GetBase().GetSn())
 	}
 }

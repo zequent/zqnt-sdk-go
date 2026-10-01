@@ -34,7 +34,11 @@ RPCs).
   `ListSchedulers` (optionally filtered by task ID — the 1.3.0-only filter main reserves). No
   Application/SkillExecution surface at all on this branch.
 - `remotecontrol/` — unchanged from `main`; `RemoteControlService`'s command-gateway surface is
-  identical at both contract versions.
+  identical at both contract versions. One addition: `GoToWithOptions(ctx, sn, coordinate,
+  GoToOptions{NoFlyZoneOverride: true})` flies through a no-fly zone that would refuse the fly-to
+  (honoured for an organization admin or a system admin only); `GoTo` is that with no options. The
+  field (`CoordinateCommandRequest.no_fly_zone_override`, zqnt-protos 4115f03) is newer than the
+  1.3.0 `gen/`, so it is written as a raw wire field until `gen/` moves to the 2.0 line.
 - `livedata/` — unchanged from `main`; returns the raw gRPC server-streaming client rather than a
   typed dataclass, so it never needed touching for the `TaskEvent`/`CommandExecutionEvent`
   drift that affected the Python SDKs' equivalent layer.
