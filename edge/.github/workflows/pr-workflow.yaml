@@ -33,9 +33,13 @@ jobs:
           go mod download
 
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v6
+        # golangci-lint v1 ("latest" under action v6) is built with Go 1.24 and refuses a module that
+        # targets Go 1.25 ("the Go language version used to build golangci-lint is lower than the
+        # targeted Go version"); v2 is built with a current Go. Pinned so a new release cannot turn
+        # the build red overnight.
+        uses: golangci/golangci-lint-action@v9
         with:
-          version: latest
+          version: v2.14.0
           args: --timeout=5m
 
   build-and-test:

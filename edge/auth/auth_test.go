@@ -181,7 +181,7 @@ func TestEndToEnd(t *testing.T) {
 
 	// Health stays open without a token.
 	open := dial()
-	defer open.Close()
+	defer func() { _ = open.Close() }()
 	if _, err := healthpb.NewHealthClient(open).Check(context.Background(), &healthpb.HealthCheckRequest{}); err != nil {
 		t.Fatalf("health: %v", err)
 	}
@@ -194,7 +194,7 @@ func TestEndToEnd(t *testing.T) {
 	}
 
 	signed := dial(grpc.WithPerRPCCredentials(BearerCredentials{Token: sign(t, key, tokenOpts{})}))
-	defer signed.Close()
+	defer func() { _ = signed.Close() }()
 	_, err = edgepb.NewEdgeAdapterServiceClient(signed).GetCapabilities(ctx, request)
 	if status.Code(err) != codes.Unimplemented {
 		t.Fatalf("a signed command must get past the guard (to Unimplemented here): got %v", err)
