@@ -23,6 +23,61 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// What the last firing of a schedule did. A firing that found no asset to run on (every online one
+// busy with more important work, none reporting, or no policy that applies) is SKIPPED, not FAILED:
+// the schedule is fine, the moment was not.
+type SchedulerFiringOutcome int32
+
+const (
+	SchedulerFiringOutcome_SCHEDULER_FIRING_OUTCOME_UNSPECIFIED SchedulerFiringOutcome = 0
+	SchedulerFiringOutcome_SCHEDULER_FIRING_OUTCOME_STARTED     SchedulerFiringOutcome = 1
+	SchedulerFiringOutcome_SCHEDULER_FIRING_OUTCOME_SKIPPED     SchedulerFiringOutcome = 2
+	SchedulerFiringOutcome_SCHEDULER_FIRING_OUTCOME_FAILED      SchedulerFiringOutcome = 3
+)
+
+// Enum value maps for SchedulerFiringOutcome.
+var (
+	SchedulerFiringOutcome_name = map[int32]string{
+		0: "SCHEDULER_FIRING_OUTCOME_UNSPECIFIED",
+		1: "SCHEDULER_FIRING_OUTCOME_STARTED",
+		2: "SCHEDULER_FIRING_OUTCOME_SKIPPED",
+		3: "SCHEDULER_FIRING_OUTCOME_FAILED",
+	}
+	SchedulerFiringOutcome_value = map[string]int32{
+		"SCHEDULER_FIRING_OUTCOME_UNSPECIFIED": 0,
+		"SCHEDULER_FIRING_OUTCOME_STARTED":     1,
+		"SCHEDULER_FIRING_OUTCOME_SKIPPED":     2,
+		"SCHEDULER_FIRING_OUTCOME_FAILED":      3,
+	}
+)
+
+func (x SchedulerFiringOutcome) Enum() *SchedulerFiringOutcome {
+	p := new(SchedulerFiringOutcome)
+	*p = x
+	return p
+}
+
+func (x SchedulerFiringOutcome) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (SchedulerFiringOutcome) Descriptor() protoreflect.EnumDescriptor {
+	return file_mission_autonomy_types_proto_enumTypes[0].Descriptor()
+}
+
+func (SchedulerFiringOutcome) Type() protoreflect.EnumType {
+	return &file_mission_autonomy_types_proto_enumTypes[0]
+}
+
+func (x SchedulerFiringOutcome) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use SchedulerFiringOutcome.Descriptor instead.
+func (SchedulerFiringOutcome) EnumDescriptor() ([]byte, []int) {
+	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{0}
+}
+
 type SchedulerType int32
 
 const (
@@ -65,11 +120,11 @@ func (x SchedulerType) String() string {
 }
 
 func (SchedulerType) Descriptor() protoreflect.EnumDescriptor {
-	return file_mission_autonomy_types_proto_enumTypes[0].Descriptor()
+	return file_mission_autonomy_types_proto_enumTypes[1].Descriptor()
 }
 
 func (SchedulerType) Type() protoreflect.EnumType {
-	return &file_mission_autonomy_types_proto_enumTypes[0]
+	return &file_mission_autonomy_types_proto_enumTypes[1]
 }
 
 func (x SchedulerType) Number() protoreflect.EnumNumber {
@@ -78,7 +133,7 @@ func (x SchedulerType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use SchedulerType.Descriptor instead.
 func (SchedulerType) EnumDescriptor() ([]byte, []int) {
-	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{0}
+	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{1}
 }
 
 type GeoAreaType int32
@@ -120,11 +175,11 @@ func (x GeoAreaType) String() string {
 }
 
 func (GeoAreaType) Descriptor() protoreflect.EnumDescriptor {
-	return file_mission_autonomy_types_proto_enumTypes[1].Descriptor()
+	return file_mission_autonomy_types_proto_enumTypes[2].Descriptor()
 }
 
 func (GeoAreaType) Type() protoreflect.EnumType {
-	return &file_mission_autonomy_types_proto_enumTypes[1]
+	return &file_mission_autonomy_types_proto_enumTypes[2]
 }
 
 func (x GeoAreaType) Number() protoreflect.EnumNumber {
@@ -133,7 +188,7 @@ func (x GeoAreaType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use GeoAreaType.Descriptor instead.
 func (GeoAreaType) EnumDescriptor() ([]byte, []int) {
-	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{1}
+	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{2}
 }
 
 type MissionZoneType int32
@@ -184,11 +239,11 @@ func (x MissionZoneType) String() string {
 }
 
 func (MissionZoneType) Descriptor() protoreflect.EnumDescriptor {
-	return file_mission_autonomy_types_proto_enumTypes[2].Descriptor()
+	return file_mission_autonomy_types_proto_enumTypes[3].Descriptor()
 }
 
 func (MissionZoneType) Type() protoreflect.EnumType {
-	return &file_mission_autonomy_types_proto_enumTypes[2]
+	return &file_mission_autonomy_types_proto_enumTypes[3]
 }
 
 func (x MissionZoneType) Number() protoreflect.EnumNumber {
@@ -197,7 +252,7 @@ func (x MissionZoneType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use MissionZoneType.Descriptor instead.
 func (MissionZoneType) EnumDescriptor() ([]byte, []int) {
-	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{2}
+	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{3}
 }
 
 type ZoneEnforcementType int32
@@ -236,11 +291,11 @@ func (x ZoneEnforcementType) String() string {
 }
 
 func (ZoneEnforcementType) Descriptor() protoreflect.EnumDescriptor {
-	return file_mission_autonomy_types_proto_enumTypes[3].Descriptor()
+	return file_mission_autonomy_types_proto_enumTypes[4].Descriptor()
 }
 
 func (ZoneEnforcementType) Type() protoreflect.EnumType {
-	return &file_mission_autonomy_types_proto_enumTypes[3]
+	return &file_mission_autonomy_types_proto_enumTypes[4]
 }
 
 func (x ZoneEnforcementType) Number() protoreflect.EnumNumber {
@@ -249,7 +304,7 @@ func (x ZoneEnforcementType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ZoneEnforcementType.Descriptor instead.
 func (ZoneEnforcementType) EnumDescriptor() ([]byte, []int) {
-	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{3}
+	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{4}
 }
 
 type ExecutionStrategy int32
@@ -291,11 +346,11 @@ func (x ExecutionStrategy) String() string {
 }
 
 func (ExecutionStrategy) Descriptor() protoreflect.EnumDescriptor {
-	return file_mission_autonomy_types_proto_enumTypes[4].Descriptor()
+	return file_mission_autonomy_types_proto_enumTypes[5].Descriptor()
 }
 
 func (ExecutionStrategy) Type() protoreflect.EnumType {
-	return &file_mission_autonomy_types_proto_enumTypes[4]
+	return &file_mission_autonomy_types_proto_enumTypes[5]
 }
 
 func (x ExecutionStrategy) Number() protoreflect.EnumNumber {
@@ -304,7 +359,7 @@ func (x ExecutionStrategy) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ExecutionStrategy.Descriptor instead.
 func (ExecutionStrategy) EnumDescriptor() ([]byte, []int) {
-	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{4}
+	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{5}
 }
 
 type FailureStrategy int32
@@ -349,11 +404,11 @@ func (x FailureStrategy) String() string {
 }
 
 func (FailureStrategy) Descriptor() protoreflect.EnumDescriptor {
-	return file_mission_autonomy_types_proto_enumTypes[5].Descriptor()
+	return file_mission_autonomy_types_proto_enumTypes[6].Descriptor()
 }
 
 func (FailureStrategy) Type() protoreflect.EnumType {
-	return &file_mission_autonomy_types_proto_enumTypes[5]
+	return &file_mission_autonomy_types_proto_enumTypes[6]
 }
 
 func (x FailureStrategy) Number() protoreflect.EnumNumber {
@@ -362,7 +417,7 @@ func (x FailureStrategy) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use FailureStrategy.Descriptor instead.
 func (FailureStrategy) EnumDescriptor() ([]byte, []int) {
-	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{5}
+	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{6}
 }
 
 type WorkflowStepType int32
@@ -410,11 +465,11 @@ func (x WorkflowStepType) String() string {
 }
 
 func (WorkflowStepType) Descriptor() protoreflect.EnumDescriptor {
-	return file_mission_autonomy_types_proto_enumTypes[6].Descriptor()
+	return file_mission_autonomy_types_proto_enumTypes[7].Descriptor()
 }
 
 func (WorkflowStepType) Type() protoreflect.EnumType {
-	return &file_mission_autonomy_types_proto_enumTypes[6]
+	return &file_mission_autonomy_types_proto_enumTypes[7]
 }
 
 func (x WorkflowStepType) Number() protoreflect.EnumNumber {
@@ -423,7 +478,7 @@ func (x WorkflowStepType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use WorkflowStepType.Descriptor instead.
 func (WorkflowStepType) EnumDescriptor() ([]byte, []int) {
-	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{6}
+	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{7}
 }
 
 type WorkflowStepStatus int32
@@ -474,11 +529,11 @@ func (x WorkflowStepStatus) String() string {
 }
 
 func (WorkflowStepStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_mission_autonomy_types_proto_enumTypes[7].Descriptor()
+	return file_mission_autonomy_types_proto_enumTypes[8].Descriptor()
 }
 
 func (WorkflowStepStatus) Type() protoreflect.EnumType {
-	return &file_mission_autonomy_types_proto_enumTypes[7]
+	return &file_mission_autonomy_types_proto_enumTypes[8]
 }
 
 func (x WorkflowStepStatus) Number() protoreflect.EnumNumber {
@@ -487,7 +542,7 @@ func (x WorkflowStepStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use WorkflowStepStatus.Descriptor instead.
 func (WorkflowStepStatus) EnumDescriptor() ([]byte, []int) {
-	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{7}
+	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{8}
 }
 
 type AutonomyMode int32
@@ -526,11 +581,11 @@ func (x AutonomyMode) String() string {
 }
 
 func (AutonomyMode) Descriptor() protoreflect.EnumDescriptor {
-	return file_mission_autonomy_types_proto_enumTypes[8].Descriptor()
+	return file_mission_autonomy_types_proto_enumTypes[9].Descriptor()
 }
 
 func (AutonomyMode) Type() protoreflect.EnumType {
-	return &file_mission_autonomy_types_proto_enumTypes[8]
+	return &file_mission_autonomy_types_proto_enumTypes[9]
 }
 
 func (x AutonomyMode) Number() protoreflect.EnumNumber {
@@ -539,7 +594,7 @@ func (x AutonomyMode) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use AutonomyMode.Descriptor instead.
 func (AutonomyMode) EnumDescriptor() ([]byte, []int) {
-	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{8}
+	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{9}
 }
 
 type DecisionStrategyType int32
@@ -584,11 +639,11 @@ func (x DecisionStrategyType) String() string {
 }
 
 func (DecisionStrategyType) Descriptor() protoreflect.EnumDescriptor {
-	return file_mission_autonomy_types_proto_enumTypes[9].Descriptor()
+	return file_mission_autonomy_types_proto_enumTypes[10].Descriptor()
 }
 
 func (DecisionStrategyType) Type() protoreflect.EnumType {
-	return &file_mission_autonomy_types_proto_enumTypes[9]
+	return &file_mission_autonomy_types_proto_enumTypes[10]
 }
 
 func (x DecisionStrategyType) Number() protoreflect.EnumNumber {
@@ -597,7 +652,7 @@ func (x DecisionStrategyType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use DecisionStrategyType.Descriptor instead.
 func (DecisionStrategyType) EnumDescriptor() ([]byte, []int) {
-	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{9}
+	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{10}
 }
 
 type DecisionTriggerType int32
@@ -648,11 +703,11 @@ func (x DecisionTriggerType) String() string {
 }
 
 func (DecisionTriggerType) Descriptor() protoreflect.EnumDescriptor {
-	return file_mission_autonomy_types_proto_enumTypes[10].Descriptor()
+	return file_mission_autonomy_types_proto_enumTypes[11].Descriptor()
 }
 
 func (DecisionTriggerType) Type() protoreflect.EnumType {
-	return &file_mission_autonomy_types_proto_enumTypes[10]
+	return &file_mission_autonomy_types_proto_enumTypes[11]
 }
 
 func (x DecisionTriggerType) Number() protoreflect.EnumNumber {
@@ -661,7 +716,7 @@ func (x DecisionTriggerType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use DecisionTriggerType.Descriptor instead.
 func (DecisionTriggerType) EnumDescriptor() ([]byte, []int) {
-	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{10}
+	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{11}
 }
 
 type DecisionActionType int32
@@ -727,11 +782,11 @@ func (x DecisionActionType) String() string {
 }
 
 func (DecisionActionType) Descriptor() protoreflect.EnumDescriptor {
-	return file_mission_autonomy_types_proto_enumTypes[11].Descriptor()
+	return file_mission_autonomy_types_proto_enumTypes[12].Descriptor()
 }
 
 func (DecisionActionType) Type() protoreflect.EnumType {
-	return &file_mission_autonomy_types_proto_enumTypes[11]
+	return &file_mission_autonomy_types_proto_enumTypes[12]
 }
 
 func (x DecisionActionType) Number() protoreflect.EnumNumber {
@@ -740,7 +795,7 @@ func (x DecisionActionType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use DecisionActionType.Descriptor instead.
 func (DecisionActionType) EnumDescriptor() ([]byte, []int) {
-	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{11}
+	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{12}
 }
 
 type MissionAutonomyCommand int32
@@ -827,11 +882,11 @@ func (x MissionAutonomyCommand) String() string {
 }
 
 func (MissionAutonomyCommand) Descriptor() protoreflect.EnumDescriptor {
-	return file_mission_autonomy_types_proto_enumTypes[12].Descriptor()
+	return file_mission_autonomy_types_proto_enumTypes[13].Descriptor()
 }
 
 func (MissionAutonomyCommand) Type() protoreflect.EnumType {
-	return &file_mission_autonomy_types_proto_enumTypes[12]
+	return &file_mission_autonomy_types_proto_enumTypes[13]
 }
 
 func (x MissionAutonomyCommand) Number() protoreflect.EnumNumber {
@@ -840,7 +895,7 @@ func (x MissionAutonomyCommand) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use MissionAutonomyCommand.Descriptor instead.
 func (MissionAutonomyCommand) EnumDescriptor() ([]byte, []int) {
-	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{12}
+	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{13}
 }
 
 type VehicleAction int32
@@ -876,11 +931,11 @@ func (x VehicleAction) String() string {
 }
 
 func (VehicleAction) Descriptor() protoreflect.EnumDescriptor {
-	return file_mission_autonomy_types_proto_enumTypes[13].Descriptor()
+	return file_mission_autonomy_types_proto_enumTypes[14].Descriptor()
 }
 
 func (VehicleAction) Type() protoreflect.EnumType {
-	return &file_mission_autonomy_types_proto_enumTypes[13]
+	return &file_mission_autonomy_types_proto_enumTypes[14]
 }
 
 func (x VehicleAction) Number() protoreflect.EnumNumber {
@@ -889,7 +944,7 @@ func (x VehicleAction) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use VehicleAction.Descriptor instead.
 func (VehicleAction) EnumDescriptor() ([]byte, []int) {
-	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{13}
+	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{14}
 }
 
 type FlyToWaylineModeProto int32
@@ -922,11 +977,11 @@ func (x FlyToWaylineModeProto) String() string {
 }
 
 func (FlyToWaylineModeProto) Descriptor() protoreflect.EnumDescriptor {
-	return file_mission_autonomy_types_proto_enumTypes[14].Descriptor()
+	return file_mission_autonomy_types_proto_enumTypes[15].Descriptor()
 }
 
 func (FlyToWaylineModeProto) Type() protoreflect.EnumType {
-	return &file_mission_autonomy_types_proto_enumTypes[14]
+	return &file_mission_autonomy_types_proto_enumTypes[15]
 }
 
 func (x FlyToWaylineModeProto) Number() protoreflect.EnumNumber {
@@ -935,7 +990,7 @@ func (x FlyToWaylineModeProto) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use FlyToWaylineModeProto.Descriptor instead.
 func (FlyToWaylineModeProto) EnumDescriptor() ([]byte, []int) {
-	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{14}
+	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{15}
 }
 
 type WaylineFinishActionProto int32
@@ -977,11 +1032,11 @@ func (x WaylineFinishActionProto) String() string {
 }
 
 func (WaylineFinishActionProto) Descriptor() protoreflect.EnumDescriptor {
-	return file_mission_autonomy_types_proto_enumTypes[15].Descriptor()
+	return file_mission_autonomy_types_proto_enumTypes[16].Descriptor()
 }
 
 func (WaylineFinishActionProto) Type() protoreflect.EnumType {
-	return &file_mission_autonomy_types_proto_enumTypes[15]
+	return &file_mission_autonomy_types_proto_enumTypes[16]
 }
 
 func (x WaylineFinishActionProto) Number() protoreflect.EnumNumber {
@@ -990,7 +1045,7 @@ func (x WaylineFinishActionProto) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use WaylineFinishActionProto.Descriptor instead.
 func (WaylineFinishActionProto) EnumDescriptor() ([]byte, []int) {
-	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{15}
+	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{16}
 }
 
 type ExitWaylineWhenRcLostEnumProto int32
@@ -1023,11 +1078,11 @@ func (x ExitWaylineWhenRcLostEnumProto) String() string {
 }
 
 func (ExitWaylineWhenRcLostEnumProto) Descriptor() protoreflect.EnumDescriptor {
-	return file_mission_autonomy_types_proto_enumTypes[16].Descriptor()
+	return file_mission_autonomy_types_proto_enumTypes[17].Descriptor()
 }
 
 func (ExitWaylineWhenRcLostEnumProto) Type() protoreflect.EnumType {
-	return &file_mission_autonomy_types_proto_enumTypes[16]
+	return &file_mission_autonomy_types_proto_enumTypes[17]
 }
 
 func (x ExitWaylineWhenRcLostEnumProto) Number() protoreflect.EnumNumber {
@@ -1036,7 +1091,7 @@ func (x ExitWaylineWhenRcLostEnumProto) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ExitWaylineWhenRcLostEnumProto.Descriptor instead.
 func (ExitWaylineWhenRcLostEnumProto) EnumDescriptor() ([]byte, []int) {
-	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{16}
+	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{17}
 }
 
 type RcLostActionEnumProto int32
@@ -1072,11 +1127,11 @@ func (x RcLostActionEnumProto) String() string {
 }
 
 func (RcLostActionEnumProto) Descriptor() protoreflect.EnumDescriptor {
-	return file_mission_autonomy_types_proto_enumTypes[17].Descriptor()
+	return file_mission_autonomy_types_proto_enumTypes[18].Descriptor()
 }
 
 func (RcLostActionEnumProto) Type() protoreflect.EnumType {
-	return &file_mission_autonomy_types_proto_enumTypes[17]
+	return &file_mission_autonomy_types_proto_enumTypes[18]
 }
 
 func (x RcLostActionEnumProto) Number() protoreflect.EnumNumber {
@@ -1085,7 +1140,7 @@ func (x RcLostActionEnumProto) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use RcLostActionEnumProto.Descriptor instead.
 func (RcLostActionEnumProto) EnumDescriptor() ([]byte, []int) {
-	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{17}
+	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{18}
 }
 
 type WaylineTypeEnumProto int32
@@ -1124,11 +1179,11 @@ func (x WaylineTypeEnumProto) String() string {
 }
 
 func (WaylineTypeEnumProto) Descriptor() protoreflect.EnumDescriptor {
-	return file_mission_autonomy_types_proto_enumTypes[18].Descriptor()
+	return file_mission_autonomy_types_proto_enumTypes[19].Descriptor()
 }
 
 func (WaylineTypeEnumProto) Type() protoreflect.EnumType {
-	return &file_mission_autonomy_types_proto_enumTypes[18]
+	return &file_mission_autonomy_types_proto_enumTypes[19]
 }
 
 func (x WaylineTypeEnumProto) Number() protoreflect.EnumNumber {
@@ -1137,7 +1192,7 @@ func (x WaylineTypeEnumProto) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use WaylineTypeEnumProto.Descriptor instead.
 func (WaylineTypeEnumProto) EnumDescriptor() ([]byte, []int) {
-	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{18}
+	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{19}
 }
 
 type WaylineTurnModeProto int32
@@ -1176,11 +1231,11 @@ func (x WaylineTurnModeProto) String() string {
 }
 
 func (WaylineTurnModeProto) Descriptor() protoreflect.EnumDescriptor {
-	return file_mission_autonomy_types_proto_enumTypes[19].Descriptor()
+	return file_mission_autonomy_types_proto_enumTypes[20].Descriptor()
 }
 
 func (WaylineTurnModeProto) Type() protoreflect.EnumType {
-	return &file_mission_autonomy_types_proto_enumTypes[19]
+	return &file_mission_autonomy_types_proto_enumTypes[20]
 }
 
 func (x WaylineTurnModeProto) Number() protoreflect.EnumNumber {
@@ -1189,7 +1244,7 @@ func (x WaylineTurnModeProto) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use WaylineTurnModeProto.Descriptor instead.
 func (WaylineTurnModeProto) EnumDescriptor() ([]byte, []int) {
-	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{19}
+	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{20}
 }
 
 type WaylineGimbalPitchModeProto int32
@@ -1225,11 +1280,11 @@ func (x WaylineGimbalPitchModeProto) String() string {
 }
 
 func (WaylineGimbalPitchModeProto) Descriptor() protoreflect.EnumDescriptor {
-	return file_mission_autonomy_types_proto_enumTypes[20].Descriptor()
+	return file_mission_autonomy_types_proto_enumTypes[21].Descriptor()
 }
 
 func (WaylineGimbalPitchModeProto) Type() protoreflect.EnumType {
-	return &file_mission_autonomy_types_proto_enumTypes[20]
+	return &file_mission_autonomy_types_proto_enumTypes[21]
 }
 
 func (x WaylineGimbalPitchModeProto) Number() protoreflect.EnumNumber {
@@ -1238,7 +1293,7 @@ func (x WaylineGimbalPitchModeProto) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use WaylineGimbalPitchModeProto.Descriptor instead.
 func (WaylineGimbalPitchModeProto) EnumDescriptor() ([]byte, []int) {
-	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{20}
+	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{21}
 }
 
 type RthModeEnumProto int32
@@ -1271,11 +1326,11 @@ func (x RthModeEnumProto) String() string {
 }
 
 func (RthModeEnumProto) Descriptor() protoreflect.EnumDescriptor {
-	return file_mission_autonomy_types_proto_enumTypes[21].Descriptor()
+	return file_mission_autonomy_types_proto_enumTypes[22].Descriptor()
 }
 
 func (RthModeEnumProto) Type() protoreflect.EnumType {
-	return &file_mission_autonomy_types_proto_enumTypes[21]
+	return &file_mission_autonomy_types_proto_enumTypes[22]
 }
 
 func (x RthModeEnumProto) Number() protoreflect.EnumNumber {
@@ -1284,7 +1339,7 @@ func (x RthModeEnumProto) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use RthModeEnumProto.Descriptor instead.
 func (RthModeEnumProto) EnumDescriptor() ([]byte, []int) {
-	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{21}
+	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{22}
 }
 
 type OutOfControlActionEnumProto int32
@@ -1320,11 +1375,11 @@ func (x OutOfControlActionEnumProto) String() string {
 }
 
 func (OutOfControlActionEnumProto) Descriptor() protoreflect.EnumDescriptor {
-	return file_mission_autonomy_types_proto_enumTypes[22].Descriptor()
+	return file_mission_autonomy_types_proto_enumTypes[23].Descriptor()
 }
 
 func (OutOfControlActionEnumProto) Type() protoreflect.EnumType {
-	return &file_mission_autonomy_types_proto_enumTypes[22]
+	return &file_mission_autonomy_types_proto_enumTypes[23]
 }
 
 func (x OutOfControlActionEnumProto) Number() protoreflect.EnumNumber {
@@ -1333,7 +1388,7 @@ func (x OutOfControlActionEnumProto) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use OutOfControlActionEnumProto.Descriptor instead.
 func (OutOfControlActionEnumProto) EnumDescriptor() ([]byte, []int) {
-	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{22}
+	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{23}
 }
 
 type WaylinePrecisionTypeEnumProto int32
@@ -1366,11 +1421,11 @@ func (x WaylinePrecisionTypeEnumProto) String() string {
 }
 
 func (WaylinePrecisionTypeEnumProto) Descriptor() protoreflect.EnumDescriptor {
-	return file_mission_autonomy_types_proto_enumTypes[23].Descriptor()
+	return file_mission_autonomy_types_proto_enumTypes[24].Descriptor()
 }
 
 func (WaylinePrecisionTypeEnumProto) Type() protoreflect.EnumType {
-	return &file_mission_autonomy_types_proto_enumTypes[23]
+	return &file_mission_autonomy_types_proto_enumTypes[24]
 }
 
 func (x WaylinePrecisionTypeEnumProto) Number() protoreflect.EnumNumber {
@@ -1379,7 +1434,7 @@ func (x WaylinePrecisionTypeEnumProto) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use WaylinePrecisionTypeEnumProto.Descriptor instead.
 func (WaylinePrecisionTypeEnumProto) EnumDescriptor() ([]byte, []int) {
-	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{23}
+	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{24}
 }
 
 type FlighttaskBreakReasonEnumProto int32
@@ -1646,11 +1701,11 @@ func (x FlighttaskBreakReasonEnumProto) String() string {
 }
 
 func (FlighttaskBreakReasonEnumProto) Descriptor() protoreflect.EnumDescriptor {
-	return file_mission_autonomy_types_proto_enumTypes[24].Descriptor()
+	return file_mission_autonomy_types_proto_enumTypes[25].Descriptor()
 }
 
 func (FlighttaskBreakReasonEnumProto) Type() protoreflect.EnumType {
-	return &file_mission_autonomy_types_proto_enumTypes[24]
+	return &file_mission_autonomy_types_proto_enumTypes[25]
 }
 
 func (x FlighttaskBreakReasonEnumProto) Number() protoreflect.EnumNumber {
@@ -1659,7 +1714,7 @@ func (x FlighttaskBreakReasonEnumProto) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use FlighttaskBreakReasonEnumProto.Descriptor instead.
 func (FlighttaskBreakReasonEnumProto) EnumDescriptor() ([]byte, []int) {
-	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{24}
+	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{25}
 }
 
 type TaskGoal int32
@@ -1701,11 +1756,11 @@ func (x TaskGoal) String() string {
 }
 
 func (TaskGoal) Descriptor() protoreflect.EnumDescriptor {
-	return file_mission_autonomy_types_proto_enumTypes[25].Descriptor()
+	return file_mission_autonomy_types_proto_enumTypes[26].Descriptor()
 }
 
 func (TaskGoal) Type() protoreflect.EnumType {
-	return &file_mission_autonomy_types_proto_enumTypes[25]
+	return &file_mission_autonomy_types_proto_enumTypes[26]
 }
 
 func (x TaskGoal) Number() protoreflect.EnumNumber {
@@ -1714,7 +1769,7 @@ func (x TaskGoal) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use TaskGoal.Descriptor instead.
 func (TaskGoal) EnumDescriptor() ([]byte, []int) {
-	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{25}
+	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{26}
 }
 
 // Canonical task type enum for mission, command, and SDK DTOs.
@@ -1822,11 +1877,11 @@ func (x TaskTypeProto) String() string {
 }
 
 func (TaskTypeProto) Descriptor() protoreflect.EnumDescriptor {
-	return file_mission_autonomy_types_proto_enumTypes[26].Descriptor()
+	return file_mission_autonomy_types_proto_enumTypes[27].Descriptor()
 }
 
 func (TaskTypeProto) Type() protoreflect.EnumType {
-	return &file_mission_autonomy_types_proto_enumTypes[26]
+	return &file_mission_autonomy_types_proto_enumTypes[27]
 }
 
 func (x TaskTypeProto) Number() protoreflect.EnumNumber {
@@ -1835,7 +1890,7 @@ func (x TaskTypeProto) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use TaskTypeProto.Descriptor instead.
 func (TaskTypeProto) EnumDescriptor() ([]byte, []int) {
-	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{26}
+	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{27}
 }
 
 type TaskStatus int32
@@ -1886,11 +1941,11 @@ func (x TaskStatus) String() string {
 }
 
 func (TaskStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_mission_autonomy_types_proto_enumTypes[27].Descriptor()
+	return file_mission_autonomy_types_proto_enumTypes[28].Descriptor()
 }
 
 func (TaskStatus) Type() protoreflect.EnumType {
-	return &file_mission_autonomy_types_proto_enumTypes[27]
+	return &file_mission_autonomy_types_proto_enumTypes[28]
 }
 
 func (x TaskStatus) Number() protoreflect.EnumNumber {
@@ -1899,7 +1954,7 @@ func (x TaskStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use TaskStatus.Descriptor instead.
 func (TaskStatus) EnumDescriptor() ([]byte, []int) {
-	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{27}
+	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{28}
 }
 
 type MissionType int32
@@ -2011,11 +2066,11 @@ func (x MissionType) String() string {
 }
 
 func (MissionType) Descriptor() protoreflect.EnumDescriptor {
-	return file_mission_autonomy_types_proto_enumTypes[28].Descriptor()
+	return file_mission_autonomy_types_proto_enumTypes[29].Descriptor()
 }
 
 func (MissionType) Type() protoreflect.EnumType {
-	return &file_mission_autonomy_types_proto_enumTypes[28]
+	return &file_mission_autonomy_types_proto_enumTypes[29]
 }
 
 func (x MissionType) Number() protoreflect.EnumNumber {
@@ -2024,7 +2079,7 @@ func (x MissionType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use MissionType.Descriptor instead.
 func (MissionType) EnumDescriptor() ([]byte, []int) {
-	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{28}
+	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{29}
 }
 
 type MissionStatus int32
@@ -2066,11 +2121,11 @@ func (x MissionStatus) String() string {
 }
 
 func (MissionStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_mission_autonomy_types_proto_enumTypes[29].Descriptor()
+	return file_mission_autonomy_types_proto_enumTypes[30].Descriptor()
 }
 
 func (MissionStatus) Type() protoreflect.EnumType {
-	return &file_mission_autonomy_types_proto_enumTypes[29]
+	return &file_mission_autonomy_types_proto_enumTypes[30]
 }
 
 func (x MissionStatus) Number() protoreflect.EnumNumber {
@@ -2079,7 +2134,7 @@ func (x MissionStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use MissionStatus.Descriptor instead.
 func (MissionStatus) EnumDescriptor() ([]byte, []int) {
-	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{29}
+	return file_mission_autonomy_types_proto_rawDescGZIP(), []int{30}
 }
 
 // Dynamic config envelope used by mission and task templates.
@@ -4357,7 +4412,12 @@ const file_mission_autonomy_types_proto_rawDesc = "" +
 	"\x15_continuous_recordingB\x10\n" +
 	"\x0e_photo_captureB\x13\n" +
 	"\x11_capture_intervalB\x17\n" +
-	"\x15_confidence_threshold*\xc1\x01\n" +
+	"\x15_confidence_threshold*\xb3\x01\n" +
+	"\x16SchedulerFiringOutcome\x12(\n" +
+	"$SCHEDULER_FIRING_OUTCOME_UNSPECIFIED\x10\x00\x12$\n" +
+	" SCHEDULER_FIRING_OUTCOME_STARTED\x10\x01\x12$\n" +
+	" SCHEDULER_FIRING_OUTCOME_SKIPPED\x10\x02\x12#\n" +
+	"\x1fSCHEDULER_FIRING_OUTCOME_FAILED\x10\x03*\xc1\x01\n" +
 	"\rSchedulerType\x12\x1a\n" +
 	"\x16SCHEDULER_TYPE_MISSION\x10\x00\x12\x17\n" +
 	"\x13SCHEDULER_TYPE_TASK\x10\x01\x12\x1e\n" +
@@ -4695,94 +4755,95 @@ func file_mission_autonomy_types_proto_rawDescGZIP() []byte {
 	return file_mission_autonomy_types_proto_rawDescData
 }
 
-var file_mission_autonomy_types_proto_enumTypes = make([]protoimpl.EnumInfo, 30)
+var file_mission_autonomy_types_proto_enumTypes = make([]protoimpl.EnumInfo, 31)
 var file_mission_autonomy_types_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
 var file_mission_autonomy_types_proto_goTypes = []any{
-	(SchedulerType)(0),                                    // 0: zqnt.SchedulerType
-	(GeoAreaType)(0),                                      // 1: zqnt.GeoAreaType
-	(MissionZoneType)(0),                                  // 2: zqnt.MissionZoneType
-	(ZoneEnforcementType)(0),                              // 3: zqnt.ZoneEnforcementType
-	(ExecutionStrategy)(0),                                // 4: zqnt.ExecutionStrategy
-	(FailureStrategy)(0),                                  // 5: zqnt.FailureStrategy
-	(WorkflowStepType)(0),                                 // 6: zqnt.WorkflowStepType
-	(WorkflowStepStatus)(0),                               // 7: zqnt.WorkflowStepStatus
-	(AutonomyMode)(0),                                     // 8: zqnt.AutonomyMode
-	(DecisionStrategyType)(0),                             // 9: zqnt.DecisionStrategyType
-	(DecisionTriggerType)(0),                              // 10: zqnt.DecisionTriggerType
-	(DecisionActionType)(0),                               // 11: zqnt.DecisionActionType
-	(MissionAutonomyCommand)(0),                           // 12: zqnt.MissionAutonomyCommand
-	(VehicleAction)(0),                                    // 13: zqnt.VehicleAction
-	(FlyToWaylineModeProto)(0),                            // 14: zqnt.FlyToWaylineModeProto
-	(WaylineFinishActionProto)(0),                         // 15: zqnt.WaylineFinishActionProto
-	(ExitWaylineWhenRcLostEnumProto)(0),                   // 16: zqnt.ExitWaylineWhenRcLostEnumProto
-	(RcLostActionEnumProto)(0),                            // 17: zqnt.RcLostActionEnumProto
-	(WaylineTypeEnumProto)(0),                             // 18: zqnt.WaylineTypeEnumProto
-	(WaylineTurnModeProto)(0),                             // 19: zqnt.WaylineTurnModeProto
-	(WaylineGimbalPitchModeProto)(0),                      // 20: zqnt.WaylineGimbalPitchModeProto
-	(RthModeEnumProto)(0),                                 // 21: zqnt.RthModeEnumProto
-	(OutOfControlActionEnumProto)(0),                      // 22: zqnt.OutOfControlActionEnumProto
-	(WaylinePrecisionTypeEnumProto)(0),                    // 23: zqnt.WaylinePrecisionTypeEnumProto
-	(FlighttaskBreakReasonEnumProto)(0),                   // 24: zqnt.FlighttaskBreakReasonEnumProto
-	(TaskGoal)(0),                                         // 25: zqnt.TaskGoal
-	(TaskTypeProto)(0),                                    // 26: zqnt.TaskTypeProto
-	(TaskStatus)(0),                                       // 27: zqnt.TaskStatus
-	(MissionType)(0),                                      // 28: zqnt.MissionType
-	(MissionStatus)(0),                                    // 29: zqnt.MissionStatus
-	(*DynamicConfigProto)(nil),                            // 30: zqnt.DynamicConfigProto
-	(*DynamicCommandTaskConfigProto)(nil),                 // 31: zqnt.DynamicCommandTaskConfigProto
-	(*DecisionTriggerProto)(nil),                          // 32: zqnt.DecisionTriggerProto
-	(*DecisionConditionProto)(nil),                        // 33: zqnt.DecisionConditionProto
-	(*DecisionConstraintProto)(nil),                       // 34: zqnt.DecisionConstraintProto
-	(*DecisionActionProto)(nil),                           // 35: zqnt.DecisionActionProto
-	(*DecisionRuleProto)(nil),                             // 36: zqnt.DecisionRuleProto
-	(*AutonomyConfigProto)(nil),                           // 37: zqnt.AutonomyConfigProto
-	(*WaypointProtoDTO)(nil),                              // 38: zqnt.WaypointProtoDTO
-	(*WaypointTaskConfigProto)(nil),                       // 39: zqnt.WaypointTaskConfigProto
-	(*DetectTaskConfigProto)(nil),                         // 40: zqnt.DetectTaskConfigProto
-	(*AreaMappingTaskConfigProto)(nil),                    // 41: zqnt.AreaMappingTaskConfigProto
-	(*PoiTaskConfigProto)(nil),                            // 42: zqnt.PoiTaskConfigProto
-	(*FollowTaskConfigProto)(nil),                         // 43: zqnt.FollowTaskConfigProto
-	(*TrackTaskConfigProto)(nil),                          // 44: zqnt.TrackTaskConfigProto
-	(*DetectTaskConfigProto_DetectionParameterProto)(nil), // 45: zqnt.DetectTaskConfigProto.DetectionParameterProto
-	(*AreaMappingTaskConfigProto_AreaVertexProto)(nil),    // 46: zqnt.AreaMappingTaskConfigProto.AreaVertexProto
-	(*structpb.Struct)(nil),                               // 47: google.protobuf.Struct
-	(*proto.CapabilityTarget)(nil),                        // 48: zqnt.CapabilityTarget
-	(*structpb.Value)(nil),                                // 49: google.protobuf.Value
+	(SchedulerFiringOutcome)(0),                           // 0: zqnt.SchedulerFiringOutcome
+	(SchedulerType)(0),                                    // 1: zqnt.SchedulerType
+	(GeoAreaType)(0),                                      // 2: zqnt.GeoAreaType
+	(MissionZoneType)(0),                                  // 3: zqnt.MissionZoneType
+	(ZoneEnforcementType)(0),                              // 4: zqnt.ZoneEnforcementType
+	(ExecutionStrategy)(0),                                // 5: zqnt.ExecutionStrategy
+	(FailureStrategy)(0),                                  // 6: zqnt.FailureStrategy
+	(WorkflowStepType)(0),                                 // 7: zqnt.WorkflowStepType
+	(WorkflowStepStatus)(0),                               // 8: zqnt.WorkflowStepStatus
+	(AutonomyMode)(0),                                     // 9: zqnt.AutonomyMode
+	(DecisionStrategyType)(0),                             // 10: zqnt.DecisionStrategyType
+	(DecisionTriggerType)(0),                              // 11: zqnt.DecisionTriggerType
+	(DecisionActionType)(0),                               // 12: zqnt.DecisionActionType
+	(MissionAutonomyCommand)(0),                           // 13: zqnt.MissionAutonomyCommand
+	(VehicleAction)(0),                                    // 14: zqnt.VehicleAction
+	(FlyToWaylineModeProto)(0),                            // 15: zqnt.FlyToWaylineModeProto
+	(WaylineFinishActionProto)(0),                         // 16: zqnt.WaylineFinishActionProto
+	(ExitWaylineWhenRcLostEnumProto)(0),                   // 17: zqnt.ExitWaylineWhenRcLostEnumProto
+	(RcLostActionEnumProto)(0),                            // 18: zqnt.RcLostActionEnumProto
+	(WaylineTypeEnumProto)(0),                             // 19: zqnt.WaylineTypeEnumProto
+	(WaylineTurnModeProto)(0),                             // 20: zqnt.WaylineTurnModeProto
+	(WaylineGimbalPitchModeProto)(0),                      // 21: zqnt.WaylineGimbalPitchModeProto
+	(RthModeEnumProto)(0),                                 // 22: zqnt.RthModeEnumProto
+	(OutOfControlActionEnumProto)(0),                      // 23: zqnt.OutOfControlActionEnumProto
+	(WaylinePrecisionTypeEnumProto)(0),                    // 24: zqnt.WaylinePrecisionTypeEnumProto
+	(FlighttaskBreakReasonEnumProto)(0),                   // 25: zqnt.FlighttaskBreakReasonEnumProto
+	(TaskGoal)(0),                                         // 26: zqnt.TaskGoal
+	(TaskTypeProto)(0),                                    // 27: zqnt.TaskTypeProto
+	(TaskStatus)(0),                                       // 28: zqnt.TaskStatus
+	(MissionType)(0),                                      // 29: zqnt.MissionType
+	(MissionStatus)(0),                                    // 30: zqnt.MissionStatus
+	(*DynamicConfigProto)(nil),                            // 31: zqnt.DynamicConfigProto
+	(*DynamicCommandTaskConfigProto)(nil),                 // 32: zqnt.DynamicCommandTaskConfigProto
+	(*DecisionTriggerProto)(nil),                          // 33: zqnt.DecisionTriggerProto
+	(*DecisionConditionProto)(nil),                        // 34: zqnt.DecisionConditionProto
+	(*DecisionConstraintProto)(nil),                       // 35: zqnt.DecisionConstraintProto
+	(*DecisionActionProto)(nil),                           // 36: zqnt.DecisionActionProto
+	(*DecisionRuleProto)(nil),                             // 37: zqnt.DecisionRuleProto
+	(*AutonomyConfigProto)(nil),                           // 38: zqnt.AutonomyConfigProto
+	(*WaypointProtoDTO)(nil),                              // 39: zqnt.WaypointProtoDTO
+	(*WaypointTaskConfigProto)(nil),                       // 40: zqnt.WaypointTaskConfigProto
+	(*DetectTaskConfigProto)(nil),                         // 41: zqnt.DetectTaskConfigProto
+	(*AreaMappingTaskConfigProto)(nil),                    // 42: zqnt.AreaMappingTaskConfigProto
+	(*PoiTaskConfigProto)(nil),                            // 43: zqnt.PoiTaskConfigProto
+	(*FollowTaskConfigProto)(nil),                         // 44: zqnt.FollowTaskConfigProto
+	(*TrackTaskConfigProto)(nil),                          // 45: zqnt.TrackTaskConfigProto
+	(*DetectTaskConfigProto_DetectionParameterProto)(nil), // 46: zqnt.DetectTaskConfigProto.DetectionParameterProto
+	(*AreaMappingTaskConfigProto_AreaVertexProto)(nil),    // 47: zqnt.AreaMappingTaskConfigProto.AreaVertexProto
+	(*structpb.Struct)(nil),                               // 48: google.protobuf.Struct
+	(*proto.CapabilityTarget)(nil),                        // 49: zqnt.CapabilityTarget
+	(*structpb.Value)(nil),                                // 50: google.protobuf.Value
 }
 var file_mission_autonomy_types_proto_depIdxs = []int32{
-	47, // 0: zqnt.DynamicConfigProto.template_config:type_name -> google.protobuf.Struct
-	47, // 1: zqnt.DynamicConfigProto.overrides:type_name -> google.protobuf.Struct
-	47, // 2: zqnt.DynamicConfigProto.decision_config:type_name -> google.protobuf.Struct
-	48, // 3: zqnt.DynamicCommandTaskConfigProto.target:type_name -> zqnt.CapabilityTarget
-	47, // 4: zqnt.DynamicCommandTaskConfigProto.params:type_name -> google.protobuf.Struct
-	10, // 5: zqnt.DecisionTriggerProto.type:type_name -> zqnt.DecisionTriggerType
-	47, // 6: zqnt.DecisionTriggerProto.params:type_name -> google.protobuf.Struct
-	49, // 7: zqnt.DecisionConditionProto.value:type_name -> google.protobuf.Value
-	47, // 8: zqnt.DecisionConstraintProto.params:type_name -> google.protobuf.Struct
-	11, // 9: zqnt.DecisionActionProto.type:type_name -> zqnt.DecisionActionType
-	47, // 10: zqnt.DecisionActionProto.params:type_name -> google.protobuf.Struct
-	32, // 11: zqnt.DecisionRuleProto.triggers:type_name -> zqnt.DecisionTriggerProto
-	33, // 12: zqnt.DecisionRuleProto.conditions:type_name -> zqnt.DecisionConditionProto
-	34, // 13: zqnt.DecisionRuleProto.constraints:type_name -> zqnt.DecisionConstraintProto
-	35, // 14: zqnt.DecisionRuleProto.actions:type_name -> zqnt.DecisionActionProto
-	8,  // 15: zqnt.AutonomyConfigProto.mode:type_name -> zqnt.AutonomyMode
-	9,  // 16: zqnt.AutonomyConfigProto.strategy_type:type_name -> zqnt.DecisionStrategyType
-	30, // 17: zqnt.AutonomyConfigProto.dynamic_config:type_name -> zqnt.DynamicConfigProto
-	36, // 18: zqnt.AutonomyConfigProto.decision_rules:type_name -> zqnt.DecisionRuleProto
-	13, // 19: zqnt.WaypointProtoDTO.vehicle_action:type_name -> zqnt.VehicleAction
-	38, // 20: zqnt.WaypointTaskConfigProto.waypoints:type_name -> zqnt.WaypointProtoDTO
-	14, // 21: zqnt.WaypointTaskConfigProto.fly_to_wayline_mode:type_name -> zqnt.FlyToWaylineModeProto
-	15, // 22: zqnt.WaypointTaskConfigProto.wayline_finish_action:type_name -> zqnt.WaylineFinishActionProto
-	18, // 23: zqnt.WaypointTaskConfigProto.wayline_type:type_name -> zqnt.WaylineTypeEnumProto
-	19, // 24: zqnt.WaypointTaskConfigProto.wayline_turn_mode:type_name -> zqnt.WaylineTurnModeProto
-	23, // 25: zqnt.WaypointTaskConfigProto.wayline_precision_type:type_name -> zqnt.WaylinePrecisionTypeEnumProto
-	16, // 26: zqnt.WaypointTaskConfigProto.exit_wayline_when_rc_lost_enum:type_name -> zqnt.ExitWaylineWhenRcLostEnumProto
-	17, // 27: zqnt.WaypointTaskConfigProto.rc_lost_action_enum:type_name -> zqnt.RcLostActionEnumProto
-	22, // 28: zqnt.WaypointTaskConfigProto.out_of_control_action:type_name -> zqnt.OutOfControlActionEnumProto
-	21, // 29: zqnt.WaypointTaskConfigProto.rth_mode:type_name -> zqnt.RthModeEnumProto
-	20, // 30: zqnt.WaypointTaskConfigProto.gimbal_pitch_mode:type_name -> zqnt.WaylineGimbalPitchModeProto
-	45, // 31: zqnt.DetectTaskConfigProto.detection_parameters:type_name -> zqnt.DetectTaskConfigProto.DetectionParameterProto
-	46, // 32: zqnt.AreaMappingTaskConfigProto.area_vertices:type_name -> zqnt.AreaMappingTaskConfigProto.AreaVertexProto
+	48, // 0: zqnt.DynamicConfigProto.template_config:type_name -> google.protobuf.Struct
+	48, // 1: zqnt.DynamicConfigProto.overrides:type_name -> google.protobuf.Struct
+	48, // 2: zqnt.DynamicConfigProto.decision_config:type_name -> google.protobuf.Struct
+	49, // 3: zqnt.DynamicCommandTaskConfigProto.target:type_name -> zqnt.CapabilityTarget
+	48, // 4: zqnt.DynamicCommandTaskConfigProto.params:type_name -> google.protobuf.Struct
+	11, // 5: zqnt.DecisionTriggerProto.type:type_name -> zqnt.DecisionTriggerType
+	48, // 6: zqnt.DecisionTriggerProto.params:type_name -> google.protobuf.Struct
+	50, // 7: zqnt.DecisionConditionProto.value:type_name -> google.protobuf.Value
+	48, // 8: zqnt.DecisionConstraintProto.params:type_name -> google.protobuf.Struct
+	12, // 9: zqnt.DecisionActionProto.type:type_name -> zqnt.DecisionActionType
+	48, // 10: zqnt.DecisionActionProto.params:type_name -> google.protobuf.Struct
+	33, // 11: zqnt.DecisionRuleProto.triggers:type_name -> zqnt.DecisionTriggerProto
+	34, // 12: zqnt.DecisionRuleProto.conditions:type_name -> zqnt.DecisionConditionProto
+	35, // 13: zqnt.DecisionRuleProto.constraints:type_name -> zqnt.DecisionConstraintProto
+	36, // 14: zqnt.DecisionRuleProto.actions:type_name -> zqnt.DecisionActionProto
+	9,  // 15: zqnt.AutonomyConfigProto.mode:type_name -> zqnt.AutonomyMode
+	10, // 16: zqnt.AutonomyConfigProto.strategy_type:type_name -> zqnt.DecisionStrategyType
+	31, // 17: zqnt.AutonomyConfigProto.dynamic_config:type_name -> zqnt.DynamicConfigProto
+	37, // 18: zqnt.AutonomyConfigProto.decision_rules:type_name -> zqnt.DecisionRuleProto
+	14, // 19: zqnt.WaypointProtoDTO.vehicle_action:type_name -> zqnt.VehicleAction
+	39, // 20: zqnt.WaypointTaskConfigProto.waypoints:type_name -> zqnt.WaypointProtoDTO
+	15, // 21: zqnt.WaypointTaskConfigProto.fly_to_wayline_mode:type_name -> zqnt.FlyToWaylineModeProto
+	16, // 22: zqnt.WaypointTaskConfigProto.wayline_finish_action:type_name -> zqnt.WaylineFinishActionProto
+	19, // 23: zqnt.WaypointTaskConfigProto.wayline_type:type_name -> zqnt.WaylineTypeEnumProto
+	20, // 24: zqnt.WaypointTaskConfigProto.wayline_turn_mode:type_name -> zqnt.WaylineTurnModeProto
+	24, // 25: zqnt.WaypointTaskConfigProto.wayline_precision_type:type_name -> zqnt.WaylinePrecisionTypeEnumProto
+	17, // 26: zqnt.WaypointTaskConfigProto.exit_wayline_when_rc_lost_enum:type_name -> zqnt.ExitWaylineWhenRcLostEnumProto
+	18, // 27: zqnt.WaypointTaskConfigProto.rc_lost_action_enum:type_name -> zqnt.RcLostActionEnumProto
+	23, // 28: zqnt.WaypointTaskConfigProto.out_of_control_action:type_name -> zqnt.OutOfControlActionEnumProto
+	22, // 29: zqnt.WaypointTaskConfigProto.rth_mode:type_name -> zqnt.RthModeEnumProto
+	21, // 30: zqnt.WaypointTaskConfigProto.gimbal_pitch_mode:type_name -> zqnt.WaylineGimbalPitchModeProto
+	46, // 31: zqnt.DetectTaskConfigProto.detection_parameters:type_name -> zqnt.DetectTaskConfigProto.DetectionParameterProto
+	47, // 32: zqnt.AreaMappingTaskConfigProto.area_vertices:type_name -> zqnt.AreaMappingTaskConfigProto.AreaVertexProto
 	33, // [33:33] is the sub-list for method output_type
 	33, // [33:33] is the sub-list for method input_type
 	33, // [33:33] is the sub-list for extension type_name
@@ -4815,7 +4876,7 @@ func file_mission_autonomy_types_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_mission_autonomy_types_proto_rawDesc), len(file_mission_autonomy_types_proto_rawDesc)),
-			NumEnums:      30,
+			NumEnums:      31,
 			NumMessages:   17,
 			NumExtensions: 0,
 			NumServices:   0,

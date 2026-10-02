@@ -7,12 +7,14 @@
 package proto
 
 import (
-	proto2 "github.com/Zequent/zqnt-client-sdk-go/gen/common/base/proto"
+	proto "github.com/Zequent/zqnt-client-sdk-go/gen/common/base/proto"
 	_ "github.com/Zequent/zqnt-client-sdk-go/gen/common/proto"
-	proto1 "github.com/Zequent/zqnt-client-sdk-go/gen/devicecontrol/contracts/proto"
-	proto "github.com/Zequent/zqnt-client-sdk-go/gen/missionautonomy/domain/types/proto"
+	proto2 "github.com/Zequent/zqnt-client-sdk-go/gen/devicecontrol/contracts/proto"
+	proto3 "github.com/Zequent/zqnt-client-sdk-go/gen/execution/dto/proto"
+	proto1 "github.com/Zequent/zqnt-client-sdk-go/gen/missionautonomy/domain/types/proto"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	structpb "google.golang.org/protobuf/types/known/structpb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
@@ -29,11 +31,13 @@ const (
 type NotificationEventType int32
 
 const (
-	NotificationEventType_NOTIFICATION_EVENT_UNSPECIFIED   NotificationEventType = 0
-	NotificationEventType_NOTIFICATION_EVENT_ASSET_STATUS  NotificationEventType = 1
-	NotificationEventType_NOTIFICATION_EVENT_TASK          NotificationEventType = 2
-	NotificationEventType_NOTIFICATION_EVENT_MISSION       NotificationEventType = 3
-	NotificationEventType_NOTIFICATION_EVENT_ASSET_RUNTIME NotificationEventType = 4
+	NotificationEventType_NOTIFICATION_EVENT_UNSPECIFIED            NotificationEventType = 0
+	NotificationEventType_NOTIFICATION_EVENT_ASSET_STATUS           NotificationEventType = 1
+	NotificationEventType_NOTIFICATION_EVENT_MISSION                NotificationEventType = 3
+	NotificationEventType_NOTIFICATION_EVENT_ASSET_RUNTIME          NotificationEventType = 4
+	NotificationEventType_NOTIFICATION_EVENT_CAPABILITY_EXECUTION   NotificationEventType = 5
+	NotificationEventType_NOTIFICATION_EVENT_COMMAND_EXECUTION      NotificationEventType = 6
+	NotificationEventType_NOTIFICATION_EVENT_LIVE_STREAM_CAPABILITY NotificationEventType = 7
 )
 
 // Enum value maps for NotificationEventType.
@@ -41,16 +45,20 @@ var (
 	NotificationEventType_name = map[int32]string{
 		0: "NOTIFICATION_EVENT_UNSPECIFIED",
 		1: "NOTIFICATION_EVENT_ASSET_STATUS",
-		2: "NOTIFICATION_EVENT_TASK",
 		3: "NOTIFICATION_EVENT_MISSION",
 		4: "NOTIFICATION_EVENT_ASSET_RUNTIME",
+		5: "NOTIFICATION_EVENT_CAPABILITY_EXECUTION",
+		6: "NOTIFICATION_EVENT_COMMAND_EXECUTION",
+		7: "NOTIFICATION_EVENT_LIVE_STREAM_CAPABILITY",
 	}
 	NotificationEventType_value = map[string]int32{
-		"NOTIFICATION_EVENT_UNSPECIFIED":   0,
-		"NOTIFICATION_EVENT_ASSET_STATUS":  1,
-		"NOTIFICATION_EVENT_TASK":          2,
-		"NOTIFICATION_EVENT_MISSION":       3,
-		"NOTIFICATION_EVENT_ASSET_RUNTIME": 4,
+		"NOTIFICATION_EVENT_UNSPECIFIED":            0,
+		"NOTIFICATION_EVENT_ASSET_STATUS":           1,
+		"NOTIFICATION_EVENT_MISSION":                3,
+		"NOTIFICATION_EVENT_ASSET_RUNTIME":          4,
+		"NOTIFICATION_EVENT_CAPABILITY_EXECUTION":   5,
+		"NOTIFICATION_EVENT_COMMAND_EXECUTION":      6,
+		"NOTIFICATION_EVENT_LIVE_STREAM_CAPABILITY": 7,
 	}
 )
 
@@ -180,6 +188,65 @@ func (x NotificationSourceState) Number() protoreflect.EnumNumber {
 // Deprecated: Use NotificationSourceState.Descriptor instead.
 func (NotificationSourceState) EnumDescriptor() ([]byte, []int) {
 	return file_events_proto_rawDescGZIP(), []int{2}
+}
+
+// Vendor-neutral lifecycle feedback for one physical command dispatched to an edge adapter.
+type CommandExecutionStatus int32
+
+const (
+	CommandExecutionStatus_COMMAND_EXECUTION_STATUS_UNSPECIFIED CommandExecutionStatus = 0
+	CommandExecutionStatus_COMMAND_EXECUTION_STATUS_ACCEPTED    CommandExecutionStatus = 1
+	CommandExecutionStatus_COMMAND_EXECUTION_STATUS_RUNNING     CommandExecutionStatus = 2
+	CommandExecutionStatus_COMMAND_EXECUTION_STATUS_SUCCEEDED   CommandExecutionStatus = 3
+	CommandExecutionStatus_COMMAND_EXECUTION_STATUS_FAILED      CommandExecutionStatus = 4
+	CommandExecutionStatus_COMMAND_EXECUTION_STATUS_CANCELLED   CommandExecutionStatus = 5
+)
+
+// Enum value maps for CommandExecutionStatus.
+var (
+	CommandExecutionStatus_name = map[int32]string{
+		0: "COMMAND_EXECUTION_STATUS_UNSPECIFIED",
+		1: "COMMAND_EXECUTION_STATUS_ACCEPTED",
+		2: "COMMAND_EXECUTION_STATUS_RUNNING",
+		3: "COMMAND_EXECUTION_STATUS_SUCCEEDED",
+		4: "COMMAND_EXECUTION_STATUS_FAILED",
+		5: "COMMAND_EXECUTION_STATUS_CANCELLED",
+	}
+	CommandExecutionStatus_value = map[string]int32{
+		"COMMAND_EXECUTION_STATUS_UNSPECIFIED": 0,
+		"COMMAND_EXECUTION_STATUS_ACCEPTED":    1,
+		"COMMAND_EXECUTION_STATUS_RUNNING":     2,
+		"COMMAND_EXECUTION_STATUS_SUCCEEDED":   3,
+		"COMMAND_EXECUTION_STATUS_FAILED":      4,
+		"COMMAND_EXECUTION_STATUS_CANCELLED":   5,
+	}
+)
+
+func (x CommandExecutionStatus) Enum() *CommandExecutionStatus {
+	p := new(CommandExecutionStatus)
+	*p = x
+	return p
+}
+
+func (x CommandExecutionStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (CommandExecutionStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_events_proto_enumTypes[3].Descriptor()
+}
+
+func (CommandExecutionStatus) Type() protoreflect.EnumType {
+	return &file_events_proto_enumTypes[3]
+}
+
+func (x CommandExecutionStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use CommandExecutionStatus.Descriptor instead.
+func (CommandExecutionStatus) EnumDescriptor() ([]byte, []int) {
+	return file_events_proto_rawDescGZIP(), []int{3}
 }
 
 // Confirms that the notification subscription is alive independently of incoming events.
@@ -364,32 +431,35 @@ func (x *AssetStatusEvent) GetMessage() string {
 	return ""
 }
 
-type TaskEvent struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	TaskId           string                 `protobuf:"bytes,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
-	TaskType         proto.TaskTypeProto    `protobuf:"varint,2,opt,name=task_type,json=taskType,proto3,enum=zqnt.TaskTypeProto" json:"task_type,omitempty"`
-	Status           proto.TaskStatus       `protobuf:"varint,3,opt,name=status,proto3,enum=zqnt.TaskStatus" json:"status,omitempty"`
-	Progress         *float32               `protobuf:"fixed32,4,opt,name=progress,proto3,oneof" json:"progress,omitempty"`
-	Message          *string                `protobuf:"bytes,5,opt,name=message,proto3,oneof" json:"message,omitempty"`
-	ExternalTaskType *string                `protobuf:"bytes,6,opt,name=external_task_type,json=externalTaskType,proto3,oneof" json:"external_task_type,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+type CommandExecutionEvent struct {
+	state               protoimpl.MessageState    `protogen:"open.v1"`
+	ExternalExecutionId string                    `protobuf:"bytes,1,opt,name=external_execution_id,json=externalExecutionId,proto3" json:"external_execution_id,omitempty"`
+	CommandId           *string                   `protobuf:"bytes,2,opt,name=command_id,json=commandId,proto3,oneof" json:"command_id,omitempty"`
+	Status              CommandExecutionStatus    `protobuf:"varint,3,opt,name=status,proto3,enum=zqnt.CommandExecutionStatus" json:"status,omitempty"`
+	Progress            *float32                  `protobuf:"fixed32,4,opt,name=progress,proto3,oneof" json:"progress,omitempty"`
+	Message             *string                   `protobuf:"bytes,5,opt,name=message,proto3,oneof" json:"message,omitempty"`
+	Output              *structpb.Struct          `protobuf:"bytes,6,opt,name=output,proto3" json:"output,omitempty"`
+	Error               *proto.GlobalErrorMessage `protobuf:"bytes,7,opt,name=error,proto3,oneof" json:"error,omitempty"`
+	OccurredAt          *timestamppb.Timestamp    `protobuf:"bytes,8,opt,name=occurred_at,json=occurredAt,proto3" json:"occurred_at,omitempty"`
+	AssetSn             string                    `protobuf:"bytes,9,opt,name=asset_sn,json=assetSn,proto3" json:"asset_sn,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
 }
 
-func (x *TaskEvent) Reset() {
-	*x = TaskEvent{}
+func (x *CommandExecutionEvent) Reset() {
+	*x = CommandExecutionEvent{}
 	mi := &file_events_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *TaskEvent) String() string {
+func (x *CommandExecutionEvent) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*TaskEvent) ProtoMessage() {}
+func (*CommandExecutionEvent) ProtoMessage() {}
 
-func (x *TaskEvent) ProtoReflect() protoreflect.Message {
+func (x *CommandExecutionEvent) ProtoReflect() protoreflect.Message {
 	mi := &file_events_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -401,49 +471,70 @@ func (x *TaskEvent) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use TaskEvent.ProtoReflect.Descriptor instead.
-func (*TaskEvent) Descriptor() ([]byte, []int) {
+// Deprecated: Use CommandExecutionEvent.ProtoReflect.Descriptor instead.
+func (*CommandExecutionEvent) Descriptor() ([]byte, []int) {
 	return file_events_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *TaskEvent) GetTaskId() string {
+func (x *CommandExecutionEvent) GetExternalExecutionId() string {
 	if x != nil {
-		return x.TaskId
+		return x.ExternalExecutionId
 	}
 	return ""
 }
 
-func (x *TaskEvent) GetTaskType() proto.TaskTypeProto {
-	if x != nil {
-		return x.TaskType
+func (x *CommandExecutionEvent) GetCommandId() string {
+	if x != nil && x.CommandId != nil {
+		return *x.CommandId
 	}
-	return proto.TaskTypeProto(0)
+	return ""
 }
 
-func (x *TaskEvent) GetStatus() proto.TaskStatus {
+func (x *CommandExecutionEvent) GetStatus() CommandExecutionStatus {
 	if x != nil {
 		return x.Status
 	}
-	return proto.TaskStatus(0)
+	return CommandExecutionStatus_COMMAND_EXECUTION_STATUS_UNSPECIFIED
 }
 
-func (x *TaskEvent) GetProgress() float32 {
+func (x *CommandExecutionEvent) GetProgress() float32 {
 	if x != nil && x.Progress != nil {
 		return *x.Progress
 	}
 	return 0
 }
 
-func (x *TaskEvent) GetMessage() string {
+func (x *CommandExecutionEvent) GetMessage() string {
 	if x != nil && x.Message != nil {
 		return *x.Message
 	}
 	return ""
 }
 
-func (x *TaskEvent) GetExternalTaskType() string {
-	if x != nil && x.ExternalTaskType != nil {
-		return *x.ExternalTaskType
+func (x *CommandExecutionEvent) GetOutput() *structpb.Struct {
+	if x != nil {
+		return x.Output
+	}
+	return nil
+}
+
+func (x *CommandExecutionEvent) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		return x.Error
+	}
+	return nil
+}
+
+func (x *CommandExecutionEvent) GetOccurredAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.OccurredAt
+	}
+	return nil
+}
+
+func (x *CommandExecutionEvent) GetAssetSn() string {
+	if x != nil {
+		return x.AssetSn
 	}
 	return ""
 }
@@ -451,8 +542,8 @@ func (x *TaskEvent) GetExternalTaskType() string {
 type MissionEvent struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	MissionId     string                 `protobuf:"bytes,1,opt,name=mission_id,json=missionId,proto3" json:"mission_id,omitempty"`
-	MissionType   proto.MissionType      `protobuf:"varint,2,opt,name=mission_type,json=missionType,proto3,enum=zqnt.MissionType" json:"mission_type,omitempty"`
-	Status        proto.MissionStatus    `protobuf:"varint,3,opt,name=status,proto3,enum=zqnt.MissionStatus" json:"status,omitempty"`
+	MissionType   proto1.MissionType     `protobuf:"varint,2,opt,name=mission_type,json=missionType,proto3,enum=zqnt.MissionType" json:"mission_type,omitempty"`
+	Status        proto1.MissionStatus   `protobuf:"varint,3,opt,name=status,proto3,enum=zqnt.MissionStatus" json:"status,omitempty"`
 	Message       *string                `protobuf:"bytes,4,opt,name=message,proto3,oneof" json:"message,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -495,18 +586,18 @@ func (x *MissionEvent) GetMissionId() string {
 	return ""
 }
 
-func (x *MissionEvent) GetMissionType() proto.MissionType {
+func (x *MissionEvent) GetMissionType() proto1.MissionType {
 	if x != nil {
 		return x.MissionType
 	}
-	return proto.MissionType(0)
+	return proto1.MissionType(0)
 }
 
-func (x *MissionEvent) GetStatus() proto.MissionStatus {
+func (x *MissionEvent) GetStatus() proto1.MissionStatus {
 	if x != nil {
 		return x.Status
 	}
-	return proto.MissionStatus(0)
+	return proto1.MissionStatus(0)
 }
 
 func (x *MissionEvent) GetMessage() string {
@@ -526,7 +617,7 @@ type AssetRuntimeEvent struct {
 	Revision      string                         `protobuf:"bytes,3,opt,name=revision,proto3" json:"revision,omitempty"`
 	ObservedAt    *timestamppb.Timestamp         `protobuf:"bytes,4,opt,name=observed_at,json=observedAt,proto3" json:"observed_at,omitempty"`
 	ValidUntil    *timestamppb.Timestamp         `protobuf:"bytes,5,opt,name=valid_until,json=validUntil,proto3,oneof" json:"valid_until,omitempty"`
-	SnapshotState proto1.CapabilitySnapshotState `protobuf:"varint,6,opt,name=snapshot_state,json=snapshotState,proto3,enum=zqnt.CapabilitySnapshotState" json:"snapshot_state,omitempty"`
+	SnapshotState proto2.CapabilitySnapshotState `protobuf:"varint,6,opt,name=snapshot_state,json=snapshotState,proto3,enum=zqnt.CapabilitySnapshotState" json:"snapshot_state,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -596,11 +687,102 @@ func (x *AssetRuntimeEvent) GetValidUntil() *timestamppb.Timestamp {
 	return nil
 }
 
-func (x *AssetRuntimeEvent) GetSnapshotState() proto1.CapabilitySnapshotState {
+func (x *AssetRuntimeEvent) GetSnapshotState() proto2.CapabilitySnapshotState {
 	if x != nil {
 		return x.SnapshotState
 	}
-	return proto1.CapabilitySnapshotState(0)
+	return proto2.CapabilitySnapshotState(0)
+}
+
+// An edge adapter reporting that a camera can stream right now -- or has stopped being able to.
+//
+// It exists so that an adapter never starts a stream on its own. A publishing credential is minted
+// by the platform, for one path, one direction and minutes; an adapter has no access to the key
+// store and cannot mint one, so a device that "auto-starts" from a URL stored on its asset is
+// publishing with whatever credential was written there months ago -- or, against a media server
+// that authenticates, not publishing at all.
+//
+// With this the adapter states the fact and the platform decides: same StartLiveStream command, same
+// freshly minted URL, whether a user pressed the button or a drone simply became ready.
+type LiveStreamCapabilityEvent struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The device that can stream -- for a DJI dock this is the aircraft, not the dock.
+	Sn      string  `protobuf:"bytes,1,opt,name=sn,proto3" json:"sn,omitempty"`
+	AssetId *string `protobuf:"bytes,2,opt,name=asset_id,json=assetId,proto3,oneof" json:"asset_id,omitempty"`
+	// Whether it can stream now. False is the withdrawal, and the platform stops the stream.
+	Available bool `protobuf:"varint,3,opt,name=available,proto3" json:"available,omitempty"`
+	// The vendor's own identifier for the camera to use, opaque to the platform and passed straight
+	// back in the start command (DJI: "<sn>/<cameraIndex>/<videoIndex>").
+	VideoId *string `protobuf:"bytes,4,opt,name=video_id,json=videoId,proto3,oneof" json:"video_id,omitempty"`
+	// The asset that routes commands to it: a sub-asset is reached through its gateway.
+	GatewaySn     *string `protobuf:"bytes,5,opt,name=gateway_sn,json=gatewaySn,proto3,oneof" json:"gateway_sn,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LiveStreamCapabilityEvent) Reset() {
+	*x = LiveStreamCapabilityEvent{}
+	mi := &file_events_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LiveStreamCapabilityEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LiveStreamCapabilityEvent) ProtoMessage() {}
+
+func (x *LiveStreamCapabilityEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_events_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LiveStreamCapabilityEvent.ProtoReflect.Descriptor instead.
+func (*LiveStreamCapabilityEvent) Descriptor() ([]byte, []int) {
+	return file_events_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *LiveStreamCapabilityEvent) GetSn() string {
+	if x != nil {
+		return x.Sn
+	}
+	return ""
+}
+
+func (x *LiveStreamCapabilityEvent) GetAssetId() string {
+	if x != nil && x.AssetId != nil {
+		return *x.AssetId
+	}
+	return ""
+}
+
+func (x *LiveStreamCapabilityEvent) GetAvailable() bool {
+	if x != nil {
+		return x.Available
+	}
+	return false
+}
+
+func (x *LiveStreamCapabilityEvent) GetVideoId() string {
+	if x != nil && x.VideoId != nil {
+		return *x.VideoId
+	}
+	return ""
+}
+
+func (x *LiveStreamCapabilityEvent) GetGatewaySn() string {
+	if x != nil && x.GatewaySn != nil {
+		return *x.GatewaySn
+	}
+	return ""
 }
 
 type NotificationEvent struct {
@@ -608,10 +790,12 @@ type NotificationEvent struct {
 	// Types that are valid to be assigned to Event:
 	//
 	//	*NotificationEvent_AssetStatus
-	//	*NotificationEvent_Task
 	//	*NotificationEvent_Mission
 	//	*NotificationEvent_Error
 	//	*NotificationEvent_AssetRuntime
+	//	*NotificationEvent_SkillExecution
+	//	*NotificationEvent_CommandExecution
+	//	*NotificationEvent_LiveStreamCapability
 	Event         isNotificationEvent_Event `protobuf_oneof:"event"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -619,7 +803,7 @@ type NotificationEvent struct {
 
 func (x *NotificationEvent) Reset() {
 	*x = NotificationEvent{}
-	mi := &file_events_proto_msgTypes[6]
+	mi := &file_events_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -631,7 +815,7 @@ func (x *NotificationEvent) String() string {
 func (*NotificationEvent) ProtoMessage() {}
 
 func (x *NotificationEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_events_proto_msgTypes[6]
+	mi := &file_events_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -644,7 +828,7 @@ func (x *NotificationEvent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NotificationEvent.ProtoReflect.Descriptor instead.
 func (*NotificationEvent) Descriptor() ([]byte, []int) {
-	return file_events_proto_rawDescGZIP(), []int{6}
+	return file_events_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *NotificationEvent) GetEvent() isNotificationEvent_Event {
@@ -663,15 +847,6 @@ func (x *NotificationEvent) GetAssetStatus() *AssetStatusEvent {
 	return nil
 }
 
-func (x *NotificationEvent) GetTask() *TaskEvent {
-	if x != nil {
-		if x, ok := x.Event.(*NotificationEvent_Task); ok {
-			return x.Task
-		}
-	}
-	return nil
-}
-
 func (x *NotificationEvent) GetMission() *MissionEvent {
 	if x != nil {
 		if x, ok := x.Event.(*NotificationEvent_Mission); ok {
@@ -681,7 +856,7 @@ func (x *NotificationEvent) GetMission() *MissionEvent {
 	return nil
 }
 
-func (x *NotificationEvent) GetError() *proto2.GlobalErrorMessage {
+func (x *NotificationEvent) GetError() *proto.GlobalErrorMessage {
 	if x != nil {
 		if x, ok := x.Event.(*NotificationEvent_Error); ok {
 			return x.Error
@@ -699,6 +874,33 @@ func (x *NotificationEvent) GetAssetRuntime() *AssetRuntimeEvent {
 	return nil
 }
 
+func (x *NotificationEvent) GetSkillExecution() *proto3.SkillExecutionEventProto {
+	if x != nil {
+		if x, ok := x.Event.(*NotificationEvent_SkillExecution); ok {
+			return x.SkillExecution
+		}
+	}
+	return nil
+}
+
+func (x *NotificationEvent) GetCommandExecution() *CommandExecutionEvent {
+	if x != nil {
+		if x, ok := x.Event.(*NotificationEvent_CommandExecution); ok {
+			return x.CommandExecution
+		}
+	}
+	return nil
+}
+
+func (x *NotificationEvent) GetLiveStreamCapability() *LiveStreamCapabilityEvent {
+	if x != nil {
+		if x, ok := x.Event.(*NotificationEvent_LiveStreamCapability); ok {
+			return x.LiveStreamCapability
+		}
+	}
+	return nil
+}
+
 type isNotificationEvent_Event interface {
 	isNotificationEvent_Event()
 }
@@ -707,25 +909,31 @@ type NotificationEvent_AssetStatus struct {
 	AssetStatus *AssetStatusEvent `protobuf:"bytes,1,opt,name=asset_status,json=assetStatus,proto3,oneof"`
 }
 
-type NotificationEvent_Task struct {
-	Task *TaskEvent `protobuf:"bytes,2,opt,name=task,proto3,oneof"`
-}
-
 type NotificationEvent_Mission struct {
 	Mission *MissionEvent `protobuf:"bytes,3,opt,name=mission,proto3,oneof"`
 }
 
 type NotificationEvent_Error struct {
-	Error *proto2.GlobalErrorMessage `protobuf:"bytes,4,opt,name=error,proto3,oneof"`
+	Error *proto.GlobalErrorMessage `protobuf:"bytes,4,opt,name=error,proto3,oneof"`
 }
 
 type NotificationEvent_AssetRuntime struct {
 	AssetRuntime *AssetRuntimeEvent `protobuf:"bytes,5,opt,name=asset_runtime,json=assetRuntime,proto3,oneof"`
 }
 
-func (*NotificationEvent_AssetStatus) isNotificationEvent_Event() {}
+type NotificationEvent_SkillExecution struct {
+	SkillExecution *proto3.SkillExecutionEventProto `protobuf:"bytes,6,opt,name=skill_execution,json=skillExecution,proto3,oneof"`
+}
 
-func (*NotificationEvent_Task) isNotificationEvent_Event() {}
+type NotificationEvent_CommandExecution struct {
+	CommandExecution *CommandExecutionEvent `protobuf:"bytes,7,opt,name=command_execution,json=commandExecution,proto3,oneof"`
+}
+
+type NotificationEvent_LiveStreamCapability struct {
+	LiveStreamCapability *LiveStreamCapabilityEvent `protobuf:"bytes,8,opt,name=live_stream_capability,json=liveStreamCapability,proto3,oneof"`
+}
+
+func (*NotificationEvent_AssetStatus) isNotificationEvent_Event() {}
 
 func (*NotificationEvent_Mission) isNotificationEvent_Event() {}
 
@@ -733,9 +941,15 @@ func (*NotificationEvent_Error) isNotificationEvent_Event() {}
 
 func (*NotificationEvent_AssetRuntime) isNotificationEvent_Event() {}
 
+func (*NotificationEvent_SkillExecution) isNotificationEvent_Event() {}
+
+func (*NotificationEvent_CommandExecution) isNotificationEvent_Event() {}
+
+func (*NotificationEvent_LiveStreamCapability) isNotificationEvent_Event() {}
+
 type StreamNotificationsRequest struct {
 	state         protoimpl.MessageState  `protogen:"open.v1"`
-	Base          *proto2.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Base          *proto.RequestBase      `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
 	EventTypes    []NotificationEventType `protobuf:"varint,2,rep,packed,name=event_types,json=eventTypes,proto3,enum=zqnt.NotificationEventType" json:"event_types,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -743,7 +957,7 @@ type StreamNotificationsRequest struct {
 
 func (x *StreamNotificationsRequest) Reset() {
 	*x = StreamNotificationsRequest{}
-	mi := &file_events_proto_msgTypes[7]
+	mi := &file_events_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -755,7 +969,7 @@ func (x *StreamNotificationsRequest) String() string {
 func (*StreamNotificationsRequest) ProtoMessage() {}
 
 func (x *StreamNotificationsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_events_proto_msgTypes[7]
+	mi := &file_events_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -768,10 +982,10 @@ func (x *StreamNotificationsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StreamNotificationsRequest.ProtoReflect.Descriptor instead.
 func (*StreamNotificationsRequest) Descriptor() ([]byte, []int) {
-	return file_events_proto_rawDescGZIP(), []int{7}
+	return file_events_proto_rawDescGZIP(), []int{8}
 }
 
-func (x *StreamNotificationsRequest) GetBase() *proto2.RequestBase {
+func (x *StreamNotificationsRequest) GetBase() *proto.RequestBase {
 	if x != nil {
 		return x.Base
 	}
@@ -787,7 +1001,7 @@ func (x *StreamNotificationsRequest) GetEventTypes() []NotificationEventType {
 
 type ProduceNotificationRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Base          *proto2.RequestBase    `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
 	Event         *NotificationEvent     `protobuf:"bytes,2,opt,name=event,proto3" json:"event,omitempty"`
 	Severity      NotificationSeverity   `protobuf:"varint,3,opt,name=severity,proto3,enum=zqnt.NotificationSeverity" json:"severity,omitempty"`
 	EventType     NotificationEventType  `protobuf:"varint,4,opt,name=event_type,json=eventType,proto3,enum=zqnt.NotificationEventType" json:"event_type,omitempty"`
@@ -797,7 +1011,7 @@ type ProduceNotificationRequest struct {
 
 func (x *ProduceNotificationRequest) Reset() {
 	*x = ProduceNotificationRequest{}
-	mi := &file_events_proto_msgTypes[8]
+	mi := &file_events_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -809,7 +1023,7 @@ func (x *ProduceNotificationRequest) String() string {
 func (*ProduceNotificationRequest) ProtoMessage() {}
 
 func (x *ProduceNotificationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_events_proto_msgTypes[8]
+	mi := &file_events_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -822,10 +1036,10 @@ func (x *ProduceNotificationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ProduceNotificationRequest.ProtoReflect.Descriptor instead.
 func (*ProduceNotificationRequest) Descriptor() ([]byte, []int) {
-	return file_events_proto_rawDescGZIP(), []int{8}
+	return file_events_proto_rawDescGZIP(), []int{9}
 }
 
-func (x *ProduceNotificationRequest) GetBase() *proto2.RequestBase {
+func (x *ProduceNotificationRequest) GetBase() *proto.RequestBase {
 	if x != nil {
 		return x.Base
 	}
@@ -873,7 +1087,7 @@ type NotificationResponse struct {
 
 func (x *NotificationResponse) Reset() {
 	*x = NotificationResponse{}
-	mi := &file_events_proto_msgTypes[9]
+	mi := &file_events_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -885,7 +1099,7 @@ func (x *NotificationResponse) String() string {
 func (*NotificationResponse) ProtoMessage() {}
 
 func (x *NotificationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_events_proto_msgTypes[9]
+	mi := &file_events_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -898,7 +1112,7 @@ func (x *NotificationResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NotificationResponse.ProtoReflect.Descriptor instead.
 func (*NotificationResponse) Descriptor() ([]byte, []int) {
-	return file_events_proto_rawDescGZIP(), []int{9}
+	return file_events_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *NotificationResponse) GetTid() string {
@@ -970,7 +1184,7 @@ func (x *NotificationResponse) GetSourceStatus() *NotificationSourceStatus {
 	return nil
 }
 
-func (x *NotificationResponse) GetError() *proto2.GlobalErrorMessage {
+func (x *NotificationResponse) GetError() *proto.GlobalErrorMessage {
 	if x != nil {
 		if x, ok := x.Detail.(*NotificationResponse_Error); ok {
 			return x.Error
@@ -996,7 +1210,7 @@ type NotificationResponse_SourceStatus struct {
 }
 
 type NotificationResponse_Error struct {
-	Error *proto2.GlobalErrorMessage `protobuf:"bytes,9,opt,name=error,proto3,oneof"`
+	Error *proto.GlobalErrorMessage `protobuf:"bytes,9,opt,name=error,proto3,oneof"`
 }
 
 func (*NotificationResponse_Event) isNotificationResponse_Detail() {}
@@ -1011,7 +1225,7 @@ var File_events_proto protoreflect.FileDescriptor
 
 const file_events_proto_rawDesc = "" +
 	"\n" +
-	"\fevents.proto\x12\x04zqnt\x1a\fcommon.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"W\n" +
+	"\fevents.proto\x12\x04zqnt\x1a\fcommon.proto\x1a\x1ecapability-execution-dto.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"W\n" +
 	"\x1bNotificationStreamHeartbeat\x128\n" +
 	"\ttimestamp\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\"\x88\x02\n" +
 	"\x18NotificationSourceStatus\x12\x0e\n" +
@@ -1029,18 +1243,24 @@ const file_events_proto_rawDesc = "" +
 	"\t_asset_idB\t\n" +
 	"\a_onlineB\n" +
 	"\n" +
-	"\b_message\"\xa3\x02\n" +
-	"\tTaskEvent\x12\x17\n" +
-	"\atask_id\x18\x01 \x01(\tR\x06taskId\x120\n" +
-	"\ttask_type\x18\x02 \x01(\x0e2\x13.zqnt.TaskTypeProtoR\btaskType\x12(\n" +
-	"\x06status\x18\x03 \x01(\x0e2\x10.zqnt.TaskStatusR\x06status\x12\x1f\n" +
-	"\bprogress\x18\x04 \x01(\x02H\x00R\bprogress\x88\x01\x01\x12\x1d\n" +
-	"\amessage\x18\x05 \x01(\tH\x01R\amessage\x88\x01\x01\x121\n" +
-	"\x12external_task_type\x18\x06 \x01(\tH\x02R\x10externalTaskType\x88\x01\x01B\v\n" +
+	"\b_message\"\xd5\x03\n" +
+	"\x15CommandExecutionEvent\x122\n" +
+	"\x15external_execution_id\x18\x01 \x01(\tR\x13externalExecutionId\x12\"\n" +
+	"\n" +
+	"command_id\x18\x02 \x01(\tH\x00R\tcommandId\x88\x01\x01\x124\n" +
+	"\x06status\x18\x03 \x01(\x0e2\x1c.zqnt.CommandExecutionStatusR\x06status\x12\x1f\n" +
+	"\bprogress\x18\x04 \x01(\x02H\x01R\bprogress\x88\x01\x01\x12\x1d\n" +
+	"\amessage\x18\x05 \x01(\tH\x02R\amessage\x88\x01\x01\x12/\n" +
+	"\x06output\x18\x06 \x01(\v2\x17.google.protobuf.StructR\x06output\x123\n" +
+	"\x05error\x18\a \x01(\v2\x18.zqnt.GlobalErrorMessageH\x03R\x05error\x88\x01\x01\x12;\n" +
+	"\voccurred_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\n" +
+	"occurredAt\x12\x19\n" +
+	"\basset_sn\x18\t \x01(\tR\aassetSnB\r\n" +
+	"\v_command_idB\v\n" +
 	"\t_progressB\n" +
 	"\n" +
-	"\b_messageB\x15\n" +
-	"\x13_external_task_type\"\xbb\x01\n" +
+	"\b_messageB\b\n" +
+	"\x06_error\"\xbb\x01\n" +
 	"\fMissionEvent\x12\x1d\n" +
 	"\n" +
 	"mission_id\x18\x01 \x01(\tR\tmissionId\x124\n" +
@@ -1059,14 +1279,26 @@ const file_events_proto_rawDesc = "" +
 	"validUntil\x88\x01\x01\x12D\n" +
 	"\x0esnapshot_state\x18\x06 \x01(\x0e2\x1d.zqnt.CapabilitySnapshotStateR\rsnapshotStateB\v\n" +
 	"\t_asset_idB\x0e\n" +
-	"\f_valid_until\"\xa2\x02\n" +
+	"\f_valid_until\"\xd6\x01\n" +
+	"\x19LiveStreamCapabilityEvent\x12\x0e\n" +
+	"\x02sn\x18\x01 \x01(\tR\x02sn\x12\x1e\n" +
+	"\basset_id\x18\x02 \x01(\tH\x00R\aassetId\x88\x01\x01\x12\x1c\n" +
+	"\tavailable\x18\x03 \x01(\bR\tavailable\x12\x1e\n" +
+	"\bvideo_id\x18\x04 \x01(\tH\x01R\avideoId\x88\x01\x01\x12\"\n" +
+	"\n" +
+	"gateway_sn\x18\x05 \x01(\tH\x02R\tgatewaySn\x88\x01\x01B\v\n" +
+	"\t_asset_idB\v\n" +
+	"\t_video_idB\r\n" +
+	"\v_gateway_sn\"\xf7\x03\n" +
 	"\x11NotificationEvent\x12;\n" +
-	"\fasset_status\x18\x01 \x01(\v2\x16.zqnt.AssetStatusEventH\x00R\vassetStatus\x12%\n" +
-	"\x04task\x18\x02 \x01(\v2\x0f.zqnt.TaskEventH\x00R\x04task\x12.\n" +
+	"\fasset_status\x18\x01 \x01(\v2\x16.zqnt.AssetStatusEventH\x00R\vassetStatus\x12.\n" +
 	"\amission\x18\x03 \x01(\v2\x12.zqnt.MissionEventH\x00R\amission\x120\n" +
 	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x12>\n" +
-	"\rasset_runtime\x18\x05 \x01(\v2\x17.zqnt.AssetRuntimeEventH\x00R\fassetRuntimeB\a\n" +
-	"\x05event\"\x81\x01\n" +
+	"\rasset_runtime\x18\x05 \x01(\v2\x17.zqnt.AssetRuntimeEventH\x00R\fassetRuntime\x12I\n" +
+	"\x0fskill_execution\x18\x06 \x01(\v2\x1e.zqnt.SkillExecutionEventProtoH\x00R\x0eskillExecution\x12J\n" +
+	"\x11command_execution\x18\a \x01(\v2\x1b.zqnt.CommandExecutionEventH\x00R\x10commandExecution\x12W\n" +
+	"\x16live_stream_capability\x18\b \x01(\v2\x1f.zqnt.LiveStreamCapabilityEventH\x00R\x14liveStreamCapabilityB\a\n" +
+	"\x05eventJ\x04\b\x02\x10\x03R\x04task\"\x81\x01\n" +
 	"\x1aStreamNotificationsRequest\x12%\n" +
 	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12<\n" +
 	"\vevent_types\x18\x02 \x03(\x0e2\x1b.zqnt.NotificationEventTypeR\n" +
@@ -1089,13 +1321,15 @@ const file_events_proto_rawDesc = "" +
 	"\rsource_status\x18\b \x01(\v2\x1e.zqnt.NotificationSourceStatusH\x00R\fsourceStatus\x120\n" +
 	"\x05error\x18\t \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05errorB\b\n" +
 	"\x06detailB\v\n" +
-	"\t_asset_id*\xc3\x01\n" +
+	"\t_asset_id*\xcb\x02\n" +
 	"\x15NotificationEventType\x12\"\n" +
 	"\x1eNOTIFICATION_EVENT_UNSPECIFIED\x10\x00\x12#\n" +
-	"\x1fNOTIFICATION_EVENT_ASSET_STATUS\x10\x01\x12\x1b\n" +
-	"\x17NOTIFICATION_EVENT_TASK\x10\x02\x12\x1e\n" +
+	"\x1fNOTIFICATION_EVENT_ASSET_STATUS\x10\x01\x12\x1e\n" +
 	"\x1aNOTIFICATION_EVENT_MISSION\x10\x03\x12$\n" +
-	" NOTIFICATION_EVENT_ASSET_RUNTIME\x10\x04*z\n" +
+	" NOTIFICATION_EVENT_ASSET_RUNTIME\x10\x04\x12+\n" +
+	"'NOTIFICATION_EVENT_CAPABILITY_EXECUTION\x10\x05\x12(\n" +
+	"$NOTIFICATION_EVENT_COMMAND_EXECUTION\x10\x06\x12-\n" +
+	")NOTIFICATION_EVENT_LIVE_STREAM_CAPABILITY\x10\a\"\x04\b\x02\x10\x02*\x17NOTIFICATION_EVENT_TASK*z\n" +
 	"\x14NotificationSeverity\x12\x1e\n" +
 	"\x1aNOTIFICATION_SEVERITY_INFO\x10\x00\x12\x1e\n" +
 	"\x1aNOTIFICATION_SEVERITY_WARN\x10\x01\x12\"\n" +
@@ -1104,7 +1338,14 @@ const file_events_proto_rawDesc = "" +
 	"%NOTIFICATION_SOURCE_STATE_UNSPECIFIED\x10\x00\x12$\n" +
 	" NOTIFICATION_SOURCE_STATE_ONLINE\x10\x01\x12#\n" +
 	"\x1fNOTIFICATION_SOURCE_STATE_STALE\x10\x02\x12%\n" +
-	"!NOTIFICATION_SOURCE_STATE_NO_DATA\x10\x03B>\n" +
+	"!NOTIFICATION_SOURCE_STATE_NO_DATA\x10\x03*\x84\x02\n" +
+	"\x16CommandExecutionStatus\x12(\n" +
+	"$COMMAND_EXECUTION_STATUS_UNSPECIFIED\x10\x00\x12%\n" +
+	"!COMMAND_EXECUTION_STATUS_ACCEPTED\x10\x01\x12$\n" +
+	" COMMAND_EXECUTION_STATUS_RUNNING\x10\x02\x12&\n" +
+	"\"COMMAND_EXECUTION_STATUS_SUCCEEDED\x10\x03\x12#\n" +
+	"\x1fCOMMAND_EXECUTION_STATUS_FAILED\x10\x04\x12&\n" +
+	"\"COMMAND_EXECUTION_STATUS_CANCELLED\x10\x05B>\n" +
 	"\x1bcom.zqnt.utils.events.protoB\vEventsProtoP\x01Z\x10gen/events/protob\x06proto3"
 
 var (
@@ -1119,64 +1360,70 @@ func file_events_proto_rawDescGZIP() []byte {
 	return file_events_proto_rawDescData
 }
 
-var file_events_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_events_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_events_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
+var file_events_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_events_proto_goTypes = []any{
-	(NotificationEventType)(0),          // 0: zqnt.NotificationEventType
-	(NotificationSeverity)(0),           // 1: zqnt.NotificationSeverity
-	(NotificationSourceState)(0),        // 2: zqnt.NotificationSourceState
-	(*NotificationStreamHeartbeat)(nil), // 3: zqnt.NotificationStreamHeartbeat
-	(*NotificationSourceStatus)(nil),    // 4: zqnt.NotificationSourceStatus
-	(*AssetStatusEvent)(nil),            // 5: zqnt.AssetStatusEvent
-	(*TaskEvent)(nil),                   // 6: zqnt.TaskEvent
-	(*MissionEvent)(nil),                // 7: zqnt.MissionEvent
-	(*AssetRuntimeEvent)(nil),           // 8: zqnt.AssetRuntimeEvent
-	(*NotificationEvent)(nil),           // 9: zqnt.NotificationEvent
-	(*StreamNotificationsRequest)(nil),  // 10: zqnt.StreamNotificationsRequest
-	(*ProduceNotificationRequest)(nil),  // 11: zqnt.ProduceNotificationRequest
-	(*NotificationResponse)(nil),        // 12: zqnt.NotificationResponse
-	(*timestamppb.Timestamp)(nil),       // 13: google.protobuf.Timestamp
-	(proto.TaskTypeProto)(0),            // 14: zqnt.TaskTypeProto
-	(proto.TaskStatus)(0),               // 15: zqnt.TaskStatus
-	(proto.MissionType)(0),              // 16: zqnt.MissionType
-	(proto.MissionStatus)(0),            // 17: zqnt.MissionStatus
-	(proto1.CapabilitySnapshotState)(0), // 18: zqnt.CapabilitySnapshotState
-	(*proto2.GlobalErrorMessage)(nil),   // 19: zqnt.GlobalErrorMessage
-	(*proto2.RequestBase)(nil),          // 20: zqnt.RequestBase
+	(NotificationEventType)(0),              // 0: zqnt.NotificationEventType
+	(NotificationSeverity)(0),               // 1: zqnt.NotificationSeverity
+	(NotificationSourceState)(0),            // 2: zqnt.NotificationSourceState
+	(CommandExecutionStatus)(0),             // 3: zqnt.CommandExecutionStatus
+	(*NotificationStreamHeartbeat)(nil),     // 4: zqnt.NotificationStreamHeartbeat
+	(*NotificationSourceStatus)(nil),        // 5: zqnt.NotificationSourceStatus
+	(*AssetStatusEvent)(nil),                // 6: zqnt.AssetStatusEvent
+	(*CommandExecutionEvent)(nil),           // 7: zqnt.CommandExecutionEvent
+	(*MissionEvent)(nil),                    // 8: zqnt.MissionEvent
+	(*AssetRuntimeEvent)(nil),               // 9: zqnt.AssetRuntimeEvent
+	(*LiveStreamCapabilityEvent)(nil),       // 10: zqnt.LiveStreamCapabilityEvent
+	(*NotificationEvent)(nil),               // 11: zqnt.NotificationEvent
+	(*StreamNotificationsRequest)(nil),      // 12: zqnt.StreamNotificationsRequest
+	(*ProduceNotificationRequest)(nil),      // 13: zqnt.ProduceNotificationRequest
+	(*NotificationResponse)(nil),            // 14: zqnt.NotificationResponse
+	(*timestamppb.Timestamp)(nil),           // 15: google.protobuf.Timestamp
+	(*structpb.Struct)(nil),                 // 16: google.protobuf.Struct
+	(*proto.GlobalErrorMessage)(nil),        // 17: zqnt.GlobalErrorMessage
+	(proto1.MissionType)(0),                 // 18: zqnt.MissionType
+	(proto1.MissionStatus)(0),               // 19: zqnt.MissionStatus
+	(proto2.CapabilitySnapshotState)(0),     // 20: zqnt.CapabilitySnapshotState
+	(*proto3.SkillExecutionEventProto)(nil), // 21: zqnt.SkillExecutionEventProto
+	(*proto.RequestBase)(nil),               // 22: zqnt.RequestBase
 }
 var file_events_proto_depIdxs = []int32{
-	13, // 0: zqnt.NotificationStreamHeartbeat.timestamp:type_name -> google.protobuf.Timestamp
+	15, // 0: zqnt.NotificationStreamHeartbeat.timestamp:type_name -> google.protobuf.Timestamp
 	2,  // 1: zqnt.NotificationSourceStatus.state:type_name -> zqnt.NotificationSourceState
-	13, // 2: zqnt.NotificationSourceStatus.observed_at:type_name -> google.protobuf.Timestamp
-	13, // 3: zqnt.NotificationSourceStatus.last_notification_at:type_name -> google.protobuf.Timestamp
-	14, // 4: zqnt.TaskEvent.task_type:type_name -> zqnt.TaskTypeProto
-	15, // 5: zqnt.TaskEvent.status:type_name -> zqnt.TaskStatus
-	16, // 6: zqnt.MissionEvent.mission_type:type_name -> zqnt.MissionType
-	17, // 7: zqnt.MissionEvent.status:type_name -> zqnt.MissionStatus
-	13, // 8: zqnt.AssetRuntimeEvent.observed_at:type_name -> google.protobuf.Timestamp
-	13, // 9: zqnt.AssetRuntimeEvent.valid_until:type_name -> google.protobuf.Timestamp
-	18, // 10: zqnt.AssetRuntimeEvent.snapshot_state:type_name -> zqnt.CapabilitySnapshotState
-	5,  // 11: zqnt.NotificationEvent.asset_status:type_name -> zqnt.AssetStatusEvent
-	6,  // 12: zqnt.NotificationEvent.task:type_name -> zqnt.TaskEvent
-	7,  // 13: zqnt.NotificationEvent.mission:type_name -> zqnt.MissionEvent
-	19, // 14: zqnt.NotificationEvent.error:type_name -> zqnt.GlobalErrorMessage
-	8,  // 15: zqnt.NotificationEvent.asset_runtime:type_name -> zqnt.AssetRuntimeEvent
-	20, // 16: zqnt.StreamNotificationsRequest.base:type_name -> zqnt.RequestBase
-	0,  // 17: zqnt.StreamNotificationsRequest.event_types:type_name -> zqnt.NotificationEventType
-	20, // 18: zqnt.ProduceNotificationRequest.base:type_name -> zqnt.RequestBase
-	9,  // 19: zqnt.ProduceNotificationRequest.event:type_name -> zqnt.NotificationEvent
-	1,  // 20: zqnt.ProduceNotificationRequest.severity:type_name -> zqnt.NotificationSeverity
-	0,  // 21: zqnt.ProduceNotificationRequest.event_type:type_name -> zqnt.NotificationEventType
-	13, // 22: zqnt.NotificationResponse.timestamp:type_name -> google.protobuf.Timestamp
-	9,  // 23: zqnt.NotificationResponse.event:type_name -> zqnt.NotificationEvent
-	3,  // 24: zqnt.NotificationResponse.stream_heartbeat:type_name -> zqnt.NotificationStreamHeartbeat
-	4,  // 25: zqnt.NotificationResponse.source_status:type_name -> zqnt.NotificationSourceStatus
-	19, // 26: zqnt.NotificationResponse.error:type_name -> zqnt.GlobalErrorMessage
-	27, // [27:27] is the sub-list for method output_type
-	27, // [27:27] is the sub-list for method input_type
-	27, // [27:27] is the sub-list for extension type_name
-	27, // [27:27] is the sub-list for extension extendee
-	0,  // [0:27] is the sub-list for field type_name
+	15, // 2: zqnt.NotificationSourceStatus.observed_at:type_name -> google.protobuf.Timestamp
+	15, // 3: zqnt.NotificationSourceStatus.last_notification_at:type_name -> google.protobuf.Timestamp
+	3,  // 4: zqnt.CommandExecutionEvent.status:type_name -> zqnt.CommandExecutionStatus
+	16, // 5: zqnt.CommandExecutionEvent.output:type_name -> google.protobuf.Struct
+	17, // 6: zqnt.CommandExecutionEvent.error:type_name -> zqnt.GlobalErrorMessage
+	15, // 7: zqnt.CommandExecutionEvent.occurred_at:type_name -> google.protobuf.Timestamp
+	18, // 8: zqnt.MissionEvent.mission_type:type_name -> zqnt.MissionType
+	19, // 9: zqnt.MissionEvent.status:type_name -> zqnt.MissionStatus
+	15, // 10: zqnt.AssetRuntimeEvent.observed_at:type_name -> google.protobuf.Timestamp
+	15, // 11: zqnt.AssetRuntimeEvent.valid_until:type_name -> google.protobuf.Timestamp
+	20, // 12: zqnt.AssetRuntimeEvent.snapshot_state:type_name -> zqnt.CapabilitySnapshotState
+	6,  // 13: zqnt.NotificationEvent.asset_status:type_name -> zqnt.AssetStatusEvent
+	8,  // 14: zqnt.NotificationEvent.mission:type_name -> zqnt.MissionEvent
+	17, // 15: zqnt.NotificationEvent.error:type_name -> zqnt.GlobalErrorMessage
+	9,  // 16: zqnt.NotificationEvent.asset_runtime:type_name -> zqnt.AssetRuntimeEvent
+	21, // 17: zqnt.NotificationEvent.skill_execution:type_name -> zqnt.SkillExecutionEventProto
+	7,  // 18: zqnt.NotificationEvent.command_execution:type_name -> zqnt.CommandExecutionEvent
+	10, // 19: zqnt.NotificationEvent.live_stream_capability:type_name -> zqnt.LiveStreamCapabilityEvent
+	22, // 20: zqnt.StreamNotificationsRequest.base:type_name -> zqnt.RequestBase
+	0,  // 21: zqnt.StreamNotificationsRequest.event_types:type_name -> zqnt.NotificationEventType
+	22, // 22: zqnt.ProduceNotificationRequest.base:type_name -> zqnt.RequestBase
+	11, // 23: zqnt.ProduceNotificationRequest.event:type_name -> zqnt.NotificationEvent
+	1,  // 24: zqnt.ProduceNotificationRequest.severity:type_name -> zqnt.NotificationSeverity
+	0,  // 25: zqnt.ProduceNotificationRequest.event_type:type_name -> zqnt.NotificationEventType
+	15, // 26: zqnt.NotificationResponse.timestamp:type_name -> google.protobuf.Timestamp
+	11, // 27: zqnt.NotificationResponse.event:type_name -> zqnt.NotificationEvent
+	4,  // 28: zqnt.NotificationResponse.stream_heartbeat:type_name -> zqnt.NotificationStreamHeartbeat
+	5,  // 29: zqnt.NotificationResponse.source_status:type_name -> zqnt.NotificationSourceStatus
+	17, // 30: zqnt.NotificationResponse.error:type_name -> zqnt.GlobalErrorMessage
+	31, // [31:31] is the sub-list for method output_type
+	31, // [31:31] is the sub-list for method input_type
+	31, // [31:31] is the sub-list for extension type_name
+	31, // [31:31] is the sub-list for extension extendee
+	0,  // [0:31] is the sub-list for field type_name
 }
 
 func init() { file_events_proto_init() }
@@ -1189,14 +1436,17 @@ func file_events_proto_init() {
 	file_events_proto_msgTypes[3].OneofWrappers = []any{}
 	file_events_proto_msgTypes[4].OneofWrappers = []any{}
 	file_events_proto_msgTypes[5].OneofWrappers = []any{}
-	file_events_proto_msgTypes[6].OneofWrappers = []any{
+	file_events_proto_msgTypes[6].OneofWrappers = []any{}
+	file_events_proto_msgTypes[7].OneofWrappers = []any{
 		(*NotificationEvent_AssetStatus)(nil),
-		(*NotificationEvent_Task)(nil),
 		(*NotificationEvent_Mission)(nil),
 		(*NotificationEvent_Error)(nil),
 		(*NotificationEvent_AssetRuntime)(nil),
+		(*NotificationEvent_SkillExecution)(nil),
+		(*NotificationEvent_CommandExecution)(nil),
+		(*NotificationEvent_LiveStreamCapability)(nil),
 	}
-	file_events_proto_msgTypes[9].OneofWrappers = []any{
+	file_events_proto_msgTypes[10].OneofWrappers = []any{
 		(*NotificationResponse_Event)(nil),
 		(*NotificationResponse_StreamHeartbeat)(nil),
 		(*NotificationResponse_SourceStatus)(nil),
@@ -1207,8 +1457,8 @@ func file_events_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_events_proto_rawDesc), len(file_events_proto_rawDesc)),
-			NumEnums:      3,
-			NumMessages:   10,
+			NumEnums:      4,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

@@ -10,7 +10,6 @@ import (
 	remotecontrolpb "github.com/Zequent/zqnt-client-sdk-go/gen/remotecontrol/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/protobuf/encoding/protowire"
 )
 
 type fakeService struct {
@@ -100,27 +99,13 @@ func TestGetCapabilitiesReturnsAnErrorOnAServerReportedFailure(t *testing.T) {
 }
 
 // overrideOnTheWire reads CoordinateCommandRequest.no_fly_zone_override (field 3) the way the
-// platform does: from the bytes the server received.
+// platform does: from the request the server decoded.
 func overrideOnTheWire(t *testing.T, req *devicecontrol.CoordinateCommandRequest) (value, present bool) {
 	t.Helper()
-	raw := req.ProtoReflect().GetUnknown()
-	for len(raw) > 0 {
-		number, kind, n := protowire.ConsumeTag(raw)
-		if n < 0 {
-			t.Fatalf("malformed unknown fields")
-		}
-		raw = raw[n:]
-		if number == 3 && kind == protowire.VarintType {
-			v, m := protowire.ConsumeVarint(raw)
-			if m < 0 {
-				t.Fatalf("malformed varint")
-			}
-			return protowire.DecodeBool(v), true
-		}
-		m := protowire.ConsumeFieldValue(number, kind, raw)
-		raw = raw[m:]
+	if req.NoFlyZoneOverride == nil {
+		return false, false
 	}
-	return false, false
+	return req.GetNoFlyZoneOverride(), true
 }
 
 func TestGoToSendsNoOverrideUnlessAsked(t *testing.T) {

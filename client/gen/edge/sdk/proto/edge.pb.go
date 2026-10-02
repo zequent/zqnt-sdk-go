@@ -28,7 +28,7 @@ var File_edge_proto protoreflect.FileDescriptor
 const file_edge_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"edge.proto\x12\x04zqnt\x1a\fcommon.proto2\xbc\x13\n" +
+	"edge.proto\x12\x04zqnt\x1a\fcommon.proto2\xf3\x12\n" +
 	"\x12EdgeAdapterService\x12R\n" +
 	"\x0fGetCapabilities\x12\x1e.zqnt.AssetCapabilitiesRequest\x1a\x1f.zqnt.AssetCapabilitiesResponse\x12@\n" +
 	"\aTakeOff\x12\x1e.zqnt.CoordinateCommandRequest\x1a\x15.zqnt.CommandResponse\x12=\n" +
@@ -39,8 +39,7 @@ const file_edge_proto_rawDesc = "" +
 	"\x12ManualControlInput\x12&.zqnt.ManualControlInputCommandRequest\x1a\x15.zqnt.CommandResponse(\x01\x12;\n" +
 	"\x06LookAt\x12\x1a.zqnt.LookAtCommandRequest\x1a\x15.zqnt.CommandResponse\x12I\n" +
 	"\x14EnableGimbalTracking\x12\x1a.zqnt.ToggleCommandRequest\x1a\x15.zqnt.CommandResponse\x12E\n" +
-	"\rGetDetections\x12\x1c.zqnt.DetectionStreamRequest\x1a\x14.zqnt.DetectionBatch0\x01\x12G\n" +
-	"\fPlayTTSAudio\x12 .zqnt.TextToSpeechCommandRequest\x1a\x15.zqnt.CommandResponse\x12=\n" +
+	"\rGetDetections\x12\x1c.zqnt.DetectionStreamRequest\x1a\x14.zqnt.DetectionBatch0\x01\x12=\n" +
 	"\tOpenCover\x12\x19.zqnt.EmptyCommandRequest\x1a\x15.zqnt.CommandResponse\x12C\n" +
 	"\n" +
 	"CloseCover\x12\x1e.zqnt.CloseCoverCommandRequest\x1a\x15.zqnt.CommandResponse\x12A\n" +
@@ -80,21 +79,20 @@ var file_edge_proto_goTypes = []any{
 	(*proto.LookAtCommandRequest)(nil),             // 5: zqnt.LookAtCommandRequest
 	(*proto.ToggleCommandRequest)(nil),             // 6: zqnt.ToggleCommandRequest
 	(*proto1.DetectionStreamRequest)(nil),          // 7: zqnt.DetectionStreamRequest
-	(*proto.TextToSpeechCommandRequest)(nil),       // 8: zqnt.TextToSpeechCommandRequest
-	(*proto.EmptyCommandRequest)(nil),              // 9: zqnt.EmptyCommandRequest
-	(*proto.CloseCoverCommandRequest)(nil),         // 10: zqnt.CloseCoverCommandRequest
-	(*proto.RegisterAssetCommandRequest)(nil),      // 11: zqnt.RegisterAssetCommandRequest
-	(*proto.ChangeAcModeCommandRequest)(nil),       // 12: zqnt.ChangeAcModeCommandRequest
-	(*proto.LiveStreamStartCommandRequest)(nil),    // 13: zqnt.LiveStreamStartCommandRequest
-	(*proto.LiveStreamStopCommandRequest)(nil),     // 14: zqnt.LiveStreamStopCommandRequest
-	(*proto.ChangeCameraLensCommandRequest)(nil),   // 15: zqnt.ChangeCameraLensCommandRequest
-	(*proto.ChangeCameraZoomCommandRequest)(nil),   // 16: zqnt.ChangeCameraZoomCommandRequest
-	(*proto.TaskCommandRequest)(nil),               // 17: zqnt.TaskCommandRequest
-	(*proto.CustomCommandRequest)(nil),             // 18: zqnt.CustomCommandRequest
-	(*proto.AssetCapabilitiesResponse)(nil),        // 19: zqnt.AssetCapabilitiesResponse
-	(*proto.CommandResponse)(nil),                  // 20: zqnt.CommandResponse
-	(*proto1.DetectionBatch)(nil),                  // 21: zqnt.DetectionBatch
-	(*proto.CustomCommandResponse)(nil),            // 22: zqnt.CustomCommandResponse
+	(*proto.EmptyCommandRequest)(nil),              // 8: zqnt.EmptyCommandRequest
+	(*proto.CloseCoverCommandRequest)(nil),         // 9: zqnt.CloseCoverCommandRequest
+	(*proto.RegisterAssetCommandRequest)(nil),      // 10: zqnt.RegisterAssetCommandRequest
+	(*proto.ChangeAcModeCommandRequest)(nil),       // 11: zqnt.ChangeAcModeCommandRequest
+	(*proto.LiveStreamStartCommandRequest)(nil),    // 12: zqnt.LiveStreamStartCommandRequest
+	(*proto.LiveStreamStopCommandRequest)(nil),     // 13: zqnt.LiveStreamStopCommandRequest
+	(*proto.ChangeCameraLensCommandRequest)(nil),   // 14: zqnt.ChangeCameraLensCommandRequest
+	(*proto.ChangeCameraZoomCommandRequest)(nil),   // 15: zqnt.ChangeCameraZoomCommandRequest
+	(*proto.TaskCommandRequest)(nil),               // 16: zqnt.TaskCommandRequest
+	(*proto.CustomCommandRequest)(nil),             // 17: zqnt.CustomCommandRequest
+	(*proto.AssetCapabilitiesResponse)(nil),        // 18: zqnt.AssetCapabilitiesResponse
+	(*proto.CommandResponse)(nil),                  // 19: zqnt.CommandResponse
+	(*proto1.DetectionBatch)(nil),                  // 20: zqnt.DetectionBatch
+	(*proto.CustomCommandResponse)(nil),            // 21: zqnt.CustomCommandResponse
 }
 var file_edge_proto_depIdxs = []int32{
 	0,  // 0: zqnt.EdgeAdapterService.GetCapabilities:input_type -> zqnt.AssetCapabilitiesRequest
@@ -107,68 +105,66 @@ var file_edge_proto_depIdxs = []int32{
 	5,  // 7: zqnt.EdgeAdapterService.LookAt:input_type -> zqnt.LookAtCommandRequest
 	6,  // 8: zqnt.EdgeAdapterService.EnableGimbalTracking:input_type -> zqnt.ToggleCommandRequest
 	7,  // 9: zqnt.EdgeAdapterService.GetDetections:input_type -> zqnt.DetectionStreamRequest
-	8,  // 10: zqnt.EdgeAdapterService.PlayTTSAudio:input_type -> zqnt.TextToSpeechCommandRequest
-	9,  // 11: zqnt.EdgeAdapterService.OpenCover:input_type -> zqnt.EmptyCommandRequest
-	10, // 12: zqnt.EdgeAdapterService.CloseCover:input_type -> zqnt.CloseCoverCommandRequest
-	9,  // 13: zqnt.EdgeAdapterService.StartCharging:input_type -> zqnt.EmptyCommandRequest
-	9,  // 14: zqnt.EdgeAdapterService.StopCharging:input_type -> zqnt.EmptyCommandRequest
-	9,  // 15: zqnt.EdgeAdapterService.RebootAsset:input_type -> zqnt.EmptyCommandRequest
-	6,  // 16: zqnt.EdgeAdapterService.BootSubAsset:input_type -> zqnt.ToggleCommandRequest
-	11, // 17: zqnt.EdgeAdapterService.RegisterAsset:input_type -> zqnt.RegisterAssetCommandRequest
-	9,  // 18: zqnt.EdgeAdapterService.DeregisterAsset:input_type -> zqnt.EmptyCommandRequest
-	6,  // 19: zqnt.EdgeAdapterService.SetRemoteDebugMode:input_type -> zqnt.ToggleCommandRequest
-	12, // 20: zqnt.EdgeAdapterService.ChangeAcMode:input_type -> zqnt.ChangeAcModeCommandRequest
-	13, // 21: zqnt.EdgeAdapterService.StartLiveStream:input_type -> zqnt.LiveStreamStartCommandRequest
-	14, // 22: zqnt.EdgeAdapterService.StopLiveStream:input_type -> zqnt.LiveStreamStopCommandRequest
-	15, // 23: zqnt.EdgeAdapterService.ChangeLens:input_type -> zqnt.ChangeCameraLensCommandRequest
-	16, // 24: zqnt.EdgeAdapterService.ChangeZoom:input_type -> zqnt.ChangeCameraZoomCommandRequest
-	9,  // 25: zqnt.EdgeAdapterService.CapturePhoto:input_type -> zqnt.EmptyCommandRequest
-	9,  // 26: zqnt.EdgeAdapterService.StartRecording:input_type -> zqnt.EmptyCommandRequest
-	9,  // 27: zqnt.EdgeAdapterService.StopRecording:input_type -> zqnt.EmptyCommandRequest
-	6,  // 28: zqnt.EdgeAdapterService.LiveStreamSplitScreen:input_type -> zqnt.ToggleCommandRequest
-	17, // 29: zqnt.EdgeAdapterService.PrepareTask:input_type -> zqnt.TaskCommandRequest
-	17, // 30: zqnt.EdgeAdapterService.StartTask:input_type -> zqnt.TaskCommandRequest
-	17, // 31: zqnt.EdgeAdapterService.StopTask:input_type -> zqnt.TaskCommandRequest
-	17, // 32: zqnt.EdgeAdapterService.PauseTask:input_type -> zqnt.TaskCommandRequest
-	17, // 33: zqnt.EdgeAdapterService.ResumeTask:input_type -> zqnt.TaskCommandRequest
-	18, // 34: zqnt.EdgeAdapterService.SendCustomCommand:input_type -> zqnt.CustomCommandRequest
-	19, // 35: zqnt.EdgeAdapterService.GetCapabilities:output_type -> zqnt.AssetCapabilitiesResponse
-	20, // 36: zqnt.EdgeAdapterService.TakeOff:output_type -> zqnt.CommandResponse
-	20, // 37: zqnt.EdgeAdapterService.GoTo:output_type -> zqnt.CommandResponse
-	20, // 38: zqnt.EdgeAdapterService.ReturnToHome:output_type -> zqnt.CommandResponse
-	20, // 39: zqnt.EdgeAdapterService.EnterManualControl:output_type -> zqnt.CommandResponse
-	20, // 40: zqnt.EdgeAdapterService.ExitManualControl:output_type -> zqnt.CommandResponse
-	20, // 41: zqnt.EdgeAdapterService.ManualControlInput:output_type -> zqnt.CommandResponse
-	20, // 42: zqnt.EdgeAdapterService.LookAt:output_type -> zqnt.CommandResponse
-	20, // 43: zqnt.EdgeAdapterService.EnableGimbalTracking:output_type -> zqnt.CommandResponse
-	21, // 44: zqnt.EdgeAdapterService.GetDetections:output_type -> zqnt.DetectionBatch
-	20, // 45: zqnt.EdgeAdapterService.PlayTTSAudio:output_type -> zqnt.CommandResponse
-	20, // 46: zqnt.EdgeAdapterService.OpenCover:output_type -> zqnt.CommandResponse
-	20, // 47: zqnt.EdgeAdapterService.CloseCover:output_type -> zqnt.CommandResponse
-	20, // 48: zqnt.EdgeAdapterService.StartCharging:output_type -> zqnt.CommandResponse
-	20, // 49: zqnt.EdgeAdapterService.StopCharging:output_type -> zqnt.CommandResponse
-	20, // 50: zqnt.EdgeAdapterService.RebootAsset:output_type -> zqnt.CommandResponse
-	20, // 51: zqnt.EdgeAdapterService.BootSubAsset:output_type -> zqnt.CommandResponse
-	20, // 52: zqnt.EdgeAdapterService.RegisterAsset:output_type -> zqnt.CommandResponse
-	20, // 53: zqnt.EdgeAdapterService.DeregisterAsset:output_type -> zqnt.CommandResponse
-	20, // 54: zqnt.EdgeAdapterService.SetRemoteDebugMode:output_type -> zqnt.CommandResponse
-	20, // 55: zqnt.EdgeAdapterService.ChangeAcMode:output_type -> zqnt.CommandResponse
-	20, // 56: zqnt.EdgeAdapterService.StartLiveStream:output_type -> zqnt.CommandResponse
-	20, // 57: zqnt.EdgeAdapterService.StopLiveStream:output_type -> zqnt.CommandResponse
-	20, // 58: zqnt.EdgeAdapterService.ChangeLens:output_type -> zqnt.CommandResponse
-	20, // 59: zqnt.EdgeAdapterService.ChangeZoom:output_type -> zqnt.CommandResponse
-	20, // 60: zqnt.EdgeAdapterService.CapturePhoto:output_type -> zqnt.CommandResponse
-	20, // 61: zqnt.EdgeAdapterService.StartRecording:output_type -> zqnt.CommandResponse
-	20, // 62: zqnt.EdgeAdapterService.StopRecording:output_type -> zqnt.CommandResponse
-	20, // 63: zqnt.EdgeAdapterService.LiveStreamSplitScreen:output_type -> zqnt.CommandResponse
-	20, // 64: zqnt.EdgeAdapterService.PrepareTask:output_type -> zqnt.CommandResponse
-	20, // 65: zqnt.EdgeAdapterService.StartTask:output_type -> zqnt.CommandResponse
-	20, // 66: zqnt.EdgeAdapterService.StopTask:output_type -> zqnt.CommandResponse
-	20, // 67: zqnt.EdgeAdapterService.PauseTask:output_type -> zqnt.CommandResponse
-	20, // 68: zqnt.EdgeAdapterService.ResumeTask:output_type -> zqnt.CommandResponse
-	22, // 69: zqnt.EdgeAdapterService.SendCustomCommand:output_type -> zqnt.CustomCommandResponse
-	35, // [35:70] is the sub-list for method output_type
-	0,  // [0:35] is the sub-list for method input_type
+	8,  // 10: zqnt.EdgeAdapterService.OpenCover:input_type -> zqnt.EmptyCommandRequest
+	9,  // 11: zqnt.EdgeAdapterService.CloseCover:input_type -> zqnt.CloseCoverCommandRequest
+	8,  // 12: zqnt.EdgeAdapterService.StartCharging:input_type -> zqnt.EmptyCommandRequest
+	8,  // 13: zqnt.EdgeAdapterService.StopCharging:input_type -> zqnt.EmptyCommandRequest
+	8,  // 14: zqnt.EdgeAdapterService.RebootAsset:input_type -> zqnt.EmptyCommandRequest
+	6,  // 15: zqnt.EdgeAdapterService.BootSubAsset:input_type -> zqnt.ToggleCommandRequest
+	10, // 16: zqnt.EdgeAdapterService.RegisterAsset:input_type -> zqnt.RegisterAssetCommandRequest
+	8,  // 17: zqnt.EdgeAdapterService.DeregisterAsset:input_type -> zqnt.EmptyCommandRequest
+	6,  // 18: zqnt.EdgeAdapterService.SetRemoteDebugMode:input_type -> zqnt.ToggleCommandRequest
+	11, // 19: zqnt.EdgeAdapterService.ChangeAcMode:input_type -> zqnt.ChangeAcModeCommandRequest
+	12, // 20: zqnt.EdgeAdapterService.StartLiveStream:input_type -> zqnt.LiveStreamStartCommandRequest
+	13, // 21: zqnt.EdgeAdapterService.StopLiveStream:input_type -> zqnt.LiveStreamStopCommandRequest
+	14, // 22: zqnt.EdgeAdapterService.ChangeLens:input_type -> zqnt.ChangeCameraLensCommandRequest
+	15, // 23: zqnt.EdgeAdapterService.ChangeZoom:input_type -> zqnt.ChangeCameraZoomCommandRequest
+	8,  // 24: zqnt.EdgeAdapterService.CapturePhoto:input_type -> zqnt.EmptyCommandRequest
+	8,  // 25: zqnt.EdgeAdapterService.StartRecording:input_type -> zqnt.EmptyCommandRequest
+	8,  // 26: zqnt.EdgeAdapterService.StopRecording:input_type -> zqnt.EmptyCommandRequest
+	6,  // 27: zqnt.EdgeAdapterService.LiveStreamSplitScreen:input_type -> zqnt.ToggleCommandRequest
+	16, // 28: zqnt.EdgeAdapterService.PrepareTask:input_type -> zqnt.TaskCommandRequest
+	16, // 29: zqnt.EdgeAdapterService.StartTask:input_type -> zqnt.TaskCommandRequest
+	16, // 30: zqnt.EdgeAdapterService.StopTask:input_type -> zqnt.TaskCommandRequest
+	16, // 31: zqnt.EdgeAdapterService.PauseTask:input_type -> zqnt.TaskCommandRequest
+	16, // 32: zqnt.EdgeAdapterService.ResumeTask:input_type -> zqnt.TaskCommandRequest
+	17, // 33: zqnt.EdgeAdapterService.SendCustomCommand:input_type -> zqnt.CustomCommandRequest
+	18, // 34: zqnt.EdgeAdapterService.GetCapabilities:output_type -> zqnt.AssetCapabilitiesResponse
+	19, // 35: zqnt.EdgeAdapterService.TakeOff:output_type -> zqnt.CommandResponse
+	19, // 36: zqnt.EdgeAdapterService.GoTo:output_type -> zqnt.CommandResponse
+	19, // 37: zqnt.EdgeAdapterService.ReturnToHome:output_type -> zqnt.CommandResponse
+	19, // 38: zqnt.EdgeAdapterService.EnterManualControl:output_type -> zqnt.CommandResponse
+	19, // 39: zqnt.EdgeAdapterService.ExitManualControl:output_type -> zqnt.CommandResponse
+	19, // 40: zqnt.EdgeAdapterService.ManualControlInput:output_type -> zqnt.CommandResponse
+	19, // 41: zqnt.EdgeAdapterService.LookAt:output_type -> zqnt.CommandResponse
+	19, // 42: zqnt.EdgeAdapterService.EnableGimbalTracking:output_type -> zqnt.CommandResponse
+	20, // 43: zqnt.EdgeAdapterService.GetDetections:output_type -> zqnt.DetectionBatch
+	19, // 44: zqnt.EdgeAdapterService.OpenCover:output_type -> zqnt.CommandResponse
+	19, // 45: zqnt.EdgeAdapterService.CloseCover:output_type -> zqnt.CommandResponse
+	19, // 46: zqnt.EdgeAdapterService.StartCharging:output_type -> zqnt.CommandResponse
+	19, // 47: zqnt.EdgeAdapterService.StopCharging:output_type -> zqnt.CommandResponse
+	19, // 48: zqnt.EdgeAdapterService.RebootAsset:output_type -> zqnt.CommandResponse
+	19, // 49: zqnt.EdgeAdapterService.BootSubAsset:output_type -> zqnt.CommandResponse
+	19, // 50: zqnt.EdgeAdapterService.RegisterAsset:output_type -> zqnt.CommandResponse
+	19, // 51: zqnt.EdgeAdapterService.DeregisterAsset:output_type -> zqnt.CommandResponse
+	19, // 52: zqnt.EdgeAdapterService.SetRemoteDebugMode:output_type -> zqnt.CommandResponse
+	19, // 53: zqnt.EdgeAdapterService.ChangeAcMode:output_type -> zqnt.CommandResponse
+	19, // 54: zqnt.EdgeAdapterService.StartLiveStream:output_type -> zqnt.CommandResponse
+	19, // 55: zqnt.EdgeAdapterService.StopLiveStream:output_type -> zqnt.CommandResponse
+	19, // 56: zqnt.EdgeAdapterService.ChangeLens:output_type -> zqnt.CommandResponse
+	19, // 57: zqnt.EdgeAdapterService.ChangeZoom:output_type -> zqnt.CommandResponse
+	19, // 58: zqnt.EdgeAdapterService.CapturePhoto:output_type -> zqnt.CommandResponse
+	19, // 59: zqnt.EdgeAdapterService.StartRecording:output_type -> zqnt.CommandResponse
+	19, // 60: zqnt.EdgeAdapterService.StopRecording:output_type -> zqnt.CommandResponse
+	19, // 61: zqnt.EdgeAdapterService.LiveStreamSplitScreen:output_type -> zqnt.CommandResponse
+	19, // 62: zqnt.EdgeAdapterService.PrepareTask:output_type -> zqnt.CommandResponse
+	19, // 63: zqnt.EdgeAdapterService.StartTask:output_type -> zqnt.CommandResponse
+	19, // 64: zqnt.EdgeAdapterService.StopTask:output_type -> zqnt.CommandResponse
+	19, // 65: zqnt.EdgeAdapterService.PauseTask:output_type -> zqnt.CommandResponse
+	19, // 66: zqnt.EdgeAdapterService.ResumeTask:output_type -> zqnt.CommandResponse
+	21, // 67: zqnt.EdgeAdapterService.SendCustomCommand:output_type -> zqnt.CustomCommandResponse
+	34, // [34:68] is the sub-list for method output_type
+	0,  // [0:34] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
 	0,  // [0:0] is the sub-list for extension extendee
 	0,  // [0:0] is the sub-list for field type_name

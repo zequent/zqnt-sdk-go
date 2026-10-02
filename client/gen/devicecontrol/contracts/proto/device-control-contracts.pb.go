@@ -245,6 +245,72 @@ func (CapabilityTargetType) EnumDescriptor() ([]byte, []int) {
 	return file_device_control_contracts_proto_rawDescGZIP(), []int{3}
 }
 
+// Where a Capability's implementation actually comes from — the platform interacts with all of
+// them through the same Capability contract regardless of source.
+type CapabilitySourceProto int32
+
+const (
+	CapabilitySourceProto_CAPABILITY_SOURCE_UNSPECIFIED  CapabilitySourceProto = 0
+	CapabilitySourceProto_CAPABILITY_SOURCE_BUILT_IN     CapabilitySourceProto = 1
+	CapabilitySourceProto_CAPABILITY_SOURCE_EDGE_ADAPTER CapabilitySourceProto = 2
+	CapabilitySourceProto_CAPABILITY_SOURCE_RUNTIME      CapabilitySourceProto = 3
+	CapabilitySourceProto_CAPABILITY_SOURCE_USER         CapabilitySourceProto = 4
+	CapabilitySourceProto_CAPABILITY_SOURCE_APPLICATION  CapabilitySourceProto = 5
+	CapabilitySourceProto_CAPABILITY_SOURCE_INTEGRATION  CapabilitySourceProto = 6
+	CapabilitySourceProto_CAPABILITY_SOURCE_AI_GENERATED CapabilitySourceProto = 7
+)
+
+// Enum value maps for CapabilitySourceProto.
+var (
+	CapabilitySourceProto_name = map[int32]string{
+		0: "CAPABILITY_SOURCE_UNSPECIFIED",
+		1: "CAPABILITY_SOURCE_BUILT_IN",
+		2: "CAPABILITY_SOURCE_EDGE_ADAPTER",
+		3: "CAPABILITY_SOURCE_RUNTIME",
+		4: "CAPABILITY_SOURCE_USER",
+		5: "CAPABILITY_SOURCE_APPLICATION",
+		6: "CAPABILITY_SOURCE_INTEGRATION",
+		7: "CAPABILITY_SOURCE_AI_GENERATED",
+	}
+	CapabilitySourceProto_value = map[string]int32{
+		"CAPABILITY_SOURCE_UNSPECIFIED":  0,
+		"CAPABILITY_SOURCE_BUILT_IN":     1,
+		"CAPABILITY_SOURCE_EDGE_ADAPTER": 2,
+		"CAPABILITY_SOURCE_RUNTIME":      3,
+		"CAPABILITY_SOURCE_USER":         4,
+		"CAPABILITY_SOURCE_APPLICATION":  5,
+		"CAPABILITY_SOURCE_INTEGRATION":  6,
+		"CAPABILITY_SOURCE_AI_GENERATED": 7,
+	}
+)
+
+func (x CapabilitySourceProto) Enum() *CapabilitySourceProto {
+	p := new(CapabilitySourceProto)
+	*p = x
+	return p
+}
+
+func (x CapabilitySourceProto) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (CapabilitySourceProto) Descriptor() protoreflect.EnumDescriptor {
+	return file_device_control_contracts_proto_enumTypes[4].Descriptor()
+}
+
+func (CapabilitySourceProto) Type() protoreflect.EnumType {
+	return &file_device_control_contracts_proto_enumTypes[4]
+}
+
+func (x CapabilitySourceProto) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use CapabilitySourceProto.Descriptor instead.
+func (CapabilitySourceProto) EnumDescriptor() ([]byte, []int) {
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{4}
+}
+
 type CommandResponse struct {
 	state     protoimpl.MessageState `protogen:"open.v1"`
 	HasErrors *bool                  `protobuf:"varint,1,opt,name=has_errors,json=hasErrors,proto3,oneof" json:"has_errors,omitempty"`
@@ -635,6 +701,194 @@ func (x *CapabilityTarget) GetTargetRef() string {
 	return ""
 }
 
+// One error a command's execution can end in — part of the command contract alongside
+// input_schema/output_schema, so a caller (Console, SDK, AI Agent) can know not just what to send
+// and what comes back, but what can go wrong, without probing the device.
+type CapabilityErrorProto struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`
+	Description   *string                `protobuf:"bytes,2,opt,name=description,proto3,oneof" json:"description,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CapabilityErrorProto) Reset() {
+	*x = CapabilityErrorProto{}
+	mi := &file_device_control_contracts_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CapabilityErrorProto) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CapabilityErrorProto) ProtoMessage() {}
+
+func (x *CapabilityErrorProto) ProtoReflect() protoreflect.Message {
+	mi := &file_device_control_contracts_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CapabilityErrorProto.ProtoReflect.Descriptor instead.
+func (*CapabilityErrorProto) Descriptor() ([]byte, []int) {
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *CapabilityErrorProto) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
+func (x *CapabilityErrorProto) GetDescription() string {
+	if x != nil && x.Description != nil {
+		return *x.Description
+	}
+	return ""
+}
+
+// One event a command (or the skill it belongs to) can emit while or after executing.
+type CapabilityEventProto struct {
+	state       protoimpl.MessageState `protogen:"open.v1"`
+	Name        string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Description *string                `protobuf:"bytes,2,opt,name=description,proto3,oneof" json:"description,omitempty"`
+	// JSON Schema describing the event payload.
+	PayloadSchema *structpb.Struct `protobuf:"bytes,3,opt,name=payload_schema,json=payloadSchema,proto3" json:"payload_schema,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CapabilityEventProto) Reset() {
+	*x = CapabilityEventProto{}
+	mi := &file_device_control_contracts_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CapabilityEventProto) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CapabilityEventProto) ProtoMessage() {}
+
+func (x *CapabilityEventProto) ProtoReflect() protoreflect.Message {
+	mi := &file_device_control_contracts_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CapabilityEventProto.ProtoReflect.Descriptor instead.
+func (*CapabilityEventProto) Descriptor() ([]byte, []int) {
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *CapabilityEventProto) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *CapabilityEventProto) GetDescription() string {
+	if x != nil && x.Description != nil {
+		return *x.Description
+	}
+	return ""
+}
+
+func (x *CapabilityEventProto) GetPayloadSchema() *structpb.Struct {
+	if x != nil {
+		return x.PayloadSchema
+	}
+	return nil
+}
+
+// What a command needs in order to be usable at all — feeds "can this Skill run on this
+// Asset/Site?" checks later; still just declarative data here, no enforcement logic implied.
+type CapabilityRequirementsProto struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	AssetTypes      []string               `protobuf:"bytes,1,rep,name=asset_types,json=assetTypes,proto3" json:"asset_types,omitempty"`
+	Payloads        []string               `protobuf:"bytes,2,rep,name=payloads,proto3" json:"payloads,omitempty"`
+	RuntimeFeatures []string               `protobuf:"bytes,3,rep,name=runtime_features,json=runtimeFeatures,proto3" json:"runtime_features,omitempty"`
+	// Free-form property requirements, e.g. {"camera.resolution": {"supported": ["4K"]}}.
+	Properties    *structpb.Struct `protobuf:"bytes,4,opt,name=properties,proto3" json:"properties,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CapabilityRequirementsProto) Reset() {
+	*x = CapabilityRequirementsProto{}
+	mi := &file_device_control_contracts_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CapabilityRequirementsProto) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CapabilityRequirementsProto) ProtoMessage() {}
+
+func (x *CapabilityRequirementsProto) ProtoReflect() protoreflect.Message {
+	mi := &file_device_control_contracts_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CapabilityRequirementsProto.ProtoReflect.Descriptor instead.
+func (*CapabilityRequirementsProto) Descriptor() ([]byte, []int) {
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *CapabilityRequirementsProto) GetAssetTypes() []string {
+	if x != nil {
+		return x.AssetTypes
+	}
+	return nil
+}
+
+func (x *CapabilityRequirementsProto) GetPayloads() []string {
+	if x != nil {
+		return x.Payloads
+	}
+	return nil
+}
+
+func (x *CapabilityRequirementsProto) GetRuntimeFeatures() []string {
+	if x != nil {
+		return x.RuntimeFeatures
+	}
+	return nil
+}
+
+func (x *CapabilityRequirementsProto) GetProperties() *structpb.Struct {
+	if x != nil {
+		return x.Properties
+	}
+	return nil
+}
+
 type Capability struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
 	CommandId         string                 `protobuf:"bytes,1,opt,name=command_id,json=commandId,proto3" json:"command_id,omitempty"`
@@ -651,14 +905,25 @@ type Capability struct {
 	Target       *CapabilityTarget `protobuf:"bytes,11,opt,name=target,proto3" json:"target,omitempty"`
 	// Adapter-defined version of the input/output contract. Change it whenever either schema
 	// changes incompatibly so persisted dynamic tasks can detect contract drift.
-	SchemaVersion *string `protobuf:"bytes,12,opt,name=schema_version,json=schemaVersion,proto3,oneof" json:"schema_version,omitempty"`
+	SchemaVersion *string                      `protobuf:"bytes,12,opt,name=schema_version,json=schemaVersion,proto3,oneof" json:"schema_version,omitempty"`
+	Errors        []*CapabilityErrorProto      `protobuf:"bytes,13,rep,name=errors,proto3" json:"errors,omitempty"`
+	Events        []*CapabilityEventProto      `protobuf:"bytes,14,rep,name=events,proto3" json:"events,omitempty"`
+	Requirements  *CapabilityRequirementsProto `protobuf:"bytes,15,opt,name=requirements,proto3,oneof" json:"requirements,omitempty"`
+	// Groups sibling commands into one logical Skill for the registry/catalog view (e.g. a
+	// "drone-flight" skill made of start/pause/resume/stop commands). When unset, the catalog
+	// falls back to grouping by the command_id's own leading namespace segment (e.g. "flight" from
+	// "flight.takeoff") — existing adapters need no changes to appear correctly grouped.
+	SkillId *string                `protobuf:"bytes,16,opt,name=skill_id,json=skillId,proto3,oneof" json:"skill_id,omitempty"`
+	Source  *CapabilitySourceProto `protobuf:"varint,17,opt,name=source,proto3,enum=zqnt.CapabilitySourceProto,oneof" json:"source,omitempty"`
+	// Human-readable origin, e.g. "DJI Adapter" or "Zequent Platform" for built-ins.
+	Provider      *string `protobuf:"bytes,18,opt,name=provider,proto3,oneof" json:"provider,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Capability) Reset() {
 	*x = Capability{}
-	mi := &file_device_control_contracts_proto_msgTypes[4]
+	mi := &file_device_control_contracts_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -670,7 +935,7 @@ func (x *Capability) String() string {
 func (*Capability) ProtoMessage() {}
 
 func (x *Capability) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[4]
+	mi := &file_device_control_contracts_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -683,7 +948,7 @@ func (x *Capability) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Capability.ProtoReflect.Descriptor instead.
 func (*Capability) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{4}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *Capability) GetCommandId() string {
@@ -763,6 +1028,48 @@ func (x *Capability) GetSchemaVersion() string {
 	return ""
 }
 
+func (x *Capability) GetErrors() []*CapabilityErrorProto {
+	if x != nil {
+		return x.Errors
+	}
+	return nil
+}
+
+func (x *Capability) GetEvents() []*CapabilityEventProto {
+	if x != nil {
+		return x.Events
+	}
+	return nil
+}
+
+func (x *Capability) GetRequirements() *CapabilityRequirementsProto {
+	if x != nil {
+		return x.Requirements
+	}
+	return nil
+}
+
+func (x *Capability) GetSkillId() string {
+	if x != nil && x.SkillId != nil {
+		return *x.SkillId
+	}
+	return ""
+}
+
+func (x *Capability) GetSource() CapabilitySourceProto {
+	if x != nil && x.Source != nil {
+		return *x.Source
+	}
+	return CapabilitySourceProto_CAPABILITY_SOURCE_UNSPECIFIED
+}
+
+func (x *Capability) GetProvider() string {
+	if x != nil && x.Provider != nil {
+		return *x.Provider
+	}
+	return ""
+}
+
 type AssetCapabilities struct {
 	state         protoimpl.MessageState  `protogen:"open.v1"`
 	AssetSn       string                  `protobuf:"bytes,1,opt,name=asset_sn,json=assetSn,proto3" json:"asset_sn,omitempty"`
@@ -778,7 +1085,7 @@ type AssetCapabilities struct {
 
 func (x *AssetCapabilities) Reset() {
 	*x = AssetCapabilities{}
-	mi := &file_device_control_contracts_proto_msgTypes[5]
+	mi := &file_device_control_contracts_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -790,7 +1097,7 @@ func (x *AssetCapabilities) String() string {
 func (*AssetCapabilities) ProtoMessage() {}
 
 func (x *AssetCapabilities) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[5]
+	mi := &file_device_control_contracts_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -803,7 +1110,7 @@ func (x *AssetCapabilities) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AssetCapabilities.ProtoReflect.Descriptor instead.
 func (*AssetCapabilities) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{5}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *AssetCapabilities) GetAssetSn() string {
@@ -867,7 +1174,7 @@ type AssetCapabilitiesRequest struct {
 
 func (x *AssetCapabilitiesRequest) Reset() {
 	*x = AssetCapabilitiesRequest{}
-	mi := &file_device_control_contracts_proto_msgTypes[6]
+	mi := &file_device_control_contracts_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -879,7 +1186,7 @@ func (x *AssetCapabilitiesRequest) String() string {
 func (*AssetCapabilitiesRequest) ProtoMessage() {}
 
 func (x *AssetCapabilitiesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[6]
+	mi := &file_device_control_contracts_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -892,7 +1199,7 @@ func (x *AssetCapabilitiesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AssetCapabilitiesRequest.ProtoReflect.Descriptor instead.
 func (*AssetCapabilitiesRequest) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{6}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *AssetCapabilitiesRequest) GetSn() string {
@@ -943,7 +1250,7 @@ type DetectedPayload struct {
 
 func (x *DetectedPayload) Reset() {
 	*x = DetectedPayload{}
-	mi := &file_device_control_contracts_proto_msgTypes[7]
+	mi := &file_device_control_contracts_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -955,7 +1262,7 @@ func (x *DetectedPayload) String() string {
 func (*DetectedPayload) ProtoMessage() {}
 
 func (x *DetectedPayload) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[7]
+	mi := &file_device_control_contracts_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -968,7 +1275,7 @@ func (x *DetectedPayload) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DetectedPayload.ProtoReflect.Descriptor instead.
 func (*DetectedPayload) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{7}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *DetectedPayload) GetPayloadRef() string {
@@ -1057,7 +1364,7 @@ type ReportAssetRuntimeRequest struct {
 
 func (x *ReportAssetRuntimeRequest) Reset() {
 	*x = ReportAssetRuntimeRequest{}
-	mi := &file_device_control_contracts_proto_msgTypes[8]
+	mi := &file_device_control_contracts_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1069,7 +1376,7 @@ func (x *ReportAssetRuntimeRequest) String() string {
 func (*ReportAssetRuntimeRequest) ProtoMessage() {}
 
 func (x *ReportAssetRuntimeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[8]
+	mi := &file_device_control_contracts_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1082,7 +1389,7 @@ func (x *ReportAssetRuntimeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReportAssetRuntimeRequest.ProtoReflect.Descriptor instead.
 func (*ReportAssetRuntimeRequest) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{8}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *ReportAssetRuntimeRequest) GetBase() *proto.RequestBase {
@@ -1143,7 +1450,7 @@ type ReportAssetRuntimeResponse struct {
 
 func (x *ReportAssetRuntimeResponse) Reset() {
 	*x = ReportAssetRuntimeResponse{}
-	mi := &file_device_control_contracts_proto_msgTypes[9]
+	mi := &file_device_control_contracts_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1155,7 +1462,7 @@ func (x *ReportAssetRuntimeResponse) String() string {
 func (*ReportAssetRuntimeResponse) ProtoMessage() {}
 
 func (x *ReportAssetRuntimeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[9]
+	mi := &file_device_control_contracts_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1168,7 +1475,7 @@ func (x *ReportAssetRuntimeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReportAssetRuntimeResponse.ProtoReflect.Descriptor instead.
 func (*ReportAssetRuntimeResponse) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{9}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *ReportAssetRuntimeResponse) GetHasErrors() bool {
@@ -1243,7 +1550,7 @@ type AssetCapabilitiesResponse struct {
 
 func (x *AssetCapabilitiesResponse) Reset() {
 	*x = AssetCapabilitiesResponse{}
-	mi := &file_device_control_contracts_proto_msgTypes[10]
+	mi := &file_device_control_contracts_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1255,7 +1562,7 @@ func (x *AssetCapabilitiesResponse) String() string {
 func (*AssetCapabilitiesResponse) ProtoMessage() {}
 
 func (x *AssetCapabilitiesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[10]
+	mi := &file_device_control_contracts_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1268,7 +1575,7 @@ func (x *AssetCapabilitiesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AssetCapabilitiesResponse.ProtoReflect.Descriptor instead.
 func (*AssetCapabilitiesResponse) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{10}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *AssetCapabilitiesResponse) GetCapabilities() *AssetCapabilities {
@@ -1296,7 +1603,7 @@ type GetAssetRuntimeRequest struct {
 
 func (x *GetAssetRuntimeRequest) Reset() {
 	*x = GetAssetRuntimeRequest{}
-	mi := &file_device_control_contracts_proto_msgTypes[11]
+	mi := &file_device_control_contracts_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1308,7 +1615,7 @@ func (x *GetAssetRuntimeRequest) String() string {
 func (*GetAssetRuntimeRequest) ProtoMessage() {}
 
 func (x *GetAssetRuntimeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[11]
+	mi := &file_device_control_contracts_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1321,7 +1628,7 @@ func (x *GetAssetRuntimeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAssetRuntimeRequest.ProtoReflect.Descriptor instead.
 func (*GetAssetRuntimeRequest) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{11}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *GetAssetRuntimeRequest) GetBase() *proto.RequestBase {
@@ -1362,7 +1669,7 @@ type AssetRuntimeSnapshot struct {
 
 func (x *AssetRuntimeSnapshot) Reset() {
 	*x = AssetRuntimeSnapshot{}
-	mi := &file_device_control_contracts_proto_msgTypes[12]
+	mi := &file_device_control_contracts_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1374,7 +1681,7 @@ func (x *AssetRuntimeSnapshot) String() string {
 func (*AssetRuntimeSnapshot) ProtoMessage() {}
 
 func (x *AssetRuntimeSnapshot) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[12]
+	mi := &file_device_control_contracts_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1387,7 +1694,7 @@ func (x *AssetRuntimeSnapshot) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AssetRuntimeSnapshot.ProtoReflect.Descriptor instead.
 func (*AssetRuntimeSnapshot) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{12}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *AssetRuntimeSnapshot) GetAssetSn() string {
@@ -1454,7 +1761,7 @@ type AssetRuntimeResponse struct {
 
 func (x *AssetRuntimeResponse) Reset() {
 	*x = AssetRuntimeResponse{}
-	mi := &file_device_control_contracts_proto_msgTypes[13]
+	mi := &file_device_control_contracts_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1466,7 +1773,7 @@ func (x *AssetRuntimeResponse) String() string {
 func (*AssetRuntimeResponse) ProtoMessage() {}
 
 func (x *AssetRuntimeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[13]
+	mi := &file_device_control_contracts_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1479,7 +1786,7 @@ func (x *AssetRuntimeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AssetRuntimeResponse.ProtoReflect.Descriptor instead.
 func (*AssetRuntimeResponse) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{13}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *AssetRuntimeResponse) GetHasErrors() bool {
@@ -1548,7 +1855,7 @@ type GeoCoordinate struct {
 
 func (x *GeoCoordinate) Reset() {
 	*x = GeoCoordinate{}
-	mi := &file_device_control_contracts_proto_msgTypes[14]
+	mi := &file_device_control_contracts_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1560,7 +1867,7 @@ func (x *GeoCoordinate) String() string {
 func (*GeoCoordinate) ProtoMessage() {}
 
 func (x *GeoCoordinate) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[14]
+	mi := &file_device_control_contracts_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1573,7 +1880,7 @@ func (x *GeoCoordinate) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GeoCoordinate.ProtoReflect.Descriptor instead.
 func (*GeoCoordinate) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{14}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *GeoCoordinate) GetLatitude() float64 {
@@ -1606,7 +1913,7 @@ type ReturnToHomeRequest struct {
 
 func (x *ReturnToHomeRequest) Reset() {
 	*x = ReturnToHomeRequest{}
-	mi := &file_device_control_contracts_proto_msgTypes[15]
+	mi := &file_device_control_contracts_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1618,7 +1925,7 @@ func (x *ReturnToHomeRequest) String() string {
 func (*ReturnToHomeRequest) ProtoMessage() {}
 
 func (x *ReturnToHomeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[15]
+	mi := &file_device_control_contracts_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1631,7 +1938,7 @@ func (x *ReturnToHomeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReturnToHomeRequest.ProtoReflect.Descriptor instead.
 func (*ReturnToHomeRequest) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{15}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *ReturnToHomeRequest) GetAltitude() float32 {
@@ -1653,7 +1960,7 @@ type ManualControlRequest struct {
 
 func (x *ManualControlRequest) Reset() {
 	*x = ManualControlRequest{}
-	mi := &file_device_control_contracts_proto_msgTypes[16]
+	mi := &file_device_control_contracts_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1665,7 +1972,7 @@ func (x *ManualControlRequest) String() string {
 func (*ManualControlRequest) ProtoMessage() {}
 
 func (x *ManualControlRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[16]
+	mi := &file_device_control_contracts_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1678,7 +1985,7 @@ func (x *ManualControlRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ManualControlRequest.ProtoReflect.Descriptor instead.
 func (*ManualControlRequest) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{16}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *ManualControlRequest) GetClientId() string {
@@ -1722,7 +2029,7 @@ type ManualControlInput struct {
 
 func (x *ManualControlInput) Reset() {
 	*x = ManualControlInput{}
-	mi := &file_device_control_contracts_proto_msgTypes[17]
+	mi := &file_device_control_contracts_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1734,7 +2041,7 @@ func (x *ManualControlInput) String() string {
 func (*ManualControlInput) ProtoMessage() {}
 
 func (x *ManualControlInput) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[17]
+	mi := &file_device_control_contracts_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1747,7 +2054,7 @@ func (x *ManualControlInput) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ManualControlInput.ProtoReflect.Descriptor instead.
 func (*ManualControlInput) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{17}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *ManualControlInput) GetRoll() float32 {
@@ -1798,7 +2105,7 @@ type LiveStreamState struct {
 
 func (x *LiveStreamState) Reset() {
 	*x = LiveStreamState{}
-	mi := &file_device_control_contracts_proto_msgTypes[18]
+	mi := &file_device_control_contracts_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1810,7 +2117,7 @@ func (x *LiveStreamState) String() string {
 func (*LiveStreamState) ProtoMessage() {}
 
 func (x *LiveStreamState) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[18]
+	mi := &file_device_control_contracts_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1823,7 +2130,7 @@ func (x *LiveStreamState) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LiveStreamState.ProtoReflect.Descriptor instead.
 func (*LiveStreamState) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{18}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *LiveStreamState) GetVideoId() string {
@@ -1871,7 +2178,7 @@ type LiveStreamStartResponse struct {
 
 func (x *LiveStreamStartResponse) Reset() {
 	*x = LiveStreamStartResponse{}
-	mi := &file_device_control_contracts_proto_msgTypes[19]
+	mi := &file_device_control_contracts_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1883,7 +2190,7 @@ func (x *LiveStreamStartResponse) String() string {
 func (*LiveStreamStartResponse) ProtoMessage() {}
 
 func (x *LiveStreamStartResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[19]
+	mi := &file_device_control_contracts_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1896,7 +2203,7 @@ func (x *LiveStreamStartResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LiveStreamStartResponse.ProtoReflect.Descriptor instead.
 func (*LiveStreamStartResponse) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{19}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *LiveStreamStartResponse) GetStreamUrl() string {
@@ -1922,7 +2229,7 @@ type ChangeCameraLensRequest struct {
 
 func (x *ChangeCameraLensRequest) Reset() {
 	*x = ChangeCameraLensRequest{}
-	mi := &file_device_control_contracts_proto_msgTypes[20]
+	mi := &file_device_control_contracts_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1934,7 +2241,7 @@ func (x *ChangeCameraLensRequest) String() string {
 func (*ChangeCameraLensRequest) ProtoMessage() {}
 
 func (x *ChangeCameraLensRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[20]
+	mi := &file_device_control_contracts_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1947,7 +2254,7 @@ func (x *ChangeCameraLensRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChangeCameraLensRequest.ProtoReflect.Descriptor instead.
 func (*ChangeCameraLensRequest) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{20}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *ChangeCameraLensRequest) GetLens() string {
@@ -1967,7 +2274,7 @@ type ChangeCameraZoomRequest struct {
 
 func (x *ChangeCameraZoomRequest) Reset() {
 	*x = ChangeCameraZoomRequest{}
-	mi := &file_device_control_contracts_proto_msgTypes[21]
+	mi := &file_device_control_contracts_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1979,7 +2286,7 @@ func (x *ChangeCameraZoomRequest) String() string {
 func (*ChangeCameraZoomRequest) ProtoMessage() {}
 
 func (x *ChangeCameraZoomRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[21]
+	mi := &file_device_control_contracts_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1992,7 +2299,7 @@ func (x *ChangeCameraZoomRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChangeCameraZoomRequest.ProtoReflect.Descriptor instead.
 func (*ChangeCameraZoomRequest) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{21}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *ChangeCameraZoomRequest) GetLens() string {
@@ -2024,7 +2331,7 @@ type ManualControlState struct {
 
 func (x *ManualControlState) Reset() {
 	*x = ManualControlState{}
-	mi := &file_device_control_contracts_proto_msgTypes[22]
+	mi := &file_device_control_contracts_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2036,7 +2343,7 @@ func (x *ManualControlState) String() string {
 func (*ManualControlState) ProtoMessage() {}
 
 func (x *ManualControlState) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[22]
+	mi := &file_device_control_contracts_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2049,7 +2356,7 @@ func (x *ManualControlState) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ManualControlState.ProtoReflect.Descriptor instead.
 func (*ManualControlState) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{22}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *ManualControlState) GetState() proto1.ManualControlStateEnum {
@@ -2110,7 +2417,7 @@ type EmptyCommandRequest struct {
 
 func (x *EmptyCommandRequest) Reset() {
 	*x = EmptyCommandRequest{}
-	mi := &file_device_control_contracts_proto_msgTypes[23]
+	mi := &file_device_control_contracts_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2122,7 +2429,7 @@ func (x *EmptyCommandRequest) String() string {
 func (*EmptyCommandRequest) ProtoMessage() {}
 
 func (x *EmptyCommandRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[23]
+	mi := &file_device_control_contracts_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2135,7 +2442,7 @@ func (x *EmptyCommandRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EmptyCommandRequest.ProtoReflect.Descriptor instead.
 func (*EmptyCommandRequest) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{23}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *EmptyCommandRequest) GetBase() *proto.RequestBase {
@@ -2146,16 +2453,22 @@ func (x *EmptyCommandRequest) GetBase() *proto.RequestBase {
 }
 
 type CoordinateCommandRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
-	Coordinate    *GeoCoordinate         `protobuf:"bytes,2,opt,name=coordinate,proto3" json:"coordinate,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state      protoimpl.MessageState `protogen:"open.v1"`
+	Base       *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Coordinate *GeoCoordinate         `protobuf:"bytes,2,opt,name=coordinate,proto3" json:"coordinate,omitempty"`
+	// RemoteControlService.GoTo only: fly straight through a HARD_BLOCK or REQUIRE_APPROVAL no-fly
+	// zone that would otherwise refuse the fly-to. Honoured only for an organization admin or a system
+	// admin (the caller's own token), recorded in the execution's safety audit, refused for anybody
+	// else -- the same rule as SkillExecutionOptionsProto.no_fly_zone_override, which it sets. Ignored
+	// by TakeOff and never sent to an edge adapter.
+	NoFlyZoneOverride *bool `protobuf:"varint,3,opt,name=no_fly_zone_override,json=noFlyZoneOverride,proto3,oneof" json:"no_fly_zone_override,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *CoordinateCommandRequest) Reset() {
 	*x = CoordinateCommandRequest{}
-	mi := &file_device_control_contracts_proto_msgTypes[24]
+	mi := &file_device_control_contracts_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2167,7 +2480,7 @@ func (x *CoordinateCommandRequest) String() string {
 func (*CoordinateCommandRequest) ProtoMessage() {}
 
 func (x *CoordinateCommandRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[24]
+	mi := &file_device_control_contracts_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2180,7 +2493,7 @@ func (x *CoordinateCommandRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CoordinateCommandRequest.ProtoReflect.Descriptor instead.
 func (*CoordinateCommandRequest) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{24}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *CoordinateCommandRequest) GetBase() *proto.RequestBase {
@@ -2197,6 +2510,13 @@ func (x *CoordinateCommandRequest) GetCoordinate() *GeoCoordinate {
 	return nil
 }
 
+func (x *CoordinateCommandRequest) GetNoFlyZoneOverride() bool {
+	if x != nil && x.NoFlyZoneOverride != nil {
+		return *x.NoFlyZoneOverride
+	}
+	return false
+}
+
 type LookAtCommandRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
@@ -2209,7 +2529,7 @@ type LookAtCommandRequest struct {
 
 func (x *LookAtCommandRequest) Reset() {
 	*x = LookAtCommandRequest{}
-	mi := &file_device_control_contracts_proto_msgTypes[25]
+	mi := &file_device_control_contracts_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2221,7 +2541,7 @@ func (x *LookAtCommandRequest) String() string {
 func (*LookAtCommandRequest) ProtoMessage() {}
 
 func (x *LookAtCommandRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[25]
+	mi := &file_device_control_contracts_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2234,7 +2554,7 @@ func (x *LookAtCommandRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LookAtCommandRequest.ProtoReflect.Descriptor instead.
 func (*LookAtCommandRequest) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{25}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *LookAtCommandRequest) GetBase() *proto.RequestBase {
@@ -2275,7 +2595,7 @@ type ReturnToHomeCommandRequest struct {
 
 func (x *ReturnToHomeCommandRequest) Reset() {
 	*x = ReturnToHomeCommandRequest{}
-	mi := &file_device_control_contracts_proto_msgTypes[26]
+	mi := &file_device_control_contracts_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2287,7 +2607,7 @@ func (x *ReturnToHomeCommandRequest) String() string {
 func (*ReturnToHomeCommandRequest) ProtoMessage() {}
 
 func (x *ReturnToHomeCommandRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[26]
+	mi := &file_device_control_contracts_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2300,7 +2620,7 @@ func (x *ReturnToHomeCommandRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReturnToHomeCommandRequest.ProtoReflect.Descriptor instead.
 func (*ReturnToHomeCommandRequest) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{26}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *ReturnToHomeCommandRequest) GetBase() *proto.RequestBase {
@@ -2327,7 +2647,7 @@ type ManualControlCommandRequest struct {
 
 func (x *ManualControlCommandRequest) Reset() {
 	*x = ManualControlCommandRequest{}
-	mi := &file_device_control_contracts_proto_msgTypes[27]
+	mi := &file_device_control_contracts_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2339,7 +2659,7 @@ func (x *ManualControlCommandRequest) String() string {
 func (*ManualControlCommandRequest) ProtoMessage() {}
 
 func (x *ManualControlCommandRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[27]
+	mi := &file_device_control_contracts_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2352,7 +2672,7 @@ func (x *ManualControlCommandRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ManualControlCommandRequest.ProtoReflect.Descriptor instead.
 func (*ManualControlCommandRequest) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{27}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *ManualControlCommandRequest) GetBase() *proto.RequestBase {
@@ -2379,7 +2699,7 @@ type ManualControlInputCommandRequest struct {
 
 func (x *ManualControlInputCommandRequest) Reset() {
 	*x = ManualControlInputCommandRequest{}
-	mi := &file_device_control_contracts_proto_msgTypes[28]
+	mi := &file_device_control_contracts_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2391,7 +2711,7 @@ func (x *ManualControlInputCommandRequest) String() string {
 func (*ManualControlInputCommandRequest) ProtoMessage() {}
 
 func (x *ManualControlInputCommandRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[28]
+	mi := &file_device_control_contracts_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2404,7 +2724,7 @@ func (x *ManualControlInputCommandRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ManualControlInputCommandRequest.ProtoReflect.Descriptor instead.
 func (*ManualControlInputCommandRequest) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{28}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *ManualControlInputCommandRequest) GetBase() *proto.RequestBase {
@@ -2431,7 +2751,7 @@ type ToggleCommandRequest struct {
 
 func (x *ToggleCommandRequest) Reset() {
 	*x = ToggleCommandRequest{}
-	mi := &file_device_control_contracts_proto_msgTypes[29]
+	mi := &file_device_control_contracts_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2443,7 +2763,7 @@ func (x *ToggleCommandRequest) String() string {
 func (*ToggleCommandRequest) ProtoMessage() {}
 
 func (x *ToggleCommandRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[29]
+	mi := &file_device_control_contracts_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2456,7 +2776,7 @@ func (x *ToggleCommandRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ToggleCommandRequest.ProtoReflect.Descriptor instead.
 func (*ToggleCommandRequest) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{29}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *ToggleCommandRequest) GetBase() *proto.RequestBase {
@@ -2473,58 +2793,6 @@ func (x *ToggleCommandRequest) GetEnabled() bool {
 	return false
 }
 
-type TextToSpeechCommandRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
-	Text          string                 `protobuf:"bytes,2,opt,name=text,proto3" json:"text,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *TextToSpeechCommandRequest) Reset() {
-	*x = TextToSpeechCommandRequest{}
-	mi := &file_device_control_contracts_proto_msgTypes[30]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *TextToSpeechCommandRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*TextToSpeechCommandRequest) ProtoMessage() {}
-
-func (x *TextToSpeechCommandRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[30]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use TextToSpeechCommandRequest.ProtoReflect.Descriptor instead.
-func (*TextToSpeechCommandRequest) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{30}
-}
-
-func (x *TextToSpeechCommandRequest) GetBase() *proto.RequestBase {
-	if x != nil {
-		return x.Base
-	}
-	return nil
-}
-
-func (x *TextToSpeechCommandRequest) GetText() string {
-	if x != nil {
-		return x.Text
-	}
-	return ""
-}
-
 type SpotlightControlRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
@@ -2535,7 +2803,7 @@ type SpotlightControlRequest struct {
 
 func (x *SpotlightControlRequest) Reset() {
 	*x = SpotlightControlRequest{}
-	mi := &file_device_control_contracts_proto_msgTypes[31]
+	mi := &file_device_control_contracts_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2547,7 +2815,7 @@ func (x *SpotlightControlRequest) String() string {
 func (*SpotlightControlRequest) ProtoMessage() {}
 
 func (x *SpotlightControlRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[31]
+	mi := &file_device_control_contracts_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2560,7 +2828,7 @@ func (x *SpotlightControlRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SpotlightControlRequest.ProtoReflect.Descriptor instead.
 func (*SpotlightControlRequest) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{31}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *SpotlightControlRequest) GetBase() *proto.RequestBase {
@@ -2587,7 +2855,7 @@ type TaskCommandRequest struct {
 
 func (x *TaskCommandRequest) Reset() {
 	*x = TaskCommandRequest{}
-	mi := &file_device_control_contracts_proto_msgTypes[32]
+	mi := &file_device_control_contracts_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2599,7 +2867,7 @@ func (x *TaskCommandRequest) String() string {
 func (*TaskCommandRequest) ProtoMessage() {}
 
 func (x *TaskCommandRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[32]
+	mi := &file_device_control_contracts_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2612,7 +2880,7 @@ func (x *TaskCommandRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TaskCommandRequest.ProtoReflect.Descriptor instead.
 func (*TaskCommandRequest) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{32}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *TaskCommandRequest) GetBase() *proto.RequestBase {
@@ -2639,7 +2907,7 @@ type CloseCoverCommandRequest struct {
 
 func (x *CloseCoverCommandRequest) Reset() {
 	*x = CloseCoverCommandRequest{}
-	mi := &file_device_control_contracts_proto_msgTypes[33]
+	mi := &file_device_control_contracts_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2651,7 +2919,7 @@ func (x *CloseCoverCommandRequest) String() string {
 func (*CloseCoverCommandRequest) ProtoMessage() {}
 
 func (x *CloseCoverCommandRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[33]
+	mi := &file_device_control_contracts_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2664,7 +2932,7 @@ func (x *CloseCoverCommandRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CloseCoverCommandRequest.ProtoReflect.Descriptor instead.
 func (*CloseCoverCommandRequest) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{33}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *CloseCoverCommandRequest) GetBase() *proto.RequestBase {
@@ -2691,7 +2959,7 @@ type BootSubAssetCommandRequest struct {
 
 func (x *BootSubAssetCommandRequest) Reset() {
 	*x = BootSubAssetCommandRequest{}
-	mi := &file_device_control_contracts_proto_msgTypes[34]
+	mi := &file_device_control_contracts_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2703,7 +2971,7 @@ func (x *BootSubAssetCommandRequest) String() string {
 func (*BootSubAssetCommandRequest) ProtoMessage() {}
 
 func (x *BootSubAssetCommandRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[34]
+	mi := &file_device_control_contracts_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2716,7 +2984,7 @@ func (x *BootSubAssetCommandRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BootSubAssetCommandRequest.ProtoReflect.Descriptor instead.
 func (*BootSubAssetCommandRequest) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{34}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *BootSubAssetCommandRequest) GetBase() *proto.RequestBase {
@@ -2743,7 +3011,7 @@ type ChangeAcModeCommandRequest struct {
 
 func (x *ChangeAcModeCommandRequest) Reset() {
 	*x = ChangeAcModeCommandRequest{}
-	mi := &file_device_control_contracts_proto_msgTypes[35]
+	mi := &file_device_control_contracts_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2755,7 +3023,7 @@ func (x *ChangeAcModeCommandRequest) String() string {
 func (*ChangeAcModeCommandRequest) ProtoMessage() {}
 
 func (x *ChangeAcModeCommandRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[35]
+	mi := &file_device_control_contracts_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2768,7 +3036,7 @@ func (x *ChangeAcModeCommandRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChangeAcModeCommandRequest.ProtoReflect.Descriptor instead.
 func (*ChangeAcModeCommandRequest) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{35}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *ChangeAcModeCommandRequest) GetBase() *proto.RequestBase {
@@ -2795,7 +3063,7 @@ type ChangeCameraLensCommandRequest struct {
 
 func (x *ChangeCameraLensCommandRequest) Reset() {
 	*x = ChangeCameraLensCommandRequest{}
-	mi := &file_device_control_contracts_proto_msgTypes[36]
+	mi := &file_device_control_contracts_proto_msgTypes[38]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2807,7 +3075,7 @@ func (x *ChangeCameraLensCommandRequest) String() string {
 func (*ChangeCameraLensCommandRequest) ProtoMessage() {}
 
 func (x *ChangeCameraLensCommandRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[36]
+	mi := &file_device_control_contracts_proto_msgTypes[38]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2820,7 +3088,7 @@ func (x *ChangeCameraLensCommandRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChangeCameraLensCommandRequest.ProtoReflect.Descriptor instead.
 func (*ChangeCameraLensCommandRequest) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{36}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{38}
 }
 
 func (x *ChangeCameraLensCommandRequest) GetBase() *proto.RequestBase {
@@ -2847,7 +3115,7 @@ type ChangeCameraZoomCommandRequest struct {
 
 func (x *ChangeCameraZoomCommandRequest) Reset() {
 	*x = ChangeCameraZoomCommandRequest{}
-	mi := &file_device_control_contracts_proto_msgTypes[37]
+	mi := &file_device_control_contracts_proto_msgTypes[39]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2859,7 +3127,7 @@ func (x *ChangeCameraZoomCommandRequest) String() string {
 func (*ChangeCameraZoomCommandRequest) ProtoMessage() {}
 
 func (x *ChangeCameraZoomCommandRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[37]
+	mi := &file_device_control_contracts_proto_msgTypes[39]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2872,7 +3140,7 @@ func (x *ChangeCameraZoomCommandRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChangeCameraZoomCommandRequest.ProtoReflect.Descriptor instead.
 func (*ChangeCameraZoomCommandRequest) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{37}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{39}
 }
 
 func (x *ChangeCameraZoomCommandRequest) GetBase() *proto.RequestBase {
@@ -2899,7 +3167,7 @@ type DetectionControlCommandRequest struct {
 
 func (x *DetectionControlCommandRequest) Reset() {
 	*x = DetectionControlCommandRequest{}
-	mi := &file_device_control_contracts_proto_msgTypes[38]
+	mi := &file_device_control_contracts_proto_msgTypes[40]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2911,7 +3179,7 @@ func (x *DetectionControlCommandRequest) String() string {
 func (*DetectionControlCommandRequest) ProtoMessage() {}
 
 func (x *DetectionControlCommandRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[38]
+	mi := &file_device_control_contracts_proto_msgTypes[40]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2924,7 +3192,7 @@ func (x *DetectionControlCommandRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DetectionControlCommandRequest.ProtoReflect.Descriptor instead.
 func (*DetectionControlCommandRequest) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{38}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{40}
 }
 
 func (x *DetectionControlCommandRequest) GetBase() *proto.RequestBase {
@@ -2951,7 +3219,7 @@ type LiveStreamStartCommandRequest struct {
 
 func (x *LiveStreamStartCommandRequest) Reset() {
 	*x = LiveStreamStartCommandRequest{}
-	mi := &file_device_control_contracts_proto_msgTypes[39]
+	mi := &file_device_control_contracts_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2963,7 +3231,7 @@ func (x *LiveStreamStartCommandRequest) String() string {
 func (*LiveStreamStartCommandRequest) ProtoMessage() {}
 
 func (x *LiveStreamStartCommandRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[39]
+	mi := &file_device_control_contracts_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2976,7 +3244,7 @@ func (x *LiveStreamStartCommandRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LiveStreamStartCommandRequest.ProtoReflect.Descriptor instead.
 func (*LiveStreamStartCommandRequest) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{39}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *LiveStreamStartCommandRequest) GetBase() *proto.RequestBase {
@@ -3003,7 +3271,7 @@ type LiveStreamStopCommandRequest struct {
 
 func (x *LiveStreamStopCommandRequest) Reset() {
 	*x = LiveStreamStopCommandRequest{}
-	mi := &file_device_control_contracts_proto_msgTypes[40]
+	mi := &file_device_control_contracts_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3015,7 +3283,7 @@ func (x *LiveStreamStopCommandRequest) String() string {
 func (*LiveStreamStopCommandRequest) ProtoMessage() {}
 
 func (x *LiveStreamStopCommandRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[40]
+	mi := &file_device_control_contracts_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3028,7 +3296,7 @@ func (x *LiveStreamStopCommandRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LiveStreamStopCommandRequest.ProtoReflect.Descriptor instead.
 func (*LiveStreamStopCommandRequest) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{40}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{42}
 }
 
 func (x *LiveStreamStopCommandRequest) GetBase() *proto.RequestBase {
@@ -3057,7 +3325,7 @@ type LiveStreamStartCommandPayload struct {
 
 func (x *LiveStreamStartCommandPayload) Reset() {
 	*x = LiveStreamStartCommandPayload{}
-	mi := &file_device_control_contracts_proto_msgTypes[41]
+	mi := &file_device_control_contracts_proto_msgTypes[43]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3069,7 +3337,7 @@ func (x *LiveStreamStartCommandPayload) String() string {
 func (*LiveStreamStartCommandPayload) ProtoMessage() {}
 
 func (x *LiveStreamStartCommandPayload) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[41]
+	mi := &file_device_control_contracts_proto_msgTypes[43]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3082,7 +3350,7 @@ func (x *LiveStreamStartCommandPayload) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LiveStreamStartCommandPayload.ProtoReflect.Descriptor instead.
 func (*LiveStreamStartCommandPayload) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{41}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{43}
 }
 
 func (x *LiveStreamStartCommandPayload) GetVideoId() string {
@@ -3122,7 +3390,7 @@ type LiveStreamStopCommandPayload struct {
 
 func (x *LiveStreamStopCommandPayload) Reset() {
 	*x = LiveStreamStopCommandPayload{}
-	mi := &file_device_control_contracts_proto_msgTypes[42]
+	mi := &file_device_control_contracts_proto_msgTypes[44]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3134,7 +3402,7 @@ func (x *LiveStreamStopCommandPayload) String() string {
 func (*LiveStreamStopCommandPayload) ProtoMessage() {}
 
 func (x *LiveStreamStopCommandPayload) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[42]
+	mi := &file_device_control_contracts_proto_msgTypes[44]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3147,7 +3415,7 @@ func (x *LiveStreamStopCommandPayload) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LiveStreamStopCommandPayload.ProtoReflect.Descriptor instead.
 func (*LiveStreamStopCommandPayload) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{42}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{44}
 }
 
 func (x *LiveStreamStopCommandPayload) GetVideoId() string {
@@ -3167,7 +3435,7 @@ type RegisterAssetCommandRequest struct {
 
 func (x *RegisterAssetCommandRequest) Reset() {
 	*x = RegisterAssetCommandRequest{}
-	mi := &file_device_control_contracts_proto_msgTypes[43]
+	mi := &file_device_control_contracts_proto_msgTypes[45]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3179,7 +3447,7 @@ func (x *RegisterAssetCommandRequest) String() string {
 func (*RegisterAssetCommandRequest) ProtoMessage() {}
 
 func (x *RegisterAssetCommandRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_device_control_contracts_proto_msgTypes[43]
+	mi := &file_device_control_contracts_proto_msgTypes[45]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3192,7 +3460,7 @@ func (x *RegisterAssetCommandRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegisterAssetCommandRequest.ProtoReflect.Descriptor instead.
 func (*RegisterAssetCommandRequest) Descriptor() ([]byte, []int) {
-	return file_device_control_contracts_proto_rawDescGZIP(), []int{43}
+	return file_device_control_contracts_proto_rawDescGZIP(), []int{45}
 }
 
 func (x *RegisterAssetCommandRequest) GetBase() *proto.RequestBase {
@@ -3249,7 +3517,24 @@ const file_device_control_contracts_proto_rawDesc = "" +
 	"\x04type\x18\x01 \x01(\x0e2\x1a.zqnt.CapabilityTargetTypeR\x04type\x12\"\n" +
 	"\n" +
 	"target_ref\x18\x02 \x01(\tH\x00R\ttargetRef\x88\x01\x01B\r\n" +
-	"\v_target_ref\"\xab\x05\n" +
+	"\v_target_ref\"a\n" +
+	"\x14CapabilityErrorProto\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\tR\x04code\x12%\n" +
+	"\vdescription\x18\x02 \x01(\tH\x00R\vdescription\x88\x01\x01B\x0e\n" +
+	"\f_description\"\xa1\x01\n" +
+	"\x14CapabilityEventProto\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12%\n" +
+	"\vdescription\x18\x02 \x01(\tH\x00R\vdescription\x88\x01\x01\x12>\n" +
+	"\x0epayload_schema\x18\x03 \x01(\v2\x17.google.protobuf.StructR\rpayloadSchemaB\x0e\n" +
+	"\f_description\"\xbe\x01\n" +
+	"\x1bCapabilityRequirementsProto\x12\x1f\n" +
+	"\vasset_types\x18\x01 \x03(\tR\n" +
+	"assetTypes\x12\x1a\n" +
+	"\bpayloads\x18\x02 \x03(\tR\bpayloads\x12)\n" +
+	"\x10runtime_features\x18\x03 \x03(\tR\x0fruntimeFeatures\x127\n" +
+	"\n" +
+	"properties\x18\x04 \x01(\v2\x17.google.protobuf.StructR\n" +
+	"properties\"\x90\b\n" +
 	"\n" +
 	"Capability\x12\x1d\n" +
 	"\n" +
@@ -3264,13 +3549,23 @@ const file_device_control_contracts_proto_rawDesc = "" +
 	"\routput_schema\x18\n" +
 	" \x01(\v2\x17.google.protobuf.StructR\foutputSchema\x12.\n" +
 	"\x06target\x18\v \x01(\v2\x16.zqnt.CapabilityTargetR\x06target\x12*\n" +
-	"\x0eschema_version\x18\f \x01(\tH\x02R\rschemaVersion\x88\x01\x01\x1a;\n" +
+	"\x0eschema_version\x18\f \x01(\tH\x02R\rschemaVersion\x88\x01\x01\x122\n" +
+	"\x06errors\x18\r \x03(\v2\x1a.zqnt.CapabilityErrorProtoR\x06errors\x122\n" +
+	"\x06events\x18\x0e \x03(\v2\x1a.zqnt.CapabilityEventProtoR\x06events\x12J\n" +
+	"\frequirements\x18\x0f \x01(\v2!.zqnt.CapabilityRequirementsProtoH\x03R\frequirements\x88\x01\x01\x12\x1e\n" +
+	"\bskill_id\x18\x10 \x01(\tH\x04R\askillId\x88\x01\x01\x128\n" +
+	"\x06source\x18\x11 \x01(\x0e2\x1b.zqnt.CapabilitySourceProtoH\x05R\x06source\x88\x01\x01\x12\x1f\n" +
+	"\bprovider\x18\x12 \x01(\tH\x06R\bprovider\x88\x01\x01\x1a;\n" +
 	"\rMetadataEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\x15\n" +
 	"\x13_unavailable_reasonB\x0e\n" +
 	"\f_descriptionB\x11\n" +
-	"\x0f_schema_versionJ\x04\b\x03\x10\x04R\tavailable\"\x83\x03\n" +
+	"\x0f_schema_versionB\x0f\n" +
+	"\r_requirementsB\v\n" +
+	"\t_skill_idB\t\n" +
+	"\a_sourceB\v\n" +
+	"\t_providerJ\x04\b\x03\x10\x04R\tavailable\"\x83\x03\n" +
 	"\x11AssetCapabilities\x12\x19\n" +
 	"\basset_sn\x18\x01 \x01(\tR\aassetSn\x12\x1d\n" +
 	"\n" +
@@ -3413,12 +3708,14 @@ const file_device_control_contracts_proto_rawDesc = "" +
 	"session_id\x18\a \x01(\tR\tsessionIdB\v\n" +
 	"\t_asset_id\"<\n" +
 	"\x13EmptyCommandRequest\x12%\n" +
-	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\"v\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\"\xc5\x01\n" +
 	"\x18CoordinateCommandRequest\x12%\n" +
 	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x123\n" +
 	"\n" +
 	"coordinate\x18\x02 \x01(\v2\x13.zqnt.GeoCoordinateR\n" +
-	"coordinate\"\xd6\x01\n" +
+	"coordinate\x124\n" +
+	"\x14no_fly_zone_override\x18\x03 \x01(\bH\x00R\x11noFlyZoneOverride\x88\x01\x01B\x17\n" +
+	"\x15_no_fly_zone_override\"\xd6\x01\n" +
 	"\x14LookAtCommandRequest\x12%\n" +
 	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x123\n" +
 	"\n" +
@@ -3439,10 +3736,7 @@ const file_device_control_contracts_proto_rawDesc = "" +
 	"\arequest\x18\x02 \x01(\v2\x18.zqnt.ManualControlInputR\arequest\"W\n" +
 	"\x14ToggleCommandRequest\x12%\n" +
 	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x18\n" +
-	"\aenabled\x18\x02 \x01(\bR\aenabled\"W\n" +
-	"\x1aTextToSpeechCommandRequest\x12%\n" +
-	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x12\n" +
-	"\x04text\x18\x02 \x01(\tR\x04text\"c\n" +
+	"\aenabled\x18\x02 \x01(\bR\aenabled\"c\n" +
 	"\x17SpotlightControlRequest\x12%\n" +
 	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12!\n" +
 	"\flight_switch\x18\x02 \x01(\bR\vlightSwitch\"T\n" +
@@ -3508,7 +3802,16 @@ const file_device_control_contracts_proto_rawDesc = "" +
 	"\x1cCAPABILITY_TARGET_TYPE_ASSET\x10\x01\x12$\n" +
 	" CAPABILITY_TARGET_TYPE_SUB_ASSET\x10\x02\x12\"\n" +
 	"\x1eCAPABILITY_TARGET_TYPE_PAYLOAD\x10\x03\x12$\n" +
-	" CAPABILITY_TARGET_TYPE_COMPONENT\x10\x04Bf\n" +
+	" CAPABILITY_TARGET_TYPE_COMPONENT\x10\x04*\xa3\x02\n" +
+	"\x15CapabilitySourceProto\x12!\n" +
+	"\x1dCAPABILITY_SOURCE_UNSPECIFIED\x10\x00\x12\x1e\n" +
+	"\x1aCAPABILITY_SOURCE_BUILT_IN\x10\x01\x12\"\n" +
+	"\x1eCAPABILITY_SOURCE_EDGE_ADAPTER\x10\x02\x12\x1d\n" +
+	"\x19CAPABILITY_SOURCE_RUNTIME\x10\x03\x12\x1a\n" +
+	"\x16CAPABILITY_SOURCE_USER\x10\x04\x12!\n" +
+	"\x1dCAPABILITY_SOURCE_APPLICATION\x10\x05\x12!\n" +
+	"\x1dCAPABILITY_SOURCE_INTEGRATION\x10\x06\x12\"\n" +
+	"\x1eCAPABILITY_SOURCE_AI_GENERATED\x10\aBf\n" +
 	"\"com.zqnt.utils.devicecontrol.protoB\x1bDeviceControlContractsProtoP\x01Z!gen/devicecontrol/contracts/protob\x06proto3"
 
 var (
@@ -3523,159 +3826,167 @@ func file_device_control_contracts_proto_rawDescGZIP() []byte {
 	return file_device_control_contracts_proto_rawDescData
 }
 
-var file_device_control_contracts_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
-var file_device_control_contracts_proto_msgTypes = make([]protoimpl.MessageInfo, 45)
+var file_device_control_contracts_proto_enumTypes = make([]protoimpl.EnumInfo, 5)
+var file_device_control_contracts_proto_msgTypes = make([]protoimpl.MessageInfo, 47)
 var file_device_control_contracts_proto_goTypes = []any{
 	(LiveDataServiceCommand)(0),              // 0: zqnt.LiveDataServiceCommand
 	(CapabilityState)(0),                     // 1: zqnt.CapabilityState
 	(CapabilitySnapshotState)(0),             // 2: zqnt.CapabilitySnapshotState
 	(CapabilityTargetType)(0),                // 3: zqnt.CapabilityTargetType
-	(*CommandResponse)(nil),                  // 4: zqnt.CommandResponse
-	(*CustomCommandRequest)(nil),             // 5: zqnt.CustomCommandRequest
-	(*CustomCommandResponse)(nil),            // 6: zqnt.CustomCommandResponse
-	(*CapabilityTarget)(nil),                 // 7: zqnt.CapabilityTarget
-	(*Capability)(nil),                       // 8: zqnt.Capability
-	(*AssetCapabilities)(nil),                // 9: zqnt.AssetCapabilities
-	(*AssetCapabilitiesRequest)(nil),         // 10: zqnt.AssetCapabilitiesRequest
-	(*DetectedPayload)(nil),                  // 11: zqnt.DetectedPayload
-	(*ReportAssetRuntimeRequest)(nil),        // 12: zqnt.ReportAssetRuntimeRequest
-	(*ReportAssetRuntimeResponse)(nil),       // 13: zqnt.ReportAssetRuntimeResponse
-	(*AssetCapabilitiesResponse)(nil),        // 14: zqnt.AssetCapabilitiesResponse
-	(*GetAssetRuntimeRequest)(nil),           // 15: zqnt.GetAssetRuntimeRequest
-	(*AssetRuntimeSnapshot)(nil),             // 16: zqnt.AssetRuntimeSnapshot
-	(*AssetRuntimeResponse)(nil),             // 17: zqnt.AssetRuntimeResponse
-	(*GeoCoordinate)(nil),                    // 18: zqnt.GeoCoordinate
-	(*ReturnToHomeRequest)(nil),              // 19: zqnt.ReturnToHomeRequest
-	(*ManualControlRequest)(nil),             // 20: zqnt.ManualControlRequest
-	(*ManualControlInput)(nil),               // 21: zqnt.ManualControlInput
-	(*LiveStreamState)(nil),                  // 22: zqnt.LiveStreamState
-	(*LiveStreamStartResponse)(nil),          // 23: zqnt.LiveStreamStartResponse
-	(*ChangeCameraLensRequest)(nil),          // 24: zqnt.ChangeCameraLensRequest
-	(*ChangeCameraZoomRequest)(nil),          // 25: zqnt.ChangeCameraZoomRequest
-	(*ManualControlState)(nil),               // 26: zqnt.ManualControlState
-	(*EmptyCommandRequest)(nil),              // 27: zqnt.EmptyCommandRequest
-	(*CoordinateCommandRequest)(nil),         // 28: zqnt.CoordinateCommandRequest
-	(*LookAtCommandRequest)(nil),             // 29: zqnt.LookAtCommandRequest
-	(*ReturnToHomeCommandRequest)(nil),       // 30: zqnt.ReturnToHomeCommandRequest
-	(*ManualControlCommandRequest)(nil),      // 31: zqnt.ManualControlCommandRequest
-	(*ManualControlInputCommandRequest)(nil), // 32: zqnt.ManualControlInputCommandRequest
-	(*ToggleCommandRequest)(nil),             // 33: zqnt.ToggleCommandRequest
-	(*TextToSpeechCommandRequest)(nil),       // 34: zqnt.TextToSpeechCommandRequest
-	(*SpotlightControlRequest)(nil),          // 35: zqnt.SpotlightControlRequest
-	(*TaskCommandRequest)(nil),               // 36: zqnt.TaskCommandRequest
-	(*CloseCoverCommandRequest)(nil),         // 37: zqnt.CloseCoverCommandRequest
-	(*BootSubAssetCommandRequest)(nil),       // 38: zqnt.BootSubAssetCommandRequest
-	(*ChangeAcModeCommandRequest)(nil),       // 39: zqnt.ChangeAcModeCommandRequest
-	(*ChangeCameraLensCommandRequest)(nil),   // 40: zqnt.ChangeCameraLensCommandRequest
-	(*ChangeCameraZoomCommandRequest)(nil),   // 41: zqnt.ChangeCameraZoomCommandRequest
-	(*DetectionControlCommandRequest)(nil),   // 42: zqnt.DetectionControlCommandRequest
-	(*LiveStreamStartCommandRequest)(nil),    // 43: zqnt.LiveStreamStartCommandRequest
-	(*LiveStreamStopCommandRequest)(nil),     // 44: zqnt.LiveStreamStopCommandRequest
-	(*LiveStreamStartCommandPayload)(nil),    // 45: zqnt.LiveStreamStartCommandPayload
-	(*LiveStreamStopCommandPayload)(nil),     // 46: zqnt.LiveStreamStopCommandPayload
-	(*RegisterAssetCommandRequest)(nil),      // 47: zqnt.RegisterAssetCommandRequest
-	nil,                                      // 48: zqnt.Capability.MetadataEntry
-	(*proto.ResponseMeta)(nil),               // 49: zqnt.ResponseMeta
-	(*emptypb.Empty)(nil),                    // 50: google.protobuf.Empty
-	(*proto.GlobalErrorMessage)(nil),         // 51: zqnt.GlobalErrorMessage
-	(*proto.CommandProgress)(nil),            // 52: zqnt.CommandProgress
-	(*proto.RequestBase)(nil),                // 53: zqnt.RequestBase
-	(*structpb.Struct)(nil),                  // 54: google.protobuf.Struct
-	(*timestamppb.Timestamp)(nil),            // 55: google.protobuf.Timestamp
-	(proto1.AssetTypeEnum)(0),                // 56: zqnt.AssetTypeEnum
-	(proto1.ManualControlStateEnum)(0),       // 57: zqnt.ManualControlStateEnum
-	(proto1.AssetAirConditionerStateEnum)(0), // 58: zqnt.AssetAirConditionerStateEnum
-	(*proto2.DetectionControlRequest)(nil),   // 59: zqnt.DetectionControlRequest
-	(proto1.LiveStreamTypeEnum)(0),           // 60: zqnt.LiveStreamTypeEnum
-	(*proto1.AssetProtoDTO)(nil),             // 61: zqnt.AssetProtoDTO
+	(CapabilitySourceProto)(0),               // 4: zqnt.CapabilitySourceProto
+	(*CommandResponse)(nil),                  // 5: zqnt.CommandResponse
+	(*CustomCommandRequest)(nil),             // 6: zqnt.CustomCommandRequest
+	(*CustomCommandResponse)(nil),            // 7: zqnt.CustomCommandResponse
+	(*CapabilityTarget)(nil),                 // 8: zqnt.CapabilityTarget
+	(*CapabilityErrorProto)(nil),             // 9: zqnt.CapabilityErrorProto
+	(*CapabilityEventProto)(nil),             // 10: zqnt.CapabilityEventProto
+	(*CapabilityRequirementsProto)(nil),      // 11: zqnt.CapabilityRequirementsProto
+	(*Capability)(nil),                       // 12: zqnt.Capability
+	(*AssetCapabilities)(nil),                // 13: zqnt.AssetCapabilities
+	(*AssetCapabilitiesRequest)(nil),         // 14: zqnt.AssetCapabilitiesRequest
+	(*DetectedPayload)(nil),                  // 15: zqnt.DetectedPayload
+	(*ReportAssetRuntimeRequest)(nil),        // 16: zqnt.ReportAssetRuntimeRequest
+	(*ReportAssetRuntimeResponse)(nil),       // 17: zqnt.ReportAssetRuntimeResponse
+	(*AssetCapabilitiesResponse)(nil),        // 18: zqnt.AssetCapabilitiesResponse
+	(*GetAssetRuntimeRequest)(nil),           // 19: zqnt.GetAssetRuntimeRequest
+	(*AssetRuntimeSnapshot)(nil),             // 20: zqnt.AssetRuntimeSnapshot
+	(*AssetRuntimeResponse)(nil),             // 21: zqnt.AssetRuntimeResponse
+	(*GeoCoordinate)(nil),                    // 22: zqnt.GeoCoordinate
+	(*ReturnToHomeRequest)(nil),              // 23: zqnt.ReturnToHomeRequest
+	(*ManualControlRequest)(nil),             // 24: zqnt.ManualControlRequest
+	(*ManualControlInput)(nil),               // 25: zqnt.ManualControlInput
+	(*LiveStreamState)(nil),                  // 26: zqnt.LiveStreamState
+	(*LiveStreamStartResponse)(nil),          // 27: zqnt.LiveStreamStartResponse
+	(*ChangeCameraLensRequest)(nil),          // 28: zqnt.ChangeCameraLensRequest
+	(*ChangeCameraZoomRequest)(nil),          // 29: zqnt.ChangeCameraZoomRequest
+	(*ManualControlState)(nil),               // 30: zqnt.ManualControlState
+	(*EmptyCommandRequest)(nil),              // 31: zqnt.EmptyCommandRequest
+	(*CoordinateCommandRequest)(nil),         // 32: zqnt.CoordinateCommandRequest
+	(*LookAtCommandRequest)(nil),             // 33: zqnt.LookAtCommandRequest
+	(*ReturnToHomeCommandRequest)(nil),       // 34: zqnt.ReturnToHomeCommandRequest
+	(*ManualControlCommandRequest)(nil),      // 35: zqnt.ManualControlCommandRequest
+	(*ManualControlInputCommandRequest)(nil), // 36: zqnt.ManualControlInputCommandRequest
+	(*ToggleCommandRequest)(nil),             // 37: zqnt.ToggleCommandRequest
+	(*SpotlightControlRequest)(nil),          // 38: zqnt.SpotlightControlRequest
+	(*TaskCommandRequest)(nil),               // 39: zqnt.TaskCommandRequest
+	(*CloseCoverCommandRequest)(nil),         // 40: zqnt.CloseCoverCommandRequest
+	(*BootSubAssetCommandRequest)(nil),       // 41: zqnt.BootSubAssetCommandRequest
+	(*ChangeAcModeCommandRequest)(nil),       // 42: zqnt.ChangeAcModeCommandRequest
+	(*ChangeCameraLensCommandRequest)(nil),   // 43: zqnt.ChangeCameraLensCommandRequest
+	(*ChangeCameraZoomCommandRequest)(nil),   // 44: zqnt.ChangeCameraZoomCommandRequest
+	(*DetectionControlCommandRequest)(nil),   // 45: zqnt.DetectionControlCommandRequest
+	(*LiveStreamStartCommandRequest)(nil),    // 46: zqnt.LiveStreamStartCommandRequest
+	(*LiveStreamStopCommandRequest)(nil),     // 47: zqnt.LiveStreamStopCommandRequest
+	(*LiveStreamStartCommandPayload)(nil),    // 48: zqnt.LiveStreamStartCommandPayload
+	(*LiveStreamStopCommandPayload)(nil),     // 49: zqnt.LiveStreamStopCommandPayload
+	(*RegisterAssetCommandRequest)(nil),      // 50: zqnt.RegisterAssetCommandRequest
+	nil,                                      // 51: zqnt.Capability.MetadataEntry
+	(*proto.ResponseMeta)(nil),               // 52: zqnt.ResponseMeta
+	(*emptypb.Empty)(nil),                    // 53: google.protobuf.Empty
+	(*proto.GlobalErrorMessage)(nil),         // 54: zqnt.GlobalErrorMessage
+	(*proto.CommandProgress)(nil),            // 55: zqnt.CommandProgress
+	(*proto.RequestBase)(nil),                // 56: zqnt.RequestBase
+	(*structpb.Struct)(nil),                  // 57: google.protobuf.Struct
+	(*timestamppb.Timestamp)(nil),            // 58: google.protobuf.Timestamp
+	(proto1.AssetTypeEnum)(0),                // 59: zqnt.AssetTypeEnum
+	(proto1.ManualControlStateEnum)(0),       // 60: zqnt.ManualControlStateEnum
+	(proto1.AssetAirConditionerStateEnum)(0), // 61: zqnt.AssetAirConditionerStateEnum
+	(*proto2.DetectionControlRequest)(nil),   // 62: zqnt.DetectionControlRequest
+	(proto1.LiveStreamTypeEnum)(0),           // 63: zqnt.LiveStreamTypeEnum
+	(*proto1.AssetProtoDTO)(nil),             // 64: zqnt.AssetProtoDTO
 }
 var file_device_control_contracts_proto_depIdxs = []int32{
-	49, // 0: zqnt.CommandResponse.meta:type_name -> zqnt.ResponseMeta
-	50, // 1: zqnt.CommandResponse.empty:type_name -> google.protobuf.Empty
-	51, // 2: zqnt.CommandResponse.error:type_name -> zqnt.GlobalErrorMessage
-	52, // 3: zqnt.CommandResponse.progress:type_name -> zqnt.CommandProgress
-	23, // 4: zqnt.CommandResponse.live_stream_start_response:type_name -> zqnt.LiveStreamStartResponse
-	53, // 5: zqnt.CustomCommandRequest.base:type_name -> zqnt.RequestBase
-	54, // 6: zqnt.CustomCommandRequest.params:type_name -> google.protobuf.Struct
-	7,  // 7: zqnt.CustomCommandRequest.target:type_name -> zqnt.CapabilityTarget
-	49, // 8: zqnt.CustomCommandResponse.meta:type_name -> zqnt.ResponseMeta
-	54, // 9: zqnt.CustomCommandResponse.result:type_name -> google.protobuf.Struct
-	50, // 10: zqnt.CustomCommandResponse.empty:type_name -> google.protobuf.Empty
-	51, // 11: zqnt.CustomCommandResponse.error:type_name -> zqnt.GlobalErrorMessage
-	52, // 12: zqnt.CustomCommandResponse.progress:type_name -> zqnt.CommandProgress
+	52, // 0: zqnt.CommandResponse.meta:type_name -> zqnt.ResponseMeta
+	53, // 1: zqnt.CommandResponse.empty:type_name -> google.protobuf.Empty
+	54, // 2: zqnt.CommandResponse.error:type_name -> zqnt.GlobalErrorMessage
+	55, // 3: zqnt.CommandResponse.progress:type_name -> zqnt.CommandProgress
+	27, // 4: zqnt.CommandResponse.live_stream_start_response:type_name -> zqnt.LiveStreamStartResponse
+	56, // 5: zqnt.CustomCommandRequest.base:type_name -> zqnt.RequestBase
+	57, // 6: zqnt.CustomCommandRequest.params:type_name -> google.protobuf.Struct
+	8,  // 7: zqnt.CustomCommandRequest.target:type_name -> zqnt.CapabilityTarget
+	52, // 8: zqnt.CustomCommandResponse.meta:type_name -> zqnt.ResponseMeta
+	57, // 9: zqnt.CustomCommandResponse.result:type_name -> google.protobuf.Struct
+	53, // 10: zqnt.CustomCommandResponse.empty:type_name -> google.protobuf.Empty
+	54, // 11: zqnt.CustomCommandResponse.error:type_name -> zqnt.GlobalErrorMessage
+	55, // 12: zqnt.CustomCommandResponse.progress:type_name -> zqnt.CommandProgress
 	3,  // 13: zqnt.CapabilityTarget.type:type_name -> zqnt.CapabilityTargetType
-	48, // 14: zqnt.Capability.metadata:type_name -> zqnt.Capability.MetadataEntry
-	1,  // 15: zqnt.Capability.state:type_name -> zqnt.CapabilityState
-	54, // 16: zqnt.Capability.constraints:type_name -> google.protobuf.Struct
-	54, // 17: zqnt.Capability.input_schema:type_name -> google.protobuf.Struct
-	54, // 18: zqnt.Capability.output_schema:type_name -> google.protobuf.Struct
-	7,  // 19: zqnt.Capability.target:type_name -> zqnt.CapabilityTarget
-	8,  // 20: zqnt.AssetCapabilities.capabilities:type_name -> zqnt.Capability
-	55, // 21: zqnt.AssetCapabilities.timestamp:type_name -> google.protobuf.Timestamp
-	55, // 22: zqnt.AssetCapabilities.valid_until:type_name -> google.protobuf.Timestamp
-	2,  // 23: zqnt.AssetCapabilities.snapshot_state:type_name -> zqnt.CapabilitySnapshotState
-	53, // 24: zqnt.AssetCapabilitiesRequest.base:type_name -> zqnt.RequestBase
-	7,  // 25: zqnt.AssetCapabilitiesRequest.target:type_name -> zqnt.CapabilityTarget
-	54, // 26: zqnt.DetectedPayload.state:type_name -> google.protobuf.Struct
-	53, // 27: zqnt.ReportAssetRuntimeRequest.base:type_name -> zqnt.RequestBase
-	55, // 28: zqnt.ReportAssetRuntimeRequest.observed_at:type_name -> google.protobuf.Timestamp
-	11, // 29: zqnt.ReportAssetRuntimeRequest.payloads:type_name -> zqnt.DetectedPayload
-	8,  // 30: zqnt.ReportAssetRuntimeRequest.capabilities:type_name -> zqnt.Capability
-	49, // 31: zqnt.ReportAssetRuntimeResponse.meta:type_name -> zqnt.ResponseMeta
-	50, // 32: zqnt.ReportAssetRuntimeResponse.empty:type_name -> google.protobuf.Empty
-	51, // 33: zqnt.ReportAssetRuntimeResponse.error:type_name -> zqnt.GlobalErrorMessage
-	9,  // 34: zqnt.AssetCapabilitiesResponse.capabilities:type_name -> zqnt.AssetCapabilities
-	51, // 35: zqnt.AssetCapabilitiesResponse.error:type_name -> zqnt.GlobalErrorMessage
-	53, // 36: zqnt.GetAssetRuntimeRequest.base:type_name -> zqnt.RequestBase
-	11, // 37: zqnt.AssetRuntimeSnapshot.payloads:type_name -> zqnt.DetectedPayload
-	8,  // 38: zqnt.AssetRuntimeSnapshot.capabilities:type_name -> zqnt.Capability
-	2,  // 39: zqnt.AssetRuntimeSnapshot.snapshot_state:type_name -> zqnt.CapabilitySnapshotState
-	55, // 40: zqnt.AssetRuntimeSnapshot.observed_at:type_name -> google.protobuf.Timestamp
-	55, // 41: zqnt.AssetRuntimeSnapshot.valid_until:type_name -> google.protobuf.Timestamp
-	49, // 42: zqnt.AssetRuntimeResponse.meta:type_name -> zqnt.ResponseMeta
-	16, // 43: zqnt.AssetRuntimeResponse.runtime:type_name -> zqnt.AssetRuntimeSnapshot
-	51, // 44: zqnt.AssetRuntimeResponse.error:type_name -> zqnt.GlobalErrorMessage
-	55, // 45: zqnt.LiveStreamState.started_at:type_name -> google.protobuf.Timestamp
-	56, // 46: zqnt.LiveStreamState.asset_type:type_name -> zqnt.AssetTypeEnum
-	57, // 47: zqnt.ManualControlState.state:type_name -> zqnt.ManualControlStateEnum
-	53, // 48: zqnt.EmptyCommandRequest.base:type_name -> zqnt.RequestBase
-	53, // 49: zqnt.CoordinateCommandRequest.base:type_name -> zqnt.RequestBase
-	18, // 50: zqnt.CoordinateCommandRequest.coordinate:type_name -> zqnt.GeoCoordinate
-	53, // 51: zqnt.LookAtCommandRequest.base:type_name -> zqnt.RequestBase
-	18, // 52: zqnt.LookAtCommandRequest.coordinate:type_name -> zqnt.GeoCoordinate
-	53, // 53: zqnt.ReturnToHomeCommandRequest.base:type_name -> zqnt.RequestBase
-	19, // 54: zqnt.ReturnToHomeCommandRequest.request:type_name -> zqnt.ReturnToHomeRequest
-	53, // 55: zqnt.ManualControlCommandRequest.base:type_name -> zqnt.RequestBase
-	20, // 56: zqnt.ManualControlCommandRequest.request:type_name -> zqnt.ManualControlRequest
-	53, // 57: zqnt.ManualControlInputCommandRequest.base:type_name -> zqnt.RequestBase
-	21, // 58: zqnt.ManualControlInputCommandRequest.request:type_name -> zqnt.ManualControlInput
-	53, // 59: zqnt.ToggleCommandRequest.base:type_name -> zqnt.RequestBase
-	53, // 60: zqnt.TextToSpeechCommandRequest.base:type_name -> zqnt.RequestBase
-	53, // 61: zqnt.SpotlightControlRequest.base:type_name -> zqnt.RequestBase
-	53, // 62: zqnt.TaskCommandRequest.base:type_name -> zqnt.RequestBase
-	53, // 63: zqnt.CloseCoverCommandRequest.base:type_name -> zqnt.RequestBase
-	53, // 64: zqnt.BootSubAssetCommandRequest.base:type_name -> zqnt.RequestBase
-	53, // 65: zqnt.ChangeAcModeCommandRequest.base:type_name -> zqnt.RequestBase
-	58, // 66: zqnt.ChangeAcModeCommandRequest.mode:type_name -> zqnt.AssetAirConditionerStateEnum
-	53, // 67: zqnt.ChangeCameraLensCommandRequest.base:type_name -> zqnt.RequestBase
-	24, // 68: zqnt.ChangeCameraLensCommandRequest.request:type_name -> zqnt.ChangeCameraLensRequest
-	53, // 69: zqnt.ChangeCameraZoomCommandRequest.base:type_name -> zqnt.RequestBase
-	25, // 70: zqnt.ChangeCameraZoomCommandRequest.request:type_name -> zqnt.ChangeCameraZoomRequest
-	53, // 71: zqnt.DetectionControlCommandRequest.base:type_name -> zqnt.RequestBase
-	59, // 72: zqnt.DetectionControlCommandRequest.request:type_name -> zqnt.DetectionControlRequest
-	53, // 73: zqnt.LiveStreamStartCommandRequest.base:type_name -> zqnt.RequestBase
-	45, // 74: zqnt.LiveStreamStartCommandRequest.request:type_name -> zqnt.LiveStreamStartCommandPayload
-	53, // 75: zqnt.LiveStreamStopCommandRequest.base:type_name -> zqnt.RequestBase
-	46, // 76: zqnt.LiveStreamStopCommandRequest.request:type_name -> zqnt.LiveStreamStopCommandPayload
-	60, // 77: zqnt.LiveStreamStartCommandPayload.stream_type:type_name -> zqnt.LiveStreamTypeEnum
-	56, // 78: zqnt.LiveStreamStartCommandPayload.asset_type:type_name -> zqnt.AssetTypeEnum
-	53, // 79: zqnt.RegisterAssetCommandRequest.base:type_name -> zqnt.RequestBase
-	61, // 80: zqnt.RegisterAssetCommandRequest.asset_dto:type_name -> zqnt.AssetProtoDTO
-	81, // [81:81] is the sub-list for method output_type
-	81, // [81:81] is the sub-list for method input_type
-	81, // [81:81] is the sub-list for extension type_name
-	81, // [81:81] is the sub-list for extension extendee
-	0,  // [0:81] is the sub-list for field type_name
+	57, // 14: zqnt.CapabilityEventProto.payload_schema:type_name -> google.protobuf.Struct
+	57, // 15: zqnt.CapabilityRequirementsProto.properties:type_name -> google.protobuf.Struct
+	51, // 16: zqnt.Capability.metadata:type_name -> zqnt.Capability.MetadataEntry
+	1,  // 17: zqnt.Capability.state:type_name -> zqnt.CapabilityState
+	57, // 18: zqnt.Capability.constraints:type_name -> google.protobuf.Struct
+	57, // 19: zqnt.Capability.input_schema:type_name -> google.protobuf.Struct
+	57, // 20: zqnt.Capability.output_schema:type_name -> google.protobuf.Struct
+	8,  // 21: zqnt.Capability.target:type_name -> zqnt.CapabilityTarget
+	9,  // 22: zqnt.Capability.errors:type_name -> zqnt.CapabilityErrorProto
+	10, // 23: zqnt.Capability.events:type_name -> zqnt.CapabilityEventProto
+	11, // 24: zqnt.Capability.requirements:type_name -> zqnt.CapabilityRequirementsProto
+	4,  // 25: zqnt.Capability.source:type_name -> zqnt.CapabilitySourceProto
+	12, // 26: zqnt.AssetCapabilities.capabilities:type_name -> zqnt.Capability
+	58, // 27: zqnt.AssetCapabilities.timestamp:type_name -> google.protobuf.Timestamp
+	58, // 28: zqnt.AssetCapabilities.valid_until:type_name -> google.protobuf.Timestamp
+	2,  // 29: zqnt.AssetCapabilities.snapshot_state:type_name -> zqnt.CapabilitySnapshotState
+	56, // 30: zqnt.AssetCapabilitiesRequest.base:type_name -> zqnt.RequestBase
+	8,  // 31: zqnt.AssetCapabilitiesRequest.target:type_name -> zqnt.CapabilityTarget
+	57, // 32: zqnt.DetectedPayload.state:type_name -> google.protobuf.Struct
+	56, // 33: zqnt.ReportAssetRuntimeRequest.base:type_name -> zqnt.RequestBase
+	58, // 34: zqnt.ReportAssetRuntimeRequest.observed_at:type_name -> google.protobuf.Timestamp
+	15, // 35: zqnt.ReportAssetRuntimeRequest.payloads:type_name -> zqnt.DetectedPayload
+	12, // 36: zqnt.ReportAssetRuntimeRequest.capabilities:type_name -> zqnt.Capability
+	52, // 37: zqnt.ReportAssetRuntimeResponse.meta:type_name -> zqnt.ResponseMeta
+	53, // 38: zqnt.ReportAssetRuntimeResponse.empty:type_name -> google.protobuf.Empty
+	54, // 39: zqnt.ReportAssetRuntimeResponse.error:type_name -> zqnt.GlobalErrorMessage
+	13, // 40: zqnt.AssetCapabilitiesResponse.capabilities:type_name -> zqnt.AssetCapabilities
+	54, // 41: zqnt.AssetCapabilitiesResponse.error:type_name -> zqnt.GlobalErrorMessage
+	56, // 42: zqnt.GetAssetRuntimeRequest.base:type_name -> zqnt.RequestBase
+	15, // 43: zqnt.AssetRuntimeSnapshot.payloads:type_name -> zqnt.DetectedPayload
+	12, // 44: zqnt.AssetRuntimeSnapshot.capabilities:type_name -> zqnt.Capability
+	2,  // 45: zqnt.AssetRuntimeSnapshot.snapshot_state:type_name -> zqnt.CapabilitySnapshotState
+	58, // 46: zqnt.AssetRuntimeSnapshot.observed_at:type_name -> google.protobuf.Timestamp
+	58, // 47: zqnt.AssetRuntimeSnapshot.valid_until:type_name -> google.protobuf.Timestamp
+	52, // 48: zqnt.AssetRuntimeResponse.meta:type_name -> zqnt.ResponseMeta
+	20, // 49: zqnt.AssetRuntimeResponse.runtime:type_name -> zqnt.AssetRuntimeSnapshot
+	54, // 50: zqnt.AssetRuntimeResponse.error:type_name -> zqnt.GlobalErrorMessage
+	58, // 51: zqnt.LiveStreamState.started_at:type_name -> google.protobuf.Timestamp
+	59, // 52: zqnt.LiveStreamState.asset_type:type_name -> zqnt.AssetTypeEnum
+	60, // 53: zqnt.ManualControlState.state:type_name -> zqnt.ManualControlStateEnum
+	56, // 54: zqnt.EmptyCommandRequest.base:type_name -> zqnt.RequestBase
+	56, // 55: zqnt.CoordinateCommandRequest.base:type_name -> zqnt.RequestBase
+	22, // 56: zqnt.CoordinateCommandRequest.coordinate:type_name -> zqnt.GeoCoordinate
+	56, // 57: zqnt.LookAtCommandRequest.base:type_name -> zqnt.RequestBase
+	22, // 58: zqnt.LookAtCommandRequest.coordinate:type_name -> zqnt.GeoCoordinate
+	56, // 59: zqnt.ReturnToHomeCommandRequest.base:type_name -> zqnt.RequestBase
+	23, // 60: zqnt.ReturnToHomeCommandRequest.request:type_name -> zqnt.ReturnToHomeRequest
+	56, // 61: zqnt.ManualControlCommandRequest.base:type_name -> zqnt.RequestBase
+	24, // 62: zqnt.ManualControlCommandRequest.request:type_name -> zqnt.ManualControlRequest
+	56, // 63: zqnt.ManualControlInputCommandRequest.base:type_name -> zqnt.RequestBase
+	25, // 64: zqnt.ManualControlInputCommandRequest.request:type_name -> zqnt.ManualControlInput
+	56, // 65: zqnt.ToggleCommandRequest.base:type_name -> zqnt.RequestBase
+	56, // 66: zqnt.SpotlightControlRequest.base:type_name -> zqnt.RequestBase
+	56, // 67: zqnt.TaskCommandRequest.base:type_name -> zqnt.RequestBase
+	56, // 68: zqnt.CloseCoverCommandRequest.base:type_name -> zqnt.RequestBase
+	56, // 69: zqnt.BootSubAssetCommandRequest.base:type_name -> zqnt.RequestBase
+	56, // 70: zqnt.ChangeAcModeCommandRequest.base:type_name -> zqnt.RequestBase
+	61, // 71: zqnt.ChangeAcModeCommandRequest.mode:type_name -> zqnt.AssetAirConditionerStateEnum
+	56, // 72: zqnt.ChangeCameraLensCommandRequest.base:type_name -> zqnt.RequestBase
+	28, // 73: zqnt.ChangeCameraLensCommandRequest.request:type_name -> zqnt.ChangeCameraLensRequest
+	56, // 74: zqnt.ChangeCameraZoomCommandRequest.base:type_name -> zqnt.RequestBase
+	29, // 75: zqnt.ChangeCameraZoomCommandRequest.request:type_name -> zqnt.ChangeCameraZoomRequest
+	56, // 76: zqnt.DetectionControlCommandRequest.base:type_name -> zqnt.RequestBase
+	62, // 77: zqnt.DetectionControlCommandRequest.request:type_name -> zqnt.DetectionControlRequest
+	56, // 78: zqnt.LiveStreamStartCommandRequest.base:type_name -> zqnt.RequestBase
+	48, // 79: zqnt.LiveStreamStartCommandRequest.request:type_name -> zqnt.LiveStreamStartCommandPayload
+	56, // 80: zqnt.LiveStreamStopCommandRequest.base:type_name -> zqnt.RequestBase
+	49, // 81: zqnt.LiveStreamStopCommandRequest.request:type_name -> zqnt.LiveStreamStopCommandPayload
+	63, // 82: zqnt.LiveStreamStartCommandPayload.stream_type:type_name -> zqnt.LiveStreamTypeEnum
+	59, // 83: zqnt.LiveStreamStartCommandPayload.asset_type:type_name -> zqnt.AssetTypeEnum
+	56, // 84: zqnt.RegisterAssetCommandRequest.base:type_name -> zqnt.RequestBase
+	64, // 85: zqnt.RegisterAssetCommandRequest.asset_dto:type_name -> zqnt.AssetProtoDTO
+	86, // [86:86] is the sub-list for method output_type
+	86, // [86:86] is the sub-list for method input_type
+	86, // [86:86] is the sub-list for extension type_name
+	86, // [86:86] is the sub-list for extension extendee
+	0,  // [0:86] is the sub-list for field type_name
 }
 
 func init() { file_device_control_contracts_proto_init() }
@@ -3698,34 +4009,37 @@ func file_device_control_contracts_proto_init() {
 	file_device_control_contracts_proto_msgTypes[3].OneofWrappers = []any{}
 	file_device_control_contracts_proto_msgTypes[4].OneofWrappers = []any{}
 	file_device_control_contracts_proto_msgTypes[5].OneofWrappers = []any{}
-	file_device_control_contracts_proto_msgTypes[6].OneofWrappers = []any{}
 	file_device_control_contracts_proto_msgTypes[7].OneofWrappers = []any{}
-	file_device_control_contracts_proto_msgTypes[9].OneofWrappers = []any{
+	file_device_control_contracts_proto_msgTypes[8].OneofWrappers = []any{}
+	file_device_control_contracts_proto_msgTypes[9].OneofWrappers = []any{}
+	file_device_control_contracts_proto_msgTypes[10].OneofWrappers = []any{}
+	file_device_control_contracts_proto_msgTypes[12].OneofWrappers = []any{
 		(*ReportAssetRuntimeResponse_Empty)(nil),
 		(*ReportAssetRuntimeResponse_Error)(nil),
 	}
-	file_device_control_contracts_proto_msgTypes[10].OneofWrappers = []any{}
-	file_device_control_contracts_proto_msgTypes[11].OneofWrappers = []any{}
-	file_device_control_contracts_proto_msgTypes[12].OneofWrappers = []any{}
-	file_device_control_contracts_proto_msgTypes[13].OneofWrappers = []any{
+	file_device_control_contracts_proto_msgTypes[13].OneofWrappers = []any{}
+	file_device_control_contracts_proto_msgTypes[14].OneofWrappers = []any{}
+	file_device_control_contracts_proto_msgTypes[15].OneofWrappers = []any{}
+	file_device_control_contracts_proto_msgTypes[16].OneofWrappers = []any{
 		(*AssetRuntimeResponse_Runtime)(nil),
 		(*AssetRuntimeResponse_Error)(nil),
 	}
-	file_device_control_contracts_proto_msgTypes[15].OneofWrappers = []any{}
-	file_device_control_contracts_proto_msgTypes[16].OneofWrappers = []any{}
-	file_device_control_contracts_proto_msgTypes[17].OneofWrappers = []any{}
+	file_device_control_contracts_proto_msgTypes[18].OneofWrappers = []any{}
+	file_device_control_contracts_proto_msgTypes[19].OneofWrappers = []any{}
 	file_device_control_contracts_proto_msgTypes[20].OneofWrappers = []any{}
-	file_device_control_contracts_proto_msgTypes[21].OneofWrappers = []any{}
-	file_device_control_contracts_proto_msgTypes[22].OneofWrappers = []any{}
+	file_device_control_contracts_proto_msgTypes[23].OneofWrappers = []any{}
+	file_device_control_contracts_proto_msgTypes[24].OneofWrappers = []any{}
 	file_device_control_contracts_proto_msgTypes[25].OneofWrappers = []any{}
-	file_device_control_contracts_proto_msgTypes[33].OneofWrappers = []any{}
+	file_device_control_contracts_proto_msgTypes[27].OneofWrappers = []any{}
+	file_device_control_contracts_proto_msgTypes[28].OneofWrappers = []any{}
+	file_device_control_contracts_proto_msgTypes[35].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_device_control_contracts_proto_rawDesc), len(file_device_control_contracts_proto_rawDesc)),
-			NumEnums:      4,
-			NumMessages:   45,
+			NumEnums:      5,
+			NumMessages:   47,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

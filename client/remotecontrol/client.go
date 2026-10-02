@@ -13,7 +13,6 @@ import (
 	devicecontrol "github.com/Zequent/zqnt-client-sdk-go/gen/devicecontrol/contracts/proto"
 	remotecontrolpb "github.com/Zequent/zqnt-client-sdk-go/gen/remotecontrol/proto"
 	"google.golang.org/grpc"
-	"google.golang.org/protobuf/encoding/protowire"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -102,20 +101,13 @@ type GoToOptions struct {
 	NoFlyZoneOverride bool
 }
 
-// coordinateCommandNoFlyZoneOverride is CoordinateCommandRequest.no_fly_zone_override (field 3,
-// optional bool) in zqnt-protos 4115f03 and later. gen/ here is still generated from the 1.3.0
-// contract, which has no such field, so it is written as a raw field on the wire -- exactly the
-// bytes the generated setter would write. Replace with the setter once gen/ moves to the 2.0 line.
-const coordinateCommandNoFlyZoneOverride protowire.Number = 3
-
 // GoToWithOptions is GoTo with options; GoTo is GoToWithOptions with none. The override is sent
 // only when asked for.
 func (c *Client) GoToWithOptions(ctx context.Context, sn string, coordinate *devicecontrol.GeoCoordinate, options GoToOptions) (*devicecontrol.CommandResponse, error) {
 	req := &devicecontrol.CoordinateCommandRequest{Base: requestBase(sn), Coordinate: coordinate}
 	if options.NoFlyZoneOverride {
-		raw := protowire.AppendTag(nil, coordinateCommandNoFlyZoneOverride, protowire.VarintType)
-		raw = protowire.AppendVarint(raw, protowire.EncodeBool(true))
-		req.ProtoReflect().SetUnknown(raw)
+		override := true
+		req.NoFlyZoneOverride = &override
 	}
 	resp, err := c.grpc.GoTo(ctx, req)
 	return unwrap("GoTo", resp, err)

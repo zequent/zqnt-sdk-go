@@ -3,51 +3,36 @@
 Go SDK for customer applications consuming the Zequent platform — the Go counterpart to
 `client-java-sdk` / `client-python-sdk`.
 
-## This branch: pinned to the 1.3.0 wire contract
+## This branch: the 2.0 (v2) wire contract
 
-`feature/v1.3.0-proto` tracks zqnt-protos' `1.3.0` tag specifically, not the current (`main`,
-2.0.0) line — see zqnt-protos' README "Versioning" section for the platform-wide convention. A
-bugfix here ships as a point release off this branch (e.g. `v1.3.1`) without touching `main`.
+`refactoring/refactoring-client-go-sdk-v2` generates `gen/` from zqnt-protos' v2 line (branch
+`refactoring/refactoring-ecosystem-v2`), carried as this repo's own `proto/` submodule and pinned by
+commit — the same commit zqnt-utils-golang generates from. The 1.3.x line (Mission/Task) lives on
+`main` / `feature/v1.3.0-proto`; see zqnt-protos' README "Versioning" section.
 
-The two branches cover genuinely different RPC surfaces, not just a version-numbered copy of the
-same code — `main`'s MissionAutonomyService surface is Application/SkillExecution
-(`capability-execution-*.proto`, which doesn't exist at 1.3.0 at all); this branch's is real
-Mission/Task CRUD + lifecycle instead, which `main` explicitly does not cover (its own README
-used to note there was "nothing working to mirror" there — true for `main`, not for 1.3.0, where
-`GetMission`/`CreateMission`/.../`StartTask`/`StopTask`/`PauseTask`/`ResumeTask` are all real
-RPCs).
-
-**Included on this branch:**
-- `gen/` — generated protobuf/gRPC Go code for the canonical protocol at zqnt-protos' `1.3.0`
-  tag, regenerated via `scripts/gen_protos.sh` (verifies the pinned tag hasn't moved before
-  generating). No `capability-execution-*.proto`/`gen/execution/...` — those don't exist at 1.3.0.
-- `connector/` — asset lookup; scheduler CRUD (`GetScheduler`/`CreateScheduler(s)`/
-  `UpdateScheduler`/`DeleteScheduler(s)`/`DeleteSchedulersByTask` — the last one is 1.3.0-only,
-  retired from ConnectorService on `main`; `ListSchedulers` is NOT here — ConnectorService has no
-  such RPC at 1.3.0, see `missionautonomy.Client.ListSchedulers` instead); operational policies
-  (`GetActivePoliciesByType`, `GetAllActivePolicies`); technical config (`GetTechnicalConfigs`).
-  No Skill Registry (`ObserveSkillContract` etc. — `main`/2.0.0-only, doesn't exist in
-  connector.proto at 1.3.0).
-- `missionautonomy/` — Mission CRUD (`CreateMission`/`UpdateMission`/`GetMission`/
-  `DeleteMission`), Task CRUD + lifecycle (`CreateTask`/`UpdateTask`/`GetTask`/
-  `GetTaskByFlightID`/`DeleteTask`/`StartTask`/`StopTask`/`PauseTask`/`ResumeTask`), and
-  `ListSchedulers` (optionally filtered by task ID — the 1.3.0-only filter main reserves). No
-  Application/SkillExecution surface at all on this branch.
-- `remotecontrol/` — unchanged from `main`; `RemoteControlService`'s command-gateway surface is
-  identical at both contract versions. One addition: `GoToWithOptions(ctx, sn, coordinate,
+**Included:**
+- `gen/` — generated protobuf/gRPC Go code for every `.proto` in `proto/`, regenerated via
+  `scripts/gen_protos.sh` (refuses to run unless the submodule is at the pinned commit).
+- `connector/` — asset lookup, the Skill Registry (`ObserveSkillContract`, `ListSkillContracts`,
+  `SetSkillContractStatus`, `SetSkillContractPermissions`), scheduler CRUD (`GetScheduler`/
+  `ListSchedulers`/`CreateScheduler(s)`/`UpdateScheduler`/`DeleteScheduler(s)`), operational policies
+  (`GetActivePoliciesByType`, `GetAllActivePolicies`) and technical config (`GetTechnicalConfigs`).
+- `missionautonomy/` — Application CRUD + `ListApplications`, the SkillExecution lifecycle
+  (`CreateSimpleExecution`/`ExecuteSimple` for a single command, `CreateApplicationExecution`/
+  `ExecuteApplication` for a named Skill out of a deployed Application, `GetSkillExecution`,
+  `ListSkillExecutions`, `Start`/`Pause`/`Resume`/`CancelSkillExecution`, `SignalSkillExecution`) and
+  `ResolveExecutionConfig`. There is no Mission/Task surface: the 2.0 contract has no such RPCs.
+- `remotecontrol/` — `RemoteControlService`'s command gateway. `GoToWithOptions(ctx, sn, coordinate,
   GoToOptions{NoFlyZoneOverride: true})` flies through a no-fly zone that would refuse the fly-to
-  (honoured for an organization admin or a system admin only); `GoTo` is that with no options. The
-  field (`CoordinateCommandRequest.no_fly_zone_override`, zqnt-protos 4115f03) is newer than the
-  1.3.0 `gen/`, so it is written as a raw wire field until `gen/` moves to the 2.0 line.
-- `livedata/` — unchanged from `main`; returns the raw gRPC server-streaming client rather than a
-  typed dataclass, so it never needed touching for the `TaskEvent`/`CommandExecutionEvent`
-  drift that affected the Python SDKs' equivalent layer.
+  (honoured for an organization admin or a system admin only); `GoTo` is that with no options.
+- `livedata/` — telemetry/detection/notification streaming, returning the raw gRPC server-streaming
+  client.
 
-**Deliberately not included (same as `main`):**
+**Deliberately not included:**
 - **Auto-reconnecting streams.** `StreamTelemetry`/`StreamDetections`/`StreamNotifications` return
   the raw `grpc.ServerStreamingClient` — redialing on a broken stream is the caller's job.
-- A shared proto module: `gen/` is vendored directly into this repo rather than pulled from one
-  common `zqnt-utils-go`.
+- A shared proto module: `gen/` is vendored directly into this repo rather than pulled from
+  zqnt-utils-golang.
 
 ## Authentication
 
@@ -112,6 +97,7 @@ Go 1.24+. `go build ./...` / `go vet ./...` / `go test ./...` all pass as of thi
 ./scripts/gen_protos.sh
 ```
 
-Checks out zqnt-protos' `1.3.0` tag (verifying it still resolves to the expected commit — fails
-loudly rather than silently regenerating from a moved tag), regenerates `gen/`, and restores the
-proto submodule to whatever it was checked out at before.
+Generates from the `proto/` submodule (`git submodule update --init proto` in a fresh clone),
+after verifying it is at the commit pinned in the script. To move to a newer contract, check the
+submodule out at the new commit, update `EXPECTED_PROTO_COMMIT` in the script, regenerate, and commit
+the submodule pointer together with `gen/`.

@@ -31,7 +31,6 @@ const (
 	RemoteControlService_ManualControlInput_FullMethodName    = "/zqnt.RemoteControlService/ManualControlInput"
 	RemoteControlService_LookAt_FullMethodName                = "/zqnt.RemoteControlService/LookAt"
 	RemoteControlService_CapturePhoto_FullMethodName          = "/zqnt.RemoteControlService/CapturePhoto"
-	RemoteControlService_PlayTTSAudio_FullMethodName          = "/zqnt.RemoteControlService/PlayTTSAudio"
 	RemoteControlService_LiveStreamSplitScreen_FullMethodName = "/zqnt.RemoteControlService/LiveStreamSplitScreen"
 	RemoteControlService_ControlDetection_FullMethodName      = "/zqnt.RemoteControlService/ControlDetection"
 	RemoteControlService_OpenCover_FullMethodName             = "/zqnt.RemoteControlService/OpenCover"
@@ -72,7 +71,6 @@ type RemoteControlServiceClient interface {
 	ManualControlInput(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[proto.ManualControlInputCommandRequest, proto.CommandResponse], error)
 	LookAt(ctx context.Context, in *proto.LookAtCommandRequest, opts ...grpc.CallOption) (*proto.CommandResponse, error)
 	CapturePhoto(ctx context.Context, in *proto.EmptyCommandRequest, opts ...grpc.CallOption) (*proto.CommandResponse, error)
-	PlayTTSAudio(ctx context.Context, in *proto.TextToSpeechCommandRequest, opts ...grpc.CallOption) (*proto.CommandResponse, error)
 	LiveStreamSplitScreen(ctx context.Context, in *proto.ToggleCommandRequest, opts ...grpc.CallOption) (*proto.CommandResponse, error)
 	// Detection
 	ControlDetection(ctx context.Context, in *proto.DetectionControlCommandRequest, opts ...grpc.CallOption) (*proto.CommandResponse, error)
@@ -209,16 +207,6 @@ func (c *remoteControlServiceClient) CapturePhoto(ctx context.Context, in *proto
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(proto.CommandResponse)
 	err := c.cc.Invoke(ctx, RemoteControlService_CapturePhoto_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *remoteControlServiceClient) PlayTTSAudio(ctx context.Context, in *proto.TextToSpeechCommandRequest, opts ...grpc.CallOption) (*proto.CommandResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(proto.CommandResponse)
-	err := c.cc.Invoke(ctx, RemoteControlService_PlayTTSAudio_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -380,7 +368,6 @@ type RemoteControlServiceServer interface {
 	ManualControlInput(grpc.ClientStreamingServer[proto.ManualControlInputCommandRequest, proto.CommandResponse]) error
 	LookAt(context.Context, *proto.LookAtCommandRequest) (*proto.CommandResponse, error)
 	CapturePhoto(context.Context, *proto.EmptyCommandRequest) (*proto.CommandResponse, error)
-	PlayTTSAudio(context.Context, *proto.TextToSpeechCommandRequest) (*proto.CommandResponse, error)
 	LiveStreamSplitScreen(context.Context, *proto.ToggleCommandRequest) (*proto.CommandResponse, error)
 	// Detection
 	ControlDetection(context.Context, *proto.DetectionControlCommandRequest) (*proto.CommandResponse, error)
@@ -442,9 +429,6 @@ func (UnimplementedRemoteControlServiceServer) LookAt(context.Context, *proto.Lo
 }
 func (UnimplementedRemoteControlServiceServer) CapturePhoto(context.Context, *proto.EmptyCommandRequest) (*proto.CommandResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CapturePhoto not implemented")
-}
-func (UnimplementedRemoteControlServiceServer) PlayTTSAudio(context.Context, *proto.TextToSpeechCommandRequest) (*proto.CommandResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method PlayTTSAudio not implemented")
 }
 func (UnimplementedRemoteControlServiceServer) LiveStreamSplitScreen(context.Context, *proto.ToggleCommandRequest) (*proto.CommandResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method LiveStreamSplitScreen not implemented")
@@ -689,24 +673,6 @@ func _RemoteControlService_CapturePhoto_Handler(srv interface{}, ctx context.Con
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(RemoteControlServiceServer).CapturePhoto(ctx, req.(*proto.EmptyCommandRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _RemoteControlService_PlayTTSAudio_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(proto.TextToSpeechCommandRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(RemoteControlServiceServer).PlayTTSAudio(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: RemoteControlService_PlayTTSAudio_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RemoteControlServiceServer).PlayTTSAudio(ctx, req.(*proto.TextToSpeechCommandRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -991,10 +957,6 @@ var RemoteControlService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CapturePhoto",
 			Handler:    _RemoteControlService_CapturePhoto_Handler,
-		},
-		{
-			MethodName: "PlayTTSAudio",
-			Handler:    _RemoteControlService_PlayTTSAudio_Handler,
 		},
 		{
 			MethodName: "LiveStreamSplitScreen",
