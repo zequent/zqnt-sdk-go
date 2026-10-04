@@ -8,8 +8,8 @@ package proto
 
 import (
 	context "context"
-	proto1 "github.com/Zequent/zqnt-client-sdk-go/gen/common/detection/proto"
-	proto "github.com/Zequent/zqnt-client-sdk-go/gen/devicecontrol/contracts/proto"
+	proto1 "github.com/Zequent/zqnt-client-sdk-go/v2/gen/common/detection/proto"
+	proto "github.com/Zequent/zqnt-client-sdk-go/v2/gen/devicecontrol/contracts/proto"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -31,7 +31,6 @@ const (
 	EdgeAdapterService_LookAt_FullMethodName                = "/zqnt.EdgeAdapterService/LookAt"
 	EdgeAdapterService_EnableGimbalTracking_FullMethodName  = "/zqnt.EdgeAdapterService/EnableGimbalTracking"
 	EdgeAdapterService_GetDetections_FullMethodName         = "/zqnt.EdgeAdapterService/GetDetections"
-	EdgeAdapterService_PlayTTSAudio_FullMethodName          = "/zqnt.EdgeAdapterService/PlayTTSAudio"
 	EdgeAdapterService_OpenCover_FullMethodName             = "/zqnt.EdgeAdapterService/OpenCover"
 	EdgeAdapterService_CloseCover_FullMethodName            = "/zqnt.EdgeAdapterService/CloseCover"
 	EdgeAdapterService_StartCharging_FullMethodName         = "/zqnt.EdgeAdapterService/StartCharging"
@@ -81,7 +80,6 @@ type EdgeAdapterServiceClient interface {
 	LookAt(ctx context.Context, in *proto.LookAtCommandRequest, opts ...grpc.CallOption) (*proto.CommandResponse, error)
 	EnableGimbalTracking(ctx context.Context, in *proto.ToggleCommandRequest, opts ...grpc.CallOption) (*proto.CommandResponse, error)
 	GetDetections(ctx context.Context, in *proto1.DetectionStreamRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[proto1.DetectionBatch], error)
-	PlayTTSAudio(ctx context.Context, in *proto.TextToSpeechCommandRequest, opts ...grpc.CallOption) (*proto.CommandResponse, error)
 	// Dock commands
 	OpenCover(ctx context.Context, in *proto.EmptyCommandRequest, opts ...grpc.CallOption) (*proto.CommandResponse, error)
 	CloseCover(ctx context.Context, in *proto.CloseCoverCommandRequest, opts ...grpc.CallOption) (*proto.CommandResponse, error)
@@ -233,16 +231,6 @@ func (c *edgeAdapterServiceClient) GetDetections(ctx context.Context, in *proto1
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type EdgeAdapterService_GetDetectionsClient = grpc.ServerStreamingClient[proto1.DetectionBatch]
-
-func (c *edgeAdapterServiceClient) PlayTTSAudio(ctx context.Context, in *proto.TextToSpeechCommandRequest, opts ...grpc.CallOption) (*proto.CommandResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(proto.CommandResponse)
-	err := c.cc.Invoke(ctx, EdgeAdapterService_PlayTTSAudio_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
 
 func (c *edgeAdapterServiceClient) OpenCover(ctx context.Context, in *proto.EmptyCommandRequest, opts ...grpc.CallOption) (*proto.CommandResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
@@ -507,7 +495,6 @@ type EdgeAdapterServiceServer interface {
 	LookAt(context.Context, *proto.LookAtCommandRequest) (*proto.CommandResponse, error)
 	EnableGimbalTracking(context.Context, *proto.ToggleCommandRequest) (*proto.CommandResponse, error)
 	GetDetections(*proto1.DetectionStreamRequest, grpc.ServerStreamingServer[proto1.DetectionBatch]) error
-	PlayTTSAudio(context.Context, *proto.TextToSpeechCommandRequest) (*proto.CommandResponse, error)
 	// Dock commands
 	OpenCover(context.Context, *proto.EmptyCommandRequest) (*proto.CommandResponse, error)
 	CloseCover(context.Context, *proto.CloseCoverCommandRequest) (*proto.CommandResponse, error)
@@ -577,9 +564,6 @@ func (UnimplementedEdgeAdapterServiceServer) EnableGimbalTracking(context.Contex
 }
 func (UnimplementedEdgeAdapterServiceServer) GetDetections(*proto1.DetectionStreamRequest, grpc.ServerStreamingServer[proto1.DetectionBatch]) error {
 	return status.Error(codes.Unimplemented, "method GetDetections not implemented")
-}
-func (UnimplementedEdgeAdapterServiceServer) PlayTTSAudio(context.Context, *proto.TextToSpeechCommandRequest) (*proto.CommandResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method PlayTTSAudio not implemented")
 }
 func (UnimplementedEdgeAdapterServiceServer) OpenCover(context.Context, *proto.EmptyCommandRequest) (*proto.CommandResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method OpenCover not implemented")
@@ -835,24 +819,6 @@ func _EdgeAdapterService_GetDetections_Handler(srv interface{}, stream grpc.Serv
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type EdgeAdapterService_GetDetectionsServer = grpc.ServerStreamingServer[proto1.DetectionBatch]
-
-func _EdgeAdapterService_PlayTTSAudio_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(proto.TextToSpeechCommandRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(EdgeAdapterServiceServer).PlayTTSAudio(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: EdgeAdapterService_PlayTTSAudio_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EdgeAdapterServiceServer).PlayTTSAudio(ctx, req.(*proto.TextToSpeechCommandRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
 
 func _EdgeAdapterService_OpenCover_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(proto.EmptyCommandRequest)
@@ -1324,10 +1290,6 @@ var EdgeAdapterService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "EnableGimbalTracking",
 			Handler:    _EdgeAdapterService_EnableGimbalTracking_Handler,
-		},
-		{
-			MethodName: "PlayTTSAudio",
-			Handler:    _EdgeAdapterService_PlayTTSAudio_Handler,
 		},
 		{
 			MethodName: "OpenCover",

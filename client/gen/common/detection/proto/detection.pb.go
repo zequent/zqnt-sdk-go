@@ -7,7 +7,7 @@
 package proto
 
 import (
-	proto "github.com/Zequent/zqnt-client-sdk-go/gen/common/base/proto"
+	proto "github.com/Zequent/zqnt-client-sdk-go/v2/gen/common/base/proto"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -65,7 +65,7 @@ func (x DetectionControlRequest_DetectionControlCommand) Number() protoreflect.E
 
 // Deprecated: Use DetectionControlRequest_DetectionControlCommand.Descriptor instead.
 func (DetectionControlRequest_DetectionControlCommand) EnumDescriptor() ([]byte, []int) {
-	return file_detection_proto_rawDescGZIP(), []int{3, 0}
+	return file_detection_proto_rawDescGZIP(), []int{4, 0}
 }
 
 type BoundingBox struct {
@@ -136,19 +136,127 @@ func (x *BoundingBox) GetHeight() float32 {
 	return 0
 }
 
+// Where a detected object is, for sensors that locate what they see: a radar, RF direction
+// finding, a camera with a geolocated target. A detection in image space alone leaves it unset
+// and keeps using bounding_box.
+type DetectionPosition struct {
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	Latitude  float64                `protobuf:"fixed64,1,opt,name=latitude,proto3" json:"latitude,omitempty"`
+	Longitude float64                `protobuf:"fixed64,2,opt,name=longitude,proto3" json:"longitude,omitempty"`
+	// Metres, as the sensor reports it.
+	Altitude *float64 `protobuf:"fixed64,3,opt,name=altitude,proto3,oneof" json:"altitude,omitempty"`
+	// Relative to the sensor that saw it.
+	RangeM *float64 `protobuf:"fixed64,4,opt,name=range_m,json=rangeM,proto3,oneof" json:"range_m,omitempty"`
+	// Degrees from true north, clockwise.
+	BearingDeg   *float64 `protobuf:"fixed64,5,opt,name=bearing_deg,json=bearingDeg,proto3,oneof" json:"bearing_deg,omitempty"`
+	ElevationDeg *float64 `protobuf:"fixed64,6,opt,name=elevation_deg,json=elevationDeg,proto3,oneof" json:"elevation_deg,omitempty"`
+	// Of the object, when the sensor tracks it.
+	SpeedMps      *float64 `protobuf:"fixed64,7,opt,name=speed_mps,json=speedMps,proto3,oneof" json:"speed_mps,omitempty"`
+	HeadingDeg    *float64 `protobuf:"fixed64,8,opt,name=heading_deg,json=headingDeg,proto3,oneof" json:"heading_deg,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DetectionPosition) Reset() {
+	*x = DetectionPosition{}
+	mi := &file_detection_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DetectionPosition) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DetectionPosition) ProtoMessage() {}
+
+func (x *DetectionPosition) ProtoReflect() protoreflect.Message {
+	mi := &file_detection_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DetectionPosition.ProtoReflect.Descriptor instead.
+func (*DetectionPosition) Descriptor() ([]byte, []int) {
+	return file_detection_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *DetectionPosition) GetLatitude() float64 {
+	if x != nil {
+		return x.Latitude
+	}
+	return 0
+}
+
+func (x *DetectionPosition) GetLongitude() float64 {
+	if x != nil {
+		return x.Longitude
+	}
+	return 0
+}
+
+func (x *DetectionPosition) GetAltitude() float64 {
+	if x != nil && x.Altitude != nil {
+		return *x.Altitude
+	}
+	return 0
+}
+
+func (x *DetectionPosition) GetRangeM() float64 {
+	if x != nil && x.RangeM != nil {
+		return *x.RangeM
+	}
+	return 0
+}
+
+func (x *DetectionPosition) GetBearingDeg() float64 {
+	if x != nil && x.BearingDeg != nil {
+		return *x.BearingDeg
+	}
+	return 0
+}
+
+func (x *DetectionPosition) GetElevationDeg() float64 {
+	if x != nil && x.ElevationDeg != nil {
+		return *x.ElevationDeg
+	}
+	return 0
+}
+
+func (x *DetectionPosition) GetSpeedMps() float64 {
+	if x != nil && x.SpeedMps != nil {
+		return *x.SpeedMps
+	}
+	return 0
+}
+
+func (x *DetectionPosition) GetHeadingDeg() float64 {
+	if x != nil && x.HeadingDeg != nil {
+		return *x.HeadingDeg
+	}
+	return 0
+}
+
 type DetectionResult struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ObjectId      *string                `protobuf:"bytes,1,opt,name=object_id,json=objectId,proto3,oneof" json:"object_id,omitempty"`
 	ObjectType    *string                `protobuf:"bytes,2,opt,name=object_type,json=objectType,proto3,oneof" json:"object_type,omitempty"`
 	Confidence    *float32               `protobuf:"fixed32,3,opt,name=confidence,proto3,oneof" json:"confidence,omitempty"`
 	BoundingBox   *BoundingBox           `protobuf:"bytes,4,opt,name=bounding_box,json=boundingBox,proto3,oneof" json:"bounding_box,omitempty"`
+	Position      *DetectionPosition     `protobuf:"bytes,5,opt,name=position,proto3,oneof" json:"position,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *DetectionResult) Reset() {
 	*x = DetectionResult{}
-	mi := &file_detection_proto_msgTypes[1]
+	mi := &file_detection_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -160,7 +268,7 @@ func (x *DetectionResult) String() string {
 func (*DetectionResult) ProtoMessage() {}
 
 func (x *DetectionResult) ProtoReflect() protoreflect.Message {
-	mi := &file_detection_proto_msgTypes[1]
+	mi := &file_detection_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -173,7 +281,7 @@ func (x *DetectionResult) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DetectionResult.ProtoReflect.Descriptor instead.
 func (*DetectionResult) Descriptor() ([]byte, []int) {
-	return file_detection_proto_rawDescGZIP(), []int{1}
+	return file_detection_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *DetectionResult) GetObjectId() string {
@@ -204,6 +312,13 @@ func (x *DetectionResult) GetBoundingBox() *BoundingBox {
 	return nil
 }
 
+func (x *DetectionResult) GetPosition() *DetectionPosition {
+	if x != nil {
+		return x.Position
+	}
+	return nil
+}
+
 type DetectionBatch struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
@@ -215,7 +330,7 @@ type DetectionBatch struct {
 
 func (x *DetectionBatch) Reset() {
 	*x = DetectionBatch{}
-	mi := &file_detection_proto_msgTypes[2]
+	mi := &file_detection_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -227,7 +342,7 @@ func (x *DetectionBatch) String() string {
 func (*DetectionBatch) ProtoMessage() {}
 
 func (x *DetectionBatch) ProtoReflect() protoreflect.Message {
-	mi := &file_detection_proto_msgTypes[2]
+	mi := &file_detection_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -240,7 +355,7 @@ func (x *DetectionBatch) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DetectionBatch.ProtoReflect.Descriptor instead.
 func (*DetectionBatch) Descriptor() ([]byte, []int) {
-	return file_detection_proto_rawDescGZIP(), []int{2}
+	return file_detection_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *DetectionBatch) GetBase() *proto.RequestBase {
@@ -278,7 +393,7 @@ type DetectionControlRequest struct {
 
 func (x *DetectionControlRequest) Reset() {
 	*x = DetectionControlRequest{}
-	mi := &file_detection_proto_msgTypes[3]
+	mi := &file_detection_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -290,7 +405,7 @@ func (x *DetectionControlRequest) String() string {
 func (*DetectionControlRequest) ProtoMessage() {}
 
 func (x *DetectionControlRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_detection_proto_msgTypes[3]
+	mi := &file_detection_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -303,7 +418,7 @@ func (x *DetectionControlRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DetectionControlRequest.ProtoReflect.Descriptor instead.
 func (*DetectionControlRequest) Descriptor() ([]byte, []int) {
-	return file_detection_proto_rawDescGZIP(), []int{3}
+	return file_detection_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *DetectionControlRequest) GetCommand() DetectionControlRequest_DetectionControlCommand {
@@ -358,7 +473,7 @@ type DetectionStreamRequest struct {
 
 func (x *DetectionStreamRequest) Reset() {
 	*x = DetectionStreamRequest{}
-	mi := &file_detection_proto_msgTypes[4]
+	mi := &file_detection_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -370,7 +485,7 @@ func (x *DetectionStreamRequest) String() string {
 func (*DetectionStreamRequest) ProtoMessage() {}
 
 func (x *DetectionStreamRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_detection_proto_msgTypes[4]
+	mi := &file_detection_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -383,7 +498,7 @@ func (x *DetectionStreamRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DetectionStreamRequest.ProtoReflect.Descriptor instead.
 func (*DetectionStreamRequest) Descriptor() ([]byte, []int) {
-	return file_detection_proto_rawDescGZIP(), []int{4}
+	return file_detection_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *DetectionStreamRequest) GetBase() *proto.RequestBase {
@@ -410,7 +525,26 @@ const file_detection_proto_rawDesc = "" +
 	"\x01x\x18\x01 \x01(\x02R\x01x\x12\f\n" +
 	"\x01y\x18\x02 \x01(\x02R\x01y\x12\x14\n" +
 	"\x05width\x18\x03 \x01(\x02R\x05width\x12\x16\n" +
-	"\x06height\x18\x04 \x01(\x02R\x06height\"\xf7\x01\n" +
+	"\x06height\x18\x04 \x01(\x02R\x06height\"\xfd\x02\n" +
+	"\x11DetectionPosition\x12\x1a\n" +
+	"\blatitude\x18\x01 \x01(\x01R\blatitude\x12\x1c\n" +
+	"\tlongitude\x18\x02 \x01(\x01R\tlongitude\x12\x1f\n" +
+	"\baltitude\x18\x03 \x01(\x01H\x00R\baltitude\x88\x01\x01\x12\x1c\n" +
+	"\arange_m\x18\x04 \x01(\x01H\x01R\x06rangeM\x88\x01\x01\x12$\n" +
+	"\vbearing_deg\x18\x05 \x01(\x01H\x02R\n" +
+	"bearingDeg\x88\x01\x01\x12(\n" +
+	"\relevation_deg\x18\x06 \x01(\x01H\x03R\felevationDeg\x88\x01\x01\x12 \n" +
+	"\tspeed_mps\x18\a \x01(\x01H\x04R\bspeedMps\x88\x01\x01\x12$\n" +
+	"\vheading_deg\x18\b \x01(\x01H\x05R\n" +
+	"headingDeg\x88\x01\x01B\v\n" +
+	"\t_altitudeB\n" +
+	"\n" +
+	"\b_range_mB\x0e\n" +
+	"\f_bearing_degB\x10\n" +
+	"\x0e_elevation_degB\f\n" +
+	"\n" +
+	"_speed_mpsB\x0e\n" +
+	"\f_heading_deg\"\xbe\x02\n" +
 	"\x0fDetectionResult\x12 \n" +
 	"\tobject_id\x18\x01 \x01(\tH\x00R\bobjectId\x88\x01\x01\x12$\n" +
 	"\vobject_type\x18\x02 \x01(\tH\x01R\n" +
@@ -418,12 +552,14 @@ const file_detection_proto_rawDesc = "" +
 	"\n" +
 	"confidence\x18\x03 \x01(\x02H\x02R\n" +
 	"confidence\x88\x01\x01\x129\n" +
-	"\fbounding_box\x18\x04 \x01(\v2\x11.zqnt.BoundingBoxH\x03R\vboundingBox\x88\x01\x01B\f\n" +
+	"\fbounding_box\x18\x04 \x01(\v2\x11.zqnt.BoundingBoxH\x03R\vboundingBox\x88\x01\x01\x128\n" +
+	"\bposition\x18\x05 \x01(\v2\x17.zqnt.DetectionPositionH\x04R\bposition\x88\x01\x01B\f\n" +
 	"\n" +
 	"_object_idB\x0e\n" +
 	"\f_object_typeB\r\n" +
 	"\v_confidenceB\x0f\n" +
-	"\r_bounding_box\"\xa1\x01\n" +
+	"\r_bounding_boxB\v\n" +
+	"\t_position\"\xa1\x01\n" +
 	"\x0eDetectionBatch\x12%\n" +
 	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x125\n" +
 	"\n" +
@@ -470,27 +606,29 @@ func file_detection_proto_rawDescGZIP() []byte {
 }
 
 var file_detection_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_detection_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_detection_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_detection_proto_goTypes = []any{
 	(DetectionControlRequest_DetectionControlCommand)(0), // 0: zqnt.DetectionControlRequest.DetectionControlCommand
 	(*BoundingBox)(nil),             // 1: zqnt.BoundingBox
-	(*DetectionResult)(nil),         // 2: zqnt.DetectionResult
-	(*DetectionBatch)(nil),          // 3: zqnt.DetectionBatch
-	(*DetectionControlRequest)(nil), // 4: zqnt.DetectionControlRequest
-	(*DetectionStreamRequest)(nil),  // 5: zqnt.DetectionStreamRequest
-	(*proto.RequestBase)(nil),       // 6: zqnt.RequestBase
+	(*DetectionPosition)(nil),       // 2: zqnt.DetectionPosition
+	(*DetectionResult)(nil),         // 3: zqnt.DetectionResult
+	(*DetectionBatch)(nil),          // 4: zqnt.DetectionBatch
+	(*DetectionControlRequest)(nil), // 5: zqnt.DetectionControlRequest
+	(*DetectionStreamRequest)(nil),  // 6: zqnt.DetectionStreamRequest
+	(*proto.RequestBase)(nil),       // 7: zqnt.RequestBase
 }
 var file_detection_proto_depIdxs = []int32{
 	1, // 0: zqnt.DetectionResult.bounding_box:type_name -> zqnt.BoundingBox
-	6, // 1: zqnt.DetectionBatch.base:type_name -> zqnt.RequestBase
-	2, // 2: zqnt.DetectionBatch.detections:type_name -> zqnt.DetectionResult
-	0, // 3: zqnt.DetectionControlRequest.command:type_name -> zqnt.DetectionControlRequest.DetectionControlCommand
-	6, // 4: zqnt.DetectionStreamRequest.base:type_name -> zqnt.RequestBase
-	5, // [5:5] is the sub-list for method output_type
-	5, // [5:5] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	2, // 1: zqnt.DetectionResult.position:type_name -> zqnt.DetectionPosition
+	7, // 2: zqnt.DetectionBatch.base:type_name -> zqnt.RequestBase
+	3, // 3: zqnt.DetectionBatch.detections:type_name -> zqnt.DetectionResult
+	0, // 4: zqnt.DetectionControlRequest.command:type_name -> zqnt.DetectionControlRequest.DetectionControlCommand
+	7, // 5: zqnt.DetectionStreamRequest.base:type_name -> zqnt.RequestBase
+	6, // [6:6] is the sub-list for method output_type
+	6, // [6:6] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_detection_proto_init() }
@@ -502,13 +640,14 @@ func file_detection_proto_init() {
 	file_detection_proto_msgTypes[2].OneofWrappers = []any{}
 	file_detection_proto_msgTypes[3].OneofWrappers = []any{}
 	file_detection_proto_msgTypes[4].OneofWrappers = []any{}
+	file_detection_proto_msgTypes[5].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_detection_proto_rawDesc), len(file_detection_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   5,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

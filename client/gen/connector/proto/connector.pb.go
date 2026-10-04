@@ -7,15 +7,22 @@
 package proto
 
 import (
-	proto1 "github.com/Zequent/zqnt-client-sdk-go/gen/common/asset/proto"
-	proto "github.com/Zequent/zqnt-client-sdk-go/gen/common/base/proto"
-	_ "github.com/Zequent/zqnt-client-sdk-go/gen/common/proto"
-	proto3 "github.com/Zequent/zqnt-client-sdk-go/gen/events/proto"
-	proto2 "github.com/Zequent/zqnt-client-sdk-go/gen/missionautonomy/contracts/proto"
+	proto2 "github.com/Zequent/zqnt-client-sdk-go/v2/gen/common/asset/proto"
+	proto "github.com/Zequent/zqnt-client-sdk-go/v2/gen/common/base/proto"
+	proto4 "github.com/Zequent/zqnt-client-sdk-go/v2/gen/common/detection/proto"
+	_ "github.com/Zequent/zqnt-client-sdk-go/v2/gen/common/proto"
+	proto3 "github.com/Zequent/zqnt-client-sdk-go/v2/gen/devicecontrol/contracts/proto"
+	proto7 "github.com/Zequent/zqnt-client-sdk-go/v2/gen/events/proto"
+	proto9 "github.com/Zequent/zqnt-client-sdk-go/v2/gen/execution/contracts/proto"
+	proto1 "github.com/Zequent/zqnt-client-sdk-go/v2/gen/execution/dto/proto"
+	proto8 "github.com/Zequent/zqnt-client-sdk-go/v2/gen/media/proto"
+	proto6 "github.com/Zequent/zqnt-client-sdk-go/v2/gen/missionautonomy/contracts/proto"
+	proto5 "github.com/Zequent/zqnt-client-sdk-go/v2/gen/missionautonomy/dto/proto"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	fieldmaskpb "google.golang.org/protobuf/types/known/fieldmaskpb"
+	structpb "google.golang.org/protobuf/types/known/structpb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
@@ -28,6 +35,117 @@ const (
 	// Verify that runtime/protoimpl is sufficiently up-to-date.
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
+
+type SkillContractStatus int32
+
+const (
+	SkillContractStatus_SKILL_CONTRACT_STATUS_ACTIVE     SkillContractStatus = 0
+	SkillContractStatus_SKILL_CONTRACT_STATUS_DRAFT      SkillContractStatus = 1
+	SkillContractStatus_SKILL_CONTRACT_STATUS_DEPRECATED SkillContractStatus = 2
+	SkillContractStatus_SKILL_CONTRACT_STATUS_RETIRED    SkillContractStatus = 3
+)
+
+// Enum value maps for SkillContractStatus.
+var (
+	SkillContractStatus_name = map[int32]string{
+		0: "SKILL_CONTRACT_STATUS_ACTIVE",
+		1: "SKILL_CONTRACT_STATUS_DRAFT",
+		2: "SKILL_CONTRACT_STATUS_DEPRECATED",
+		3: "SKILL_CONTRACT_STATUS_RETIRED",
+	}
+	SkillContractStatus_value = map[string]int32{
+		"SKILL_CONTRACT_STATUS_ACTIVE":     0,
+		"SKILL_CONTRACT_STATUS_DRAFT":      1,
+		"SKILL_CONTRACT_STATUS_DEPRECATED": 2,
+		"SKILL_CONTRACT_STATUS_RETIRED":    3,
+	}
+)
+
+func (x SkillContractStatus) Enum() *SkillContractStatus {
+	p := new(SkillContractStatus)
+	*p = x
+	return p
+}
+
+func (x SkillContractStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (SkillContractStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_connector_proto_enumTypes[0].Descriptor()
+}
+
+func (SkillContractStatus) Type() protoreflect.EnumType {
+	return &file_connector_proto_enumTypes[0]
+}
+
+func (x SkillContractStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use SkillContractStatus.Descriptor instead.
+func (SkillContractStatus) EnumDescriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{0}
+}
+
+// Structural verdict comparing a schema_version's input/output schema against the command_id's
+// previous version — computed by SkillContractCompatibilityChecker (connector) on each observation
+// that introduces a new schema_version for an already-known command_id.
+type SkillContractCompatibility int32
+
+const (
+	SkillContractCompatibility_SKILL_CONTRACT_COMPATIBILITY_UNKNOWN SkillContractCompatibility = 0
+	// First version ever observed for this command_id — nothing to compare against.
+	SkillContractCompatibility_SKILL_CONTRACT_COMPATIBILITY_NEW SkillContractCompatibility = 1
+	// Only additive/optional changes versus the previous version (safe for existing graphs/callers).
+	SkillContractCompatibility_SKILL_CONTRACT_COMPATIBILITY_COMPATIBLE SkillContractCompatibility = 2
+	// A required input was added/changed or an existing input/output property was removed or
+	// retyped — existing authored graphs referencing the previous version may now be invalid.
+	SkillContractCompatibility_SKILL_CONTRACT_COMPATIBILITY_BREAKING SkillContractCompatibility = 3
+)
+
+// Enum value maps for SkillContractCompatibility.
+var (
+	SkillContractCompatibility_name = map[int32]string{
+		0: "SKILL_CONTRACT_COMPATIBILITY_UNKNOWN",
+		1: "SKILL_CONTRACT_COMPATIBILITY_NEW",
+		2: "SKILL_CONTRACT_COMPATIBILITY_COMPATIBLE",
+		3: "SKILL_CONTRACT_COMPATIBILITY_BREAKING",
+	}
+	SkillContractCompatibility_value = map[string]int32{
+		"SKILL_CONTRACT_COMPATIBILITY_UNKNOWN":    0,
+		"SKILL_CONTRACT_COMPATIBILITY_NEW":        1,
+		"SKILL_CONTRACT_COMPATIBILITY_COMPATIBLE": 2,
+		"SKILL_CONTRACT_COMPATIBILITY_BREAKING":   3,
+	}
+)
+
+func (x SkillContractCompatibility) Enum() *SkillContractCompatibility {
+	p := new(SkillContractCompatibility)
+	*p = x
+	return p
+}
+
+func (x SkillContractCompatibility) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (SkillContractCompatibility) Descriptor() protoreflect.EnumDescriptor {
+	return file_connector_proto_enumTypes[1].Descriptor()
+}
+
+func (SkillContractCompatibility) Type() protoreflect.EnumType {
+	return &file_connector_proto_enumTypes[1]
+}
+
+func (x SkillContractCompatibility) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use SkillContractCompatibility.Descriptor instead.
+func (SkillContractCompatibility) EnumDescriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{1}
+}
 
 type TelemetryType int32
 
@@ -62,11 +180,11 @@ func (x TelemetryType) String() string {
 }
 
 func (TelemetryType) Descriptor() protoreflect.EnumDescriptor {
-	return file_connector_proto_enumTypes[0].Descriptor()
+	return file_connector_proto_enumTypes[2].Descriptor()
 }
 
 func (TelemetryType) Type() protoreflect.EnumType {
-	return &file_connector_proto_enumTypes[0]
+	return &file_connector_proto_enumTypes[2]
 }
 
 func (x TelemetryType) Number() protoreflect.EnumNumber {
@@ -75,13 +193,1659 @@ func (x TelemetryType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use TelemetryType.Descriptor instead.
 func (TelemetryType) EnumDescriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{2}
+}
+
+type AuthenticateUserRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Email         string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
+	Password      string                 `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AuthenticateUserRequest) Reset() {
+	*x = AuthenticateUserRequest{}
+	mi := &file_connector_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AuthenticateUserRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AuthenticateUserRequest) ProtoMessage() {}
+
+func (x *AuthenticateUserRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AuthenticateUserRequest.ProtoReflect.Descriptor instead.
+func (*AuthenticateUserRequest) Descriptor() ([]byte, []int) {
 	return file_connector_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *AuthenticateUserRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *AuthenticateUserRequest) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+func (x *AuthenticateUserRequest) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
+}
+
+// What the caller (admin-console) actually mints an auth token's claims from — see
+// com.zqnt.utils.auth.PlatformClaims, which this shape deliberately mirrors field-for-field.
+type AuthenticatedUserProtoDTO struct {
+	state  protoimpl.MessageState `protogen:"open.v1"`
+	UserId string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Email  string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
+	// Absent only for a system_admin — not scoped to any single organization by design.
+	OrganizationId *string                `protobuf:"bytes,3,opt,name=organization_id,json=organizationId,proto3,oneof" json:"organization_id,omitempty"`
+	Roles          []string               `protobuf:"bytes,4,rep,name=roles,proto3" json:"roles,omitempty"`
+	Enabled        bool                   `protobuf:"varint,5,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	CreatedAt      *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	// How the user signs in: "LOCAL" (email + password) or "OIDC" (the organization's SSO, whose
+	// role mapping owns the roles). Absent from servers that predate it.
+	Provider      *string `protobuf:"bytes,7,opt,name=provider,proto3,oneof" json:"provider,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AuthenticatedUserProtoDTO) Reset() {
+	*x = AuthenticatedUserProtoDTO{}
+	mi := &file_connector_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AuthenticatedUserProtoDTO) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AuthenticatedUserProtoDTO) ProtoMessage() {}
+
+func (x *AuthenticatedUserProtoDTO) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AuthenticatedUserProtoDTO.ProtoReflect.Descriptor instead.
+func (*AuthenticatedUserProtoDTO) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *AuthenticatedUserProtoDTO) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *AuthenticatedUserProtoDTO) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+func (x *AuthenticatedUserProtoDTO) GetOrganizationId() string {
+	if x != nil && x.OrganizationId != nil {
+		return *x.OrganizationId
+	}
+	return ""
+}
+
+func (x *AuthenticatedUserProtoDTO) GetRoles() []string {
+	if x != nil {
+		return x.Roles
+	}
+	return nil
+}
+
+func (x *AuthenticatedUserProtoDTO) GetEnabled() bool {
+	if x != nil {
+		return x.Enabled
+	}
+	return false
+}
+
+func (x *AuthenticatedUserProtoDTO) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *AuthenticatedUserProtoDTO) GetProvider() string {
+	if x != nil && x.Provider != nil {
+		return *x.Provider
+	}
+	return ""
+}
+
+type AuthenticateUserResponse struct {
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	HasErrors bool                   `protobuf:"varint,1,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Meta      *proto.ResponseMeta    `protobuf:"bytes,2,opt,name=meta,proto3" json:"meta,omitempty"`
+	// Types that are valid to be assigned to Response:
+	//
+	//	*AuthenticateUserResponse_User
+	//	*AuthenticateUserResponse_Error
+	Response      isAuthenticateUserResponse_Response `protobuf_oneof:"response"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AuthenticateUserResponse) Reset() {
+	*x = AuthenticateUserResponse{}
+	mi := &file_connector_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AuthenticateUserResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AuthenticateUserResponse) ProtoMessage() {}
+
+func (x *AuthenticateUserResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AuthenticateUserResponse.ProtoReflect.Descriptor instead.
+func (*AuthenticateUserResponse) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *AuthenticateUserResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *AuthenticateUserResponse) GetMeta() *proto.ResponseMeta {
+	if x != nil {
+		return x.Meta
+	}
+	return nil
+}
+
+func (x *AuthenticateUserResponse) GetResponse() isAuthenticateUserResponse_Response {
+	if x != nil {
+		return x.Response
+	}
+	return nil
+}
+
+func (x *AuthenticateUserResponse) GetUser() *AuthenticatedUserProtoDTO {
+	if x != nil {
+		if x, ok := x.Response.(*AuthenticateUserResponse_User); ok {
+			return x.User
+		}
+	}
+	return nil
+}
+
+func (x *AuthenticateUserResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		if x, ok := x.Response.(*AuthenticateUserResponse_Error); ok {
+			return x.Error
+		}
+	}
+	return nil
+}
+
+type isAuthenticateUserResponse_Response interface {
+	isAuthenticateUserResponse_Response()
+}
+
+type AuthenticateUserResponse_User struct {
+	User *AuthenticatedUserProtoDTO `protobuf:"bytes,3,opt,name=user,proto3,oneof"`
+}
+
+type AuthenticateUserResponse_Error struct {
+	Error *proto.GlobalErrorMessage `protobuf:"bytes,4,opt,name=error,proto3,oneof"`
+}
+
+func (*AuthenticateUserResponse_User) isAuthenticateUserResponse_Response() {}
+
+func (*AuthenticateUserResponse_Error) isAuthenticateUserResponse_Response() {}
+
+type CreateUserRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Base  *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	// Absent only when creating a system_admin (see AuthenticatedUserProtoDTO.organization_id) —
+	// every other user must belong to an organization.
+	OrganizationId *string  `protobuf:"bytes,2,opt,name=organization_id,json=organizationId,proto3,oneof" json:"organization_id,omitempty"`
+	Email          string   `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
+	Password       string   `protobuf:"bytes,4,opt,name=password,proto3" json:"password,omitempty"`
+	Roles          []string `protobuf:"bytes,5,rep,name=roles,proto3" json:"roles,omitempty"`
+	// Caller-supplied when the id needs to be known BEFORE this call — e.g. admin-console reserves
+	// a license seat under this exact id first (so the hub's LicenseSeat.userId and this row's id
+	// are the same value from the start, not reconciled after the fact), then creates the row here.
+	// Server-generated if absent.
+	UserId        *string `protobuf:"bytes,6,opt,name=user_id,json=userId,proto3,oneof" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateUserRequest) Reset() {
+	*x = CreateUserRequest{}
+	mi := &file_connector_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateUserRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateUserRequest) ProtoMessage() {}
+
+func (x *CreateUserRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateUserRequest.ProtoReflect.Descriptor instead.
+func (*CreateUserRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *CreateUserRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *CreateUserRequest) GetOrganizationId() string {
+	if x != nil && x.OrganizationId != nil {
+		return *x.OrganizationId
+	}
+	return ""
+}
+
+func (x *CreateUserRequest) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+func (x *CreateUserRequest) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
+}
+
+func (x *CreateUserRequest) GetRoles() []string {
+	if x != nil {
+		return x.Roles
+	}
+	return nil
+}
+
+func (x *CreateUserRequest) GetUserId() string {
+	if x != nil && x.UserId != nil {
+		return *x.UserId
+	}
+	return ""
+}
+
+type CreateUserResponse struct {
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	HasErrors bool                   `protobuf:"varint,1,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Meta      *proto.ResponseMeta    `protobuf:"bytes,2,opt,name=meta,proto3" json:"meta,omitempty"`
+	// Types that are valid to be assigned to Response:
+	//
+	//	*CreateUserResponse_User
+	//	*CreateUserResponse_Error
+	Response      isCreateUserResponse_Response `protobuf_oneof:"response"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateUserResponse) Reset() {
+	*x = CreateUserResponse{}
+	mi := &file_connector_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateUserResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateUserResponse) ProtoMessage() {}
+
+func (x *CreateUserResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateUserResponse.ProtoReflect.Descriptor instead.
+func (*CreateUserResponse) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *CreateUserResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *CreateUserResponse) GetMeta() *proto.ResponseMeta {
+	if x != nil {
+		return x.Meta
+	}
+	return nil
+}
+
+func (x *CreateUserResponse) GetResponse() isCreateUserResponse_Response {
+	if x != nil {
+		return x.Response
+	}
+	return nil
+}
+
+func (x *CreateUserResponse) GetUser() *AuthenticatedUserProtoDTO {
+	if x != nil {
+		if x, ok := x.Response.(*CreateUserResponse_User); ok {
+			return x.User
+		}
+	}
+	return nil
+}
+
+func (x *CreateUserResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		if x, ok := x.Response.(*CreateUserResponse_Error); ok {
+			return x.Error
+		}
+	}
+	return nil
+}
+
+type isCreateUserResponse_Response interface {
+	isCreateUserResponse_Response()
+}
+
+type CreateUserResponse_User struct {
+	User *AuthenticatedUserProtoDTO `protobuf:"bytes,3,opt,name=user,proto3,oneof"`
+}
+
+type CreateUserResponse_Error struct {
+	Error *proto.GlobalErrorMessage `protobuf:"bytes,4,opt,name=error,proto3,oneof"`
+}
+
+func (*CreateUserResponse_User) isCreateUserResponse_Response() {}
+
+func (*CreateUserResponse_Error) isCreateUserResponse_Response() {}
+
+// Admin-driven password reset — generates and persists a fresh random password for an existing
+// user, same one-time-display temporary-password convention CreateUserRequest already uses.
+// Deliberately doesn't touch session revocation itself (see UserAdminService#resetPassword's doc);
+// the caller (admin-console) revokes the user's outstanding sessions once this succeeds.
+type ResetPasswordRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ResetPasswordRequest) Reset() {
+	*x = ResetPasswordRequest{}
+	mi := &file_connector_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ResetPasswordRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ResetPasswordRequest) ProtoMessage() {}
+
+func (x *ResetPasswordRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ResetPasswordRequest.ProtoReflect.Descriptor instead.
+func (*ResetPasswordRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *ResetPasswordRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *ResetPasswordRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+type ResetPasswordResponse struct {
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	HasErrors bool                   `protobuf:"varint,1,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Meta      *proto.ResponseMeta    `protobuf:"bytes,2,opt,name=meta,proto3" json:"meta,omitempty"`
+	// Types that are valid to be assigned to Response:
+	//
+	//	*ResetPasswordResponse_NewPassword
+	//	*ResetPasswordResponse_Error
+	Response      isResetPasswordResponse_Response `protobuf_oneof:"response"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ResetPasswordResponse) Reset() {
+	*x = ResetPasswordResponse{}
+	mi := &file_connector_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ResetPasswordResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ResetPasswordResponse) ProtoMessage() {}
+
+func (x *ResetPasswordResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ResetPasswordResponse.ProtoReflect.Descriptor instead.
+func (*ResetPasswordResponse) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *ResetPasswordResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *ResetPasswordResponse) GetMeta() *proto.ResponseMeta {
+	if x != nil {
+		return x.Meta
+	}
+	return nil
+}
+
+func (x *ResetPasswordResponse) GetResponse() isResetPasswordResponse_Response {
+	if x != nil {
+		return x.Response
+	}
+	return nil
+}
+
+func (x *ResetPasswordResponse) GetNewPassword() string {
+	if x != nil {
+		if x, ok := x.Response.(*ResetPasswordResponse_NewPassword); ok {
+			return x.NewPassword
+		}
+	}
+	return ""
+}
+
+func (x *ResetPasswordResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		if x, ok := x.Response.(*ResetPasswordResponse_Error); ok {
+			return x.Error
+		}
+	}
+	return nil
+}
+
+type isResetPasswordResponse_Response interface {
+	isResetPasswordResponse_Response()
+}
+
+type ResetPasswordResponse_NewPassword struct {
+	// The new plaintext password — shown to the caller exactly once, same as CreateUserResponse's
+	// temporary password never being persisted anywhere in plaintext beyond this one response.
+	NewPassword string `protobuf:"bytes,3,opt,name=new_password,json=newPassword,proto3,oneof"`
+}
+
+type ResetPasswordResponse_Error struct {
+	Error *proto.GlobalErrorMessage `protobuf:"bytes,4,opt,name=error,proto3,oneof"`
+}
+
+func (*ResetPasswordResponse_NewPassword) isResetPasswordResponse_Response() {}
+
+func (*ResetPasswordResponse_Error) isResetPasswordResponse_Response() {}
+
+type RecordAuthAuditEventRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Base  *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	// One of com.zqnt.utils.auth.AuthAuditEventType's LOGIN_SUCCESS/LOGIN_FAILURE/LOGOUT/PASSWORD_RESET/
+	// SESSIONS_REVOKED constants — a plain string, not an enum, so a new event type doesn't need a
+	// proto/codegen change to start being recorded.
+	EventType      string  `protobuf:"bytes,2,opt,name=event_type,json=eventType,proto3" json:"event_type,omitempty"`
+	UserId         *string `protobuf:"bytes,3,opt,name=user_id,json=userId,proto3,oneof" json:"user_id,omitempty"`
+	OrganizationId *string `protobuf:"bytes,4,opt,name=organization_id,json=organizationId,proto3,oneof" json:"organization_id,omitempty"`
+	Email          *string `protobuf:"bytes,5,opt,name=email,proto3,oneof" json:"email,omitempty"`
+	SourceIp       *string `protobuf:"bytes,6,opt,name=source_ip,json=sourceIp,proto3,oneof" json:"source_ip,omitempty"`
+	Detail         *string `protobuf:"bytes,7,opt,name=detail,proto3,oneof" json:"detail,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *RecordAuthAuditEventRequest) Reset() {
+	*x = RecordAuthAuditEventRequest{}
+	mi := &file_connector_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RecordAuthAuditEventRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RecordAuthAuditEventRequest) ProtoMessage() {}
+
+func (x *RecordAuthAuditEventRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RecordAuthAuditEventRequest.ProtoReflect.Descriptor instead.
+func (*RecordAuthAuditEventRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *RecordAuthAuditEventRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *RecordAuthAuditEventRequest) GetEventType() string {
+	if x != nil {
+		return x.EventType
+	}
+	return ""
+}
+
+func (x *RecordAuthAuditEventRequest) GetUserId() string {
+	if x != nil && x.UserId != nil {
+		return *x.UserId
+	}
+	return ""
+}
+
+func (x *RecordAuthAuditEventRequest) GetOrganizationId() string {
+	if x != nil && x.OrganizationId != nil {
+		return *x.OrganizationId
+	}
+	return ""
+}
+
+func (x *RecordAuthAuditEventRequest) GetEmail() string {
+	if x != nil && x.Email != nil {
+		return *x.Email
+	}
+	return ""
+}
+
+func (x *RecordAuthAuditEventRequest) GetSourceIp() string {
+	if x != nil && x.SourceIp != nil {
+		return *x.SourceIp
+	}
+	return ""
+}
+
+func (x *RecordAuthAuditEventRequest) GetDetail() string {
+	if x != nil && x.Detail != nil {
+		return *x.Detail
+	}
+	return ""
+}
+
+type ListUsersRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListUsersRequest) Reset() {
+	*x = ListUsersRequest{}
+	mi := &file_connector_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListUsersRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListUsersRequest) ProtoMessage() {}
+
+func (x *ListUsersRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListUsersRequest.ProtoReflect.Descriptor instead.
+func (*ListUsersRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *ListUsersRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+type ListUsersResponse struct {
+	state         protoimpl.MessageState       `protogen:"open.v1"`
+	HasErrors     bool                         `protobuf:"varint,1,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Meta          *proto.ResponseMeta          `protobuf:"bytes,2,opt,name=meta,proto3" json:"meta,omitempty"`
+	Users         []*AuthenticatedUserProtoDTO `protobuf:"bytes,3,rep,name=users,proto3" json:"users,omitempty"`
+	Error         *proto.GlobalErrorMessage    `protobuf:"bytes,4,opt,name=error,proto3" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListUsersResponse) Reset() {
+	*x = ListUsersResponse{}
+	mi := &file_connector_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListUsersResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListUsersResponse) ProtoMessage() {}
+
+func (x *ListUsersResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListUsersResponse.ProtoReflect.Descriptor instead.
+func (*ListUsersResponse) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *ListUsersResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *ListUsersResponse) GetMeta() *proto.ResponseMeta {
+	if x != nil {
+		return x.Meta
+	}
+	return nil
+}
+
+func (x *ListUsersResponse) GetUsers() []*AuthenticatedUserProtoDTO {
+	if x != nil {
+		return x.Users
+	}
+	return nil
+}
+
+func (x *ListUsersResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		return x.Error
+	}
+	return nil
+}
+
+type GetUserByIdRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetUserByIdRequest) Reset() {
+	*x = GetUserByIdRequest{}
+	mi := &file_connector_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetUserByIdRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetUserByIdRequest) ProtoMessage() {}
+
+func (x *GetUserByIdRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetUserByIdRequest.ProtoReflect.Descriptor instead.
+func (*GetUserByIdRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *GetUserByIdRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *GetUserByIdRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+// Replaces the user's roles with exactly this set (not a merge); at least one role.
+type UpdateUserRolesRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Roles         []string               `protobuf:"bytes,3,rep,name=roles,proto3" json:"roles,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateUserRolesRequest) Reset() {
+	*x = UpdateUserRolesRequest{}
+	mi := &file_connector_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateUserRolesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateUserRolesRequest) ProtoMessage() {}
+
+func (x *UpdateUserRolesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateUserRolesRequest.ProtoReflect.Descriptor instead.
+func (*UpdateUserRolesRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *UpdateUserRolesRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *UpdateUserRolesRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *UpdateUserRolesRequest) GetRoles() []string {
+	if x != nil {
+		return x.Roles
+	}
+	return nil
+}
+
+type SetUserEnabledRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Enabled       bool                   `protobuf:"varint,3,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetUserEnabledRequest) Reset() {
+	*x = SetUserEnabledRequest{}
+	mi := &file_connector_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetUserEnabledRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetUserEnabledRequest) ProtoMessage() {}
+
+func (x *SetUserEnabledRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetUserEnabledRequest.ProtoReflect.Descriptor instead.
+func (*SetUserEnabledRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *SetUserEnabledRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *SetUserEnabledRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *SetUserEnabledRequest) GetEnabled() bool {
+	if x != nil {
+		return x.Enabled
+	}
+	return false
+}
+
+type DeleteUserRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteUserRequest) Reset() {
+	*x = DeleteUserRequest{}
+	mi := &file_connector_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteUserRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteUserRequest) ProtoMessage() {}
+
+func (x *DeleteUserRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteUserRequest.ProtoReflect.Descriptor instead.
+func (*DeleteUserRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *DeleteUserRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *DeleteUserRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+// One organization's OIDC configuration — at most one per organization_id. client_secret IS
+// echoed back on GetIdentityProvider/discovery at this gRPC layer — this shape only ever crosses
+// trusted service-to-service traffic (connector <-> admin-console), and admin-console's OIDC
+// token exchange genuinely needs the real secret. The write-only guarantee is enforced one layer
+// up, at admin-console's REST boundary: IdentityProviderAdminAPIImpl maps this into
+// IdentityProviderConfigSummary (no secret field at all) before anything reaches a browser, and
+// the login/discover flow never threads getClientSecret() into anything sent back to one either.
+type IdentityProviderConfigProtoDTO struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	OrganizationId string                 `protobuf:"bytes,1,opt,name=organization_id,json=organizationId,proto3" json:"organization_id,omitempty"`
+	IssuerUrl      string                 `protobuf:"bytes,2,opt,name=issuer_url,json=issuerUrl,proto3" json:"issuer_url,omitempty"`
+	ClientId       string                 `protobuf:"bytes,3,opt,name=client_id,json=clientId,proto3" json:"client_id,omitempty"`
+	ClientSecret   string                 `protobuf:"bytes,4,opt,name=client_secret,json=clientSecret,proto3" json:"client_secret,omitempty"`
+	// Domains this org's SSO owns for login-screen discovery (e.g. "customer.com"). Globally unique
+	// across the installation — a domain can belong to at most one organization's config, so
+	// discovery is an unambiguous single lookup.
+	EmailDomains []string `protobuf:"bytes,5,rep,name=email_domains,json=emailDomains,proto3" json:"email_domains,omitempty"`
+	// Claim name to read group/role membership from (e.g. "groups") — provider-specific, since IdPs
+	// don't agree on where role-ish claims live.
+	RoleClaimName string `protobuf:"bytes,6,opt,name=role_claim_name,json=roleClaimName,proto3" json:"role_claim_name,omitempty"`
+	// IdP claim value -> platform role wire value (see com.zqnt.utils.auth.PlatformRole), e.g.
+	// {"Zequent-Operators": "operator"}. A claim value with no entry here grants no role from it.
+	ClaimRoleMapping map[string]string      `protobuf:"bytes,7,rep,name=claim_role_mapping,json=claimRoleMapping,proto3" json:"claim_role_mapping,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Enabled          bool                   `protobuf:"varint,8,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	CreatedAt        *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt        *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *IdentityProviderConfigProtoDTO) Reset() {
+	*x = IdentityProviderConfigProtoDTO{}
+	mi := &file_connector_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *IdentityProviderConfigProtoDTO) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*IdentityProviderConfigProtoDTO) ProtoMessage() {}
+
+func (x *IdentityProviderConfigProtoDTO) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use IdentityProviderConfigProtoDTO.ProtoReflect.Descriptor instead.
+func (*IdentityProviderConfigProtoDTO) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *IdentityProviderConfigProtoDTO) GetOrganizationId() string {
+	if x != nil {
+		return x.OrganizationId
+	}
+	return ""
+}
+
+func (x *IdentityProviderConfigProtoDTO) GetIssuerUrl() string {
+	if x != nil {
+		return x.IssuerUrl
+	}
+	return ""
+}
+
+func (x *IdentityProviderConfigProtoDTO) GetClientId() string {
+	if x != nil {
+		return x.ClientId
+	}
+	return ""
+}
+
+func (x *IdentityProviderConfigProtoDTO) GetClientSecret() string {
+	if x != nil {
+		return x.ClientSecret
+	}
+	return ""
+}
+
+func (x *IdentityProviderConfigProtoDTO) GetEmailDomains() []string {
+	if x != nil {
+		return x.EmailDomains
+	}
+	return nil
+}
+
+func (x *IdentityProviderConfigProtoDTO) GetRoleClaimName() string {
+	if x != nil {
+		return x.RoleClaimName
+	}
+	return ""
+}
+
+func (x *IdentityProviderConfigProtoDTO) GetClaimRoleMapping() map[string]string {
+	if x != nil {
+		return x.ClaimRoleMapping
+	}
+	return nil
+}
+
+func (x *IdentityProviderConfigProtoDTO) GetEnabled() bool {
+	if x != nil {
+		return x.Enabled
+	}
+	return false
+}
+
+func (x *IdentityProviderConfigProtoDTO) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *IdentityProviderConfigProtoDTO) GetUpdatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return nil
+}
+
+type UpsertIdentityProviderRequest struct {
+	state         protoimpl.MessageState          `protogen:"open.v1"`
+	Base          *proto.RequestBase              `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Config        *IdentityProviderConfigProtoDTO `protobuf:"bytes,2,opt,name=config,proto3" json:"config,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpsertIdentityProviderRequest) Reset() {
+	*x = UpsertIdentityProviderRequest{}
+	mi := &file_connector_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpsertIdentityProviderRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpsertIdentityProviderRequest) ProtoMessage() {}
+
+func (x *UpsertIdentityProviderRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpsertIdentityProviderRequest.ProtoReflect.Descriptor instead.
+func (*UpsertIdentityProviderRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *UpsertIdentityProviderRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *UpsertIdentityProviderRequest) GetConfig() *IdentityProviderConfigProtoDTO {
+	if x != nil {
+		return x.Config
+	}
+	return nil
+}
+
+type GetIdentityProviderRequest struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Base           *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	OrganizationId string                 `protobuf:"bytes,2,opt,name=organization_id,json=organizationId,proto3" json:"organization_id,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *GetIdentityProviderRequest) Reset() {
+	*x = GetIdentityProviderRequest{}
+	mi := &file_connector_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetIdentityProviderRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetIdentityProviderRequest) ProtoMessage() {}
+
+func (x *GetIdentityProviderRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetIdentityProviderRequest.ProtoReflect.Descriptor instead.
+func (*GetIdentityProviderRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *GetIdentityProviderRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *GetIdentityProviderRequest) GetOrganizationId() string {
+	if x != nil {
+		return x.OrganizationId
+	}
+	return ""
+}
+
+type FindIdentityProviderByEmailDomainRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Email         string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FindIdentityProviderByEmailDomainRequest) Reset() {
+	*x = FindIdentityProviderByEmailDomainRequest{}
+	mi := &file_connector_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FindIdentityProviderByEmailDomainRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FindIdentityProviderByEmailDomainRequest) ProtoMessage() {}
+
+func (x *FindIdentityProviderByEmailDomainRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FindIdentityProviderByEmailDomainRequest.ProtoReflect.Descriptor instead.
+func (*FindIdentityProviderByEmailDomainRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *FindIdentityProviderByEmailDomainRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *FindIdentityProviderByEmailDomainRequest) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+type IdentityProviderResponse struct {
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	HasErrors bool                   `protobuf:"varint,1,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Meta      *proto.ResponseMeta    `protobuf:"bytes,2,opt,name=meta,proto3" json:"meta,omitempty"`
+	// Absent (with has_errors still false) means "no config found" — not every caller of this shape
+	// is asking about an org guaranteed to have one, especially FindIdentityProviderByEmailDomain.
+	Config        *IdentityProviderConfigProtoDTO `protobuf:"bytes,3,opt,name=config,proto3,oneof" json:"config,omitempty"`
+	Error         *proto.GlobalErrorMessage       `protobuf:"bytes,4,opt,name=error,proto3" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *IdentityProviderResponse) Reset() {
+	*x = IdentityProviderResponse{}
+	mi := &file_connector_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *IdentityProviderResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*IdentityProviderResponse) ProtoMessage() {}
+
+func (x *IdentityProviderResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use IdentityProviderResponse.ProtoReflect.Descriptor instead.
+func (*IdentityProviderResponse) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *IdentityProviderResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *IdentityProviderResponse) GetMeta() *proto.ResponseMeta {
+	if x != nil {
+		return x.Meta
+	}
+	return nil
+}
+
+func (x *IdentityProviderResponse) GetConfig() *IdentityProviderConfigProtoDTO {
+	if x != nil {
+		return x.Config
+	}
+	return nil
+}
+
+func (x *IdentityProviderResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		return x.Error
+	}
+	return nil
+}
+
+type FindOidcUserRequest struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Base            *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	OrganizationId  string                 `protobuf:"bytes,2,opt,name=organization_id,json=organizationId,proto3" json:"organization_id,omitempty"`
+	ExternalSubject string                 `protobuf:"bytes,3,opt,name=external_subject,json=externalSubject,proto3" json:"external_subject,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *FindOidcUserRequest) Reset() {
+	*x = FindOidcUserRequest{}
+	mi := &file_connector_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FindOidcUserRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FindOidcUserRequest) ProtoMessage() {}
+
+func (x *FindOidcUserRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FindOidcUserRequest.ProtoReflect.Descriptor instead.
+func (*FindOidcUserRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *FindOidcUserRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *FindOidcUserRequest) GetOrganizationId() string {
+	if x != nil {
+		return x.OrganizationId
+	}
+	return ""
+}
+
+func (x *FindOidcUserRequest) GetExternalSubject() string {
+	if x != nil {
+		return x.ExternalSubject
+	}
+	return ""
+}
+
+type UpsertOidcUserRequest struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Base           *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	OrganizationId string                 `protobuf:"bytes,2,opt,name=organization_id,json=organizationId,proto3" json:"organization_id,omitempty"`
+	// The IdP's own "sub" claim — stable per-user identifier at that IdP, distinct from this
+	// platform's own user id.
+	ExternalSubject string `protobuf:"bytes,3,opt,name=external_subject,json=externalSubject,proto3" json:"external_subject,omitempty"`
+	Email           string `protobuf:"bytes,4,opt,name=email,proto3" json:"email,omitempty"`
+	// Roles already resolved from the org's claim_role_mapping — this RPC just persists them, it
+	// doesn't re-derive them from raw IdP claims (connector has no reason to know OIDC's claim
+	// shapes at all, that resolution happens once, in admin-console).
+	Roles []string `protobuf:"bytes,5,rep,name=roles,proto3" json:"roles,omitempty"`
+	// Caller-supplied when the id needs to be known BEFORE this call, same reason as
+	// CreateUserRequest.user_id: admin-console reserves a license seat under this exact id first
+	// (via FindOidcUser to confirm this is actually a new user), then this call persists the row
+	// under that id. Ignored (the existing row's id is kept) when the (organization_id,
+	// external_subject) pair already exists — this field only ever matters for first-time
+	// provisioning. Server-generated if absent.
+	UserId        *string `protobuf:"bytes,6,opt,name=user_id,json=userId,proto3,oneof" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpsertOidcUserRequest) Reset() {
+	*x = UpsertOidcUserRequest{}
+	mi := &file_connector_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpsertOidcUserRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpsertOidcUserRequest) ProtoMessage() {}
+
+func (x *UpsertOidcUserRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpsertOidcUserRequest.ProtoReflect.Descriptor instead.
+func (*UpsertOidcUserRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *UpsertOidcUserRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *UpsertOidcUserRequest) GetOrganizationId() string {
+	if x != nil {
+		return x.OrganizationId
+	}
+	return ""
+}
+
+func (x *UpsertOidcUserRequest) GetExternalSubject() string {
+	if x != nil {
+		return x.ExternalSubject
+	}
+	return ""
+}
+
+func (x *UpsertOidcUserRequest) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+func (x *UpsertOidcUserRequest) GetRoles() []string {
+	if x != nil {
+		return x.Roles
+	}
+	return nil
+}
+
+func (x *UpsertOidcUserRequest) GetUserId() string {
+	if x != nil && x.UserId != nil {
+		return *x.UserId
+	}
+	return ""
+}
+
+type PersistSkillExecutionRequest struct {
+	state         protoimpl.MessageState         `protogen:"open.v1"`
+	Base          *proto.RequestBase             `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Execution     *proto1.SkillExecutionProtoDTO `protobuf:"bytes,2,opt,name=execution,proto3" json:"execution,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PersistSkillExecutionRequest) Reset() {
+	*x = PersistSkillExecutionRequest{}
+	mi := &file_connector_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PersistSkillExecutionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PersistSkillExecutionRequest) ProtoMessage() {}
+
+func (x *PersistSkillExecutionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PersistSkillExecutionRequest.ProtoReflect.Descriptor instead.
+func (*PersistSkillExecutionRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *PersistSkillExecutionRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *PersistSkillExecutionRequest) GetExecution() *proto1.SkillExecutionProtoDTO {
+	if x != nil {
+		return x.Execution
+	}
+	return nil
+}
+
+type AppendSkillExecutionEventRequest struct {
+	state         protoimpl.MessageState           `protogen:"open.v1"`
+	Base          *proto.RequestBase               `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Event         *proto1.SkillExecutionEventProto `protobuf:"bytes,2,opt,name=event,proto3" json:"event,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AppendSkillExecutionEventRequest) Reset() {
+	*x = AppendSkillExecutionEventRequest{}
+	mi := &file_connector_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AppendSkillExecutionEventRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AppendSkillExecutionEventRequest) ProtoMessage() {}
+
+func (x *AppendSkillExecutionEventRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AppendSkillExecutionEventRequest.ProtoReflect.Descriptor instead.
+func (*AppendSkillExecutionEventRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *AppendSkillExecutionEventRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *AppendSkillExecutionEventRequest) GetEvent() *proto1.SkillExecutionEventProto {
+	if x != nil {
+		return x.Event
+	}
+	return nil
 }
 
 type UpsertAssetPayloadRequest struct {
 	state      protoimpl.MessageState       `protogen:"open.v1"`
 	Base       *proto.RequestBase           `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
-	Payload    *proto1.AssetPayloadProtoDTO `protobuf:"bytes,2,opt,name=payload,proto3" json:"payload,omitempty"`
+	Payload    *proto2.AssetPayloadProtoDTO `protobuf:"bytes,2,opt,name=payload,proto3" json:"payload,omitempty"`
 	SubAssetSn *string                      `protobuf:"bytes,3,opt,name=sub_asset_sn,json=subAssetSn,proto3,oneof" json:"sub_asset_sn,omitempty"`
 	Owner      *AssetPayloadOwner           `protobuf:"bytes,4,opt,name=owner,proto3,oneof" json:"owner,omitempty"`
 	// Empty means a full upsert; otherwise only listed paths change.
@@ -92,7 +1856,7 @@ type UpsertAssetPayloadRequest struct {
 
 func (x *UpsertAssetPayloadRequest) Reset() {
 	*x = UpsertAssetPayloadRequest{}
-	mi := &file_connector_proto_msgTypes[0]
+	mi := &file_connector_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -104,7 +1868,7 @@ func (x *UpsertAssetPayloadRequest) String() string {
 func (*UpsertAssetPayloadRequest) ProtoMessage() {}
 
 func (x *UpsertAssetPayloadRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[0]
+	mi := &file_connector_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -117,7 +1881,7 @@ func (x *UpsertAssetPayloadRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpsertAssetPayloadRequest.ProtoReflect.Descriptor instead.
 func (*UpsertAssetPayloadRequest) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{0}
+	return file_connector_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *UpsertAssetPayloadRequest) GetBase() *proto.RequestBase {
@@ -127,7 +1891,7 @@ func (x *UpsertAssetPayloadRequest) GetBase() *proto.RequestBase {
 	return nil
 }
 
-func (x *UpsertAssetPayloadRequest) GetPayload() *proto1.AssetPayloadProtoDTO {
+func (x *UpsertAssetPayloadRequest) GetPayload() *proto2.AssetPayloadProtoDTO {
 	if x != nil {
 		return x.Payload
 	}
@@ -168,7 +1932,7 @@ type AssetPayloadOwner struct {
 
 func (x *AssetPayloadOwner) Reset() {
 	*x = AssetPayloadOwner{}
-	mi := &file_connector_proto_msgTypes[1]
+	mi := &file_connector_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -180,7 +1944,7 @@ func (x *AssetPayloadOwner) String() string {
 func (*AssetPayloadOwner) ProtoMessage() {}
 
 func (x *AssetPayloadOwner) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[1]
+	mi := &file_connector_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -193,7 +1957,7 @@ func (x *AssetPayloadOwner) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AssetPayloadOwner.ProtoReflect.Descriptor instead.
 func (*AssetPayloadOwner) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{1}
+	return file_connector_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *AssetPayloadOwner) GetOwner() isAssetPayloadOwner_Owner {
@@ -247,7 +2011,7 @@ type ListAssetPayloadsRequest struct {
 
 func (x *ListAssetPayloadsRequest) Reset() {
 	*x = ListAssetPayloadsRequest{}
-	mi := &file_connector_proto_msgTypes[2]
+	mi := &file_connector_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -259,7 +2023,7 @@ func (x *ListAssetPayloadsRequest) String() string {
 func (*ListAssetPayloadsRequest) ProtoMessage() {}
 
 func (x *ListAssetPayloadsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[2]
+	mi := &file_connector_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -272,7 +2036,7 @@ func (x *ListAssetPayloadsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAssetPayloadsRequest.ProtoReflect.Descriptor instead.
 func (*ListAssetPayloadsRequest) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{2}
+	return file_connector_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *ListAssetPayloadsRequest) GetBase() *proto.RequestBase {
@@ -300,7 +2064,7 @@ type DeleteAssetPayloadRequest struct {
 
 func (x *DeleteAssetPayloadRequest) Reset() {
 	*x = DeleteAssetPayloadRequest{}
-	mi := &file_connector_proto_msgTypes[3]
+	mi := &file_connector_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -312,7 +2076,7 @@ func (x *DeleteAssetPayloadRequest) String() string {
 func (*DeleteAssetPayloadRequest) ProtoMessage() {}
 
 func (x *DeleteAssetPayloadRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[3]
+	mi := &file_connector_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -325,7 +2089,7 @@ func (x *DeleteAssetPayloadRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteAssetPayloadRequest.ProtoReflect.Descriptor instead.
 func (*DeleteAssetPayloadRequest) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{3}
+	return file_connector_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *DeleteAssetPayloadRequest) GetBase() *proto.RequestBase {
@@ -353,7 +2117,7 @@ type AssetPayloadResponse struct {
 	state         protoimpl.MessageState       `protogen:"open.v1"`
 	Tid           string                       `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
 	HasErrors     bool                         `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
-	Payload       *proto1.AssetPayloadProtoDTO `protobuf:"bytes,3,opt,name=payload,proto3,oneof" json:"payload,omitempty"`
+	Payload       *proto2.AssetPayloadProtoDTO `protobuf:"bytes,3,opt,name=payload,proto3,oneof" json:"payload,omitempty"`
 	Error         *proto.GlobalErrorMessage    `protobuf:"bytes,4,opt,name=error,proto3,oneof" json:"error,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -361,7 +2125,7 @@ type AssetPayloadResponse struct {
 
 func (x *AssetPayloadResponse) Reset() {
 	*x = AssetPayloadResponse{}
-	mi := &file_connector_proto_msgTypes[4]
+	mi := &file_connector_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -373,7 +2137,7 @@ func (x *AssetPayloadResponse) String() string {
 func (*AssetPayloadResponse) ProtoMessage() {}
 
 func (x *AssetPayloadResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[4]
+	mi := &file_connector_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -386,7 +2150,7 @@ func (x *AssetPayloadResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AssetPayloadResponse.ProtoReflect.Descriptor instead.
 func (*AssetPayloadResponse) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{4}
+	return file_connector_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *AssetPayloadResponse) GetTid() string {
@@ -403,7 +2167,7 @@ func (x *AssetPayloadResponse) GetHasErrors() bool {
 	return false
 }
 
-func (x *AssetPayloadResponse) GetPayload() *proto1.AssetPayloadProtoDTO {
+func (x *AssetPayloadResponse) GetPayload() *proto2.AssetPayloadProtoDTO {
 	if x != nil {
 		return x.Payload
 	}
@@ -421,7 +2185,7 @@ type AssetPayloadListResponse struct {
 	state         protoimpl.MessageState         `protogen:"open.v1"`
 	Tid           string                         `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
 	HasErrors     bool                           `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
-	Payloads      []*proto1.AssetPayloadProtoDTO `protobuf:"bytes,3,rep,name=payloads,proto3" json:"payloads,omitempty"`
+	Payloads      []*proto2.AssetPayloadProtoDTO `protobuf:"bytes,3,rep,name=payloads,proto3" json:"payloads,omitempty"`
 	Error         *proto.GlobalErrorMessage      `protobuf:"bytes,4,opt,name=error,proto3,oneof" json:"error,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -429,7 +2193,7 @@ type AssetPayloadListResponse struct {
 
 func (x *AssetPayloadListResponse) Reset() {
 	*x = AssetPayloadListResponse{}
-	mi := &file_connector_proto_msgTypes[5]
+	mi := &file_connector_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -441,7 +2205,7 @@ func (x *AssetPayloadListResponse) String() string {
 func (*AssetPayloadListResponse) ProtoMessage() {}
 
 func (x *AssetPayloadListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[5]
+	mi := &file_connector_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -454,7 +2218,7 @@ func (x *AssetPayloadListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AssetPayloadListResponse.ProtoReflect.Descriptor instead.
 func (*AssetPayloadListResponse) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{5}
+	return file_connector_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *AssetPayloadListResponse) GetTid() string {
@@ -471,7 +2235,7 @@ func (x *AssetPayloadListResponse) GetHasErrors() bool {
 	return false
 }
 
-func (x *AssetPayloadListResponse) GetPayloads() []*proto1.AssetPayloadProtoDTO {
+func (x *AssetPayloadListResponse) GetPayloads() []*proto2.AssetPayloadProtoDTO {
 	if x != nil {
 		return x.Payloads
 	}
@@ -479,6 +2243,908 @@ func (x *AssetPayloadListResponse) GetPayloads() []*proto1.AssetPayloadProtoDTO 
 }
 
 func (x *AssetPayloadListResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		return x.Error
+	}
+	return nil
+}
+
+type SetAssetPropertyRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Sn            string                 `protobuf:"bytes,2,opt,name=sn,proto3" json:"sn,omitempty"`
+	Key           string                 `protobuf:"bytes,3,opt,name=key,proto3" json:"key,omitempty"`
+	Value         *structpb.Value        `protobuf:"bytes,4,opt,name=value,proto3" json:"value,omitempty"`
+	Description   *string                `protobuf:"bytes,5,opt,name=description,proto3,oneof" json:"description,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetAssetPropertyRequest) Reset() {
+	*x = SetAssetPropertyRequest{}
+	mi := &file_connector_proto_msgTypes[29]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetAssetPropertyRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetAssetPropertyRequest) ProtoMessage() {}
+
+func (x *SetAssetPropertyRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[29]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetAssetPropertyRequest.ProtoReflect.Descriptor instead.
+func (*SetAssetPropertyRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{29}
+}
+
+func (x *SetAssetPropertyRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *SetAssetPropertyRequest) GetSn() string {
+	if x != nil {
+		return x.Sn
+	}
+	return ""
+}
+
+func (x *SetAssetPropertyRequest) GetKey() string {
+	if x != nil {
+		return x.Key
+	}
+	return ""
+}
+
+func (x *SetAssetPropertyRequest) GetValue() *structpb.Value {
+	if x != nil {
+		return x.Value
+	}
+	return nil
+}
+
+func (x *SetAssetPropertyRequest) GetDescription() string {
+	if x != nil && x.Description != nil {
+		return *x.Description
+	}
+	return ""
+}
+
+type ListAssetPropertiesRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Sn            string                 `protobuf:"bytes,2,opt,name=sn,proto3" json:"sn,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListAssetPropertiesRequest) Reset() {
+	*x = ListAssetPropertiesRequest{}
+	mi := &file_connector_proto_msgTypes[30]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListAssetPropertiesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListAssetPropertiesRequest) ProtoMessage() {}
+
+func (x *ListAssetPropertiesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[30]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListAssetPropertiesRequest.ProtoReflect.Descriptor instead.
+func (*ListAssetPropertiesRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{30}
+}
+
+func (x *ListAssetPropertiesRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *ListAssetPropertiesRequest) GetSn() string {
+	if x != nil {
+		return x.Sn
+	}
+	return ""
+}
+
+type DeleteAssetPropertyRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Sn            string                 `protobuf:"bytes,2,opt,name=sn,proto3" json:"sn,omitempty"`
+	Key           string                 `protobuf:"bytes,3,opt,name=key,proto3" json:"key,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteAssetPropertyRequest) Reset() {
+	*x = DeleteAssetPropertyRequest{}
+	mi := &file_connector_proto_msgTypes[31]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteAssetPropertyRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteAssetPropertyRequest) ProtoMessage() {}
+
+func (x *DeleteAssetPropertyRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[31]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteAssetPropertyRequest.ProtoReflect.Descriptor instead.
+func (*DeleteAssetPropertyRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{31}
+}
+
+func (x *DeleteAssetPropertyRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *DeleteAssetPropertyRequest) GetSn() string {
+	if x != nil {
+		return x.Sn
+	}
+	return ""
+}
+
+func (x *DeleteAssetPropertyRequest) GetKey() string {
+	if x != nil {
+		return x.Key
+	}
+	return ""
+}
+
+type AssetPropertyResponse struct {
+	state         protoimpl.MessageState        `protogen:"open.v1"`
+	Tid           string                        `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
+	HasErrors     bool                          `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Property      *proto2.AssetPropertyProtoDTO `protobuf:"bytes,3,opt,name=property,proto3,oneof" json:"property,omitempty"`
+	Error         *proto.GlobalErrorMessage     `protobuf:"bytes,4,opt,name=error,proto3,oneof" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AssetPropertyResponse) Reset() {
+	*x = AssetPropertyResponse{}
+	mi := &file_connector_proto_msgTypes[32]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AssetPropertyResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AssetPropertyResponse) ProtoMessage() {}
+
+func (x *AssetPropertyResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[32]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AssetPropertyResponse.ProtoReflect.Descriptor instead.
+func (*AssetPropertyResponse) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{32}
+}
+
+func (x *AssetPropertyResponse) GetTid() string {
+	if x != nil {
+		return x.Tid
+	}
+	return ""
+}
+
+func (x *AssetPropertyResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *AssetPropertyResponse) GetProperty() *proto2.AssetPropertyProtoDTO {
+	if x != nil {
+		return x.Property
+	}
+	return nil
+}
+
+func (x *AssetPropertyResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		return x.Error
+	}
+	return nil
+}
+
+type AssetPropertyListResponse struct {
+	state         protoimpl.MessageState          `protogen:"open.v1"`
+	Tid           string                          `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
+	HasErrors     bool                            `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Properties    []*proto2.AssetPropertyProtoDTO `protobuf:"bytes,3,rep,name=properties,proto3" json:"properties,omitempty"`
+	Error         *proto.GlobalErrorMessage       `protobuf:"bytes,4,opt,name=error,proto3,oneof" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AssetPropertyListResponse) Reset() {
+	*x = AssetPropertyListResponse{}
+	mi := &file_connector_proto_msgTypes[33]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AssetPropertyListResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AssetPropertyListResponse) ProtoMessage() {}
+
+func (x *AssetPropertyListResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[33]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AssetPropertyListResponse.ProtoReflect.Descriptor instead.
+func (*AssetPropertyListResponse) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{33}
+}
+
+func (x *AssetPropertyListResponse) GetTid() string {
+	if x != nil {
+		return x.Tid
+	}
+	return ""
+}
+
+func (x *AssetPropertyListResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *AssetPropertyListResponse) GetProperties() []*proto2.AssetPropertyProtoDTO {
+	if x != nil {
+		return x.Properties
+	}
+	return nil
+}
+
+func (x *AssetPropertyListResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		return x.Error
+	}
+	return nil
+}
+
+// A persisted Skill Registry entry — one row per (command_id, schema_version). Reuses the same
+// errors/events/requirements/source/provider shapes as the live Capability contract
+// (device-control-contracts.proto) so a registry entry and a live snapshot are directly comparable.
+type SkillContractProtoDTO struct {
+	state         protoimpl.MessageState              `protogen:"open.v1"`
+	Id            string                              `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	CommandId     string                              `protobuf:"bytes,2,opt,name=command_id,json=commandId,proto3" json:"command_id,omitempty"`
+	SkillId       string                              `protobuf:"bytes,3,opt,name=skill_id,json=skillId,proto3" json:"skill_id,omitempty"`
+	DisplayName   *string                             `protobuf:"bytes,4,opt,name=display_name,json=displayName,proto3,oneof" json:"display_name,omitempty"`
+	Description   *string                             `protobuf:"bytes,5,opt,name=description,proto3,oneof" json:"description,omitempty"`
+	SchemaVersion *string                             `protobuf:"bytes,6,opt,name=schema_version,json=schemaVersion,proto3,oneof" json:"schema_version,omitempty"`
+	InputSchema   *structpb.Struct                    `protobuf:"bytes,7,opt,name=input_schema,json=inputSchema,proto3" json:"input_schema,omitempty"`
+	OutputSchema  *structpb.Struct                    `protobuf:"bytes,8,opt,name=output_schema,json=outputSchema,proto3" json:"output_schema,omitempty"`
+	Errors        []*proto3.CapabilityErrorProto      `protobuf:"bytes,9,rep,name=errors,proto3" json:"errors,omitempty"`
+	Events        []*proto3.CapabilityEventProto      `protobuf:"bytes,10,rep,name=events,proto3" json:"events,omitempty"`
+	Requirements  *proto3.CapabilityRequirementsProto `protobuf:"bytes,11,opt,name=requirements,proto3,oneof" json:"requirements,omitempty"`
+	Source        *proto3.CapabilitySourceProto       `protobuf:"varint,12,opt,name=source,proto3,enum=zqnt.CapabilitySourceProto,oneof" json:"source,omitempty"`
+	Provider      *string                             `protobuf:"bytes,13,opt,name=provider,proto3,oneof" json:"provider,omitempty"`
+	Status        SkillContractStatus                 `protobuf:"varint,14,opt,name=status,proto3,enum=zqnt.SkillContractStatus" json:"status,omitempty"`
+	FirstSeenAt   *timestamppb.Timestamp              `protobuf:"bytes,15,opt,name=first_seen_at,json=firstSeenAt,proto3,oneof" json:"first_seen_at,omitempty"`
+	LastSeenAt    *timestamppb.Timestamp              `protobuf:"bytes,16,opt,name=last_seen_at,json=lastSeenAt,proto3,oneof" json:"last_seen_at,omitempty"`
+	// Version lineage: set whenever this schema_version isn't the first one observed for command_id.
+	PreviousSchemaVersion *string                     `protobuf:"bytes,17,opt,name=previous_schema_version,json=previousSchemaVersion,proto3,oneof" json:"previous_schema_version,omitempty"`
+	Compatibility         *SkillContractCompatibility `protobuf:"varint,18,opt,name=compatibility,proto3,enum=zqnt.SkillContractCompatibility,oneof" json:"compatibility,omitempty"`
+	// Human-readable reasons behind the compatibility verdict, e.g. "required field 'zoom' added",
+	// "property 'lens' type changed from string to number". Empty when compatibility is COMPATIBLE/NEW.
+	CompatibilityNotes []string `protobuf:"bytes,19,rep,name=compatibility_notes,json=compatibilityNotes,proto3" json:"compatibility_notes,omitempty"`
+	// Declarative only — no enforcement exists yet, since the platform has no user-level
+	// identity/role system today (only the installation-level license lease). System integrators set
+	// this via the console (SetSkillContractPermissions) as forward-prep for when one does; free-form
+	// strings by design (e.g. "mission.launch", "role:pilot") so no fixed permission vocabulary is
+	// baked in ahead of that decision.
+	RequiredPermissions []string `protobuf:"bytes,20,rep,name=required_permissions,json=requiredPermissions,proto3" json:"required_permissions,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
+}
+
+func (x *SkillContractProtoDTO) Reset() {
+	*x = SkillContractProtoDTO{}
+	mi := &file_connector_proto_msgTypes[34]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SkillContractProtoDTO) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SkillContractProtoDTO) ProtoMessage() {}
+
+func (x *SkillContractProtoDTO) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[34]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SkillContractProtoDTO.ProtoReflect.Descriptor instead.
+func (*SkillContractProtoDTO) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{34}
+}
+
+func (x *SkillContractProtoDTO) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *SkillContractProtoDTO) GetCommandId() string {
+	if x != nil {
+		return x.CommandId
+	}
+	return ""
+}
+
+func (x *SkillContractProtoDTO) GetSkillId() string {
+	if x != nil {
+		return x.SkillId
+	}
+	return ""
+}
+
+func (x *SkillContractProtoDTO) GetDisplayName() string {
+	if x != nil && x.DisplayName != nil {
+		return *x.DisplayName
+	}
+	return ""
+}
+
+func (x *SkillContractProtoDTO) GetDescription() string {
+	if x != nil && x.Description != nil {
+		return *x.Description
+	}
+	return ""
+}
+
+func (x *SkillContractProtoDTO) GetSchemaVersion() string {
+	if x != nil && x.SchemaVersion != nil {
+		return *x.SchemaVersion
+	}
+	return ""
+}
+
+func (x *SkillContractProtoDTO) GetInputSchema() *structpb.Struct {
+	if x != nil {
+		return x.InputSchema
+	}
+	return nil
+}
+
+func (x *SkillContractProtoDTO) GetOutputSchema() *structpb.Struct {
+	if x != nil {
+		return x.OutputSchema
+	}
+	return nil
+}
+
+func (x *SkillContractProtoDTO) GetErrors() []*proto3.CapabilityErrorProto {
+	if x != nil {
+		return x.Errors
+	}
+	return nil
+}
+
+func (x *SkillContractProtoDTO) GetEvents() []*proto3.CapabilityEventProto {
+	if x != nil {
+		return x.Events
+	}
+	return nil
+}
+
+func (x *SkillContractProtoDTO) GetRequirements() *proto3.CapabilityRequirementsProto {
+	if x != nil {
+		return x.Requirements
+	}
+	return nil
+}
+
+func (x *SkillContractProtoDTO) GetSource() proto3.CapabilitySourceProto {
+	if x != nil && x.Source != nil {
+		return *x.Source
+	}
+	return proto3.CapabilitySourceProto(0)
+}
+
+func (x *SkillContractProtoDTO) GetProvider() string {
+	if x != nil && x.Provider != nil {
+		return *x.Provider
+	}
+	return ""
+}
+
+func (x *SkillContractProtoDTO) GetStatus() SkillContractStatus {
+	if x != nil {
+		return x.Status
+	}
+	return SkillContractStatus_SKILL_CONTRACT_STATUS_ACTIVE
+}
+
+func (x *SkillContractProtoDTO) GetFirstSeenAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.FirstSeenAt
+	}
+	return nil
+}
+
+func (x *SkillContractProtoDTO) GetLastSeenAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.LastSeenAt
+	}
+	return nil
+}
+
+func (x *SkillContractProtoDTO) GetPreviousSchemaVersion() string {
+	if x != nil && x.PreviousSchemaVersion != nil {
+		return *x.PreviousSchemaVersion
+	}
+	return ""
+}
+
+func (x *SkillContractProtoDTO) GetCompatibility() SkillContractCompatibility {
+	if x != nil && x.Compatibility != nil {
+		return *x.Compatibility
+	}
+	return SkillContractCompatibility_SKILL_CONTRACT_COMPATIBILITY_UNKNOWN
+}
+
+func (x *SkillContractProtoDTO) GetCompatibilityNotes() []string {
+	if x != nil {
+		return x.CompatibilityNotes
+	}
+	return nil
+}
+
+func (x *SkillContractProtoDTO) GetRequiredPermissions() []string {
+	if x != nil {
+		return x.RequiredPermissions
+	}
+	return nil
+}
+
+type UpsertSkillContractRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Contract      *SkillContractProtoDTO `protobuf:"bytes,2,opt,name=contract,proto3" json:"contract,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpsertSkillContractRequest) Reset() {
+	*x = UpsertSkillContractRequest{}
+	mi := &file_connector_proto_msgTypes[35]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpsertSkillContractRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpsertSkillContractRequest) ProtoMessage() {}
+
+func (x *UpsertSkillContractRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[35]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpsertSkillContractRequest.ProtoReflect.Descriptor instead.
+func (*UpsertSkillContractRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{35}
+}
+
+func (x *UpsertSkillContractRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *UpsertSkillContractRequest) GetContract() *SkillContractProtoDTO {
+	if x != nil {
+		return x.Contract
+	}
+	return nil
+}
+
+type ListSkillContractsRequest struct {
+	state  protoimpl.MessageState `protogen:"open.v1"`
+	Base   *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Status *SkillContractStatus   `protobuf:"varint,2,opt,name=status,proto3,enum=zqnt.SkillContractStatus,oneof" json:"status,omitempty"`
+	// When set, lists every persisted version of this one command_id (its full version history)
+	// instead of the whole registry.
+	CommandId     *string `protobuf:"bytes,3,opt,name=command_id,json=commandId,proto3,oneof" json:"command_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListSkillContractsRequest) Reset() {
+	*x = ListSkillContractsRequest{}
+	mi := &file_connector_proto_msgTypes[36]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListSkillContractsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListSkillContractsRequest) ProtoMessage() {}
+
+func (x *ListSkillContractsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[36]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListSkillContractsRequest.ProtoReflect.Descriptor instead.
+func (*ListSkillContractsRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{36}
+}
+
+func (x *ListSkillContractsRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *ListSkillContractsRequest) GetStatus() SkillContractStatus {
+	if x != nil && x.Status != nil {
+		return *x.Status
+	}
+	return SkillContractStatus_SKILL_CONTRACT_STATUS_ACTIVE
+}
+
+func (x *ListSkillContractsRequest) GetCommandId() string {
+	if x != nil && x.CommandId != nil {
+		return *x.CommandId
+	}
+	return ""
+}
+
+type SetSkillContractStatusRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Id            string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	Status        SkillContractStatus    `protobuf:"varint,3,opt,name=status,proto3,enum=zqnt.SkillContractStatus" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetSkillContractStatusRequest) Reset() {
+	*x = SetSkillContractStatusRequest{}
+	mi := &file_connector_proto_msgTypes[37]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetSkillContractStatusRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetSkillContractStatusRequest) ProtoMessage() {}
+
+func (x *SetSkillContractStatusRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[37]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetSkillContractStatusRequest.ProtoReflect.Descriptor instead.
+func (*SetSkillContractStatusRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{37}
+}
+
+func (x *SetSkillContractStatusRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *SetSkillContractStatusRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *SetSkillContractStatusRequest) GetStatus() SkillContractStatus {
+	if x != nil {
+		return x.Status
+	}
+	return SkillContractStatus_SKILL_CONTRACT_STATUS_ACTIVE
+}
+
+type SetSkillContractPermissionsRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Base  *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Id    string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	// Full replacement, not a merge — mirrors SetSkillContractStatus's replace-the-field semantics.
+	RequiredPermissions []string `protobuf:"bytes,3,rep,name=required_permissions,json=requiredPermissions,proto3" json:"required_permissions,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
+}
+
+func (x *SetSkillContractPermissionsRequest) Reset() {
+	*x = SetSkillContractPermissionsRequest{}
+	mi := &file_connector_proto_msgTypes[38]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetSkillContractPermissionsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetSkillContractPermissionsRequest) ProtoMessage() {}
+
+func (x *SetSkillContractPermissionsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[38]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetSkillContractPermissionsRequest.ProtoReflect.Descriptor instead.
+func (*SetSkillContractPermissionsRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{38}
+}
+
+func (x *SetSkillContractPermissionsRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *SetSkillContractPermissionsRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *SetSkillContractPermissionsRequest) GetRequiredPermissions() []string {
+	if x != nil {
+		return x.RequiredPermissions
+	}
+	return nil
+}
+
+type SkillContractResponse struct {
+	state         protoimpl.MessageState    `protogen:"open.v1"`
+	Tid           string                    `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
+	HasErrors     bool                      `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Contract      *SkillContractProtoDTO    `protobuf:"bytes,3,opt,name=contract,proto3,oneof" json:"contract,omitempty"`
+	Error         *proto.GlobalErrorMessage `protobuf:"bytes,4,opt,name=error,proto3,oneof" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SkillContractResponse) Reset() {
+	*x = SkillContractResponse{}
+	mi := &file_connector_proto_msgTypes[39]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SkillContractResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SkillContractResponse) ProtoMessage() {}
+
+func (x *SkillContractResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[39]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SkillContractResponse.ProtoReflect.Descriptor instead.
+func (*SkillContractResponse) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{39}
+}
+
+func (x *SkillContractResponse) GetTid() string {
+	if x != nil {
+		return x.Tid
+	}
+	return ""
+}
+
+func (x *SkillContractResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *SkillContractResponse) GetContract() *SkillContractProtoDTO {
+	if x != nil {
+		return x.Contract
+	}
+	return nil
+}
+
+func (x *SkillContractResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		return x.Error
+	}
+	return nil
+}
+
+type SkillContractListResponse struct {
+	state         protoimpl.MessageState    `protogen:"open.v1"`
+	Tid           string                    `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
+	HasErrors     bool                      `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Contracts     []*SkillContractProtoDTO  `protobuf:"bytes,3,rep,name=contracts,proto3" json:"contracts,omitempty"`
+	Error         *proto.GlobalErrorMessage `protobuf:"bytes,4,opt,name=error,proto3,oneof" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SkillContractListResponse) Reset() {
+	*x = SkillContractListResponse{}
+	mi := &file_connector_proto_msgTypes[40]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SkillContractListResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SkillContractListResponse) ProtoMessage() {}
+
+func (x *SkillContractListResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[40]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SkillContractListResponse.ProtoReflect.Descriptor instead.
+func (*SkillContractListResponse) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{40}
+}
+
+func (x *SkillContractListResponse) GetTid() string {
+	if x != nil {
+		return x.Tid
+	}
+	return ""
+}
+
+func (x *SkillContractListResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *SkillContractListResponse) GetContracts() []*SkillContractProtoDTO {
+	if x != nil {
+		return x.Contracts
+	}
+	return nil
+}
+
+func (x *SkillContractListResponse) GetError() *proto.GlobalErrorMessage {
 	if x != nil {
 		return x.Error
 	}
@@ -495,7 +3161,7 @@ type ConnectorGetAssetByIdRequest struct {
 
 func (x *ConnectorGetAssetByIdRequest) Reset() {
 	*x = ConnectorGetAssetByIdRequest{}
-	mi := &file_connector_proto_msgTypes[6]
+	mi := &file_connector_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -507,7 +3173,7 @@ func (x *ConnectorGetAssetByIdRequest) String() string {
 func (*ConnectorGetAssetByIdRequest) ProtoMessage() {}
 
 func (x *ConnectorGetAssetByIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[6]
+	mi := &file_connector_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -520,7 +3186,7 @@ func (x *ConnectorGetAssetByIdRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectorGetAssetByIdRequest.ProtoReflect.Descriptor instead.
 func (*ConnectorGetAssetByIdRequest) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{6}
+	return file_connector_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *ConnectorGetAssetByIdRequest) GetBase() *proto.RequestBase {
@@ -539,14 +3205,14 @@ func (x *ConnectorGetAssetByIdRequest) GetAssetId() string {
 
 type ConnectorAssetList struct {
 	state         protoimpl.MessageState  `protogen:"open.v1"`
-	Assets        []*proto1.AssetProtoDTO `protobuf:"bytes,1,rep,name=assets,proto3" json:"assets,omitempty"`
+	Assets        []*proto2.AssetProtoDTO `protobuf:"bytes,1,rep,name=assets,proto3" json:"assets,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ConnectorAssetList) Reset() {
 	*x = ConnectorAssetList{}
-	mi := &file_connector_proto_msgTypes[7]
+	mi := &file_connector_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -558,7 +3224,7 @@ func (x *ConnectorAssetList) String() string {
 func (*ConnectorAssetList) ProtoMessage() {}
 
 func (x *ConnectorAssetList) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[7]
+	mi := &file_connector_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -571,12 +3237,124 @@ func (x *ConnectorAssetList) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectorAssetList.ProtoReflect.Descriptor instead.
 func (*ConnectorAssetList) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{7}
+	return file_connector_proto_rawDescGZIP(), []int{42}
 }
 
-func (x *ConnectorAssetList) GetAssets() []*proto1.AssetProtoDTO {
+func (x *ConnectorAssetList) GetAssets() []*proto2.AssetProtoDTO {
 	if x != nil {
 		return x.Assets
+	}
+	return nil
+}
+
+type ListAssetsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListAssetsRequest) Reset() {
+	*x = ListAssetsRequest{}
+	mi := &file_connector_proto_msgTypes[43]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListAssetsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListAssetsRequest) ProtoMessage() {}
+
+func (x *ListAssetsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[43]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListAssetsRequest.ProtoReflect.Descriptor instead.
+func (*ListAssetsRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{43}
+}
+
+func (x *ListAssetsRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+type AssetListResponse struct {
+	state         protoimpl.MessageState    `protogen:"open.v1"`
+	Tid           string                    `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
+	HasErrors     bool                      `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Assets        []*proto2.AssetProtoDTO   `protobuf:"bytes,3,rep,name=assets,proto3" json:"assets,omitempty"`
+	Error         *proto.GlobalErrorMessage `protobuf:"bytes,4,opt,name=error,proto3,oneof" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AssetListResponse) Reset() {
+	*x = AssetListResponse{}
+	mi := &file_connector_proto_msgTypes[44]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AssetListResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AssetListResponse) ProtoMessage() {}
+
+func (x *AssetListResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[44]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AssetListResponse.ProtoReflect.Descriptor instead.
+func (*AssetListResponse) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{44}
+}
+
+func (x *AssetListResponse) GetTid() string {
+	if x != nil {
+		return x.Tid
+	}
+	return ""
+}
+
+func (x *AssetListResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *AssetListResponse) GetAssets() []*proto2.AssetProtoDTO {
+	if x != nil {
+		return x.Assets
+	}
+	return nil
+}
+
+func (x *AssetListResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		return x.Error
 	}
 	return nil
 }
@@ -584,14 +3362,14 @@ func (x *ConnectorAssetList) GetAssets() []*proto1.AssetProtoDTO {
 type ConnectorRegisterAssetRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
-	Asset         *proto1.AssetProtoDTO  `protobuf:"bytes,2,opt,name=asset,proto3" json:"asset,omitempty"`
+	Asset         *proto2.AssetProtoDTO  `protobuf:"bytes,2,opt,name=asset,proto3" json:"asset,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ConnectorRegisterAssetRequest) Reset() {
 	*x = ConnectorRegisterAssetRequest{}
-	mi := &file_connector_proto_msgTypes[8]
+	mi := &file_connector_proto_msgTypes[45]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -603,7 +3381,7 @@ func (x *ConnectorRegisterAssetRequest) String() string {
 func (*ConnectorRegisterAssetRequest) ProtoMessage() {}
 
 func (x *ConnectorRegisterAssetRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[8]
+	mi := &file_connector_proto_msgTypes[45]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -616,7 +3394,7 @@ func (x *ConnectorRegisterAssetRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectorRegisterAssetRequest.ProtoReflect.Descriptor instead.
 func (*ConnectorRegisterAssetRequest) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{8}
+	return file_connector_proto_rawDescGZIP(), []int{45}
 }
 
 func (x *ConnectorRegisterAssetRequest) GetBase() *proto.RequestBase {
@@ -626,17 +3404,755 @@ func (x *ConnectorRegisterAssetRequest) GetBase() *proto.RequestBase {
 	return nil
 }
 
-func (x *ConnectorRegisterAssetRequest) GetAsset() *proto1.AssetProtoDTO {
+func (x *ConnectorRegisterAssetRequest) GetAsset() *proto2.AssetProtoDTO {
 	if x != nil {
 		return x.Asset
 	}
 	return nil
 }
 
+// A provisioning claim. Deliberately carries neither the code nor its hash: only a SHA-256 hash is
+// stored, and the code itself is returned exactly once, by CreateAssetClaim.
+type AssetClaimProtoDTO struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Id             string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	OrganizationId string                 `protobuf:"bytes,2,opt,name=organization_id,json=organizationId,proto3" json:"organization_id,omitempty"`
+	Label          *string                `protobuf:"bytes,3,opt,name=label,proto3,oneof" json:"label,omitempty"`
+	CreatedBy      *string                `protobuf:"bytes,4,opt,name=created_by,json=createdBy,proto3,oneof" json:"created_by,omitempty"`
+	// Narrowing. A code cut for a MAVLink aircraft should not be redeemable by whatever else
+	// happens to learn it.
+	AllowedVendor *proto2.AssetVendor   `protobuf:"varint,5,opt,name=allowed_vendor,json=allowedVendor,proto3,enum=zqnt.AssetVendor,oneof" json:"allowed_vendor,omitempty"`
+	AllowedType   *proto2.AssetTypeEnum `protobuf:"varint,6,opt,name=allowed_type,json=allowedType,proto3,enum=zqnt.AssetTypeEnum,oneof" json:"allowed_type,omitempty"`
+	// A DJI bind request carries a LIST of devices — a dock and its drone arrive together — so a
+	// strictly single-use code would refuse the second one. Defaults to 1.
+	MaxRedemptions  int32                           `protobuf:"varint,7,opt,name=max_redemptions,json=maxRedemptions,proto3" json:"max_redemptions,omitempty"`
+	RedemptionCount int32                           `protobuf:"varint,8,opt,name=redemption_count,json=redemptionCount,proto3" json:"redemption_count,omitempty"`
+	ExpiresAt       *timestamppb.Timestamp          `protobuf:"bytes,9,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
+	RevokedAt       *timestamppb.Timestamp          `protobuf:"bytes,10,opt,name=revoked_at,json=revokedAt,proto3,oneof" json:"revoked_at,omitempty"`
+	CreatedAt       *timestamppb.Timestamp          `protobuf:"bytes,11,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	Redemptions     []*AssetClaimRedemptionProtoDTO `protobuf:"bytes,12,rep,name=redemptions,proto3" json:"redemptions,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *AssetClaimProtoDTO) Reset() {
+	*x = AssetClaimProtoDTO{}
+	mi := &file_connector_proto_msgTypes[46]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AssetClaimProtoDTO) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AssetClaimProtoDTO) ProtoMessage() {}
+
+func (x *AssetClaimProtoDTO) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[46]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AssetClaimProtoDTO.ProtoReflect.Descriptor instead.
+func (*AssetClaimProtoDTO) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{46}
+}
+
+func (x *AssetClaimProtoDTO) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *AssetClaimProtoDTO) GetOrganizationId() string {
+	if x != nil {
+		return x.OrganizationId
+	}
+	return ""
+}
+
+func (x *AssetClaimProtoDTO) GetLabel() string {
+	if x != nil && x.Label != nil {
+		return *x.Label
+	}
+	return ""
+}
+
+func (x *AssetClaimProtoDTO) GetCreatedBy() string {
+	if x != nil && x.CreatedBy != nil {
+		return *x.CreatedBy
+	}
+	return ""
+}
+
+func (x *AssetClaimProtoDTO) GetAllowedVendor() proto2.AssetVendor {
+	if x != nil && x.AllowedVendor != nil {
+		return *x.AllowedVendor
+	}
+	return proto2.AssetVendor(0)
+}
+
+func (x *AssetClaimProtoDTO) GetAllowedType() proto2.AssetTypeEnum {
+	if x != nil && x.AllowedType != nil {
+		return *x.AllowedType
+	}
+	return proto2.AssetTypeEnum(0)
+}
+
+func (x *AssetClaimProtoDTO) GetMaxRedemptions() int32 {
+	if x != nil {
+		return x.MaxRedemptions
+	}
+	return 0
+}
+
+func (x *AssetClaimProtoDTO) GetRedemptionCount() int32 {
+	if x != nil {
+		return x.RedemptionCount
+	}
+	return 0
+}
+
+func (x *AssetClaimProtoDTO) GetExpiresAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.ExpiresAt
+	}
+	return nil
+}
+
+func (x *AssetClaimProtoDTO) GetRevokedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.RevokedAt
+	}
+	return nil
+}
+
+func (x *AssetClaimProtoDTO) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *AssetClaimProtoDTO) GetRedemptions() []*AssetClaimRedemptionProtoDTO {
+	if x != nil {
+		return x.Redemptions
+	}
+	return nil
+}
+
+// What a claim actually produced — the provenance of an asset that did not come from the console.
+type AssetClaimRedemptionProtoDTO struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	AssetId       string                 `protobuf:"bytes,2,opt,name=asset_id,json=assetId,proto3" json:"asset_id,omitempty"`
+	Sn            string                 `protobuf:"bytes,3,opt,name=sn,proto3" json:"sn,omitempty"`
+	RedeemedAt    *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=redeemed_at,json=redeemedAt,proto3" json:"redeemed_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AssetClaimRedemptionProtoDTO) Reset() {
+	*x = AssetClaimRedemptionProtoDTO{}
+	mi := &file_connector_proto_msgTypes[47]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AssetClaimRedemptionProtoDTO) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AssetClaimRedemptionProtoDTO) ProtoMessage() {}
+
+func (x *AssetClaimRedemptionProtoDTO) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[47]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AssetClaimRedemptionProtoDTO.ProtoReflect.Descriptor instead.
+func (*AssetClaimRedemptionProtoDTO) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{47}
+}
+
+func (x *AssetClaimRedemptionProtoDTO) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *AssetClaimRedemptionProtoDTO) GetAssetId() string {
+	if x != nil {
+		return x.AssetId
+	}
+	return ""
+}
+
+func (x *AssetClaimRedemptionProtoDTO) GetSn() string {
+	if x != nil {
+		return x.Sn
+	}
+	return ""
+}
+
+func (x *AssetClaimRedemptionProtoDTO) GetRedeemedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.RedeemedAt
+	}
+	return nil
+}
+
+type CreateAssetClaimRequest struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Base           *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	OrganizationId string                 `protobuf:"bytes,2,opt,name=organization_id,json=organizationId,proto3" json:"organization_id,omitempty"`
+	Label          *string                `protobuf:"bytes,3,opt,name=label,proto3,oneof" json:"label,omitempty"`
+	AllowedVendor  *proto2.AssetVendor    `protobuf:"varint,4,opt,name=allowed_vendor,json=allowedVendor,proto3,enum=zqnt.AssetVendor,oneof" json:"allowed_vendor,omitempty"`
+	AllowedType    *proto2.AssetTypeEnum  `protobuf:"varint,5,opt,name=allowed_type,json=allowedType,proto3,enum=zqnt.AssetTypeEnum,oneof" json:"allowed_type,omitempty"`
+	MaxRedemptions *int32                 `protobuf:"varint,6,opt,name=max_redemptions,json=maxRedemptions,proto3,oneof" json:"max_redemptions,omitempty"`
+	// Server applies its own default and upper bound; a claim is meant to stop working soon.
+	TtlSeconds    *int32 `protobuf:"varint,7,opt,name=ttl_seconds,json=ttlSeconds,proto3,oneof" json:"ttl_seconds,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateAssetClaimRequest) Reset() {
+	*x = CreateAssetClaimRequest{}
+	mi := &file_connector_proto_msgTypes[48]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateAssetClaimRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateAssetClaimRequest) ProtoMessage() {}
+
+func (x *CreateAssetClaimRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[48]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateAssetClaimRequest.ProtoReflect.Descriptor instead.
+func (*CreateAssetClaimRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{48}
+}
+
+func (x *CreateAssetClaimRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *CreateAssetClaimRequest) GetOrganizationId() string {
+	if x != nil {
+		return x.OrganizationId
+	}
+	return ""
+}
+
+func (x *CreateAssetClaimRequest) GetLabel() string {
+	if x != nil && x.Label != nil {
+		return *x.Label
+	}
+	return ""
+}
+
+func (x *CreateAssetClaimRequest) GetAllowedVendor() proto2.AssetVendor {
+	if x != nil && x.AllowedVendor != nil {
+		return *x.AllowedVendor
+	}
+	return proto2.AssetVendor(0)
+}
+
+func (x *CreateAssetClaimRequest) GetAllowedType() proto2.AssetTypeEnum {
+	if x != nil && x.AllowedType != nil {
+		return *x.AllowedType
+	}
+	return proto2.AssetTypeEnum(0)
+}
+
+func (x *CreateAssetClaimRequest) GetMaxRedemptions() int32 {
+	if x != nil && x.MaxRedemptions != nil {
+		return *x.MaxRedemptions
+	}
+	return 0
+}
+
+func (x *CreateAssetClaimRequest) GetTtlSeconds() int32 {
+	if x != nil && x.TtlSeconds != nil {
+		return *x.TtlSeconds
+	}
+	return 0
+}
+
+type AssetClaimResponse struct {
+	state     protoimpl.MessageState    `protogen:"open.v1"`
+	Tid       string                    `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
+	HasErrors bool                      `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Error     *proto.GlobalErrorMessage `protobuf:"bytes,3,opt,name=error,proto3,oneof" json:"error,omitempty"`
+	Claim     *AssetClaimProtoDTO       `protobuf:"bytes,4,opt,name=claim,proto3,oneof" json:"claim,omitempty"`
+	// The raw code, on CreateAssetClaim only. Nothing can recover it afterwards, because only its
+	// hash was ever stored — show it to the operator once or the claim is worthless.
+	Code          *string `protobuf:"bytes,5,opt,name=code,proto3,oneof" json:"code,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AssetClaimResponse) Reset() {
+	*x = AssetClaimResponse{}
+	mi := &file_connector_proto_msgTypes[49]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AssetClaimResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AssetClaimResponse) ProtoMessage() {}
+
+func (x *AssetClaimResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[49]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AssetClaimResponse.ProtoReflect.Descriptor instead.
+func (*AssetClaimResponse) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{49}
+}
+
+func (x *AssetClaimResponse) GetTid() string {
+	if x != nil {
+		return x.Tid
+	}
+	return ""
+}
+
+func (x *AssetClaimResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *AssetClaimResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		return x.Error
+	}
+	return nil
+}
+
+func (x *AssetClaimResponse) GetClaim() *AssetClaimProtoDTO {
+	if x != nil {
+		return x.Claim
+	}
+	return nil
+}
+
+func (x *AssetClaimResponse) GetCode() string {
+	if x != nil && x.Code != nil {
+		return *x.Code
+	}
+	return ""
+}
+
+type RedeemAssetClaimRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Base  *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Code  string                 `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
+	// sn/name/type/vendor/connection/system_connection_string. The organization field is ignored:
+	// the claim decides it, which is the entire point of redeeming rather than registering.
+	Asset         *proto2.AssetProtoDTO `protobuf:"bytes,3,opt,name=asset,proto3" json:"asset,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RedeemAssetClaimRequest) Reset() {
+	*x = RedeemAssetClaimRequest{}
+	mi := &file_connector_proto_msgTypes[50]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RedeemAssetClaimRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RedeemAssetClaimRequest) ProtoMessage() {}
+
+func (x *RedeemAssetClaimRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[50]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RedeemAssetClaimRequest.ProtoReflect.Descriptor instead.
+func (*RedeemAssetClaimRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{50}
+}
+
+func (x *RedeemAssetClaimRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *RedeemAssetClaimRequest) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
+func (x *RedeemAssetClaimRequest) GetAsset() *proto2.AssetProtoDTO {
+	if x != nil {
+		return x.Asset
+	}
+	return nil
+}
+
+type DescribeAssetClaimRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Code          string                 `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DescribeAssetClaimRequest) Reset() {
+	*x = DescribeAssetClaimRequest{}
+	mi := &file_connector_proto_msgTypes[51]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DescribeAssetClaimRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DescribeAssetClaimRequest) ProtoMessage() {}
+
+func (x *DescribeAssetClaimRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[51]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DescribeAssetClaimRequest.ProtoReflect.Descriptor instead.
+func (*DescribeAssetClaimRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{51}
+}
+
+func (x *DescribeAssetClaimRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *DescribeAssetClaimRequest) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
+// Deliberately thin. No claim id, no organization id, no expiry, no narrowing, no redemption
+// counts: this answers an untokened caller holding a guessable-length code, so everything it
+// returns is something an attacker would learn for free. The organization name is the one field
+// the flow actually needs — it is what the operator confirms on the device's screen.
+type AssetClaimDescriptionResponse struct {
+	state            protoimpl.MessageState    `protogen:"open.v1"`
+	Tid              string                    `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
+	HasErrors        bool                      `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Error            *proto.GlobalErrorMessage `protobuf:"bytes,3,opt,name=error,proto3,oneof" json:"error,omitempty"`
+	OrganizationName *string                   `protobuf:"bytes,4,opt,name=organization_name,json=organizationName,proto3,oneof" json:"organization_name,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *AssetClaimDescriptionResponse) Reset() {
+	*x = AssetClaimDescriptionResponse{}
+	mi := &file_connector_proto_msgTypes[52]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AssetClaimDescriptionResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AssetClaimDescriptionResponse) ProtoMessage() {}
+
+func (x *AssetClaimDescriptionResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[52]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AssetClaimDescriptionResponse.ProtoReflect.Descriptor instead.
+func (*AssetClaimDescriptionResponse) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{52}
+}
+
+func (x *AssetClaimDescriptionResponse) GetTid() string {
+	if x != nil {
+		return x.Tid
+	}
+	return ""
+}
+
+func (x *AssetClaimDescriptionResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *AssetClaimDescriptionResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		return x.Error
+	}
+	return nil
+}
+
+func (x *AssetClaimDescriptionResponse) GetOrganizationName() string {
+	if x != nil && x.OrganizationName != nil {
+		return *x.OrganizationName
+	}
+	return ""
+}
+
+type ListAssetClaimsRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Base  *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	// Expired, revoked and fully redeemed claims — off by default, since the useful view is
+	// "what is open right now".
+	IncludeClosed *bool `protobuf:"varint,2,opt,name=include_closed,json=includeClosed,proto3,oneof" json:"include_closed,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListAssetClaimsRequest) Reset() {
+	*x = ListAssetClaimsRequest{}
+	mi := &file_connector_proto_msgTypes[53]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListAssetClaimsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListAssetClaimsRequest) ProtoMessage() {}
+
+func (x *ListAssetClaimsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[53]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListAssetClaimsRequest.ProtoReflect.Descriptor instead.
+func (*ListAssetClaimsRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{53}
+}
+
+func (x *ListAssetClaimsRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *ListAssetClaimsRequest) GetIncludeClosed() bool {
+	if x != nil && x.IncludeClosed != nil {
+		return *x.IncludeClosed
+	}
+	return false
+}
+
+type AssetClaimListResponse struct {
+	state         protoimpl.MessageState    `protogen:"open.v1"`
+	Tid           string                    `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
+	HasErrors     bool                      `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Claims        []*AssetClaimProtoDTO     `protobuf:"bytes,3,rep,name=claims,proto3" json:"claims,omitempty"`
+	Error         *proto.GlobalErrorMessage `protobuf:"bytes,4,opt,name=error,proto3,oneof" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AssetClaimListResponse) Reset() {
+	*x = AssetClaimListResponse{}
+	mi := &file_connector_proto_msgTypes[54]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AssetClaimListResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AssetClaimListResponse) ProtoMessage() {}
+
+func (x *AssetClaimListResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[54]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AssetClaimListResponse.ProtoReflect.Descriptor instead.
+func (*AssetClaimListResponse) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{54}
+}
+
+func (x *AssetClaimListResponse) GetTid() string {
+	if x != nil {
+		return x.Tid
+	}
+	return ""
+}
+
+func (x *AssetClaimListResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *AssetClaimListResponse) GetClaims() []*AssetClaimProtoDTO {
+	if x != nil {
+		return x.Claims
+	}
+	return nil
+}
+
+func (x *AssetClaimListResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		return x.Error
+	}
+	return nil
+}
+
+type RevokeAssetClaimRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	ClaimId       string                 `protobuf:"bytes,2,opt,name=claim_id,json=claimId,proto3" json:"claim_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RevokeAssetClaimRequest) Reset() {
+	*x = RevokeAssetClaimRequest{}
+	mi := &file_connector_proto_msgTypes[55]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RevokeAssetClaimRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RevokeAssetClaimRequest) ProtoMessage() {}
+
+func (x *RevokeAssetClaimRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[55]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RevokeAssetClaimRequest.ProtoReflect.Descriptor instead.
+func (*RevokeAssetClaimRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{55}
+}
+
+func (x *RevokeAssetClaimRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *RevokeAssetClaimRequest) GetClaimId() string {
+	if x != nil {
+		return x.ClaimId
+	}
+	return ""
+}
+
 type ConnectorUpdateAssetRequest struct {
 	state   protoimpl.MessageState `protogen:"open.v1"`
 	Base    *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
-	Asset   *proto1.AssetProtoDTO  `protobuf:"bytes,2,opt,name=asset,proto3" json:"asset,omitempty"`
+	Asset   *proto2.AssetProtoDTO  `protobuf:"bytes,2,opt,name=asset,proto3" json:"asset,omitempty"`
 	AssetId string                 `protobuf:"bytes,3,opt,name=asset_id,json=assetId,proto3" json:"asset_id,omitempty"`
 	// Empty means replace all mutable fields; otherwise only listed paths change.
 	UpdateMask    *fieldmaskpb.FieldMask `protobuf:"bytes,4,opt,name=update_mask,json=updateMask,proto3" json:"update_mask,omitempty"`
@@ -646,7 +4162,7 @@ type ConnectorUpdateAssetRequest struct {
 
 func (x *ConnectorUpdateAssetRequest) Reset() {
 	*x = ConnectorUpdateAssetRequest{}
-	mi := &file_connector_proto_msgTypes[9]
+	mi := &file_connector_proto_msgTypes[56]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -658,7 +4174,7 @@ func (x *ConnectorUpdateAssetRequest) String() string {
 func (*ConnectorUpdateAssetRequest) ProtoMessage() {}
 
 func (x *ConnectorUpdateAssetRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[9]
+	mi := &file_connector_proto_msgTypes[56]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -671,7 +4187,7 @@ func (x *ConnectorUpdateAssetRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectorUpdateAssetRequest.ProtoReflect.Descriptor instead.
 func (*ConnectorUpdateAssetRequest) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{9}
+	return file_connector_proto_rawDescGZIP(), []int{56}
 }
 
 func (x *ConnectorUpdateAssetRequest) GetBase() *proto.RequestBase {
@@ -681,7 +4197,7 @@ func (x *ConnectorUpdateAssetRequest) GetBase() *proto.RequestBase {
 	return nil
 }
 
-func (x *ConnectorUpdateAssetRequest) GetAsset() *proto1.AssetProtoDTO {
+func (x *ConnectorUpdateAssetRequest) GetAsset() *proto2.AssetProtoDTO {
 	if x != nil {
 		return x.Asset
 	}
@@ -705,7 +4221,7 @@ func (x *ConnectorUpdateAssetRequest) GetUpdateMask() *fieldmaskpb.FieldMask {
 type ConnectorUpdateSubAssetRequest struct {
 	state      protoimpl.MessageState   `protogen:"open.v1"`
 	Base       *proto.RequestBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
-	SubAsset   *proto1.SubAssetProtoDTO `protobuf:"bytes,2,opt,name=sub_asset,json=subAsset,proto3" json:"sub_asset,omitempty"`
+	SubAsset   *proto2.SubAssetProtoDTO `protobuf:"bytes,2,opt,name=sub_asset,json=subAsset,proto3" json:"sub_asset,omitempty"`
 	SubAssetId string                   `protobuf:"bytes,3,opt,name=sub_asset_id,json=subAssetId,proto3" json:"sub_asset_id,omitempty"`
 	// Empty means replace all mutable fields; otherwise only listed paths change.
 	UpdateMask    *fieldmaskpb.FieldMask `protobuf:"bytes,4,opt,name=update_mask,json=updateMask,proto3" json:"update_mask,omitempty"`
@@ -715,7 +4231,7 @@ type ConnectorUpdateSubAssetRequest struct {
 
 func (x *ConnectorUpdateSubAssetRequest) Reset() {
 	*x = ConnectorUpdateSubAssetRequest{}
-	mi := &file_connector_proto_msgTypes[10]
+	mi := &file_connector_proto_msgTypes[57]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -727,7 +4243,7 @@ func (x *ConnectorUpdateSubAssetRequest) String() string {
 func (*ConnectorUpdateSubAssetRequest) ProtoMessage() {}
 
 func (x *ConnectorUpdateSubAssetRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[10]
+	mi := &file_connector_proto_msgTypes[57]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -740,7 +4256,7 @@ func (x *ConnectorUpdateSubAssetRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectorUpdateSubAssetRequest.ProtoReflect.Descriptor instead.
 func (*ConnectorUpdateSubAssetRequest) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{10}
+	return file_connector_proto_rawDescGZIP(), []int{57}
 }
 
 func (x *ConnectorUpdateSubAssetRequest) GetBase() *proto.RequestBase {
@@ -750,7 +4266,7 @@ func (x *ConnectorUpdateSubAssetRequest) GetBase() *proto.RequestBase {
 	return nil
 }
 
-func (x *ConnectorUpdateSubAssetRequest) GetSubAsset() *proto1.SubAssetProtoDTO {
+func (x *ConnectorUpdateSubAssetRequest) GetSubAsset() *proto2.SubAssetProtoDTO {
 	if x != nil {
 		return x.SubAsset
 	}
@@ -793,7 +4309,7 @@ type ConnectorResponse struct {
 
 func (x *ConnectorResponse) Reset() {
 	*x = ConnectorResponse{}
-	mi := &file_connector_proto_msgTypes[11]
+	mi := &file_connector_proto_msgTypes[58]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -805,7 +4321,7 @@ func (x *ConnectorResponse) String() string {
 func (*ConnectorResponse) ProtoMessage() {}
 
 func (x *ConnectorResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[11]
+	mi := &file_connector_proto_msgTypes[58]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -818,7 +4334,7 @@ func (x *ConnectorResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectorResponse.ProtoReflect.Descriptor instead.
 func (*ConnectorResponse) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{11}
+	return file_connector_proto_rawDescGZIP(), []int{58}
 }
 
 func (x *ConnectorResponse) GetTid() string {
@@ -888,7 +4404,7 @@ func (x *ConnectorResponse) GetError() *proto.GlobalErrorMessage {
 	return nil
 }
 
-func (x *ConnectorResponse) GetAsset() *proto1.AssetProtoDTO {
+func (x *ConnectorResponse) GetAsset() *proto2.AssetProtoDTO {
 	if x != nil {
 		if x, ok := x.Response.(*ConnectorResponse_Asset); ok {
 			return x.Asset
@@ -897,7 +4413,7 @@ func (x *ConnectorResponse) GetAsset() *proto1.AssetProtoDTO {
 	return nil
 }
 
-func (x *ConnectorResponse) GetSubAsset() *proto1.SubAssetProtoDTO {
+func (x *ConnectorResponse) GetSubAsset() *proto2.SubAssetProtoDTO {
 	if x != nil {
 		if x, ok := x.Response.(*ConnectorResponse_SubAsset); ok {
 			return x.SubAsset
@@ -906,7 +4422,7 @@ func (x *ConnectorResponse) GetSubAsset() *proto1.SubAssetProtoDTO {
 	return nil
 }
 
-func (x *ConnectorResponse) GetOrganization() *proto1.OrganizationProtoDTO {
+func (x *ConnectorResponse) GetOrganization() *proto2.OrganizationProtoDTO {
 	if x != nil {
 		if x, ok := x.Response.(*ConnectorResponse_Organization); ok {
 			return x.Organization
@@ -928,15 +4444,15 @@ type ConnectorResponse_Error struct {
 }
 
 type ConnectorResponse_Asset struct {
-	Asset *proto1.AssetProtoDTO `protobuf:"bytes,9,opt,name=asset,proto3,oneof"`
+	Asset *proto2.AssetProtoDTO `protobuf:"bytes,9,opt,name=asset,proto3,oneof"`
 }
 
 type ConnectorResponse_SubAsset struct {
-	SubAsset *proto1.SubAssetProtoDTO `protobuf:"bytes,10,opt,name=sub_asset,json=subAsset,proto3,oneof"`
+	SubAsset *proto2.SubAssetProtoDTO `protobuf:"bytes,10,opt,name=sub_asset,json=subAsset,proto3,oneof"`
 }
 
 type ConnectorResponse_Organization struct {
-	Organization *proto1.OrganizationProtoDTO `protobuf:"bytes,11,opt,name=organization,proto3,oneof"`
+	Organization *proto2.OrganizationProtoDTO `protobuf:"bytes,11,opt,name=organization,proto3,oneof"`
 }
 
 func (*ConnectorResponse_Empty) isConnectorResponse_Response() {}
@@ -966,7 +4482,7 @@ type AssetMonitoringResponse struct {
 
 func (x *AssetMonitoringResponse) Reset() {
 	*x = AssetMonitoringResponse{}
-	mi := &file_connector_proto_msgTypes[12]
+	mi := &file_connector_proto_msgTypes[59]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -978,7 +4494,7 @@ func (x *AssetMonitoringResponse) String() string {
 func (*AssetMonitoringResponse) ProtoMessage() {}
 
 func (x *AssetMonitoringResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[12]
+	mi := &file_connector_proto_msgTypes[59]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -991,7 +4507,7 @@ func (x *AssetMonitoringResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AssetMonitoringResponse.ProtoReflect.Descriptor instead.
 func (*AssetMonitoringResponse) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{12}
+	return file_connector_proto_rawDescGZIP(), []int{59}
 }
 
 func (x *AssetMonitoringResponse) GetTid() string {
@@ -1081,7 +4597,7 @@ type ConnectorGetOrganizationRequest struct {
 
 func (x *ConnectorGetOrganizationRequest) Reset() {
 	*x = ConnectorGetOrganizationRequest{}
-	mi := &file_connector_proto_msgTypes[13]
+	mi := &file_connector_proto_msgTypes[60]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1093,7 +4609,7 @@ func (x *ConnectorGetOrganizationRequest) String() string {
 func (*ConnectorGetOrganizationRequest) ProtoMessage() {}
 
 func (x *ConnectorGetOrganizationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[13]
+	mi := &file_connector_proto_msgTypes[60]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1106,7 +4622,7 @@ func (x *ConnectorGetOrganizationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectorGetOrganizationRequest.ProtoReflect.Descriptor instead.
 func (*ConnectorGetOrganizationRequest) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{13}
+	return file_connector_proto_rawDescGZIP(), []int{60}
 }
 
 func (x *ConnectorGetOrganizationRequest) GetBase() *proto.RequestBase {
@@ -1138,7 +4654,7 @@ type ConnectorStoreTelemetryRequest struct {
 
 func (x *ConnectorStoreTelemetryRequest) Reset() {
 	*x = ConnectorStoreTelemetryRequest{}
-	mi := &file_connector_proto_msgTypes[14]
+	mi := &file_connector_proto_msgTypes[61]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1150,7 +4666,7 @@ func (x *ConnectorStoreTelemetryRequest) String() string {
 func (*ConnectorStoreTelemetryRequest) ProtoMessage() {}
 
 func (x *ConnectorStoreTelemetryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[14]
+	mi := &file_connector_proto_msgTypes[61]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1163,7 +4679,7 @@ func (x *ConnectorStoreTelemetryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectorStoreTelemetryRequest.ProtoReflect.Descriptor instead.
 func (*ConnectorStoreTelemetryRequest) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{14}
+	return file_connector_proto_rawDescGZIP(), []int{61}
 }
 
 func (x *ConnectorStoreTelemetryRequest) GetBase() *proto.RequestBase {
@@ -1223,27 +4739,28 @@ func (*ConnectorStoreTelemetryRequest_SubAssetTelemetry) isConnectorStoreTelemet
 }
 
 type ConnectorStoreDetectionRequest struct {
-	state             protoimpl.MessageState `protogen:"open.v1"`
-	Base              *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
-	AssetSn           string                 `protobuf:"bytes,2,opt,name=asset_sn,json=assetSn,proto3" json:"asset_sn,omitempty"`
-	SubAssetSn        *string                `protobuf:"bytes,3,opt,name=sub_asset_sn,json=subAssetSn,proto3,oneof" json:"sub_asset_sn,omitempty"`
-	TaskId            *string                `protobuf:"bytes,4,opt,name=task_id,json=taskId,proto3,oneof" json:"task_id,omitempty"`
-	ObjectId          string                 `protobuf:"bytes,5,opt,name=object_id,json=objectId,proto3" json:"object_id,omitempty"`
-	ObjectType        string                 `protobuf:"bytes,6,opt,name=object_type,json=objectType,proto3" json:"object_type,omitempty"`
-	Confidence        *float32               `protobuf:"fixed32,7,opt,name=confidence,proto3,oneof" json:"confidence,omitempty"`
-	BoundingBoxX      *float32               `protobuf:"fixed32,8,opt,name=bounding_box_x,json=boundingBoxX,proto3,oneof" json:"bounding_box_x,omitempty"`
-	BoundingBoxY      *float32               `protobuf:"fixed32,9,opt,name=bounding_box_y,json=boundingBoxY,proto3,oneof" json:"bounding_box_y,omitempty"`
-	BoundingBoxWidth  *float32               `protobuf:"fixed32,10,opt,name=bounding_box_width,json=boundingBoxWidth,proto3,oneof" json:"bounding_box_width,omitempty"`
-	BoundingBoxHeight *float32               `protobuf:"fixed32,11,opt,name=bounding_box_height,json=boundingBoxHeight,proto3,oneof" json:"bounding_box_height,omitempty"`
-	StreamUrl         *string                `protobuf:"bytes,12,opt,name=stream_url,json=streamUrl,proto3,oneof" json:"stream_url,omitempty"`
-	DetectedAt        *timestamppb.Timestamp `protobuf:"bytes,13,opt,name=detected_at,json=detectedAt,proto3" json:"detected_at,omitempty"`
+	state             protoimpl.MessageState    `protogen:"open.v1"`
+	Base              *proto.RequestBase        `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	AssetSn           string                    `protobuf:"bytes,2,opt,name=asset_sn,json=assetSn,proto3" json:"asset_sn,omitempty"`
+	SubAssetSn        *string                   `protobuf:"bytes,3,opt,name=sub_asset_sn,json=subAssetSn,proto3,oneof" json:"sub_asset_sn,omitempty"`
+	TaskId            *string                   `protobuf:"bytes,4,opt,name=task_id,json=taskId,proto3,oneof" json:"task_id,omitempty"`
+	ObjectId          string                    `protobuf:"bytes,5,opt,name=object_id,json=objectId,proto3" json:"object_id,omitempty"`
+	ObjectType        string                    `protobuf:"bytes,6,opt,name=object_type,json=objectType,proto3" json:"object_type,omitempty"`
+	Confidence        *float32                  `protobuf:"fixed32,7,opt,name=confidence,proto3,oneof" json:"confidence,omitempty"`
+	BoundingBoxX      *float32                  `protobuf:"fixed32,8,opt,name=bounding_box_x,json=boundingBoxX,proto3,oneof" json:"bounding_box_x,omitempty"`
+	BoundingBoxY      *float32                  `protobuf:"fixed32,9,opt,name=bounding_box_y,json=boundingBoxY,proto3,oneof" json:"bounding_box_y,omitempty"`
+	BoundingBoxWidth  *float32                  `protobuf:"fixed32,10,opt,name=bounding_box_width,json=boundingBoxWidth,proto3,oneof" json:"bounding_box_width,omitempty"`
+	BoundingBoxHeight *float32                  `protobuf:"fixed32,11,opt,name=bounding_box_height,json=boundingBoxHeight,proto3,oneof" json:"bounding_box_height,omitempty"`
+	StreamUrl         *string                   `protobuf:"bytes,12,opt,name=stream_url,json=streamUrl,proto3,oneof" json:"stream_url,omitempty"`
+	DetectedAt        *timestamppb.Timestamp    `protobuf:"bytes,13,opt,name=detected_at,json=detectedAt,proto3" json:"detected_at,omitempty"`
+	Position          *proto4.DetectionPosition `protobuf:"bytes,14,opt,name=position,proto3,oneof" json:"position,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
 
 func (x *ConnectorStoreDetectionRequest) Reset() {
 	*x = ConnectorStoreDetectionRequest{}
-	mi := &file_connector_proto_msgTypes[15]
+	mi := &file_connector_proto_msgTypes[62]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1255,7 +4772,7 @@ func (x *ConnectorStoreDetectionRequest) String() string {
 func (*ConnectorStoreDetectionRequest) ProtoMessage() {}
 
 func (x *ConnectorStoreDetectionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[15]
+	mi := &file_connector_proto_msgTypes[62]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1268,7 +4785,7 @@ func (x *ConnectorStoreDetectionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectorStoreDetectionRequest.ProtoReflect.Descriptor instead.
 func (*ConnectorStoreDetectionRequest) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{15}
+	return file_connector_proto_rawDescGZIP(), []int{62}
 }
 
 func (x *ConnectorStoreDetectionRequest) GetBase() *proto.RequestBase {
@@ -1362,6 +4879,13 @@ func (x *ConnectorStoreDetectionRequest) GetDetectedAt() *timestamppb.Timestamp 
 	return nil
 }
 
+func (x *ConnectorStoreDetectionRequest) GetPosition() *proto4.DetectionPosition {
+	if x != nil {
+		return x.Position
+	}
+	return nil
+}
+
 type AssetTelemetryProto struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
 	AssetId           string                 `protobuf:"bytes,1,opt,name=asset_id,json=assetId,proto3" json:"asset_id,omitempty"`
@@ -1387,7 +4911,7 @@ type AssetTelemetryProto struct {
 
 func (x *AssetTelemetryProto) Reset() {
 	*x = AssetTelemetryProto{}
-	mi := &file_connector_proto_msgTypes[16]
+	mi := &file_connector_proto_msgTypes[63]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1399,7 +4923,7 @@ func (x *AssetTelemetryProto) String() string {
 func (*AssetTelemetryProto) ProtoMessage() {}
 
 func (x *AssetTelemetryProto) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[16]
+	mi := &file_connector_proto_msgTypes[63]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1412,7 +4936,7 @@ func (x *AssetTelemetryProto) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AssetTelemetryProto.ProtoReflect.Descriptor instead.
 func (*AssetTelemetryProto) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{16}
+	return file_connector_proto_rawDescGZIP(), []int{63}
 }
 
 func (x *AssetTelemetryProto) GetAssetId() string {
@@ -1557,7 +5081,7 @@ type SubAssetTelemetryProto struct {
 
 func (x *SubAssetTelemetryProto) Reset() {
 	*x = SubAssetTelemetryProto{}
-	mi := &file_connector_proto_msgTypes[17]
+	mi := &file_connector_proto_msgTypes[64]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1569,7 +5093,7 @@ func (x *SubAssetTelemetryProto) String() string {
 func (*SubAssetTelemetryProto) ProtoMessage() {}
 
 func (x *SubAssetTelemetryProto) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[17]
+	mi := &file_connector_proto_msgTypes[64]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1582,7 +5106,7 @@ func (x *SubAssetTelemetryProto) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubAssetTelemetryProto.ProtoReflect.Descriptor instead.
 func (*SubAssetTelemetryProto) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{17}
+	return file_connector_proto_rawDescGZIP(), []int{64}
 }
 
 func (x *SubAssetTelemetryProto) GetAssetId() string {
@@ -1691,26 +5215,29 @@ func (x *SubAssetTelemetryProto) GetTelemetryData() map[string]string {
 }
 
 type PolicyProtoDTO struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	PolicyType    string                 `protobuf:"bytes,4,opt,name=policy_type,json=policyType,proto3" json:"policy_type,omitempty"`
-	Scope         string                 `protobuf:"bytes,5,opt,name=scope,proto3" json:"scope,omitempty"`
-	ScopeTarget   *string                `protobuf:"bytes,6,opt,name=scope_target,json=scopeTarget,proto3,oneof" json:"scope_target,omitempty"`
-	Priority      int32                  `protobuf:"varint,7,opt,name=priority,proto3" json:"priority,omitempty"`
-	Active        bool                   `protobuf:"varint,8,opt,name=active,proto3" json:"active,omitempty"`
-	StrategyType  string                 `protobuf:"bytes,9,opt,name=strategy_type,json=strategyType,proto3" json:"strategy_type,omitempty"`
-	Conditions    *string                `protobuf:"bytes,10,opt,name=conditions,proto3,oneof" json:"conditions,omitempty"`   // JSON array string
-	Constraints   *string                `protobuf:"bytes,11,opt,name=constraints,proto3,oneof" json:"constraints,omitempty"` // JSON array string
-	Actions       *string                `protobuf:"bytes,12,opt,name=actions,proto3,oneof" json:"actions,omitempty"`         // JSON array string
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Id             string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name           string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Description    string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	PolicyType     string                 `protobuf:"bytes,4,opt,name=policy_type,json=policyType,proto3" json:"policy_type,omitempty"`
+	Scope          string                 `protobuf:"bytes,5,opt,name=scope,proto3" json:"scope,omitempty"`
+	ScopeTarget    *string                `protobuf:"bytes,6,opt,name=scope_target,json=scopeTarget,proto3,oneof" json:"scope_target,omitempty"`
+	Priority       int32                  `protobuf:"varint,7,opt,name=priority,proto3" json:"priority,omitempty"`
+	Active         bool                   `protobuf:"varint,8,opt,name=active,proto3" json:"active,omitempty"`
+	StrategyType   string                 `protobuf:"bytes,9,opt,name=strategy_type,json=strategyType,proto3" json:"strategy_type,omitempty"`
+	Conditions     *string                `protobuf:"bytes,10,opt,name=conditions,proto3,oneof" json:"conditions,omitempty"`   // JSON array string
+	Constraints    *string                `protobuf:"bytes,11,opt,name=constraints,proto3,oneof" json:"constraints,omitempty"` // JSON array string
+	Actions        *string                `protobuf:"bytes,12,opt,name=actions,proto3,oneof" json:"actions,omitempty"`         // JSON array string
+	OrganizationId *string                `protobuf:"bytes,13,opt,name=organization_id,json=organizationId,proto3,oneof" json:"organization_id,omitempty"`
+	CreatedAt      *timestamppb.Timestamp `protobuf:"bytes,14,opt,name=created_at,json=createdAt,proto3,oneof" json:"created_at,omitempty"`
+	ModifiedAt     *timestamppb.Timestamp `protobuf:"bytes,15,opt,name=modified_at,json=modifiedAt,proto3,oneof" json:"modified_at,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *PolicyProtoDTO) Reset() {
 	*x = PolicyProtoDTO{}
-	mi := &file_connector_proto_msgTypes[18]
+	mi := &file_connector_proto_msgTypes[65]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1722,7 +5249,7 @@ func (x *PolicyProtoDTO) String() string {
 func (*PolicyProtoDTO) ProtoMessage() {}
 
 func (x *PolicyProtoDTO) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[18]
+	mi := &file_connector_proto_msgTypes[65]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1735,7 +5262,7 @@ func (x *PolicyProtoDTO) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PolicyProtoDTO.ProtoReflect.Descriptor instead.
 func (*PolicyProtoDTO) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{18}
+	return file_connector_proto_rawDescGZIP(), []int{65}
 }
 
 func (x *PolicyProtoDTO) GetId() string {
@@ -1822,6 +5349,27 @@ func (x *PolicyProtoDTO) GetActions() string {
 	return ""
 }
 
+func (x *PolicyProtoDTO) GetOrganizationId() string {
+	if x != nil && x.OrganizationId != nil {
+		return *x.OrganizationId
+	}
+	return ""
+}
+
+func (x *PolicyProtoDTO) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *PolicyProtoDTO) GetModifiedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.ModifiedAt
+	}
+	return nil
+}
+
 type PolicyProtoDTOList struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Policies      []*PolicyProtoDTO      `protobuf:"bytes,1,rep,name=policies,proto3" json:"policies,omitempty"`
@@ -1831,7 +5379,7 @@ type PolicyProtoDTOList struct {
 
 func (x *PolicyProtoDTOList) Reset() {
 	*x = PolicyProtoDTOList{}
-	mi := &file_connector_proto_msgTypes[19]
+	mi := &file_connector_proto_msgTypes[66]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1843,7 +5391,7 @@ func (x *PolicyProtoDTOList) String() string {
 func (*PolicyProtoDTOList) ProtoMessage() {}
 
 func (x *PolicyProtoDTOList) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[19]
+	mi := &file_connector_proto_msgTypes[66]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1856,7 +5404,7 @@ func (x *PolicyProtoDTOList) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PolicyProtoDTOList.ProtoReflect.Descriptor instead.
 func (*PolicyProtoDTOList) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{19}
+	return file_connector_proto_rawDescGZIP(), []int{66}
 }
 
 func (x *PolicyProtoDTOList) GetPolicies() []*PolicyProtoDTO {
@@ -1876,7 +5424,7 @@ type ConnectorGetPoliciesRequest struct {
 
 func (x *ConnectorGetPoliciesRequest) Reset() {
 	*x = ConnectorGetPoliciesRequest{}
-	mi := &file_connector_proto_msgTypes[20]
+	mi := &file_connector_proto_msgTypes[67]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1888,7 +5436,7 @@ func (x *ConnectorGetPoliciesRequest) String() string {
 func (*ConnectorGetPoliciesRequest) ProtoMessage() {}
 
 func (x *ConnectorGetPoliciesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[20]
+	mi := &file_connector_proto_msgTypes[67]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1901,7 +5449,7 @@ func (x *ConnectorGetPoliciesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectorGetPoliciesRequest.ProtoReflect.Descriptor instead.
 func (*ConnectorGetPoliciesRequest) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{20}
+	return file_connector_proto_rawDescGZIP(), []int{67}
 }
 
 func (x *ConnectorGetPoliciesRequest) GetBase() *proto.RequestBase {
@@ -1919,15 +5467,19 @@ func (x *ConnectorGetPoliciesRequest) GetPolicyType() string {
 }
 
 type ConnectorGetAllPoliciesRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Base  *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	// False (default) matches every prior caller's expectation -- only the admin console's "show
+	// deactivated policies" view sets this true. Same reasoning as ConnectorGetConfigsRequest's
+	// include_inactive.
+	IncludeInactive bool `protobuf:"varint,2,opt,name=include_inactive,json=includeInactive,proto3" json:"include_inactive,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *ConnectorGetAllPoliciesRequest) Reset() {
 	*x = ConnectorGetAllPoliciesRequest{}
-	mi := &file_connector_proto_msgTypes[21]
+	mi := &file_connector_proto_msgTypes[68]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1939,7 +5491,7 @@ func (x *ConnectorGetAllPoliciesRequest) String() string {
 func (*ConnectorGetAllPoliciesRequest) ProtoMessage() {}
 
 func (x *ConnectorGetAllPoliciesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[21]
+	mi := &file_connector_proto_msgTypes[68]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1952,7 +5504,7 @@ func (x *ConnectorGetAllPoliciesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectorGetAllPoliciesRequest.ProtoReflect.Descriptor instead.
 func (*ConnectorGetAllPoliciesRequest) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{21}
+	return file_connector_proto_rawDescGZIP(), []int{68}
 }
 
 func (x *ConnectorGetAllPoliciesRequest) GetBase() *proto.RequestBase {
@@ -1960,6 +5512,13 @@ func (x *ConnectorGetAllPoliciesRequest) GetBase() *proto.RequestBase {
 		return x.Base
 	}
 	return nil
+}
+
+func (x *ConnectorGetAllPoliciesRequest) GetIncludeInactive() bool {
+	if x != nil {
+		return x.IncludeInactive
+	}
+	return false
 }
 
 type ConnectorPolicyResponse struct {
@@ -1978,7 +5537,7 @@ type ConnectorPolicyResponse struct {
 
 func (x *ConnectorPolicyResponse) Reset() {
 	*x = ConnectorPolicyResponse{}
-	mi := &file_connector_proto_msgTypes[22]
+	mi := &file_connector_proto_msgTypes[69]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1990,7 +5549,7 @@ func (x *ConnectorPolicyResponse) String() string {
 func (*ConnectorPolicyResponse) ProtoMessage() {}
 
 func (x *ConnectorPolicyResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[22]
+	mi := &file_connector_proto_msgTypes[69]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2003,7 +5562,7 @@ func (x *ConnectorPolicyResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectorPolicyResponse.ProtoReflect.Descriptor instead.
 func (*ConnectorPolicyResponse) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{22}
+	return file_connector_proto_rawDescGZIP(), []int{69}
 }
 
 func (x *ConnectorPolicyResponse) GetTid() string {
@@ -2068,23 +5627,4453 @@ func (*ConnectorPolicyResponse_Error) isConnectorPolicyResponse_Response() {}
 
 func (*ConnectorPolicyResponse_PolicyList) isConnectorPolicyResponse_Response() {}
 
-type TechnicalConfigProtoDTO struct {
+type GetPolicyByIdRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	ConfigKey     string                 `protobuf:"bytes,2,opt,name=config_key,json=configKey,proto3" json:"config_key,omitempty"`
-	ConfigValue   *string                `protobuf:"bytes,3,opt,name=config_value,json=configValue,proto3,oneof" json:"config_value,omitempty"`
-	ValueType     string                 `protobuf:"bytes,4,opt,name=value_type,json=valueType,proto3" json:"value_type,omitempty"`
-	Scope         string                 `protobuf:"bytes,5,opt,name=scope,proto3" json:"scope,omitempty"`
-	ScopeTarget   *string                `protobuf:"bytes,6,opt,name=scope_target,json=scopeTarget,proto3,oneof" json:"scope_target,omitempty"`
-	Active        bool                   `protobuf:"varint,7,opt,name=active,proto3" json:"active,omitempty"`
-	Description   *string                `protobuf:"bytes,8,opt,name=description,proto3,oneof" json:"description,omitempty"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Id            string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
+func (x *GetPolicyByIdRequest) Reset() {
+	*x = GetPolicyByIdRequest{}
+	mi := &file_connector_proto_msgTypes[70]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetPolicyByIdRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetPolicyByIdRequest) ProtoMessage() {}
+
+func (x *GetPolicyByIdRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[70]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetPolicyByIdRequest.ProtoReflect.Descriptor instead.
+func (*GetPolicyByIdRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{70}
+}
+
+func (x *GetPolicyByIdRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *GetPolicyByIdRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type CreatePolicyRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Policy        *PolicyProtoDTO        `protobuf:"bytes,2,opt,name=policy,proto3" json:"policy,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreatePolicyRequest) Reset() {
+	*x = CreatePolicyRequest{}
+	mi := &file_connector_proto_msgTypes[71]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreatePolicyRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreatePolicyRequest) ProtoMessage() {}
+
+func (x *CreatePolicyRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[71]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreatePolicyRequest.ProtoReflect.Descriptor instead.
+func (*CreatePolicyRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{71}
+}
+
+func (x *CreatePolicyRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *CreatePolicyRequest) GetPolicy() *PolicyProtoDTO {
+	if x != nil {
+		return x.Policy
+	}
+	return nil
+}
+
+type UpdatePolicyRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Id            string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	Policy        *PolicyProtoDTO        `protobuf:"bytes,3,opt,name=policy,proto3" json:"policy,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdatePolicyRequest) Reset() {
+	*x = UpdatePolicyRequest{}
+	mi := &file_connector_proto_msgTypes[72]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdatePolicyRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdatePolicyRequest) ProtoMessage() {}
+
+func (x *UpdatePolicyRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[72]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdatePolicyRequest.ProtoReflect.Descriptor instead.
+func (*UpdatePolicyRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{72}
+}
+
+func (x *UpdatePolicyRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *UpdatePolicyRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdatePolicyRequest) GetPolicy() *PolicyProtoDTO {
+	if x != nil {
+		return x.Policy
+	}
+	return nil
+}
+
+type DeletePolicyRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Id            string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeletePolicyRequest) Reset() {
+	*x = DeletePolicyRequest{}
+	mi := &file_connector_proto_msgTypes[73]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeletePolicyRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeletePolicyRequest) ProtoMessage() {}
+
+func (x *DeletePolicyRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[73]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeletePolicyRequest.ProtoReflect.Descriptor instead.
+func (*DeletePolicyRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{73}
+}
+
+func (x *DeletePolicyRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *DeletePolicyRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type ConnectorPolicySingleResponse struct {
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	Tid       string                 `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
+	HasErrors bool                   `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Timestamp *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	// Types that are valid to be assigned to Response:
+	//
+	//	*ConnectorPolicySingleResponse_Error
+	//	*ConnectorPolicySingleResponse_Policy
+	Response      isConnectorPolicySingleResponse_Response `protobuf_oneof:"response"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ConnectorPolicySingleResponse) Reset() {
+	*x = ConnectorPolicySingleResponse{}
+	mi := &file_connector_proto_msgTypes[74]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConnectorPolicySingleResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConnectorPolicySingleResponse) ProtoMessage() {}
+
+func (x *ConnectorPolicySingleResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[74]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConnectorPolicySingleResponse.ProtoReflect.Descriptor instead.
+func (*ConnectorPolicySingleResponse) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{74}
+}
+
+func (x *ConnectorPolicySingleResponse) GetTid() string {
+	if x != nil {
+		return x.Tid
+	}
+	return ""
+}
+
+func (x *ConnectorPolicySingleResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *ConnectorPolicySingleResponse) GetTimestamp() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Timestamp
+	}
+	return nil
+}
+
+func (x *ConnectorPolicySingleResponse) GetResponse() isConnectorPolicySingleResponse_Response {
+	if x != nil {
+		return x.Response
+	}
+	return nil
+}
+
+func (x *ConnectorPolicySingleResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		if x, ok := x.Response.(*ConnectorPolicySingleResponse_Error); ok {
+			return x.Error
+		}
+	}
+	return nil
+}
+
+func (x *ConnectorPolicySingleResponse) GetPolicy() *PolicyProtoDTO {
+	if x != nil {
+		if x, ok := x.Response.(*ConnectorPolicySingleResponse_Policy); ok {
+			return x.Policy
+		}
+	}
+	return nil
+}
+
+type isConnectorPolicySingleResponse_Response interface {
+	isConnectorPolicySingleResponse_Response()
+}
+
+type ConnectorPolicySingleResponse_Error struct {
+	Error *proto.GlobalErrorMessage `protobuf:"bytes,4,opt,name=error,proto3,oneof"`
+}
+
+type ConnectorPolicySingleResponse_Policy struct {
+	Policy *PolicyProtoDTO `protobuf:"bytes,5,opt,name=policy,proto3,oneof"`
+}
+
+func (*ConnectorPolicySingleResponse_Error) isConnectorPolicySingleResponse_Response() {}
+
+func (*ConnectorPolicySingleResponse_Policy) isConnectorPolicySingleResponse_Response() {}
+
+type ConnectorDeletePolicyResponse struct {
+	state         protoimpl.MessageState    `protogen:"open.v1"`
+	Tid           string                    `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
+	HasErrors     bool                      `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Timestamp     *timestamppb.Timestamp    `protobuf:"bytes,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Deleted       bool                      `protobuf:"varint,4,opt,name=deleted,proto3" json:"deleted,omitempty"`
+	Error         *proto.GlobalErrorMessage `protobuf:"bytes,5,opt,name=error,proto3,oneof" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ConnectorDeletePolicyResponse) Reset() {
+	*x = ConnectorDeletePolicyResponse{}
+	mi := &file_connector_proto_msgTypes[75]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConnectorDeletePolicyResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConnectorDeletePolicyResponse) ProtoMessage() {}
+
+func (x *ConnectorDeletePolicyResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[75]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConnectorDeletePolicyResponse.ProtoReflect.Descriptor instead.
+func (*ConnectorDeletePolicyResponse) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{75}
+}
+
+func (x *ConnectorDeletePolicyResponse) GetTid() string {
+	if x != nil {
+		return x.Tid
+	}
+	return ""
+}
+
+func (x *ConnectorDeletePolicyResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *ConnectorDeletePolicyResponse) GetTimestamp() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Timestamp
+	}
+	return nil
+}
+
+func (x *ConnectorDeletePolicyResponse) GetDeleted() bool {
+	if x != nil {
+		return x.Deleted
+	}
+	return false
+}
+
+func (x *ConnectorDeletePolicyResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		return x.Error
+	}
+	return nil
+}
+
+type ConnectorGetAllOrganizationsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ConnectorGetAllOrganizationsRequest) Reset() {
+	*x = ConnectorGetAllOrganizationsRequest{}
+	mi := &file_connector_proto_msgTypes[76]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConnectorGetAllOrganizationsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConnectorGetAllOrganizationsRequest) ProtoMessage() {}
+
+func (x *ConnectorGetAllOrganizationsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[76]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConnectorGetAllOrganizationsRequest.ProtoReflect.Descriptor instead.
+func (*ConnectorGetAllOrganizationsRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{76}
+}
+
+func (x *ConnectorGetAllOrganizationsRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+type GetOrganizationByIdRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Id            string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetOrganizationByIdRequest) Reset() {
+	*x = GetOrganizationByIdRequest{}
+	mi := &file_connector_proto_msgTypes[77]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetOrganizationByIdRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetOrganizationByIdRequest) ProtoMessage() {}
+
+func (x *GetOrganizationByIdRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[77]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetOrganizationByIdRequest.ProtoReflect.Descriptor instead.
+func (*GetOrganizationByIdRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{77}
+}
+
+func (x *GetOrganizationByIdRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *GetOrganizationByIdRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type CreateOrganizationRequest struct {
+	state         protoimpl.MessageState       `protogen:"open.v1"`
+	Base          *proto.RequestBase           `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Organization  *proto2.OrganizationProtoDTO `protobuf:"bytes,2,opt,name=organization,proto3" json:"organization,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateOrganizationRequest) Reset() {
+	*x = CreateOrganizationRequest{}
+	mi := &file_connector_proto_msgTypes[78]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateOrganizationRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateOrganizationRequest) ProtoMessage() {}
+
+func (x *CreateOrganizationRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[78]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateOrganizationRequest.ProtoReflect.Descriptor instead.
+func (*CreateOrganizationRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{78}
+}
+
+func (x *CreateOrganizationRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *CreateOrganizationRequest) GetOrganization() *proto2.OrganizationProtoDTO {
+	if x != nil {
+		return x.Organization
+	}
+	return nil
+}
+
+type UpdateOrganizationRequest struct {
+	state         protoimpl.MessageState       `protogen:"open.v1"`
+	Base          *proto.RequestBase           `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Id            string                       `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	Organization  *proto2.OrganizationProtoDTO `protobuf:"bytes,3,opt,name=organization,proto3" json:"organization,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateOrganizationRequest) Reset() {
+	*x = UpdateOrganizationRequest{}
+	mi := &file_connector_proto_msgTypes[79]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateOrganizationRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateOrganizationRequest) ProtoMessage() {}
+
+func (x *UpdateOrganizationRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[79]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateOrganizationRequest.ProtoReflect.Descriptor instead.
+func (*UpdateOrganizationRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{79}
+}
+
+func (x *UpdateOrganizationRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *UpdateOrganizationRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdateOrganizationRequest) GetOrganization() *proto2.OrganizationProtoDTO {
+	if x != nil {
+		return x.Organization
+	}
+	return nil
+}
+
+type DeleteOrganizationRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Id            string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteOrganizationRequest) Reset() {
+	*x = DeleteOrganizationRequest{}
+	mi := &file_connector_proto_msgTypes[80]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteOrganizationRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteOrganizationRequest) ProtoMessage() {}
+
+func (x *DeleteOrganizationRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[80]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteOrganizationRequest.ProtoReflect.Descriptor instead.
+func (*DeleteOrganizationRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{80}
+}
+
+func (x *DeleteOrganizationRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *DeleteOrganizationRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type OrganizationProtoDTOList struct {
+	state         protoimpl.MessageState         `protogen:"open.v1"`
+	Organizations []*proto2.OrganizationProtoDTO `protobuf:"bytes,1,rep,name=organizations,proto3" json:"organizations,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *OrganizationProtoDTOList) Reset() {
+	*x = OrganizationProtoDTOList{}
+	mi := &file_connector_proto_msgTypes[81]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OrganizationProtoDTOList) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OrganizationProtoDTOList) ProtoMessage() {}
+
+func (x *OrganizationProtoDTOList) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[81]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OrganizationProtoDTOList.ProtoReflect.Descriptor instead.
+func (*OrganizationProtoDTOList) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{81}
+}
+
+func (x *OrganizationProtoDTOList) GetOrganizations() []*proto2.OrganizationProtoDTO {
+	if x != nil {
+		return x.Organizations
+	}
+	return nil
+}
+
+type ConnectorOrganizationResponse struct {
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	Tid       string                 `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
+	HasErrors bool                   `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Timestamp *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	// Types that are valid to be assigned to Response:
+	//
+	//	*ConnectorOrganizationResponse_Error
+	//	*ConnectorOrganizationResponse_OrganizationList
+	Response      isConnectorOrganizationResponse_Response `protobuf_oneof:"response"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ConnectorOrganizationResponse) Reset() {
+	*x = ConnectorOrganizationResponse{}
+	mi := &file_connector_proto_msgTypes[82]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConnectorOrganizationResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConnectorOrganizationResponse) ProtoMessage() {}
+
+func (x *ConnectorOrganizationResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[82]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConnectorOrganizationResponse.ProtoReflect.Descriptor instead.
+func (*ConnectorOrganizationResponse) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{82}
+}
+
+func (x *ConnectorOrganizationResponse) GetTid() string {
+	if x != nil {
+		return x.Tid
+	}
+	return ""
+}
+
+func (x *ConnectorOrganizationResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *ConnectorOrganizationResponse) GetTimestamp() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Timestamp
+	}
+	return nil
+}
+
+func (x *ConnectorOrganizationResponse) GetResponse() isConnectorOrganizationResponse_Response {
+	if x != nil {
+		return x.Response
+	}
+	return nil
+}
+
+func (x *ConnectorOrganizationResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		if x, ok := x.Response.(*ConnectorOrganizationResponse_Error); ok {
+			return x.Error
+		}
+	}
+	return nil
+}
+
+func (x *ConnectorOrganizationResponse) GetOrganizationList() *OrganizationProtoDTOList {
+	if x != nil {
+		if x, ok := x.Response.(*ConnectorOrganizationResponse_OrganizationList); ok {
+			return x.OrganizationList
+		}
+	}
+	return nil
+}
+
+type isConnectorOrganizationResponse_Response interface {
+	isConnectorOrganizationResponse_Response()
+}
+
+type ConnectorOrganizationResponse_Error struct {
+	Error *proto.GlobalErrorMessage `protobuf:"bytes,4,opt,name=error,proto3,oneof"`
+}
+
+type ConnectorOrganizationResponse_OrganizationList struct {
+	OrganizationList *OrganizationProtoDTOList `protobuf:"bytes,5,opt,name=organization_list,json=organizationList,proto3,oneof"`
+}
+
+func (*ConnectorOrganizationResponse_Error) isConnectorOrganizationResponse_Response() {}
+
+func (*ConnectorOrganizationResponse_OrganizationList) isConnectorOrganizationResponse_Response() {}
+
+type ConnectorOrganizationSingleResponse struct {
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	Tid       string                 `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
+	HasErrors bool                   `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Timestamp *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	// Types that are valid to be assigned to Response:
+	//
+	//	*ConnectorOrganizationSingleResponse_Error
+	//	*ConnectorOrganizationSingleResponse_Organization
+	Response      isConnectorOrganizationSingleResponse_Response `protobuf_oneof:"response"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ConnectorOrganizationSingleResponse) Reset() {
+	*x = ConnectorOrganizationSingleResponse{}
+	mi := &file_connector_proto_msgTypes[83]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConnectorOrganizationSingleResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConnectorOrganizationSingleResponse) ProtoMessage() {}
+
+func (x *ConnectorOrganizationSingleResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[83]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConnectorOrganizationSingleResponse.ProtoReflect.Descriptor instead.
+func (*ConnectorOrganizationSingleResponse) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{83}
+}
+
+func (x *ConnectorOrganizationSingleResponse) GetTid() string {
+	if x != nil {
+		return x.Tid
+	}
+	return ""
+}
+
+func (x *ConnectorOrganizationSingleResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *ConnectorOrganizationSingleResponse) GetTimestamp() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Timestamp
+	}
+	return nil
+}
+
+func (x *ConnectorOrganizationSingleResponse) GetResponse() isConnectorOrganizationSingleResponse_Response {
+	if x != nil {
+		return x.Response
+	}
+	return nil
+}
+
+func (x *ConnectorOrganizationSingleResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		if x, ok := x.Response.(*ConnectorOrganizationSingleResponse_Error); ok {
+			return x.Error
+		}
+	}
+	return nil
+}
+
+func (x *ConnectorOrganizationSingleResponse) GetOrganization() *proto2.OrganizationProtoDTO {
+	if x != nil {
+		if x, ok := x.Response.(*ConnectorOrganizationSingleResponse_Organization); ok {
+			return x.Organization
+		}
+	}
+	return nil
+}
+
+type isConnectorOrganizationSingleResponse_Response interface {
+	isConnectorOrganizationSingleResponse_Response()
+}
+
+type ConnectorOrganizationSingleResponse_Error struct {
+	Error *proto.GlobalErrorMessage `protobuf:"bytes,4,opt,name=error,proto3,oneof"`
+}
+
+type ConnectorOrganizationSingleResponse_Organization struct {
+	Organization *proto2.OrganizationProtoDTO `protobuf:"bytes,5,opt,name=organization,proto3,oneof"`
+}
+
+func (*ConnectorOrganizationSingleResponse_Error) isConnectorOrganizationSingleResponse_Response() {}
+
+func (*ConnectorOrganizationSingleResponse_Organization) isConnectorOrganizationSingleResponse_Response() {
+}
+
+type ConnectorDeleteOrganizationResponse struct {
+	state         protoimpl.MessageState    `protogen:"open.v1"`
+	Tid           string                    `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
+	HasErrors     bool                      `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Timestamp     *timestamppb.Timestamp    `protobuf:"bytes,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Deleted       bool                      `protobuf:"varint,4,opt,name=deleted,proto3" json:"deleted,omitempty"`
+	Error         *proto.GlobalErrorMessage `protobuf:"bytes,5,opt,name=error,proto3,oneof" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ConnectorDeleteOrganizationResponse) Reset() {
+	*x = ConnectorDeleteOrganizationResponse{}
+	mi := &file_connector_proto_msgTypes[84]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConnectorDeleteOrganizationResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConnectorDeleteOrganizationResponse) ProtoMessage() {}
+
+func (x *ConnectorDeleteOrganizationResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[84]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConnectorDeleteOrganizationResponse.ProtoReflect.Descriptor instead.
+func (*ConnectorDeleteOrganizationResponse) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{84}
+}
+
+func (x *ConnectorDeleteOrganizationResponse) GetTid() string {
+	if x != nil {
+		return x.Tid
+	}
+	return ""
+}
+
+func (x *ConnectorDeleteOrganizationResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *ConnectorDeleteOrganizationResponse) GetTimestamp() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Timestamp
+	}
+	return nil
+}
+
+func (x *ConnectorDeleteOrganizationResponse) GetDeleted() bool {
+	if x != nil {
+		return x.Deleted
+	}
+	return false
+}
+
+func (x *ConnectorDeleteOrganizationResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		return x.Error
+	}
+	return nil
+}
+
+type TheatreProtoDTO struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Id             *string                `protobuf:"bytes,1,opt,name=id,proto3,oneof" json:"id,omitempty"`
+	OrganizationId string                 `protobuf:"bytes,2,opt,name=organization_id,json=organizationId,proto3" json:"organization_id,omitempty"`
+	Name           string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Description    string                 `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
+	// Same shape mission-autonomy's no-fly-zones/mission-zones already use (polygon/circle/geojson/
+	// bounding-box) -- absent means this theatre is a real grouping with no spatial matching, not an
+	// error.
+	GeoZone *proto5.GeoAreaProtoDTO `protobuf:"bytes,5,opt,name=geo_zone,json=geoZone,proto3,oneof" json:"geo_zone,omitempty"`
+	// Each asset's own id, not settable here -- an asset joins a theatre via its own theatre_id field
+	// (see AssetProtoDTO.theatre_id), same one-directional relationship Organization.assets already
+	// has to Asset.organization.
+	Assets []string `protobuf:"bytes,6,rep,name=assets,proto3" json:"assets,omitempty"`
+	// Each assigned user's own id -- mutated via AssignUserToTheatre/RemoveUserFromTheatre, not by
+	// resending this list on an update.
+	AssignedUserIds []string               `protobuf:"bytes,7,rep,name=assigned_user_ids,json=assignedUserIds,proto3" json:"assigned_user_ids,omitempty"`
+	CreatedAt       *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=created_at,json=createdAt,proto3,oneof" json:"created_at,omitempty"`
+	ModifiedAt      *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=modified_at,json=modifiedAt,proto3,oneof" json:"modified_at,omitempty"`
+	// The site this one lies within (a building inside a campus), of the same organization. A run in
+	// this site draws on its own assets first, then its parent's, up the chain, then the whole fleet.
+	// On an update: absent keeps the current parent, present and blank makes it a top-level site.
+	ParentTheatreId *string `protobuf:"bytes,10,opt,name=parent_theatre_id,json=parentTheatreId,proto3,oneof" json:"parent_theatre_id,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *TheatreProtoDTO) Reset() {
+	*x = TheatreProtoDTO{}
+	mi := &file_connector_proto_msgTypes[85]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TheatreProtoDTO) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TheatreProtoDTO) ProtoMessage() {}
+
+func (x *TheatreProtoDTO) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[85]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TheatreProtoDTO.ProtoReflect.Descriptor instead.
+func (*TheatreProtoDTO) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{85}
+}
+
+func (x *TheatreProtoDTO) GetId() string {
+	if x != nil && x.Id != nil {
+		return *x.Id
+	}
+	return ""
+}
+
+func (x *TheatreProtoDTO) GetOrganizationId() string {
+	if x != nil {
+		return x.OrganizationId
+	}
+	return ""
+}
+
+func (x *TheatreProtoDTO) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *TheatreProtoDTO) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *TheatreProtoDTO) GetGeoZone() *proto5.GeoAreaProtoDTO {
+	if x != nil {
+		return x.GeoZone
+	}
+	return nil
+}
+
+func (x *TheatreProtoDTO) GetAssets() []string {
+	if x != nil {
+		return x.Assets
+	}
+	return nil
+}
+
+func (x *TheatreProtoDTO) GetAssignedUserIds() []string {
+	if x != nil {
+		return x.AssignedUserIds
+	}
+	return nil
+}
+
+func (x *TheatreProtoDTO) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *TheatreProtoDTO) GetModifiedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.ModifiedAt
+	}
+	return nil
+}
+
+func (x *TheatreProtoDTO) GetParentTheatreId() string {
+	if x != nil && x.ParentTheatreId != nil {
+		return *x.ParentTheatreId
+	}
+	return ""
+}
+
+type TheatreProtoDTOList struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Theatres      []*TheatreProtoDTO     `protobuf:"bytes,1,rep,name=theatres,proto3" json:"theatres,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TheatreProtoDTOList) Reset() {
+	*x = TheatreProtoDTOList{}
+	mi := &file_connector_proto_msgTypes[86]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TheatreProtoDTOList) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TheatreProtoDTOList) ProtoMessage() {}
+
+func (x *TheatreProtoDTOList) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[86]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TheatreProtoDTOList.ProtoReflect.Descriptor instead.
+func (*TheatreProtoDTOList) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{86}
+}
+
+func (x *TheatreProtoDTOList) GetTheatres() []*TheatreProtoDTO {
+	if x != nil {
+		return x.Theatres
+	}
+	return nil
+}
+
+type ConnectorGetAllTheatresRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Base  *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	// Absent = every theatre platform-wide (system_admin use); present = one organization's own.
+	OrganizationId *string `protobuf:"bytes,2,opt,name=organization_id,json=organizationId,proto3,oneof" json:"organization_id,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *ConnectorGetAllTheatresRequest) Reset() {
+	*x = ConnectorGetAllTheatresRequest{}
+	mi := &file_connector_proto_msgTypes[87]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConnectorGetAllTheatresRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConnectorGetAllTheatresRequest) ProtoMessage() {}
+
+func (x *ConnectorGetAllTheatresRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[87]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConnectorGetAllTheatresRequest.ProtoReflect.Descriptor instead.
+func (*ConnectorGetAllTheatresRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{87}
+}
+
+func (x *ConnectorGetAllTheatresRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *ConnectorGetAllTheatresRequest) GetOrganizationId() string {
+	if x != nil && x.OrganizationId != nil {
+		return *x.OrganizationId
+	}
+	return ""
+}
+
+type GetTheatreByIdRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Id            string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetTheatreByIdRequest) Reset() {
+	*x = GetTheatreByIdRequest{}
+	mi := &file_connector_proto_msgTypes[88]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetTheatreByIdRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetTheatreByIdRequest) ProtoMessage() {}
+
+func (x *GetTheatreByIdRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[88]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetTheatreByIdRequest.ProtoReflect.Descriptor instead.
+func (*GetTheatreByIdRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{88}
+}
+
+func (x *GetTheatreByIdRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *GetTheatreByIdRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type CreateTheatreRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Theatre       *TheatreProtoDTO       `protobuf:"bytes,2,opt,name=theatre,proto3" json:"theatre,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateTheatreRequest) Reset() {
+	*x = CreateTheatreRequest{}
+	mi := &file_connector_proto_msgTypes[89]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateTheatreRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateTheatreRequest) ProtoMessage() {}
+
+func (x *CreateTheatreRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[89]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateTheatreRequest.ProtoReflect.Descriptor instead.
+func (*CreateTheatreRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{89}
+}
+
+func (x *CreateTheatreRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *CreateTheatreRequest) GetTheatre() *TheatreProtoDTO {
+	if x != nil {
+		return x.Theatre
+	}
+	return nil
+}
+
+type UpdateTheatreRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Id            string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	Theatre       *TheatreProtoDTO       `protobuf:"bytes,3,opt,name=theatre,proto3" json:"theatre,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateTheatreRequest) Reset() {
+	*x = UpdateTheatreRequest{}
+	mi := &file_connector_proto_msgTypes[90]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateTheatreRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateTheatreRequest) ProtoMessage() {}
+
+func (x *UpdateTheatreRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[90]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateTheatreRequest.ProtoReflect.Descriptor instead.
+func (*UpdateTheatreRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{90}
+}
+
+func (x *UpdateTheatreRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *UpdateTheatreRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdateTheatreRequest) GetTheatre() *TheatreProtoDTO {
+	if x != nil {
+		return x.Theatre
+	}
+	return nil
+}
+
+type DeleteTheatreRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Id            string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteTheatreRequest) Reset() {
+	*x = DeleteTheatreRequest{}
+	mi := &file_connector_proto_msgTypes[91]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteTheatreRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteTheatreRequest) ProtoMessage() {}
+
+func (x *DeleteTheatreRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[91]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteTheatreRequest.ProtoReflect.Descriptor instead.
+func (*DeleteTheatreRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{91}
+}
+
+func (x *DeleteTheatreRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *DeleteTheatreRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type ConnectorTheatreResponse struct {
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	Tid       string                 `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
+	HasErrors bool                   `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Timestamp *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	// Types that are valid to be assigned to Response:
+	//
+	//	*ConnectorTheatreResponse_Error
+	//	*ConnectorTheatreResponse_TheatreList
+	Response      isConnectorTheatreResponse_Response `protobuf_oneof:"response"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ConnectorTheatreResponse) Reset() {
+	*x = ConnectorTheatreResponse{}
+	mi := &file_connector_proto_msgTypes[92]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConnectorTheatreResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConnectorTheatreResponse) ProtoMessage() {}
+
+func (x *ConnectorTheatreResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[92]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConnectorTheatreResponse.ProtoReflect.Descriptor instead.
+func (*ConnectorTheatreResponse) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{92}
+}
+
+func (x *ConnectorTheatreResponse) GetTid() string {
+	if x != nil {
+		return x.Tid
+	}
+	return ""
+}
+
+func (x *ConnectorTheatreResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *ConnectorTheatreResponse) GetTimestamp() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Timestamp
+	}
+	return nil
+}
+
+func (x *ConnectorTheatreResponse) GetResponse() isConnectorTheatreResponse_Response {
+	if x != nil {
+		return x.Response
+	}
+	return nil
+}
+
+func (x *ConnectorTheatreResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		if x, ok := x.Response.(*ConnectorTheatreResponse_Error); ok {
+			return x.Error
+		}
+	}
+	return nil
+}
+
+func (x *ConnectorTheatreResponse) GetTheatreList() *TheatreProtoDTOList {
+	if x != nil {
+		if x, ok := x.Response.(*ConnectorTheatreResponse_TheatreList); ok {
+			return x.TheatreList
+		}
+	}
+	return nil
+}
+
+type isConnectorTheatreResponse_Response interface {
+	isConnectorTheatreResponse_Response()
+}
+
+type ConnectorTheatreResponse_Error struct {
+	Error *proto.GlobalErrorMessage `protobuf:"bytes,4,opt,name=error,proto3,oneof"`
+}
+
+type ConnectorTheatreResponse_TheatreList struct {
+	TheatreList *TheatreProtoDTOList `protobuf:"bytes,5,opt,name=theatre_list,json=theatreList,proto3,oneof"`
+}
+
+func (*ConnectorTheatreResponse_Error) isConnectorTheatreResponse_Response() {}
+
+func (*ConnectorTheatreResponse_TheatreList) isConnectorTheatreResponse_Response() {}
+
+type ConnectorTheatreSingleResponse struct {
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	Tid       string                 `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
+	HasErrors bool                   `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Timestamp *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	// Types that are valid to be assigned to Response:
+	//
+	//	*ConnectorTheatreSingleResponse_Error
+	//	*ConnectorTheatreSingleResponse_Theatre
+	Response      isConnectorTheatreSingleResponse_Response `protobuf_oneof:"response"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ConnectorTheatreSingleResponse) Reset() {
+	*x = ConnectorTheatreSingleResponse{}
+	mi := &file_connector_proto_msgTypes[93]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConnectorTheatreSingleResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConnectorTheatreSingleResponse) ProtoMessage() {}
+
+func (x *ConnectorTheatreSingleResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[93]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConnectorTheatreSingleResponse.ProtoReflect.Descriptor instead.
+func (*ConnectorTheatreSingleResponse) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{93}
+}
+
+func (x *ConnectorTheatreSingleResponse) GetTid() string {
+	if x != nil {
+		return x.Tid
+	}
+	return ""
+}
+
+func (x *ConnectorTheatreSingleResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *ConnectorTheatreSingleResponse) GetTimestamp() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Timestamp
+	}
+	return nil
+}
+
+func (x *ConnectorTheatreSingleResponse) GetResponse() isConnectorTheatreSingleResponse_Response {
+	if x != nil {
+		return x.Response
+	}
+	return nil
+}
+
+func (x *ConnectorTheatreSingleResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		if x, ok := x.Response.(*ConnectorTheatreSingleResponse_Error); ok {
+			return x.Error
+		}
+	}
+	return nil
+}
+
+func (x *ConnectorTheatreSingleResponse) GetTheatre() *TheatreProtoDTO {
+	if x != nil {
+		if x, ok := x.Response.(*ConnectorTheatreSingleResponse_Theatre); ok {
+			return x.Theatre
+		}
+	}
+	return nil
+}
+
+type isConnectorTheatreSingleResponse_Response interface {
+	isConnectorTheatreSingleResponse_Response()
+}
+
+type ConnectorTheatreSingleResponse_Error struct {
+	Error *proto.GlobalErrorMessage `protobuf:"bytes,4,opt,name=error,proto3,oneof"`
+}
+
+type ConnectorTheatreSingleResponse_Theatre struct {
+	Theatre *TheatreProtoDTO `protobuf:"bytes,5,opt,name=theatre,proto3,oneof"`
+}
+
+func (*ConnectorTheatreSingleResponse_Error) isConnectorTheatreSingleResponse_Response() {}
+
+func (*ConnectorTheatreSingleResponse_Theatre) isConnectorTheatreSingleResponse_Response() {}
+
+type ConnectorDeleteTheatreResponse struct {
+	state         protoimpl.MessageState    `protogen:"open.v1"`
+	Tid           string                    `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
+	HasErrors     bool                      `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Timestamp     *timestamppb.Timestamp    `protobuf:"bytes,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Deleted       bool                      `protobuf:"varint,4,opt,name=deleted,proto3" json:"deleted,omitempty"`
+	Error         *proto.GlobalErrorMessage `protobuf:"bytes,5,opt,name=error,proto3,oneof" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ConnectorDeleteTheatreResponse) Reset() {
+	*x = ConnectorDeleteTheatreResponse{}
+	mi := &file_connector_proto_msgTypes[94]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConnectorDeleteTheatreResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConnectorDeleteTheatreResponse) ProtoMessage() {}
+
+func (x *ConnectorDeleteTheatreResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[94]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConnectorDeleteTheatreResponse.ProtoReflect.Descriptor instead.
+func (*ConnectorDeleteTheatreResponse) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{94}
+}
+
+func (x *ConnectorDeleteTheatreResponse) GetTid() string {
+	if x != nil {
+		return x.Tid
+	}
+	return ""
+}
+
+func (x *ConnectorDeleteTheatreResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *ConnectorDeleteTheatreResponse) GetTimestamp() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Timestamp
+	}
+	return nil
+}
+
+func (x *ConnectorDeleteTheatreResponse) GetDeleted() bool {
+	if x != nil {
+		return x.Deleted
+	}
+	return false
+}
+
+func (x *ConnectorDeleteTheatreResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		return x.Error
+	}
+	return nil
+}
+
+type AssignUserToTheatreRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	TheatreId     string                 `protobuf:"bytes,3,opt,name=theatre_id,json=theatreId,proto3" json:"theatre_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AssignUserToTheatreRequest) Reset() {
+	*x = AssignUserToTheatreRequest{}
+	mi := &file_connector_proto_msgTypes[95]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AssignUserToTheatreRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AssignUserToTheatreRequest) ProtoMessage() {}
+
+func (x *AssignUserToTheatreRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[95]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AssignUserToTheatreRequest.ProtoReflect.Descriptor instead.
+func (*AssignUserToTheatreRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{95}
+}
+
+func (x *AssignUserToTheatreRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *AssignUserToTheatreRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *AssignUserToTheatreRequest) GetTheatreId() string {
+	if x != nil {
+		return x.TheatreId
+	}
+	return ""
+}
+
+type RemoveUserFromTheatreRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	TheatreId     string                 `protobuf:"bytes,3,opt,name=theatre_id,json=theatreId,proto3" json:"theatre_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RemoveUserFromTheatreRequest) Reset() {
+	*x = RemoveUserFromTheatreRequest{}
+	mi := &file_connector_proto_msgTypes[96]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RemoveUserFromTheatreRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RemoveUserFromTheatreRequest) ProtoMessage() {}
+
+func (x *RemoveUserFromTheatreRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[96]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RemoveUserFromTheatreRequest.ProtoReflect.Descriptor instead.
+func (*RemoveUserFromTheatreRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{96}
+}
+
+func (x *RemoveUserFromTheatreRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *RemoveUserFromTheatreRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *RemoveUserFromTheatreRequest) GetTheatreId() string {
+	if x != nil {
+		return x.TheatreId
+	}
+	return ""
+}
+
+type TheatreAssignmentResponse struct {
+	state         protoimpl.MessageState    `protogen:"open.v1"`
+	Tid           string                    `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
+	HasErrors     bool                      `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Timestamp     *timestamppb.Timestamp    `protobuf:"bytes,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Error         *proto.GlobalErrorMessage `protobuf:"bytes,4,opt,name=error,proto3,oneof" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TheatreAssignmentResponse) Reset() {
+	*x = TheatreAssignmentResponse{}
+	mi := &file_connector_proto_msgTypes[97]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TheatreAssignmentResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TheatreAssignmentResponse) ProtoMessage() {}
+
+func (x *TheatreAssignmentResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[97]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TheatreAssignmentResponse.ProtoReflect.Descriptor instead.
+func (*TheatreAssignmentResponse) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{97}
+}
+
+func (x *TheatreAssignmentResponse) GetTid() string {
+	if x != nil {
+		return x.Tid
+	}
+	return ""
+}
+
+func (x *TheatreAssignmentResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *TheatreAssignmentResponse) GetTimestamp() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Timestamp
+	}
+	return nil
+}
+
+func (x *TheatreAssignmentResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		return x.Error
+	}
+	return nil
+}
+
+type ListNoFlyZonesRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Base  *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	// Required: whose zones. There is no platform-wide listing -- a zone is always one organization's.
+	OrganizationId string `protobuf:"bytes,2,opt,name=organization_id,json=organizationId,proto3" json:"organization_id,omitempty"`
+	// True = only the zones currently enforced (what flight planning reads).
+	ActiveOnly    *bool `protobuf:"varint,3,opt,name=active_only,json=activeOnly,proto3,oneof" json:"active_only,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListNoFlyZonesRequest) Reset() {
+	*x = ListNoFlyZonesRequest{}
+	mi := &file_connector_proto_msgTypes[98]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListNoFlyZonesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListNoFlyZonesRequest) ProtoMessage() {}
+
+func (x *ListNoFlyZonesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[98]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListNoFlyZonesRequest.ProtoReflect.Descriptor instead.
+func (*ListNoFlyZonesRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{98}
+}
+
+func (x *ListNoFlyZonesRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *ListNoFlyZonesRequest) GetOrganizationId() string {
+	if x != nil {
+		return x.OrganizationId
+	}
+	return ""
+}
+
+func (x *ListNoFlyZonesRequest) GetActiveOnly() bool {
+	if x != nil && x.ActiveOnly != nil {
+		return *x.ActiveOnly
+	}
+	return false
+}
+
+type UpsertNoFlyZoneRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Base  *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	// id, organization_id and a POLYGON area of at least three vertices are required; type is always
+	// stored as NO_FLY. Unset enforcement_type = HARD_BLOCK, unset active = true.
+	Zone          *proto5.MissionZoneProtoDTO `protobuf:"bytes,2,opt,name=zone,proto3" json:"zone,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpsertNoFlyZoneRequest) Reset() {
+	*x = UpsertNoFlyZoneRequest{}
+	mi := &file_connector_proto_msgTypes[99]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpsertNoFlyZoneRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpsertNoFlyZoneRequest) ProtoMessage() {}
+
+func (x *UpsertNoFlyZoneRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[99]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpsertNoFlyZoneRequest.ProtoReflect.Descriptor instead.
+func (*UpsertNoFlyZoneRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{99}
+}
+
+func (x *UpsertNoFlyZoneRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *UpsertNoFlyZoneRequest) GetZone() *proto5.MissionZoneProtoDTO {
+	if x != nil {
+		return x.Zone
+	}
+	return nil
+}
+
+type DeleteNoFlyZoneRequest struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Base           *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Id             string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	OrganizationId string                 `protobuf:"bytes,3,opt,name=organization_id,json=organizationId,proto3" json:"organization_id,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *DeleteNoFlyZoneRequest) Reset() {
+	*x = DeleteNoFlyZoneRequest{}
+	mi := &file_connector_proto_msgTypes[100]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteNoFlyZoneRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteNoFlyZoneRequest) ProtoMessage() {}
+
+func (x *DeleteNoFlyZoneRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[100]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteNoFlyZoneRequest.ProtoReflect.Descriptor instead.
+func (*DeleteNoFlyZoneRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{100}
+}
+
+func (x *DeleteNoFlyZoneRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *DeleteNoFlyZoneRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *DeleteNoFlyZoneRequest) GetOrganizationId() string {
+	if x != nil {
+		return x.OrganizationId
+	}
+	return ""
+}
+
+type NoFlyZoneListResponse struct {
+	state         protoimpl.MessageState        `protogen:"open.v1"`
+	Tid           string                        `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
+	HasErrors     bool                          `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Timestamp     *timestamppb.Timestamp        `protobuf:"bytes,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Error         *proto.GlobalErrorMessage     `protobuf:"bytes,4,opt,name=error,proto3,oneof" json:"error,omitempty"`
+	Zones         []*proto5.MissionZoneProtoDTO `protobuf:"bytes,5,rep,name=zones,proto3" json:"zones,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *NoFlyZoneListResponse) Reset() {
+	*x = NoFlyZoneListResponse{}
+	mi := &file_connector_proto_msgTypes[101]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *NoFlyZoneListResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NoFlyZoneListResponse) ProtoMessage() {}
+
+func (x *NoFlyZoneListResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[101]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use NoFlyZoneListResponse.ProtoReflect.Descriptor instead.
+func (*NoFlyZoneListResponse) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{101}
+}
+
+func (x *NoFlyZoneListResponse) GetTid() string {
+	if x != nil {
+		return x.Tid
+	}
+	return ""
+}
+
+func (x *NoFlyZoneListResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *NoFlyZoneListResponse) GetTimestamp() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Timestamp
+	}
+	return nil
+}
+
+func (x *NoFlyZoneListResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		return x.Error
+	}
+	return nil
+}
+
+func (x *NoFlyZoneListResponse) GetZones() []*proto5.MissionZoneProtoDTO {
+	if x != nil {
+		return x.Zones
+	}
+	return nil
+}
+
+type NoFlyZoneSingleResponse struct {
+	state         protoimpl.MessageState      `protogen:"open.v1"`
+	Tid           string                      `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
+	HasErrors     bool                        `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Timestamp     *timestamppb.Timestamp      `protobuf:"bytes,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Error         *proto.GlobalErrorMessage   `protobuf:"bytes,4,opt,name=error,proto3,oneof" json:"error,omitempty"`
+	Zone          *proto5.MissionZoneProtoDTO `protobuf:"bytes,5,opt,name=zone,proto3,oneof" json:"zone,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *NoFlyZoneSingleResponse) Reset() {
+	*x = NoFlyZoneSingleResponse{}
+	mi := &file_connector_proto_msgTypes[102]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *NoFlyZoneSingleResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NoFlyZoneSingleResponse) ProtoMessage() {}
+
+func (x *NoFlyZoneSingleResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[102]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use NoFlyZoneSingleResponse.ProtoReflect.Descriptor instead.
+func (*NoFlyZoneSingleResponse) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{102}
+}
+
+func (x *NoFlyZoneSingleResponse) GetTid() string {
+	if x != nil {
+		return x.Tid
+	}
+	return ""
+}
+
+func (x *NoFlyZoneSingleResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *NoFlyZoneSingleResponse) GetTimestamp() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Timestamp
+	}
+	return nil
+}
+
+func (x *NoFlyZoneSingleResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		return x.Error
+	}
+	return nil
+}
+
+func (x *NoFlyZoneSingleResponse) GetZone() *proto5.MissionZoneProtoDTO {
+	if x != nil {
+		return x.Zone
+	}
+	return nil
+}
+
+type DeleteNoFlyZoneResponse struct {
+	state         protoimpl.MessageState    `protogen:"open.v1"`
+	Tid           string                    `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
+	HasErrors     bool                      `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Timestamp     *timestamppb.Timestamp    `protobuf:"bytes,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Error         *proto.GlobalErrorMessage `protobuf:"bytes,4,opt,name=error,proto3,oneof" json:"error,omitempty"`
+	Deleted       bool                      `protobuf:"varint,5,opt,name=deleted,proto3" json:"deleted,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteNoFlyZoneResponse) Reset() {
+	*x = DeleteNoFlyZoneResponse{}
+	mi := &file_connector_proto_msgTypes[103]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteNoFlyZoneResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteNoFlyZoneResponse) ProtoMessage() {}
+
+func (x *DeleteNoFlyZoneResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[103]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteNoFlyZoneResponse.ProtoReflect.Descriptor instead.
+func (*DeleteNoFlyZoneResponse) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{103}
+}
+
+func (x *DeleteNoFlyZoneResponse) GetTid() string {
+	if x != nil {
+		return x.Tid
+	}
+	return ""
+}
+
+func (x *DeleteNoFlyZoneResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *DeleteNoFlyZoneResponse) GetTimestamp() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Timestamp
+	}
+	return nil
+}
+
+func (x *DeleteNoFlyZoneResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		return x.Error
+	}
+	return nil
+}
+
+func (x *DeleteNoFlyZoneResponse) GetDeleted() bool {
+	if x != nil {
+		return x.Deleted
+	}
+	return false
+}
+
+type ProvisionLicensedOrganizationRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Base  *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	// Required UUID: the organization_id claim of the verified license lease.
+	OrganizationId string `protobuf:"bytes,2,opt,name=organization_id,json=organizationId,proto3" json:"organization_id,omitempty"`
+	// Required: the organization's name (the license's organization_name claim, or what the
+	// administrator entered when the license carries none).
+	Name        string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Description string `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
+	// Required: the activation of that license; credentials.organization_id must equal organization_id.
+	Credentials   *LicenseActivationCredentialsProtoDTO `protobuf:"bytes,5,opt,name=credentials,proto3" json:"credentials,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ProvisionLicensedOrganizationRequest) Reset() {
+	*x = ProvisionLicensedOrganizationRequest{}
+	mi := &file_connector_proto_msgTypes[104]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ProvisionLicensedOrganizationRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ProvisionLicensedOrganizationRequest) ProtoMessage() {}
+
+func (x *ProvisionLicensedOrganizationRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[104]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ProvisionLicensedOrganizationRequest.ProtoReflect.Descriptor instead.
+func (*ProvisionLicensedOrganizationRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{104}
+}
+
+func (x *ProvisionLicensedOrganizationRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *ProvisionLicensedOrganizationRequest) GetOrganizationId() string {
+	if x != nil {
+		return x.OrganizationId
+	}
+	return ""
+}
+
+func (x *ProvisionLicensedOrganizationRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *ProvisionLicensedOrganizationRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *ProvisionLicensedOrganizationRequest) GetCredentials() *LicenseActivationCredentialsProtoDTO {
+	if x != nil {
+		return x.Credentials
+	}
+	return nil
+}
+
+type ProvisionLicensedOrganizationResponse struct {
+	state     protoimpl.MessageState    `protogen:"open.v1"`
+	Tid       string                    `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
+	HasErrors bool                      `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Timestamp *timestamppb.Timestamp    `protobuf:"bytes,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Error     *proto.GlobalErrorMessage `protobuf:"bytes,4,opt,name=error,proto3,oneof" json:"error,omitempty"`
+	// The created organization, or the existing one when already_exists.
+	Organization *proto2.OrganizationProtoDTO `protobuf:"bytes,5,opt,name=organization,proto3,oneof" json:"organization,omitempty"`
+	// The id already existed: nothing was created and no credentials were stored.
+	AlreadyExists bool `protobuf:"varint,6,opt,name=already_exists,json=alreadyExists,proto3" json:"already_exists,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ProvisionLicensedOrganizationResponse) Reset() {
+	*x = ProvisionLicensedOrganizationResponse{}
+	mi := &file_connector_proto_msgTypes[105]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ProvisionLicensedOrganizationResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ProvisionLicensedOrganizationResponse) ProtoMessage() {}
+
+func (x *ProvisionLicensedOrganizationResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[105]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ProvisionLicensedOrganizationResponse.ProtoReflect.Descriptor instead.
+func (*ProvisionLicensedOrganizationResponse) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{105}
+}
+
+func (x *ProvisionLicensedOrganizationResponse) GetTid() string {
+	if x != nil {
+		return x.Tid
+	}
+	return ""
+}
+
+func (x *ProvisionLicensedOrganizationResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *ProvisionLicensedOrganizationResponse) GetTimestamp() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Timestamp
+	}
+	return nil
+}
+
+func (x *ProvisionLicensedOrganizationResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		return x.Error
+	}
+	return nil
+}
+
+func (x *ProvisionLicensedOrganizationResponse) GetOrganization() *proto2.OrganizationProtoDTO {
+	if x != nil {
+		return x.Organization
+	}
+	return nil
+}
+
+func (x *ProvisionLicensedOrganizationResponse) GetAlreadyExists() bool {
+	if x != nil {
+		return x.AlreadyExists
+	}
+	return false
+}
+
+type LicenseActivationCredentialsProtoDTO struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The organization the activation licenses (an existing organization; deleting it deletes this).
+	OrganizationId string `protobuf:"bytes,1,opt,name=organization_id,json=organizationId,proto3" json:"organization_id,omitempty"`
+	// The hub's activation id. Not secret: every lease carries it as activation_id.
+	ActivationId string `protobuf:"bytes,2,opt,name=activation_id,json=activationId,proto3" json:"activation_id,omitempty"`
+	// The activation token, sealed by admin-console: nonce(12) || AES-256-GCM ciphertext+tag.
+	SealedToken []byte `protobuf:"bytes,3,opt,name=sealed_token,json=sealedToken,proto3" json:"sealed_token,omitempty"`
+	// How sealed_token was sealed, so a later key or scheme change can tell old records apart.
+	SealingScheme string                 `protobuf:"bytes,4,opt,name=sealing_scheme,json=sealingScheme,proto3" json:"sealing_scheme,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3,oneof" json:"created_at,omitempty"`
+	ModifiedAt    *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=modified_at,json=modifiedAt,proto3,oneof" json:"modified_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LicenseActivationCredentialsProtoDTO) Reset() {
+	*x = LicenseActivationCredentialsProtoDTO{}
+	mi := &file_connector_proto_msgTypes[106]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LicenseActivationCredentialsProtoDTO) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LicenseActivationCredentialsProtoDTO) ProtoMessage() {}
+
+func (x *LicenseActivationCredentialsProtoDTO) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[106]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LicenseActivationCredentialsProtoDTO.ProtoReflect.Descriptor instead.
+func (*LicenseActivationCredentialsProtoDTO) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{106}
+}
+
+func (x *LicenseActivationCredentialsProtoDTO) GetOrganizationId() string {
+	if x != nil {
+		return x.OrganizationId
+	}
+	return ""
+}
+
+func (x *LicenseActivationCredentialsProtoDTO) GetActivationId() string {
+	if x != nil {
+		return x.ActivationId
+	}
+	return ""
+}
+
+func (x *LicenseActivationCredentialsProtoDTO) GetSealedToken() []byte {
+	if x != nil {
+		return x.SealedToken
+	}
+	return nil
+}
+
+func (x *LicenseActivationCredentialsProtoDTO) GetSealingScheme() string {
+	if x != nil {
+		return x.SealingScheme
+	}
+	return ""
+}
+
+func (x *LicenseActivationCredentialsProtoDTO) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *LicenseActivationCredentialsProtoDTO) GetModifiedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.ModifiedAt
+	}
+	return nil
+}
+
+type ListLicenseActivationCredentialsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListLicenseActivationCredentialsRequest) Reset() {
+	*x = ListLicenseActivationCredentialsRequest{}
+	mi := &file_connector_proto_msgTypes[107]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListLicenseActivationCredentialsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListLicenseActivationCredentialsRequest) ProtoMessage() {}
+
+func (x *ListLicenseActivationCredentialsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[107]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListLicenseActivationCredentialsRequest.ProtoReflect.Descriptor instead.
+func (*ListLicenseActivationCredentialsRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{107}
+}
+
+func (x *ListLicenseActivationCredentialsRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+type GetLicenseActivationCredentialsRequest struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Base           *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	OrganizationId string                 `protobuf:"bytes,2,opt,name=organization_id,json=organizationId,proto3" json:"organization_id,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *GetLicenseActivationCredentialsRequest) Reset() {
+	*x = GetLicenseActivationCredentialsRequest{}
+	mi := &file_connector_proto_msgTypes[108]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetLicenseActivationCredentialsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetLicenseActivationCredentialsRequest) ProtoMessage() {}
+
+func (x *GetLicenseActivationCredentialsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[108]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetLicenseActivationCredentialsRequest.ProtoReflect.Descriptor instead.
+func (*GetLicenseActivationCredentialsRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{108}
+}
+
+func (x *GetLicenseActivationCredentialsRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *GetLicenseActivationCredentialsRequest) GetOrganizationId() string {
+	if x != nil {
+		return x.OrganizationId
+	}
+	return ""
+}
+
+type PutLicenseActivationCredentialsRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Base  *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	// organization_id, activation_id, sealed_token and sealing_scheme are required.
+	Credentials   *LicenseActivationCredentialsProtoDTO `protobuf:"bytes,2,opt,name=credentials,proto3" json:"credentials,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PutLicenseActivationCredentialsRequest) Reset() {
+	*x = PutLicenseActivationCredentialsRequest{}
+	mi := &file_connector_proto_msgTypes[109]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PutLicenseActivationCredentialsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PutLicenseActivationCredentialsRequest) ProtoMessage() {}
+
+func (x *PutLicenseActivationCredentialsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[109]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PutLicenseActivationCredentialsRequest.ProtoReflect.Descriptor instead.
+func (*PutLicenseActivationCredentialsRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{109}
+}
+
+func (x *PutLicenseActivationCredentialsRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *PutLicenseActivationCredentialsRequest) GetCredentials() *LicenseActivationCredentialsProtoDTO {
+	if x != nil {
+		return x.Credentials
+	}
+	return nil
+}
+
+type DeleteLicenseActivationCredentialsRequest struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Base           *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	OrganizationId string                 `protobuf:"bytes,2,opt,name=organization_id,json=organizationId,proto3" json:"organization_id,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *DeleteLicenseActivationCredentialsRequest) Reset() {
+	*x = DeleteLicenseActivationCredentialsRequest{}
+	mi := &file_connector_proto_msgTypes[110]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteLicenseActivationCredentialsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteLicenseActivationCredentialsRequest) ProtoMessage() {}
+
+func (x *DeleteLicenseActivationCredentialsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[110]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteLicenseActivationCredentialsRequest.ProtoReflect.Descriptor instead.
+func (*DeleteLicenseActivationCredentialsRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{110}
+}
+
+func (x *DeleteLicenseActivationCredentialsRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *DeleteLicenseActivationCredentialsRequest) GetOrganizationId() string {
+	if x != nil {
+		return x.OrganizationId
+	}
+	return ""
+}
+
+type LicenseActivationCredentialsListResponse struct {
+	state         protoimpl.MessageState                  `protogen:"open.v1"`
+	Tid           string                                  `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
+	HasErrors     bool                                    `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Timestamp     *timestamppb.Timestamp                  `protobuf:"bytes,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Error         *proto.GlobalErrorMessage               `protobuf:"bytes,4,opt,name=error,proto3,oneof" json:"error,omitempty"`
+	Credentials   []*LicenseActivationCredentialsProtoDTO `protobuf:"bytes,5,rep,name=credentials,proto3" json:"credentials,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LicenseActivationCredentialsListResponse) Reset() {
+	*x = LicenseActivationCredentialsListResponse{}
+	mi := &file_connector_proto_msgTypes[111]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LicenseActivationCredentialsListResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LicenseActivationCredentialsListResponse) ProtoMessage() {}
+
+func (x *LicenseActivationCredentialsListResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[111]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LicenseActivationCredentialsListResponse.ProtoReflect.Descriptor instead.
+func (*LicenseActivationCredentialsListResponse) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{111}
+}
+
+func (x *LicenseActivationCredentialsListResponse) GetTid() string {
+	if x != nil {
+		return x.Tid
+	}
+	return ""
+}
+
+func (x *LicenseActivationCredentialsListResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *LicenseActivationCredentialsListResponse) GetTimestamp() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Timestamp
+	}
+	return nil
+}
+
+func (x *LicenseActivationCredentialsListResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		return x.Error
+	}
+	return nil
+}
+
+func (x *LicenseActivationCredentialsListResponse) GetCredentials() []*LicenseActivationCredentialsProtoDTO {
+	if x != nil {
+		return x.Credentials
+	}
+	return nil
+}
+
+type LicenseActivationCredentialsSingleResponse struct {
+	state     protoimpl.MessageState    `protogen:"open.v1"`
+	Tid       string                    `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
+	HasErrors bool                      `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Timestamp *timestamppb.Timestamp    `protobuf:"bytes,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Error     *proto.GlobalErrorMessage `protobuf:"bytes,4,opt,name=error,proto3,oneof" json:"error,omitempty"`
+	// Unset on a Get for an organization that has none.
+	Credentials   *LicenseActivationCredentialsProtoDTO `protobuf:"bytes,5,opt,name=credentials,proto3,oneof" json:"credentials,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LicenseActivationCredentialsSingleResponse) Reset() {
+	*x = LicenseActivationCredentialsSingleResponse{}
+	mi := &file_connector_proto_msgTypes[112]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LicenseActivationCredentialsSingleResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LicenseActivationCredentialsSingleResponse) ProtoMessage() {}
+
+func (x *LicenseActivationCredentialsSingleResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[112]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LicenseActivationCredentialsSingleResponse.ProtoReflect.Descriptor instead.
+func (*LicenseActivationCredentialsSingleResponse) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{112}
+}
+
+func (x *LicenseActivationCredentialsSingleResponse) GetTid() string {
+	if x != nil {
+		return x.Tid
+	}
+	return ""
+}
+
+func (x *LicenseActivationCredentialsSingleResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *LicenseActivationCredentialsSingleResponse) GetTimestamp() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Timestamp
+	}
+	return nil
+}
+
+func (x *LicenseActivationCredentialsSingleResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		return x.Error
+	}
+	return nil
+}
+
+func (x *LicenseActivationCredentialsSingleResponse) GetCredentials() *LicenseActivationCredentialsProtoDTO {
+	if x != nil {
+		return x.Credentials
+	}
+	return nil
+}
+
+type DeleteLicenseActivationCredentialsResponse struct {
+	state         protoimpl.MessageState    `protogen:"open.v1"`
+	Tid           string                    `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
+	HasErrors     bool                      `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Timestamp     *timestamppb.Timestamp    `protobuf:"bytes,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Error         *proto.GlobalErrorMessage `protobuf:"bytes,4,opt,name=error,proto3,oneof" json:"error,omitempty"`
+	Deleted       bool                      `protobuf:"varint,5,opt,name=deleted,proto3" json:"deleted,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteLicenseActivationCredentialsResponse) Reset() {
+	*x = DeleteLicenseActivationCredentialsResponse{}
+	mi := &file_connector_proto_msgTypes[113]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteLicenseActivationCredentialsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteLicenseActivationCredentialsResponse) ProtoMessage() {}
+
+func (x *DeleteLicenseActivationCredentialsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[113]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteLicenseActivationCredentialsResponse.ProtoReflect.Descriptor instead.
+func (*DeleteLicenseActivationCredentialsResponse) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{113}
+}
+
+func (x *DeleteLicenseActivationCredentialsResponse) GetTid() string {
+	if x != nil {
+		return x.Tid
+	}
+	return ""
+}
+
+func (x *DeleteLicenseActivationCredentialsResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *DeleteLicenseActivationCredentialsResponse) GetTimestamp() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Timestamp
+	}
+	return nil
+}
+
+func (x *DeleteLicenseActivationCredentialsResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		return x.Error
+	}
+	return nil
+}
+
+func (x *DeleteLicenseActivationCredentialsResponse) GetDeleted() bool {
+	if x != nil {
+		return x.Deleted
+	}
+	return false
+}
+
+type EventTriggerProtoDTO struct {
+	state  protoimpl.MessageState `protogen:"open.v1"`
+	Id     *string                `protobuf:"bytes,1,opt,name=id,proto3,oneof" json:"id,omitempty"`
+	Name   string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Active bool                   `protobuf:"varint,3,opt,name=active,proto3" json:"active,omitempty"`
+	// DETECTION | TELEMETRY_THRESHOLD | ASSET_STATUS | WEBHOOK | INTEGRATION -- plain string, validated server-side
+	// against a real enum, same "proto stays a plain string, Java owns the closed vocabulary" trade
+	// PolicyProtoDTO.scope already makes.
+	EventType string `protobuf:"bytes,4,opt,name=event_type,json=eventType,proto3" json:"event_type,omitempty"`
+	// DETECTION: filters which asset's detections this watches, blank = any registered asset.
+	// TELEMETRY_THRESHOLD / ASSET_STATUS: which asset's telemetry this watches, blank = any
+	// registered asset (checked each poll). Unused for WEBHOOK.
+	AssetSn       *string  `protobuf:"bytes,5,opt,name=asset_sn,json=assetSn,proto3,oneof" json:"asset_sn,omitempty"`
+	ObjectType    *string  `protobuf:"bytes,6,opt,name=object_type,json=objectType,proto3,oneof" json:"object_type,omitempty"`            // DETECTION filter, e.g. "person"
+	MinConfidence *float32 `protobuf:"fixed32,7,opt,name=min_confidence,json=minConfidence,proto3,oneof" json:"min_confidence,omitempty"` // DETECTION filter
+	// TELEMETRY_THRESHOLD / ASSET_STATUS: which AssetTelemetryProto field to read, e.g.
+	// "batteryPercentage", "altitude", "temperature", "isOnline", "operationalMode".
+	TelemetryField     *string `protobuf:"bytes,8,opt,name=telemetry_field,json=telemetryField,proto3,oneof" json:"telemetry_field,omitempty"`
+	ComparisonOperator string  `protobuf:"bytes,9,opt,name=comparison_operator,json=comparisonOperator,proto3" json:"comparison_operator,omitempty"` // LESS_THAN | GREATER_THAN | EQUALS | NOT_EQUALS
+	ComparisonValue    *string `protobuf:"bytes,10,opt,name=comparison_value,json=comparisonValue,proto3,oneof" json:"comparison_value,omitempty"`
+	// WEBHOOK: the shared secret an inbound POST must present. Generated server-side on create,
+	// never client-supplied.
+	WebhookToken            *string                `protobuf:"bytes,11,opt,name=webhook_token,json=webhookToken,proto3,oneof" json:"webhook_token,omitempty"`
+	ApplicationId           string                 `protobuf:"bytes,12,opt,name=application_id,json=applicationId,proto3" json:"application_id,omitempty"`
+	SkillId                 string                 `protobuf:"bytes,13,opt,name=skill_id,json=skillId,proto3" json:"skill_id,omitempty"`
+	ExecutionParametersJson *string                `protobuf:"bytes,14,opt,name=execution_parameters_json,json=executionParametersJson,proto3,oneof" json:"execution_parameters_json,omitempty"`
+	AutoStart               bool                   `protobuf:"varint,15,opt,name=auto_start,json=autoStart,proto3" json:"auto_start,omitempty"`
+	CooldownSeconds         int32                  `protobuf:"varint,16,opt,name=cooldown_seconds,json=cooldownSeconds,proto3" json:"cooldown_seconds,omitempty"`
+	LastFiredAt             *timestamppb.Timestamp `protobuf:"bytes,17,opt,name=last_fired_at,json=lastFiredAt,proto3,oneof" json:"last_fired_at,omitempty"`
+	CreatedAt               *timestamppb.Timestamp `protobuf:"bytes,18,opt,name=created_at,json=createdAt,proto3,oneof" json:"created_at,omitempty"`
+	ModifiedAt              *timestamppb.Timestamp `protobuf:"bytes,19,opt,name=modified_at,json=modifiedAt,proto3,oneof" json:"modified_at,omitempty"`
+	// INTEGRATION: the Integration Hub bridge whose messages this watches. The bridge is the unit
+	// that has a payload shape (its mapping names every field), so it is what a condition can be
+	// written against -- the same reason a capability contract follows a bridge and not a connector.
+	// Unused for every other event type.
+	BridgeId *string `protobuf:"bytes,20,opt,name=bridge_id,json=bridgeId,proto3,oneof" json:"bridge_id,omitempty"`
+	// DETECTION: which asset runs the Application. Blank or DETECTING_ASSET -- the asset that saw it
+	// (the behaviour before this field). POLICY_SELECTED -- the platform's asset selection picks one,
+	// aimed at the detection's position (e.g. the nearest aircraft to what a radar saw). Plain string,
+	// validated server-side, like event_type.
+	DispatchTarget *string `protobuf:"bytes,21,opt,name=dispatch_target,json=dispatchTarget,proto3,oneof" json:"dispatch_target,omitempty"`
+	// 0..100, how much this alarm matters. Carried into the execution it starts (options.priority):
+	// an asset busy with another execution is only taken over when this is strictly higher than that
+	// execution's priority. Unset on the wire = 75: above scheduled routine work (50), far above a
+	// manual run (0).
+	Priority *int32 `protobuf:"varint,22,opt,name=priority,proto3,oneof" json:"priority,omitempty"`
+	// The organization this trigger belongs to. Set server-side from the caller's token when it is
+	// created (a system admin may choose one); every execution it starts carries it, so policy
+	// selection, an Application's organization scope and who may see the run all work. Unset = a
+	// system-wide trigger, visible to system admins only.
+	OrganizationId *string `protobuf:"bytes,23,opt,name=organization_id,json=organizationId,proto3,oneof" json:"organization_id,omitempty"`
+	// DETECTION / TELEMETRY_THRESHOLD / ASSET_STATUS: the site (theatre) this trigger protects. Set,
+	// only events whose position lies inside that theatre's geo_zone fire it, and the run it starts
+	// records the theatre and chooses its assets from the site first. Unset = anywhere, as before.
+	// On an update: absent keeps the current site, present and blank clears it.
+	TheatreId *string `protobuf:"bytes,24,opt,name=theatre_id,json=theatreId,proto3,oneof" json:"theatre_id,omitempty"`
+	// Output only: why the platform switched this trigger off (its Application was deleted, its
+	// Skill is no longer in the version it would run, or that version needs an input the trigger
+	// never provides). Cleared when the trigger is switched on again.
+	AttentionReason *string `protobuf:"bytes,25,opt,name=attention_reason,json=attentionReason,proto3,oneof" json:"attention_reason,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *EventTriggerProtoDTO) Reset() {
+	*x = EventTriggerProtoDTO{}
+	mi := &file_connector_proto_msgTypes[114]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EventTriggerProtoDTO) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EventTriggerProtoDTO) ProtoMessage() {}
+
+func (x *EventTriggerProtoDTO) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[114]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EventTriggerProtoDTO.ProtoReflect.Descriptor instead.
+func (*EventTriggerProtoDTO) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{114}
+}
+
+func (x *EventTriggerProtoDTO) GetId() string {
+	if x != nil && x.Id != nil {
+		return *x.Id
+	}
+	return ""
+}
+
+func (x *EventTriggerProtoDTO) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *EventTriggerProtoDTO) GetActive() bool {
+	if x != nil {
+		return x.Active
+	}
+	return false
+}
+
+func (x *EventTriggerProtoDTO) GetEventType() string {
+	if x != nil {
+		return x.EventType
+	}
+	return ""
+}
+
+func (x *EventTriggerProtoDTO) GetAssetSn() string {
+	if x != nil && x.AssetSn != nil {
+		return *x.AssetSn
+	}
+	return ""
+}
+
+func (x *EventTriggerProtoDTO) GetObjectType() string {
+	if x != nil && x.ObjectType != nil {
+		return *x.ObjectType
+	}
+	return ""
+}
+
+func (x *EventTriggerProtoDTO) GetMinConfidence() float32 {
+	if x != nil && x.MinConfidence != nil {
+		return *x.MinConfidence
+	}
+	return 0
+}
+
+func (x *EventTriggerProtoDTO) GetTelemetryField() string {
+	if x != nil && x.TelemetryField != nil {
+		return *x.TelemetryField
+	}
+	return ""
+}
+
+func (x *EventTriggerProtoDTO) GetComparisonOperator() string {
+	if x != nil {
+		return x.ComparisonOperator
+	}
+	return ""
+}
+
+func (x *EventTriggerProtoDTO) GetComparisonValue() string {
+	if x != nil && x.ComparisonValue != nil {
+		return *x.ComparisonValue
+	}
+	return ""
+}
+
+func (x *EventTriggerProtoDTO) GetWebhookToken() string {
+	if x != nil && x.WebhookToken != nil {
+		return *x.WebhookToken
+	}
+	return ""
+}
+
+func (x *EventTriggerProtoDTO) GetApplicationId() string {
+	if x != nil {
+		return x.ApplicationId
+	}
+	return ""
+}
+
+func (x *EventTriggerProtoDTO) GetSkillId() string {
+	if x != nil {
+		return x.SkillId
+	}
+	return ""
+}
+
+func (x *EventTriggerProtoDTO) GetExecutionParametersJson() string {
+	if x != nil && x.ExecutionParametersJson != nil {
+		return *x.ExecutionParametersJson
+	}
+	return ""
+}
+
+func (x *EventTriggerProtoDTO) GetAutoStart() bool {
+	if x != nil {
+		return x.AutoStart
+	}
+	return false
+}
+
+func (x *EventTriggerProtoDTO) GetCooldownSeconds() int32 {
+	if x != nil {
+		return x.CooldownSeconds
+	}
+	return 0
+}
+
+func (x *EventTriggerProtoDTO) GetLastFiredAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.LastFiredAt
+	}
+	return nil
+}
+
+func (x *EventTriggerProtoDTO) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *EventTriggerProtoDTO) GetModifiedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.ModifiedAt
+	}
+	return nil
+}
+
+func (x *EventTriggerProtoDTO) GetBridgeId() string {
+	if x != nil && x.BridgeId != nil {
+		return *x.BridgeId
+	}
+	return ""
+}
+
+func (x *EventTriggerProtoDTO) GetDispatchTarget() string {
+	if x != nil && x.DispatchTarget != nil {
+		return *x.DispatchTarget
+	}
+	return ""
+}
+
+func (x *EventTriggerProtoDTO) GetPriority() int32 {
+	if x != nil && x.Priority != nil {
+		return *x.Priority
+	}
+	return 0
+}
+
+func (x *EventTriggerProtoDTO) GetOrganizationId() string {
+	if x != nil && x.OrganizationId != nil {
+		return *x.OrganizationId
+	}
+	return ""
+}
+
+func (x *EventTriggerProtoDTO) GetTheatreId() string {
+	if x != nil && x.TheatreId != nil {
+		return *x.TheatreId
+	}
+	return ""
+}
+
+func (x *EventTriggerProtoDTO) GetAttentionReason() string {
+	if x != nil && x.AttentionReason != nil {
+		return *x.AttentionReason
+	}
+	return ""
+}
+
+type EventTriggerProtoDTOList struct {
+	state         protoimpl.MessageState  `protogen:"open.v1"`
+	EventTriggers []*EventTriggerProtoDTO `protobuf:"bytes,1,rep,name=event_triggers,json=eventTriggers,proto3" json:"event_triggers,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EventTriggerProtoDTOList) Reset() {
+	*x = EventTriggerProtoDTOList{}
+	mi := &file_connector_proto_msgTypes[115]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EventTriggerProtoDTOList) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EventTriggerProtoDTOList) ProtoMessage() {}
+
+func (x *EventTriggerProtoDTOList) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[115]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EventTriggerProtoDTOList.ProtoReflect.Descriptor instead.
+func (*EventTriggerProtoDTOList) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{115}
+}
+
+func (x *EventTriggerProtoDTOList) GetEventTriggers() []*EventTriggerProtoDTO {
+	if x != nil {
+		return x.EventTriggers
+	}
+	return nil
+}
+
+type ConnectorGetAllEventTriggersRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Base  *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	// True restricts to active triggers only -- what mission-autonomy's polling evaluator uses;
+	// the admin screen leaves this false to show everything, active or not.
+	ActiveOnly    bool `protobuf:"varint,2,opt,name=active_only,json=activeOnly,proto3" json:"active_only,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ConnectorGetAllEventTriggersRequest) Reset() {
+	*x = ConnectorGetAllEventTriggersRequest{}
+	mi := &file_connector_proto_msgTypes[116]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConnectorGetAllEventTriggersRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConnectorGetAllEventTriggersRequest) ProtoMessage() {}
+
+func (x *ConnectorGetAllEventTriggersRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[116]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConnectorGetAllEventTriggersRequest.ProtoReflect.Descriptor instead.
+func (*ConnectorGetAllEventTriggersRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{116}
+}
+
+func (x *ConnectorGetAllEventTriggersRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *ConnectorGetAllEventTriggersRequest) GetActiveOnly() bool {
+	if x != nil {
+		return x.ActiveOnly
+	}
+	return false
+}
+
+type GetEventTriggerByIdRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Id            string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetEventTriggerByIdRequest) Reset() {
+	*x = GetEventTriggerByIdRequest{}
+	mi := &file_connector_proto_msgTypes[117]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetEventTriggerByIdRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetEventTriggerByIdRequest) ProtoMessage() {}
+
+func (x *GetEventTriggerByIdRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[117]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetEventTriggerByIdRequest.ProtoReflect.Descriptor instead.
+func (*GetEventTriggerByIdRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{117}
+}
+
+func (x *GetEventTriggerByIdRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *GetEventTriggerByIdRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type CreateEventTriggerRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	EventTrigger  *EventTriggerProtoDTO  `protobuf:"bytes,2,opt,name=event_trigger,json=eventTrigger,proto3" json:"event_trigger,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateEventTriggerRequest) Reset() {
+	*x = CreateEventTriggerRequest{}
+	mi := &file_connector_proto_msgTypes[118]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateEventTriggerRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateEventTriggerRequest) ProtoMessage() {}
+
+func (x *CreateEventTriggerRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[118]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateEventTriggerRequest.ProtoReflect.Descriptor instead.
+func (*CreateEventTriggerRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{118}
+}
+
+func (x *CreateEventTriggerRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *CreateEventTriggerRequest) GetEventTrigger() *EventTriggerProtoDTO {
+	if x != nil {
+		return x.EventTrigger
+	}
+	return nil
+}
+
+type UpdateEventTriggerRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Id            string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	EventTrigger  *EventTriggerProtoDTO  `protobuf:"bytes,3,opt,name=event_trigger,json=eventTrigger,proto3" json:"event_trigger,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateEventTriggerRequest) Reset() {
+	*x = UpdateEventTriggerRequest{}
+	mi := &file_connector_proto_msgTypes[119]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateEventTriggerRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateEventTriggerRequest) ProtoMessage() {}
+
+func (x *UpdateEventTriggerRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[119]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateEventTriggerRequest.ProtoReflect.Descriptor instead.
+func (*UpdateEventTriggerRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{119}
+}
+
+func (x *UpdateEventTriggerRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *UpdateEventTriggerRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdateEventTriggerRequest) GetEventTrigger() *EventTriggerProtoDTO {
+	if x != nil {
+		return x.EventTrigger
+	}
+	return nil
+}
+
+type DeleteEventTriggerRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Id            string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteEventTriggerRequest) Reset() {
+	*x = DeleteEventTriggerRequest{}
+	mi := &file_connector_proto_msgTypes[120]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteEventTriggerRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteEventTriggerRequest) ProtoMessage() {}
+
+func (x *DeleteEventTriggerRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[120]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteEventTriggerRequest.ProtoReflect.Descriptor instead.
+func (*DeleteEventTriggerRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{120}
+}
+
+func (x *DeleteEventTriggerRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *DeleteEventTriggerRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type RecordEventTriggerFiredRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Id            string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RecordEventTriggerFiredRequest) Reset() {
+	*x = RecordEventTriggerFiredRequest{}
+	mi := &file_connector_proto_msgTypes[121]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RecordEventTriggerFiredRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RecordEventTriggerFiredRequest) ProtoMessage() {}
+
+func (x *RecordEventTriggerFiredRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[121]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RecordEventTriggerFiredRequest.ProtoReflect.Descriptor instead.
+func (*RecordEventTriggerFiredRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{121}
+}
+
+func (x *RecordEventTriggerFiredRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *RecordEventTriggerFiredRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type RegenerateEventTriggerWebhookTokenRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Id            string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RegenerateEventTriggerWebhookTokenRequest) Reset() {
+	*x = RegenerateEventTriggerWebhookTokenRequest{}
+	mi := &file_connector_proto_msgTypes[122]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RegenerateEventTriggerWebhookTokenRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RegenerateEventTriggerWebhookTokenRequest) ProtoMessage() {}
+
+func (x *RegenerateEventTriggerWebhookTokenRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[122]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RegenerateEventTriggerWebhookTokenRequest.ProtoReflect.Descriptor instead.
+func (*RegenerateEventTriggerWebhookTokenRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{122}
+}
+
+func (x *RegenerateEventTriggerWebhookTokenRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *RegenerateEventTriggerWebhookTokenRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+// The webhook firing path (admin-console) looks a trigger up by the token an inbound POST
+// presents, not by id -- the caller (an external system) only ever knows the token.
+type GetEventTriggerByWebhookTokenRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Token         string                 `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetEventTriggerByWebhookTokenRequest) Reset() {
+	*x = GetEventTriggerByWebhookTokenRequest{}
+	mi := &file_connector_proto_msgTypes[123]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetEventTriggerByWebhookTokenRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetEventTriggerByWebhookTokenRequest) ProtoMessage() {}
+
+func (x *GetEventTriggerByWebhookTokenRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[123]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetEventTriggerByWebhookTokenRequest.ProtoReflect.Descriptor instead.
+func (*GetEventTriggerByWebhookTokenRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{123}
+}
+
+func (x *GetEventTriggerByWebhookTokenRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *GetEventTriggerByWebhookTokenRequest) GetToken() string {
+	if x != nil {
+		return x.Token
+	}
+	return ""
+}
+
+type ConnectorEventTriggerResponse struct {
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	Tid       string                 `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
+	HasErrors bool                   `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Timestamp *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	// Types that are valid to be assigned to Response:
+	//
+	//	*ConnectorEventTriggerResponse_Error
+	//	*ConnectorEventTriggerResponse_EventTriggerList
+	Response      isConnectorEventTriggerResponse_Response `protobuf_oneof:"response"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ConnectorEventTriggerResponse) Reset() {
+	*x = ConnectorEventTriggerResponse{}
+	mi := &file_connector_proto_msgTypes[124]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConnectorEventTriggerResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConnectorEventTriggerResponse) ProtoMessage() {}
+
+func (x *ConnectorEventTriggerResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[124]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConnectorEventTriggerResponse.ProtoReflect.Descriptor instead.
+func (*ConnectorEventTriggerResponse) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{124}
+}
+
+func (x *ConnectorEventTriggerResponse) GetTid() string {
+	if x != nil {
+		return x.Tid
+	}
+	return ""
+}
+
+func (x *ConnectorEventTriggerResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *ConnectorEventTriggerResponse) GetTimestamp() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Timestamp
+	}
+	return nil
+}
+
+func (x *ConnectorEventTriggerResponse) GetResponse() isConnectorEventTriggerResponse_Response {
+	if x != nil {
+		return x.Response
+	}
+	return nil
+}
+
+func (x *ConnectorEventTriggerResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		if x, ok := x.Response.(*ConnectorEventTriggerResponse_Error); ok {
+			return x.Error
+		}
+	}
+	return nil
+}
+
+func (x *ConnectorEventTriggerResponse) GetEventTriggerList() *EventTriggerProtoDTOList {
+	if x != nil {
+		if x, ok := x.Response.(*ConnectorEventTriggerResponse_EventTriggerList); ok {
+			return x.EventTriggerList
+		}
+	}
+	return nil
+}
+
+type isConnectorEventTriggerResponse_Response interface {
+	isConnectorEventTriggerResponse_Response()
+}
+
+type ConnectorEventTriggerResponse_Error struct {
+	Error *proto.GlobalErrorMessage `protobuf:"bytes,4,opt,name=error,proto3,oneof"`
+}
+
+type ConnectorEventTriggerResponse_EventTriggerList struct {
+	EventTriggerList *EventTriggerProtoDTOList `protobuf:"bytes,5,opt,name=event_trigger_list,json=eventTriggerList,proto3,oneof"`
+}
+
+func (*ConnectorEventTriggerResponse_Error) isConnectorEventTriggerResponse_Response() {}
+
+func (*ConnectorEventTriggerResponse_EventTriggerList) isConnectorEventTriggerResponse_Response() {}
+
+type ConnectorEventTriggerSingleResponse struct {
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	Tid       string                 `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
+	HasErrors bool                   `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Timestamp *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	// Types that are valid to be assigned to Response:
+	//
+	//	*ConnectorEventTriggerSingleResponse_Error
+	//	*ConnectorEventTriggerSingleResponse_EventTrigger
+	Response      isConnectorEventTriggerSingleResponse_Response `protobuf_oneof:"response"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ConnectorEventTriggerSingleResponse) Reset() {
+	*x = ConnectorEventTriggerSingleResponse{}
+	mi := &file_connector_proto_msgTypes[125]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConnectorEventTriggerSingleResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConnectorEventTriggerSingleResponse) ProtoMessage() {}
+
+func (x *ConnectorEventTriggerSingleResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[125]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConnectorEventTriggerSingleResponse.ProtoReflect.Descriptor instead.
+func (*ConnectorEventTriggerSingleResponse) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{125}
+}
+
+func (x *ConnectorEventTriggerSingleResponse) GetTid() string {
+	if x != nil {
+		return x.Tid
+	}
+	return ""
+}
+
+func (x *ConnectorEventTriggerSingleResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *ConnectorEventTriggerSingleResponse) GetTimestamp() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Timestamp
+	}
+	return nil
+}
+
+func (x *ConnectorEventTriggerSingleResponse) GetResponse() isConnectorEventTriggerSingleResponse_Response {
+	if x != nil {
+		return x.Response
+	}
+	return nil
+}
+
+func (x *ConnectorEventTriggerSingleResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		if x, ok := x.Response.(*ConnectorEventTriggerSingleResponse_Error); ok {
+			return x.Error
+		}
+	}
+	return nil
+}
+
+func (x *ConnectorEventTriggerSingleResponse) GetEventTrigger() *EventTriggerProtoDTO {
+	if x != nil {
+		if x, ok := x.Response.(*ConnectorEventTriggerSingleResponse_EventTrigger); ok {
+			return x.EventTrigger
+		}
+	}
+	return nil
+}
+
+type isConnectorEventTriggerSingleResponse_Response interface {
+	isConnectorEventTriggerSingleResponse_Response()
+}
+
+type ConnectorEventTriggerSingleResponse_Error struct {
+	Error *proto.GlobalErrorMessage `protobuf:"bytes,4,opt,name=error,proto3,oneof"`
+}
+
+type ConnectorEventTriggerSingleResponse_EventTrigger struct {
+	EventTrigger *EventTriggerProtoDTO `protobuf:"bytes,5,opt,name=event_trigger,json=eventTrigger,proto3,oneof"`
+}
+
+func (*ConnectorEventTriggerSingleResponse_Error) isConnectorEventTriggerSingleResponse_Response() {}
+
+func (*ConnectorEventTriggerSingleResponse_EventTrigger) isConnectorEventTriggerSingleResponse_Response() {
+}
+
+type ConnectorDeleteEventTriggerResponse struct {
+	state         protoimpl.MessageState    `protogen:"open.v1"`
+	Tid           string                    `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
+	HasErrors     bool                      `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Timestamp     *timestamppb.Timestamp    `protobuf:"bytes,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Deleted       bool                      `protobuf:"varint,4,opt,name=deleted,proto3" json:"deleted,omitempty"`
+	Error         *proto.GlobalErrorMessage `protobuf:"bytes,5,opt,name=error,proto3,oneof" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ConnectorDeleteEventTriggerResponse) Reset() {
+	*x = ConnectorDeleteEventTriggerResponse{}
+	mi := &file_connector_proto_msgTypes[126]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConnectorDeleteEventTriggerResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConnectorDeleteEventTriggerResponse) ProtoMessage() {}
+
+func (x *ConnectorDeleteEventTriggerResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[126]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConnectorDeleteEventTriggerResponse.ProtoReflect.Descriptor instead.
+func (*ConnectorDeleteEventTriggerResponse) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{126}
+}
+
+func (x *ConnectorDeleteEventTriggerResponse) GetTid() string {
+	if x != nil {
+		return x.Tid
+	}
+	return ""
+}
+
+func (x *ConnectorDeleteEventTriggerResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *ConnectorDeleteEventTriggerResponse) GetTimestamp() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Timestamp
+	}
+	return nil
+}
+
+func (x *ConnectorDeleteEventTriggerResponse) GetDeleted() bool {
+	if x != nil {
+		return x.Deleted
+	}
+	return false
+}
+
+func (x *ConnectorDeleteEventTriggerResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		return x.Error
+	}
+	return nil
+}
+
+type DetectionSummaryProtoDTO struct {
+	state         protoimpl.MessageState    `protogen:"open.v1"`
+	Id            string                    `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	AssetSn       string                    `protobuf:"bytes,2,opt,name=asset_sn,json=assetSn,proto3" json:"asset_sn,omitempty"`
+	ObjectType    string                    `protobuf:"bytes,3,opt,name=object_type,json=objectType,proto3" json:"object_type,omitempty"`
+	Confidence    *float32                  `protobuf:"fixed32,4,opt,name=confidence,proto3,oneof" json:"confidence,omitempty"`
+	DetectedAt    *timestamppb.Timestamp    `protobuf:"bytes,5,opt,name=detected_at,json=detectedAt,proto3" json:"detected_at,omitempty"`
+	ObjectId      *string                   `protobuf:"bytes,6,opt,name=object_id,json=objectId,proto3,oneof" json:"object_id,omitempty"`
+	Position      *proto4.DetectionPosition `protobuf:"bytes,7,opt,name=position,proto3,oneof" json:"position,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DetectionSummaryProtoDTO) Reset() {
+	*x = DetectionSummaryProtoDTO{}
+	mi := &file_connector_proto_msgTypes[127]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DetectionSummaryProtoDTO) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DetectionSummaryProtoDTO) ProtoMessage() {}
+
+func (x *DetectionSummaryProtoDTO) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[127]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DetectionSummaryProtoDTO.ProtoReflect.Descriptor instead.
+func (*DetectionSummaryProtoDTO) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{127}
+}
+
+func (x *DetectionSummaryProtoDTO) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *DetectionSummaryProtoDTO) GetAssetSn() string {
+	if x != nil {
+		return x.AssetSn
+	}
+	return ""
+}
+
+func (x *DetectionSummaryProtoDTO) GetObjectType() string {
+	if x != nil {
+		return x.ObjectType
+	}
+	return ""
+}
+
+func (x *DetectionSummaryProtoDTO) GetConfidence() float32 {
+	if x != nil && x.Confidence != nil {
+		return *x.Confidence
+	}
+	return 0
+}
+
+func (x *DetectionSummaryProtoDTO) GetDetectedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.DetectedAt
+	}
+	return nil
+}
+
+func (x *DetectionSummaryProtoDTO) GetObjectId() string {
+	if x != nil && x.ObjectId != nil {
+		return *x.ObjectId
+	}
+	return ""
+}
+
+func (x *DetectionSummaryProtoDTO) GetPosition() *proto4.DetectionPosition {
+	if x != nil {
+		return x.Position
+	}
+	return nil
+}
+
+type ListRecentDetectionsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Since         *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=since,proto3" json:"since,omitempty"`
+	AssetSn       *string                `protobuf:"bytes,3,opt,name=asset_sn,json=assetSn,proto3,oneof" json:"asset_sn,omitempty"`
+	ObjectType    *string                `protobuf:"bytes,4,opt,name=object_type,json=objectType,proto3,oneof" json:"object_type,omitempty"`
+	MinConfidence *float32               `protobuf:"fixed32,5,opt,name=min_confidence,json=minConfidence,proto3,oneof" json:"min_confidence,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListRecentDetectionsRequest) Reset() {
+	*x = ListRecentDetectionsRequest{}
+	mi := &file_connector_proto_msgTypes[128]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListRecentDetectionsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListRecentDetectionsRequest) ProtoMessage() {}
+
+func (x *ListRecentDetectionsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[128]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListRecentDetectionsRequest.ProtoReflect.Descriptor instead.
+func (*ListRecentDetectionsRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{128}
+}
+
+func (x *ListRecentDetectionsRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *ListRecentDetectionsRequest) GetSince() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Since
+	}
+	return nil
+}
+
+func (x *ListRecentDetectionsRequest) GetAssetSn() string {
+	if x != nil && x.AssetSn != nil {
+		return *x.AssetSn
+	}
+	return ""
+}
+
+func (x *ListRecentDetectionsRequest) GetObjectType() string {
+	if x != nil && x.ObjectType != nil {
+		return *x.ObjectType
+	}
+	return ""
+}
+
+func (x *ListRecentDetectionsRequest) GetMinConfidence() float32 {
+	if x != nil && x.MinConfidence != nil {
+		return *x.MinConfidence
+	}
+	return 0
+}
+
+type ConnectorDetectionListResponse struct {
+	state         protoimpl.MessageState      `protogen:"open.v1"`
+	Tid           string                      `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
+	HasErrors     bool                        `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Timestamp     *timestamppb.Timestamp      `protobuf:"bytes,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Detections    []*DetectionSummaryProtoDTO `protobuf:"bytes,4,rep,name=detections,proto3" json:"detections,omitempty"`
+	Error         *proto.GlobalErrorMessage   `protobuf:"bytes,5,opt,name=error,proto3,oneof" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ConnectorDetectionListResponse) Reset() {
+	*x = ConnectorDetectionListResponse{}
+	mi := &file_connector_proto_msgTypes[129]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConnectorDetectionListResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConnectorDetectionListResponse) ProtoMessage() {}
+
+func (x *ConnectorDetectionListResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[129]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConnectorDetectionListResponse.ProtoReflect.Descriptor instead.
+func (*ConnectorDetectionListResponse) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{129}
+}
+
+func (x *ConnectorDetectionListResponse) GetTid() string {
+	if x != nil {
+		return x.Tid
+	}
+	return ""
+}
+
+func (x *ConnectorDetectionListResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *ConnectorDetectionListResponse) GetTimestamp() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Timestamp
+	}
+	return nil
+}
+
+func (x *ConnectorDetectionListResponse) GetDetections() []*DetectionSummaryProtoDTO {
+	if x != nil {
+		return x.Detections
+	}
+	return nil
+}
+
+func (x *ConnectorDetectionListResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		return x.Error
+	}
+	return nil
+}
+
+type GetLatestTelemetryForAssetRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	AssetSn       string                 `protobuf:"bytes,2,opt,name=asset_sn,json=assetSn,proto3" json:"asset_sn,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetLatestTelemetryForAssetRequest) Reset() {
+	*x = GetLatestTelemetryForAssetRequest{}
+	mi := &file_connector_proto_msgTypes[130]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetLatestTelemetryForAssetRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetLatestTelemetryForAssetRequest) ProtoMessage() {}
+
+func (x *GetLatestTelemetryForAssetRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[130]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetLatestTelemetryForAssetRequest.ProtoReflect.Descriptor instead.
+func (*GetLatestTelemetryForAssetRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{130}
+}
+
+func (x *GetLatestTelemetryForAssetRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *GetLatestTelemetryForAssetRequest) GetAssetSn() string {
+	if x != nil {
+		return x.AssetSn
+	}
+	return ""
+}
+
+type ConnectorTelemetrySingleResponse struct {
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	Tid       string                 `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
+	HasErrors bool                   `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Timestamp *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	// Types that are valid to be assigned to Response:
+	//
+	//	*ConnectorTelemetrySingleResponse_Error
+	//	*ConnectorTelemetrySingleResponse_Telemetry
+	Response      isConnectorTelemetrySingleResponse_Response `protobuf_oneof:"response"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ConnectorTelemetrySingleResponse) Reset() {
+	*x = ConnectorTelemetrySingleResponse{}
+	mi := &file_connector_proto_msgTypes[131]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConnectorTelemetrySingleResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConnectorTelemetrySingleResponse) ProtoMessage() {}
+
+func (x *ConnectorTelemetrySingleResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[131]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConnectorTelemetrySingleResponse.ProtoReflect.Descriptor instead.
+func (*ConnectorTelemetrySingleResponse) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{131}
+}
+
+func (x *ConnectorTelemetrySingleResponse) GetTid() string {
+	if x != nil {
+		return x.Tid
+	}
+	return ""
+}
+
+func (x *ConnectorTelemetrySingleResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *ConnectorTelemetrySingleResponse) GetTimestamp() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Timestamp
+	}
+	return nil
+}
+
+func (x *ConnectorTelemetrySingleResponse) GetResponse() isConnectorTelemetrySingleResponse_Response {
+	if x != nil {
+		return x.Response
+	}
+	return nil
+}
+
+func (x *ConnectorTelemetrySingleResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		if x, ok := x.Response.(*ConnectorTelemetrySingleResponse_Error); ok {
+			return x.Error
+		}
+	}
+	return nil
+}
+
+func (x *ConnectorTelemetrySingleResponse) GetTelemetry() *AssetTelemetryProto {
+	if x != nil {
+		if x, ok := x.Response.(*ConnectorTelemetrySingleResponse_Telemetry); ok {
+			return x.Telemetry
+		}
+	}
+	return nil
+}
+
+type isConnectorTelemetrySingleResponse_Response interface {
+	isConnectorTelemetrySingleResponse_Response()
+}
+
+type ConnectorTelemetrySingleResponse_Error struct {
+	Error *proto.GlobalErrorMessage `protobuf:"bytes,4,opt,name=error,proto3,oneof"`
+}
+
+type ConnectorTelemetrySingleResponse_Telemetry struct {
+	Telemetry *AssetTelemetryProto `protobuf:"bytes,5,opt,name=telemetry,proto3,oneof"`
+}
+
+func (*ConnectorTelemetrySingleResponse_Error) isConnectorTelemetrySingleResponse_Response() {}
+
+func (*ConnectorTelemetrySingleResponse_Telemetry) isConnectorTelemetrySingleResponse_Response() {}
+
+type TechnicalConfigProtoDTO struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Id             string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	ConfigKey      string                 `protobuf:"bytes,2,opt,name=config_key,json=configKey,proto3" json:"config_key,omitempty"`
+	ConfigValue    *string                `protobuf:"bytes,3,opt,name=config_value,json=configValue,proto3,oneof" json:"config_value,omitempty"`
+	ValueType      string                 `protobuf:"bytes,4,opt,name=value_type,json=valueType,proto3" json:"value_type,omitempty"`
+	Scope          string                 `protobuf:"bytes,5,opt,name=scope,proto3" json:"scope,omitempty"`
+	ScopeTarget    *string                `protobuf:"bytes,6,opt,name=scope_target,json=scopeTarget,proto3,oneof" json:"scope_target,omitempty"`
+	Active         bool                   `protobuf:"varint,7,opt,name=active,proto3" json:"active,omitempty"`
+	Description    *string                `protobuf:"bytes,8,opt,name=description,proto3,oneof" json:"description,omitempty"`
+	OrganizationId *string                `protobuf:"bytes,9,opt,name=organization_id,json=organizationId,proto3,oneof" json:"organization_id,omitempty"`
+	CreatedAt      *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=created_at,json=createdAt,proto3,oneof" json:"created_at,omitempty"`
+	ModifiedAt     *timestamppb.Timestamp `protobuf:"bytes,11,opt,name=modified_at,json=modifiedAt,proto3,oneof" json:"modified_at,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
 func (x *TechnicalConfigProtoDTO) Reset() {
 	*x = TechnicalConfigProtoDTO{}
-	mi := &file_connector_proto_msgTypes[23]
+	mi := &file_connector_proto_msgTypes[132]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2096,7 +10085,7 @@ func (x *TechnicalConfigProtoDTO) String() string {
 func (*TechnicalConfigProtoDTO) ProtoMessage() {}
 
 func (x *TechnicalConfigProtoDTO) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[23]
+	mi := &file_connector_proto_msgTypes[132]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2109,7 +10098,7 @@ func (x *TechnicalConfigProtoDTO) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TechnicalConfigProtoDTO.ProtoReflect.Descriptor instead.
 func (*TechnicalConfigProtoDTO) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{23}
+	return file_connector_proto_rawDescGZIP(), []int{132}
 }
 
 func (x *TechnicalConfigProtoDTO) GetId() string {
@@ -2168,6 +10157,27 @@ func (x *TechnicalConfigProtoDTO) GetDescription() string {
 	return ""
 }
 
+func (x *TechnicalConfigProtoDTO) GetOrganizationId() string {
+	if x != nil && x.OrganizationId != nil {
+		return *x.OrganizationId
+	}
+	return ""
+}
+
+func (x *TechnicalConfigProtoDTO) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *TechnicalConfigProtoDTO) GetModifiedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.ModifiedAt
+	}
+	return nil
+}
+
 type TechnicalConfigProtoDTOList struct {
 	state         protoimpl.MessageState     `protogen:"open.v1"`
 	Configs       []*TechnicalConfigProtoDTO `protobuf:"bytes,1,rep,name=configs,proto3" json:"configs,omitempty"`
@@ -2177,7 +10187,7 @@ type TechnicalConfigProtoDTOList struct {
 
 func (x *TechnicalConfigProtoDTOList) Reset() {
 	*x = TechnicalConfigProtoDTOList{}
-	mi := &file_connector_proto_msgTypes[24]
+	mi := &file_connector_proto_msgTypes[133]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2189,7 +10199,7 @@ func (x *TechnicalConfigProtoDTOList) String() string {
 func (*TechnicalConfigProtoDTOList) ProtoMessage() {}
 
 func (x *TechnicalConfigProtoDTOList) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[24]
+	mi := &file_connector_proto_msgTypes[133]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2202,7 +10212,7 @@ func (x *TechnicalConfigProtoDTOList) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TechnicalConfigProtoDTOList.ProtoReflect.Descriptor instead.
 func (*TechnicalConfigProtoDTOList) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{24}
+	return file_connector_proto_rawDescGZIP(), []int{133}
 }
 
 func (x *TechnicalConfigProtoDTOList) GetConfigs() []*TechnicalConfigProtoDTO {
@@ -2213,17 +10223,20 @@ func (x *TechnicalConfigProtoDTOList) GetConfigs() []*TechnicalConfigProtoDTO {
 }
 
 type ConnectorGetConfigsRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
-	Scope         *string                `protobuf:"bytes,2,opt,name=scope,proto3,oneof" json:"scope,omitempty"`
-	ScopeTarget   *string                `protobuf:"bytes,3,opt,name=scope_target,json=scopeTarget,proto3,oneof" json:"scope_target,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state       protoimpl.MessageState `protogen:"open.v1"`
+	Base        *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Scope       *string                `protobuf:"bytes,2,opt,name=scope,proto3,oneof" json:"scope,omitempty"`
+	ScopeTarget *string                `protobuf:"bytes,3,opt,name=scope_target,json=scopeTarget,proto3,oneof" json:"scope_target,omitempty"`
+	// False (default) matches every prior caller's expectation (ConfigSyncService's runtime-cache
+	// sync included) -- only the admin console's "show deactivated configs" view sets this true.
+	IncludeInactive bool `protobuf:"varint,4,opt,name=include_inactive,json=includeInactive,proto3" json:"include_inactive,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *ConnectorGetConfigsRequest) Reset() {
 	*x = ConnectorGetConfigsRequest{}
-	mi := &file_connector_proto_msgTypes[25]
+	mi := &file_connector_proto_msgTypes[134]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2235,7 +10248,7 @@ func (x *ConnectorGetConfigsRequest) String() string {
 func (*ConnectorGetConfigsRequest) ProtoMessage() {}
 
 func (x *ConnectorGetConfigsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[25]
+	mi := &file_connector_proto_msgTypes[134]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2248,7 +10261,7 @@ func (x *ConnectorGetConfigsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectorGetConfigsRequest.ProtoReflect.Descriptor instead.
 func (*ConnectorGetConfigsRequest) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{25}
+	return file_connector_proto_rawDescGZIP(), []int{134}
 }
 
 func (x *ConnectorGetConfigsRequest) GetBase() *proto.RequestBase {
@@ -2272,6 +10285,13 @@ func (x *ConnectorGetConfigsRequest) GetScopeTarget() string {
 	return ""
 }
 
+func (x *ConnectorGetConfigsRequest) GetIncludeInactive() bool {
+	if x != nil {
+		return x.IncludeInactive
+	}
+	return false
+}
+
 type ConnectorConfigResponse struct {
 	state     protoimpl.MessageState `protogen:"open.v1"`
 	Tid       string                 `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
@@ -2288,7 +10308,7 @@ type ConnectorConfigResponse struct {
 
 func (x *ConnectorConfigResponse) Reset() {
 	*x = ConnectorConfigResponse{}
-	mi := &file_connector_proto_msgTypes[26]
+	mi := &file_connector_proto_msgTypes[135]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2300,7 +10320,7 @@ func (x *ConnectorConfigResponse) String() string {
 func (*ConnectorConfigResponse) ProtoMessage() {}
 
 func (x *ConnectorConfigResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_connector_proto_msgTypes[26]
+	mi := &file_connector_proto_msgTypes[135]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2313,7 +10333,7 @@ func (x *ConnectorConfigResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectorConfigResponse.ProtoReflect.Descriptor instead.
 func (*ConnectorConfigResponse) Descriptor() ([]byte, []int) {
-	return file_connector_proto_rawDescGZIP(), []int{26}
+	return file_connector_proto_rawDescGZIP(), []int{135}
 }
 
 func (x *ConnectorConfigResponse) GetTid() string {
@@ -2378,11 +10398,552 @@ func (*ConnectorConfigResponse_Error) isConnectorConfigResponse_Response() {}
 
 func (*ConnectorConfigResponse_ConfigList) isConnectorConfigResponse_Response() {}
 
+type GetTechnicalConfigByIdRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Id            string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetTechnicalConfigByIdRequest) Reset() {
+	*x = GetTechnicalConfigByIdRequest{}
+	mi := &file_connector_proto_msgTypes[136]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetTechnicalConfigByIdRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetTechnicalConfigByIdRequest) ProtoMessage() {}
+
+func (x *GetTechnicalConfigByIdRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[136]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetTechnicalConfigByIdRequest.ProtoReflect.Descriptor instead.
+func (*GetTechnicalConfigByIdRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{136}
+}
+
+func (x *GetTechnicalConfigByIdRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *GetTechnicalConfigByIdRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type CreateTechnicalConfigRequest struct {
+	state         protoimpl.MessageState   `protogen:"open.v1"`
+	Base          *proto.RequestBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Config        *TechnicalConfigProtoDTO `protobuf:"bytes,2,opt,name=config,proto3" json:"config,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateTechnicalConfigRequest) Reset() {
+	*x = CreateTechnicalConfigRequest{}
+	mi := &file_connector_proto_msgTypes[137]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateTechnicalConfigRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateTechnicalConfigRequest) ProtoMessage() {}
+
+func (x *CreateTechnicalConfigRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[137]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateTechnicalConfigRequest.ProtoReflect.Descriptor instead.
+func (*CreateTechnicalConfigRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{137}
+}
+
+func (x *CreateTechnicalConfigRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *CreateTechnicalConfigRequest) GetConfig() *TechnicalConfigProtoDTO {
+	if x != nil {
+		return x.Config
+	}
+	return nil
+}
+
+type UpdateTechnicalConfigRequest struct {
+	state         protoimpl.MessageState   `protogen:"open.v1"`
+	Base          *proto.RequestBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Id            string                   `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	Config        *TechnicalConfigProtoDTO `protobuf:"bytes,3,opt,name=config,proto3" json:"config,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateTechnicalConfigRequest) Reset() {
+	*x = UpdateTechnicalConfigRequest{}
+	mi := &file_connector_proto_msgTypes[138]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateTechnicalConfigRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateTechnicalConfigRequest) ProtoMessage() {}
+
+func (x *UpdateTechnicalConfigRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[138]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateTechnicalConfigRequest.ProtoReflect.Descriptor instead.
+func (*UpdateTechnicalConfigRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{138}
+}
+
+func (x *UpdateTechnicalConfigRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *UpdateTechnicalConfigRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdateTechnicalConfigRequest) GetConfig() *TechnicalConfigProtoDTO {
+	if x != nil {
+		return x.Config
+	}
+	return nil
+}
+
+type DeleteTechnicalConfigRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *proto.RequestBase     `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Id            string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteTechnicalConfigRequest) Reset() {
+	*x = DeleteTechnicalConfigRequest{}
+	mi := &file_connector_proto_msgTypes[139]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteTechnicalConfigRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteTechnicalConfigRequest) ProtoMessage() {}
+
+func (x *DeleteTechnicalConfigRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[139]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteTechnicalConfigRequest.ProtoReflect.Descriptor instead.
+func (*DeleteTechnicalConfigRequest) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{139}
+}
+
+func (x *DeleteTechnicalConfigRequest) GetBase() *proto.RequestBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *DeleteTechnicalConfigRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type ConnectorConfigSingleResponse struct {
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	Tid       string                 `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
+	HasErrors bool                   `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Timestamp *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	// Types that are valid to be assigned to Response:
+	//
+	//	*ConnectorConfigSingleResponse_Error
+	//	*ConnectorConfigSingleResponse_Config
+	Response      isConnectorConfigSingleResponse_Response `protobuf_oneof:"response"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ConnectorConfigSingleResponse) Reset() {
+	*x = ConnectorConfigSingleResponse{}
+	mi := &file_connector_proto_msgTypes[140]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConnectorConfigSingleResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConnectorConfigSingleResponse) ProtoMessage() {}
+
+func (x *ConnectorConfigSingleResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[140]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConnectorConfigSingleResponse.ProtoReflect.Descriptor instead.
+func (*ConnectorConfigSingleResponse) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{140}
+}
+
+func (x *ConnectorConfigSingleResponse) GetTid() string {
+	if x != nil {
+		return x.Tid
+	}
+	return ""
+}
+
+func (x *ConnectorConfigSingleResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *ConnectorConfigSingleResponse) GetTimestamp() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Timestamp
+	}
+	return nil
+}
+
+func (x *ConnectorConfigSingleResponse) GetResponse() isConnectorConfigSingleResponse_Response {
+	if x != nil {
+		return x.Response
+	}
+	return nil
+}
+
+func (x *ConnectorConfigSingleResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		if x, ok := x.Response.(*ConnectorConfigSingleResponse_Error); ok {
+			return x.Error
+		}
+	}
+	return nil
+}
+
+func (x *ConnectorConfigSingleResponse) GetConfig() *TechnicalConfigProtoDTO {
+	if x != nil {
+		if x, ok := x.Response.(*ConnectorConfigSingleResponse_Config); ok {
+			return x.Config
+		}
+	}
+	return nil
+}
+
+type isConnectorConfigSingleResponse_Response interface {
+	isConnectorConfigSingleResponse_Response()
+}
+
+type ConnectorConfigSingleResponse_Error struct {
+	Error *proto.GlobalErrorMessage `protobuf:"bytes,4,opt,name=error,proto3,oneof"`
+}
+
+type ConnectorConfigSingleResponse_Config struct {
+	Config *TechnicalConfigProtoDTO `protobuf:"bytes,5,opt,name=config,proto3,oneof"`
+}
+
+func (*ConnectorConfigSingleResponse_Error) isConnectorConfigSingleResponse_Response() {}
+
+func (*ConnectorConfigSingleResponse_Config) isConnectorConfigSingleResponse_Response() {}
+
+type ConnectorDeleteConfigResponse struct {
+	state         protoimpl.MessageState    `protogen:"open.v1"`
+	Tid           string                    `protobuf:"bytes,1,opt,name=tid,proto3" json:"tid,omitempty"`
+	HasErrors     bool                      `protobuf:"varint,2,opt,name=has_errors,json=hasErrors,proto3" json:"has_errors,omitempty"`
+	Timestamp     *timestamppb.Timestamp    `protobuf:"bytes,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Deleted       bool                      `protobuf:"varint,4,opt,name=deleted,proto3" json:"deleted,omitempty"`
+	Error         *proto.GlobalErrorMessage `protobuf:"bytes,5,opt,name=error,proto3,oneof" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ConnectorDeleteConfigResponse) Reset() {
+	*x = ConnectorDeleteConfigResponse{}
+	mi := &file_connector_proto_msgTypes[141]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConnectorDeleteConfigResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConnectorDeleteConfigResponse) ProtoMessage() {}
+
+func (x *ConnectorDeleteConfigResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connector_proto_msgTypes[141]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConnectorDeleteConfigResponse.ProtoReflect.Descriptor instead.
+func (*ConnectorDeleteConfigResponse) Descriptor() ([]byte, []int) {
+	return file_connector_proto_rawDescGZIP(), []int{141}
+}
+
+func (x *ConnectorDeleteConfigResponse) GetTid() string {
+	if x != nil {
+		return x.Tid
+	}
+	return ""
+}
+
+func (x *ConnectorDeleteConfigResponse) GetHasErrors() bool {
+	if x != nil {
+		return x.HasErrors
+	}
+	return false
+}
+
+func (x *ConnectorDeleteConfigResponse) GetTimestamp() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Timestamp
+	}
+	return nil
+}
+
+func (x *ConnectorDeleteConfigResponse) GetDeleted() bool {
+	if x != nil {
+		return x.Deleted
+	}
+	return false
+}
+
+func (x *ConnectorDeleteConfigResponse) GetError() *proto.GlobalErrorMessage {
+	if x != nil {
+		return x.Error
+	}
+	return nil
+}
+
 var File_connector_proto protoreflect.FileDescriptor
 
 const file_connector_proto_rawDesc = "" +
 	"\n" +
-	"\x0fconnector.proto\x12\x04zqnt\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a google/protobuf/field_mask.proto\x1a\fcommon.proto\x1a\fevents.proto\x1a mission-autonomy-contracts.proto\"\xab\x02\n" +
+	"\x0fconnector.proto\x12\x04zqnt\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a google/protobuf/field_mask.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\fcommon.proto\x1a\fevents.proto\x1a mission-autonomy-contracts.proto\x1a\x1amission-autonomy-dto.proto\x1a$capability-execution-contracts.proto\x1a\x1ecapability-execution-dto.proto\x1a\x1edevice-control-contracts.proto\x1a\vmedia.proto\"r\n" +
+	"\x17AuthenticateUserRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x14\n" +
+	"\x05email\x18\x02 \x01(\tR\x05email\x12\x1a\n" +
+	"\bpassword\x18\x03 \x01(\tR\bpassword\"\xa5\x02\n" +
+	"\x19AuthenticatedUserProtoDTO\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x14\n" +
+	"\x05email\x18\x02 \x01(\tR\x05email\x12,\n" +
+	"\x0forganization_id\x18\x03 \x01(\tH\x00R\x0eorganizationId\x88\x01\x01\x12\x14\n" +
+	"\x05roles\x18\x04 \x03(\tR\x05roles\x12\x18\n" +
+	"\aenabled\x18\x05 \x01(\bR\aenabled\x129\n" +
+	"\n" +
+	"created_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12\x1f\n" +
+	"\bprovider\x18\a \x01(\tH\x01R\bprovider\x88\x01\x01B\x12\n" +
+	"\x10_organization_idB\v\n" +
+	"\t_provider\"\xd6\x01\n" +
+	"\x18AuthenticateUserResponse\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x01 \x01(\bR\thasErrors\x12&\n" +
+	"\x04meta\x18\x02 \x01(\v2\x12.zqnt.ResponseMetaR\x04meta\x125\n" +
+	"\x04user\x18\x03 \x01(\v2\x1f.zqnt.AuthenticatedUserProtoDTOH\x00R\x04user\x120\n" +
+	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05errorB\n" +
+	"\n" +
+	"\bresponse\"\xee\x01\n" +
+	"\x11CreateUserRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12,\n" +
+	"\x0forganization_id\x18\x02 \x01(\tH\x00R\x0eorganizationId\x88\x01\x01\x12\x14\n" +
+	"\x05email\x18\x03 \x01(\tR\x05email\x12\x1a\n" +
+	"\bpassword\x18\x04 \x01(\tR\bpassword\x12\x14\n" +
+	"\x05roles\x18\x05 \x03(\tR\x05roles\x12\x1c\n" +
+	"\auser_id\x18\x06 \x01(\tH\x01R\x06userId\x88\x01\x01B\x12\n" +
+	"\x10_organization_idB\n" +
+	"\n" +
+	"\b_user_id\"\xd0\x01\n" +
+	"\x12CreateUserResponse\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x01 \x01(\bR\thasErrors\x12&\n" +
+	"\x04meta\x18\x02 \x01(\v2\x12.zqnt.ResponseMetaR\x04meta\x125\n" +
+	"\x04user\x18\x03 \x01(\v2\x1f.zqnt.AuthenticatedUserProtoDTOH\x00R\x04user\x120\n" +
+	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05errorB\n" +
+	"\n" +
+	"\bresponse\"V\n" +
+	"\x14ResetPasswordRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\"\xc1\x01\n" +
+	"\x15ResetPasswordResponse\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x01 \x01(\bR\thasErrors\x12&\n" +
+	"\x04meta\x18\x02 \x01(\v2\x12.zqnt.ResponseMetaR\x04meta\x12#\n" +
+	"\fnew_password\x18\x03 \x01(\tH\x00R\vnewPassword\x120\n" +
+	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05errorB\n" +
+	"\n" +
+	"\bresponse\"\xcc\x02\n" +
+	"\x1bRecordAuthAuditEventRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x1d\n" +
+	"\n" +
+	"event_type\x18\x02 \x01(\tR\teventType\x12\x1c\n" +
+	"\auser_id\x18\x03 \x01(\tH\x00R\x06userId\x88\x01\x01\x12,\n" +
+	"\x0forganization_id\x18\x04 \x01(\tH\x01R\x0eorganizationId\x88\x01\x01\x12\x19\n" +
+	"\x05email\x18\x05 \x01(\tH\x02R\x05email\x88\x01\x01\x12 \n" +
+	"\tsource_ip\x18\x06 \x01(\tH\x03R\bsourceIp\x88\x01\x01\x12\x1b\n" +
+	"\x06detail\x18\a \x01(\tH\x04R\x06detail\x88\x01\x01B\n" +
+	"\n" +
+	"\b_user_idB\x12\n" +
+	"\x10_organization_idB\b\n" +
+	"\x06_emailB\f\n" +
+	"\n" +
+	"_source_ipB\t\n" +
+	"\a_detail\"9\n" +
+	"\x10ListUsersRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\"\xc1\x01\n" +
+	"\x11ListUsersResponse\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x01 \x01(\bR\thasErrors\x12&\n" +
+	"\x04meta\x18\x02 \x01(\v2\x12.zqnt.ResponseMetaR\x04meta\x125\n" +
+	"\x05users\x18\x03 \x03(\v2\x1f.zqnt.AuthenticatedUserProtoDTOR\x05users\x12.\n" +
+	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageR\x05error\"T\n" +
+	"\x12GetUserByIdRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\"n\n" +
+	"\x16UpdateUserRolesRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x14\n" +
+	"\x05roles\x18\x03 \x03(\tR\x05roles\"q\n" +
+	"\x15SetUserEnabledRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x18\n" +
+	"\aenabled\x18\x03 \x01(\bR\aenabled\"S\n" +
+	"\x11DeleteUserRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\"\xb6\x04\n" +
+	"\x1eIdentityProviderConfigProtoDTO\x12'\n" +
+	"\x0forganization_id\x18\x01 \x01(\tR\x0eorganizationId\x12\x1d\n" +
+	"\n" +
+	"issuer_url\x18\x02 \x01(\tR\tissuerUrl\x12\x1b\n" +
+	"\tclient_id\x18\x03 \x01(\tR\bclientId\x12#\n" +
+	"\rclient_secret\x18\x04 \x01(\tR\fclientSecret\x12#\n" +
+	"\remail_domains\x18\x05 \x03(\tR\femailDomains\x12&\n" +
+	"\x0frole_claim_name\x18\x06 \x01(\tR\rroleClaimName\x12h\n" +
+	"\x12claim_role_mapping\x18\a \x03(\v2:.zqnt.IdentityProviderConfigProtoDTO.ClaimRoleMappingEntryR\x10claimRoleMapping\x12\x18\n" +
+	"\aenabled\x18\b \x01(\bR\aenabled\x129\n" +
+	"\n" +
+	"created_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
+	"\n" +
+	"updated_at\x18\n" +
+	" \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x1aC\n" +
+	"\x15ClaimRoleMappingEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x84\x01\n" +
+	"\x1dUpsertIdentityProviderRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12<\n" +
+	"\x06config\x18\x02 \x01(\v2$.zqnt.IdentityProviderConfigProtoDTOR\x06config\"l\n" +
+	"\x1aGetIdentityProviderRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12'\n" +
+	"\x0forganization_id\x18\x02 \x01(\tR\x0eorganizationId\"g\n" +
+	"(FindIdentityProviderByEmailDomainRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x14\n" +
+	"\x05email\x18\x02 \x01(\tR\x05email\"\xdf\x01\n" +
+	"\x18IdentityProviderResponse\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x01 \x01(\bR\thasErrors\x12&\n" +
+	"\x04meta\x18\x02 \x01(\v2\x12.zqnt.ResponseMetaR\x04meta\x12A\n" +
+	"\x06config\x18\x03 \x01(\v2$.zqnt.IdentityProviderConfigProtoDTOH\x00R\x06config\x88\x01\x01\x12.\n" +
+	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageR\x05errorB\t\n" +
+	"\a_config\"\x90\x01\n" +
+	"\x13FindOidcUserRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12'\n" +
+	"\x0forganization_id\x18\x02 \x01(\tR\x0eorganizationId\x12)\n" +
+	"\x10external_subject\x18\x03 \x01(\tR\x0fexternalSubject\"\xe8\x01\n" +
+	"\x15UpsertOidcUserRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12'\n" +
+	"\x0forganization_id\x18\x02 \x01(\tR\x0eorganizationId\x12)\n" +
+	"\x10external_subject\x18\x03 \x01(\tR\x0fexternalSubject\x12\x14\n" +
+	"\x05email\x18\x04 \x01(\tR\x05email\x12\x14\n" +
+	"\x05roles\x18\x05 \x03(\tR\x05roles\x12\x1c\n" +
+	"\auser_id\x18\x06 \x01(\tH\x00R\x06userId\x88\x01\x01B\n" +
+	"\n" +
+	"\b_user_id\"\x81\x01\n" +
+	"\x1cPersistSkillExecutionRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12:\n" +
+	"\texecution\x18\x02 \x01(\v2\x1c.zqnt.SkillExecutionProtoDTOR\texecution\"\x7f\n" +
+	" AppendSkillExecutionEventRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x124\n" +
+	"\x05event\x18\x02 \x01(\v2\x1e.zqnt.SkillExecutionEventProtoR\x05event\"\xab\x02\n" +
 	"\x19UpsertAssetPayloadRequest\x12%\n" +
 	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x124\n" +
 	"\apayload\x18\x02 \x01(\v2\x1a.zqnt.AssetPayloadProtoDTOR\apayload\x12%\n" +
@@ -2421,15 +10982,204 @@ const file_connector_proto_rawDesc = "" +
 	"has_errors\x18\x02 \x01(\bR\thasErrors\x126\n" +
 	"\bpayloads\x18\x03 \x03(\v2\x1a.zqnt.AssetPayloadProtoDTOR\bpayloads\x123\n" +
 	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x88\x01\x01B\b\n" +
+	"\x06_error\"\xc7\x01\n" +
+	"\x17SetAssetPropertyRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x0e\n" +
+	"\x02sn\x18\x02 \x01(\tR\x02sn\x12\x10\n" +
+	"\x03key\x18\x03 \x01(\tR\x03key\x12,\n" +
+	"\x05value\x18\x04 \x01(\v2\x16.google.protobuf.ValueR\x05value\x12%\n" +
+	"\vdescription\x18\x05 \x01(\tH\x00R\vdescription\x88\x01\x01B\x0e\n" +
+	"\f_description\"S\n" +
+	"\x1aListAssetPropertiesRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x0e\n" +
+	"\x02sn\x18\x02 \x01(\tR\x02sn\"e\n" +
+	"\x1aDeleteAssetPropertyRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x0e\n" +
+	"\x02sn\x18\x02 \x01(\tR\x02sn\x12\x10\n" +
+	"\x03key\x18\x03 \x01(\tR\x03key\"\xd2\x01\n" +
+	"\x15AssetPropertyResponse\x12\x10\n" +
+	"\x03tid\x18\x01 \x01(\tR\x03tid\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x02 \x01(\bR\thasErrors\x12<\n" +
+	"\bproperty\x18\x03 \x01(\v2\x1b.zqnt.AssetPropertyProtoDTOH\x00R\bproperty\x88\x01\x01\x123\n" +
+	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x01R\x05error\x88\x01\x01B\v\n" +
+	"\t_propertyB\b\n" +
+	"\x06_error\"\xc8\x01\n" +
+	"\x19AssetPropertyListResponse\x12\x10\n" +
+	"\x03tid\x18\x01 \x01(\tR\x03tid\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x02 \x01(\bR\thasErrors\x12;\n" +
+	"\n" +
+	"properties\x18\x03 \x03(\v2\x1b.zqnt.AssetPropertyProtoDTOR\n" +
+	"properties\x123\n" +
+	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x88\x01\x01B\b\n" +
+	"\x06_error\"\xbc\t\n" +
+	"\x15SkillContractProtoDTO\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
+	"\n" +
+	"command_id\x18\x02 \x01(\tR\tcommandId\x12\x19\n" +
+	"\bskill_id\x18\x03 \x01(\tR\askillId\x12&\n" +
+	"\fdisplay_name\x18\x04 \x01(\tH\x00R\vdisplayName\x88\x01\x01\x12%\n" +
+	"\vdescription\x18\x05 \x01(\tH\x01R\vdescription\x88\x01\x01\x12*\n" +
+	"\x0eschema_version\x18\x06 \x01(\tH\x02R\rschemaVersion\x88\x01\x01\x12:\n" +
+	"\finput_schema\x18\a \x01(\v2\x17.google.protobuf.StructR\vinputSchema\x12<\n" +
+	"\routput_schema\x18\b \x01(\v2\x17.google.protobuf.StructR\foutputSchema\x122\n" +
+	"\x06errors\x18\t \x03(\v2\x1a.zqnt.CapabilityErrorProtoR\x06errors\x122\n" +
+	"\x06events\x18\n" +
+	" \x03(\v2\x1a.zqnt.CapabilityEventProtoR\x06events\x12J\n" +
+	"\frequirements\x18\v \x01(\v2!.zqnt.CapabilityRequirementsProtoH\x03R\frequirements\x88\x01\x01\x128\n" +
+	"\x06source\x18\f \x01(\x0e2\x1b.zqnt.CapabilitySourceProtoH\x04R\x06source\x88\x01\x01\x12\x1f\n" +
+	"\bprovider\x18\r \x01(\tH\x05R\bprovider\x88\x01\x01\x121\n" +
+	"\x06status\x18\x0e \x01(\x0e2\x19.zqnt.SkillContractStatusR\x06status\x12C\n" +
+	"\rfirst_seen_at\x18\x0f \x01(\v2\x1a.google.protobuf.TimestampH\x06R\vfirstSeenAt\x88\x01\x01\x12A\n" +
+	"\flast_seen_at\x18\x10 \x01(\v2\x1a.google.protobuf.TimestampH\aR\n" +
+	"lastSeenAt\x88\x01\x01\x12;\n" +
+	"\x17previous_schema_version\x18\x11 \x01(\tH\bR\x15previousSchemaVersion\x88\x01\x01\x12K\n" +
+	"\rcompatibility\x18\x12 \x01(\x0e2 .zqnt.SkillContractCompatibilityH\tR\rcompatibility\x88\x01\x01\x12/\n" +
+	"\x13compatibility_notes\x18\x13 \x03(\tR\x12compatibilityNotes\x121\n" +
+	"\x14required_permissions\x18\x14 \x03(\tR\x13requiredPermissionsB\x0f\n" +
+	"\r_display_nameB\x0e\n" +
+	"\f_descriptionB\x11\n" +
+	"\x0f_schema_versionB\x0f\n" +
+	"\r_requirementsB\t\n" +
+	"\a_sourceB\v\n" +
+	"\t_providerB\x10\n" +
+	"\x0e_first_seen_atB\x0f\n" +
+	"\r_last_seen_atB\x1a\n" +
+	"\x18_previous_schema_versionB\x10\n" +
+	"\x0e_compatibility\"|\n" +
+	"\x1aUpsertSkillContractRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x127\n" +
+	"\bcontract\x18\x02 \x01(\v2\x1b.zqnt.SkillContractProtoDTOR\bcontract\"\xb8\x01\n" +
+	"\x19ListSkillContractsRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x126\n" +
+	"\x06status\x18\x02 \x01(\x0e2\x19.zqnt.SkillContractStatusH\x00R\x06status\x88\x01\x01\x12\"\n" +
+	"\n" +
+	"command_id\x18\x03 \x01(\tH\x01R\tcommandId\x88\x01\x01B\t\n" +
+	"\a_statusB\r\n" +
+	"\v_command_id\"\x89\x01\n" +
+	"\x1dSetSkillContractStatusRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\x121\n" +
+	"\x06status\x18\x03 \x01(\x0e2\x19.zqnt.SkillContractStatusR\x06status\"\x8e\x01\n" +
+	"\"SetSkillContractPermissionsRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\x121\n" +
+	"\x14required_permissions\x18\x03 \x03(\tR\x13requiredPermissions\"\xd2\x01\n" +
+	"\x15SkillContractResponse\x12\x10\n" +
+	"\x03tid\x18\x01 \x01(\tR\x03tid\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x02 \x01(\bR\thasErrors\x12<\n" +
+	"\bcontract\x18\x03 \x01(\v2\x1b.zqnt.SkillContractProtoDTOH\x00R\bcontract\x88\x01\x01\x123\n" +
+	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x01R\x05error\x88\x01\x01B\v\n" +
+	"\t_contractB\b\n" +
+	"\x06_error\"\xc6\x01\n" +
+	"\x19SkillContractListResponse\x12\x10\n" +
+	"\x03tid\x18\x01 \x01(\tR\x03tid\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x02 \x01(\bR\thasErrors\x129\n" +
+	"\tcontracts\x18\x03 \x03(\v2\x1b.zqnt.SkillContractProtoDTOR\tcontracts\x123\n" +
+	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x88\x01\x01B\b\n" +
 	"\x06_error\"`\n" +
 	"\x1cConnectorGetAssetByIdRequest\x12%\n" +
 	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x19\n" +
 	"\basset_id\x18\x02 \x01(\tR\aassetId\"A\n" +
 	"\x12ConnectorAssetList\x12+\n" +
-	"\x06assets\x18\x01 \x03(\v2\x13.zqnt.AssetProtoDTOR\x06assets\"q\n" +
+	"\x06assets\x18\x01 \x03(\v2\x13.zqnt.AssetProtoDTOR\x06assets\":\n" +
+	"\x11ListAssetsRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\"\xb0\x01\n" +
+	"\x11AssetListResponse\x12\x10\n" +
+	"\x03tid\x18\x01 \x01(\tR\x03tid\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x02 \x01(\bR\thasErrors\x12+\n" +
+	"\x06assets\x18\x03 \x03(\v2\x13.zqnt.AssetProtoDTOR\x06assets\x123\n" +
+	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x88\x01\x01B\b\n" +
+	"\x06_error\"q\n" +
 	"\x1dConnectorRegisterAssetRequest\x12%\n" +
 	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12)\n" +
-	"\x05asset\x18\x02 \x01(\v2\x13.zqnt.AssetProtoDTOR\x05asset\"\xc7\x01\n" +
+	"\x05asset\x18\x02 \x01(\v2\x13.zqnt.AssetProtoDTOR\x05asset\"\xa4\x05\n" +
+	"\x12AssetClaimProtoDTO\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12'\n" +
+	"\x0forganization_id\x18\x02 \x01(\tR\x0eorganizationId\x12\x19\n" +
+	"\x05label\x18\x03 \x01(\tH\x00R\x05label\x88\x01\x01\x12\"\n" +
+	"\n" +
+	"created_by\x18\x04 \x01(\tH\x01R\tcreatedBy\x88\x01\x01\x12=\n" +
+	"\x0eallowed_vendor\x18\x05 \x01(\x0e2\x11.zqnt.AssetVendorH\x02R\rallowedVendor\x88\x01\x01\x12;\n" +
+	"\fallowed_type\x18\x06 \x01(\x0e2\x13.zqnt.AssetTypeEnumH\x03R\vallowedType\x88\x01\x01\x12'\n" +
+	"\x0fmax_redemptions\x18\a \x01(\x05R\x0emaxRedemptions\x12)\n" +
+	"\x10redemption_count\x18\b \x01(\x05R\x0fredemptionCount\x129\n" +
+	"\n" +
+	"expires_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\x12>\n" +
+	"\n" +
+	"revoked_at\x18\n" +
+	" \x01(\v2\x1a.google.protobuf.TimestampH\x04R\trevokedAt\x88\x01\x01\x129\n" +
+	"\n" +
+	"created_at\x18\v \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12D\n" +
+	"\vredemptions\x18\f \x03(\v2\".zqnt.AssetClaimRedemptionProtoDTOR\vredemptionsB\b\n" +
+	"\x06_labelB\r\n" +
+	"\v_created_byB\x11\n" +
+	"\x0f_allowed_vendorB\x0f\n" +
+	"\r_allowed_typeB\r\n" +
+	"\v_revoked_at\"\x96\x01\n" +
+	"\x1cAssetClaimRedemptionProtoDTO\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x19\n" +
+	"\basset_id\x18\x02 \x01(\tR\aassetId\x12\x0e\n" +
+	"\x02sn\x18\x03 \x01(\tR\x02sn\x12;\n" +
+	"\vredeemed_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
+	"redeemedAt\"\xa6\x03\n" +
+	"\x17CreateAssetClaimRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12'\n" +
+	"\x0forganization_id\x18\x02 \x01(\tR\x0eorganizationId\x12\x19\n" +
+	"\x05label\x18\x03 \x01(\tH\x00R\x05label\x88\x01\x01\x12=\n" +
+	"\x0eallowed_vendor\x18\x04 \x01(\x0e2\x11.zqnt.AssetVendorH\x01R\rallowedVendor\x88\x01\x01\x12;\n" +
+	"\fallowed_type\x18\x05 \x01(\x0e2\x13.zqnt.AssetTypeEnumH\x02R\vallowedType\x88\x01\x01\x12,\n" +
+	"\x0fmax_redemptions\x18\x06 \x01(\x05H\x03R\x0emaxRedemptions\x88\x01\x01\x12$\n" +
+	"\vttl_seconds\x18\a \x01(\x05H\x04R\n" +
+	"ttlSeconds\x88\x01\x01B\b\n" +
+	"\x06_labelB\x11\n" +
+	"\x0f_allowed_vendorB\x0f\n" +
+	"\r_allowed_typeB\x12\n" +
+	"\x10_max_redemptionsB\x0e\n" +
+	"\f_ttl_seconds\"\xe5\x01\n" +
+	"\x12AssetClaimResponse\x12\x10\n" +
+	"\x03tid\x18\x01 \x01(\tR\x03tid\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x02 \x01(\bR\thasErrors\x123\n" +
+	"\x05error\x18\x03 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x88\x01\x01\x123\n" +
+	"\x05claim\x18\x04 \x01(\v2\x18.zqnt.AssetClaimProtoDTOH\x01R\x05claim\x88\x01\x01\x12\x17\n" +
+	"\x04code\x18\x05 \x01(\tH\x02R\x04code\x88\x01\x01B\b\n" +
+	"\x06_errorB\b\n" +
+	"\x06_claimB\a\n" +
+	"\x05_code\"\x7f\n" +
+	"\x17RedeemAssetClaimRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x12\n" +
+	"\x04code\x18\x02 \x01(\tR\x04code\x12)\n" +
+	"\x05asset\x18\x03 \x01(\v2\x13.zqnt.AssetProtoDTOR\x05asset\"V\n" +
+	"\x19DescribeAssetClaimRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x12\n" +
+	"\x04code\x18\x02 \x01(\tR\x04code\"\xd7\x01\n" +
+	"\x1dAssetClaimDescriptionResponse\x12\x10\n" +
+	"\x03tid\x18\x01 \x01(\tR\x03tid\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x02 \x01(\bR\thasErrors\x123\n" +
+	"\x05error\x18\x03 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x88\x01\x01\x120\n" +
+	"\x11organization_name\x18\x04 \x01(\tH\x01R\x10organizationName\x88\x01\x01B\b\n" +
+	"\x06_errorB\x14\n" +
+	"\x12_organization_name\"~\n" +
+	"\x16ListAssetClaimsRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12*\n" +
+	"\x0einclude_closed\x18\x02 \x01(\bH\x00R\rincludeClosed\x88\x01\x01B\x11\n" +
+	"\x0f_include_closed\"\xba\x01\n" +
+	"\x16AssetClaimListResponse\x12\x10\n" +
+	"\x03tid\x18\x01 \x01(\tR\x03tid\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x02 \x01(\bR\thasErrors\x120\n" +
+	"\x06claims\x18\x03 \x03(\v2\x18.zqnt.AssetClaimProtoDTOR\x06claims\x123\n" +
+	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x88\x01\x01B\b\n" +
+	"\x06_error\"[\n" +
+	"\x17RevokeAssetClaimRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x19\n" +
+	"\bclaim_id\x18\x02 \x01(\tR\aclaimId\"\xc7\x01\n" +
 	"\x1bConnectorUpdateAssetRequest\x12%\n" +
 	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12)\n" +
 	"\x05asset\x18\x02 \x01(\v2\x13.zqnt.AssetProtoDTOR\x05asset\x12\x19\n" +
@@ -2483,7 +11233,7 @@ const file_connector_proto_rawDesc = "" +
 	"\x04type\x18\x02 \x01(\x0e2\x13.zqnt.TelemetryTypeR\x04type\x12D\n" +
 	"\x0fasset_telemetry\x18\x03 \x01(\v2\x19.zqnt.AssetTelemetryProtoH\x00R\x0eassetTelemetry\x12N\n" +
 	"\x13sub_asset_telemetry\x18\x04 \x01(\v2\x1c.zqnt.SubAssetTelemetryProtoH\x00R\x11subAssetTelemetryB\v\n" +
-	"\ttelemetry\"\xb9\x05\n" +
+	"\ttelemetry\"\x80\x06\n" +
 	"\x1eConnectorStoreDetectionRequest\x12%\n" +
 	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x19\n" +
 	"\basset_sn\x18\x02 \x01(\tR\aassetSn\x12%\n" +
@@ -2504,7 +11254,8 @@ const file_connector_proto_rawDesc = "" +
 	"\n" +
 	"stream_url\x18\f \x01(\tH\aR\tstreamUrl\x88\x01\x01\x12;\n" +
 	"\vdetected_at\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\n" +
-	"detectedAtB\x0f\n" +
+	"detectedAt\x128\n" +
+	"\bposition\x18\x0e \x01(\v2\x17.zqnt.DetectionPositionH\bR\bposition\x88\x01\x01B\x0f\n" +
 	"\r_sub_asset_snB\n" +
 	"\n" +
 	"\b_task_idB\r\n" +
@@ -2513,7 +11264,8 @@ const file_connector_proto_rawDesc = "" +
 	"\x0f_bounding_box_yB\x15\n" +
 	"\x13_bounding_box_widthB\x16\n" +
 	"\x14_bounding_box_heightB\r\n" +
-	"\v_stream_url\"\xf9\a\n" +
+	"\v_stream_urlB\v\n" +
+	"\t_position\"\xf9\a\n" +
 	"\x13AssetTelemetryProto\x12\x19\n" +
 	"\basset_id\x18\x01 \x01(\tR\aassetId\x128\n" +
 	"\ttimestamp\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x12\x1f\n" +
@@ -2589,7 +11341,7 @@ const file_connector_proto_rawDesc = "" +
 	"\x13_battery_percentageB\x13\n" +
 	"\x11_operational_modeB\f\n" +
 	"\n" +
-	"_is_online\"\xb5\x03\n" +
+	"_is_online\"\x98\x05\n" +
 	"\x0ePolicyProtoDTO\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
@@ -2606,20 +11358,29 @@ const file_connector_proto_rawDesc = "" +
 	" \x01(\tH\x01R\n" +
 	"conditions\x88\x01\x01\x12%\n" +
 	"\vconstraints\x18\v \x01(\tH\x02R\vconstraints\x88\x01\x01\x12\x1d\n" +
-	"\aactions\x18\f \x01(\tH\x03R\aactions\x88\x01\x01B\x0f\n" +
+	"\aactions\x18\f \x01(\tH\x03R\aactions\x88\x01\x01\x12,\n" +
+	"\x0forganization_id\x18\r \x01(\tH\x04R\x0eorganizationId\x88\x01\x01\x12>\n" +
+	"\n" +
+	"created_at\x18\x0e \x01(\v2\x1a.google.protobuf.TimestampH\x05R\tcreatedAt\x88\x01\x01\x12@\n" +
+	"\vmodified_at\x18\x0f \x01(\v2\x1a.google.protobuf.TimestampH\x06R\n" +
+	"modifiedAt\x88\x01\x01B\x0f\n" +
 	"\r_scope_targetB\r\n" +
 	"\v_conditionsB\x0e\n" +
 	"\f_constraintsB\n" +
 	"\n" +
-	"\b_actions\"F\n" +
+	"\b_actionsB\x12\n" +
+	"\x10_organization_idB\r\n" +
+	"\v_created_atB\x0e\n" +
+	"\f_modified_at\"F\n" +
 	"\x12PolicyProtoDTOList\x120\n" +
 	"\bpolicies\x18\x01 \x03(\v2\x14.zqnt.PolicyProtoDTOR\bpolicies\"e\n" +
 	"\x1bConnectorGetPoliciesRequest\x12%\n" +
 	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x1f\n" +
 	"\vpolicy_type\x18\x02 \x01(\tR\n" +
-	"policyType\"G\n" +
+	"policyType\"r\n" +
 	"\x1eConnectorGetAllPoliciesRequest\x12%\n" +
-	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\"\xff\x01\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12)\n" +
+	"\x10include_inactive\x18\x02 \x01(\bR\x0fincludeInactive\"\xff\x01\n" +
 	"\x17ConnectorPolicyResponse\x12\x10\n" +
 	"\x03tid\x18\x01 \x01(\tR\x03tid\x12\x1d\n" +
 	"\n" +
@@ -2629,7 +11390,417 @@ const file_connector_proto_rawDesc = "" +
 	"\vpolicy_list\x18\x05 \x01(\v2\x18.zqnt.PolicyProtoDTOListH\x00R\n" +
 	"policyListB\n" +
 	"\n" +
-	"\bresponse\"\xbe\x02\n" +
+	"\bresponse\"M\n" +
+	"\x14GetPolicyByIdRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\"j\n" +
+	"\x13CreatePolicyRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12,\n" +
+	"\x06policy\x18\x02 \x01(\v2\x14.zqnt.PolicyProtoDTOR\x06policy\"z\n" +
+	"\x13UpdatePolicyRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\x12,\n" +
+	"\x06policy\x18\x03 \x01(\v2\x14.zqnt.PolicyProtoDTOR\x06policy\"L\n" +
+	"\x13DeletePolicyRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\"\xf8\x01\n" +
+	"\x1dConnectorPolicySingleResponse\x12\x10\n" +
+	"\x03tid\x18\x01 \x01(\tR\x03tid\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x02 \x01(\bR\thasErrors\x128\n" +
+	"\ttimestamp\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x120\n" +
+	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x12.\n" +
+	"\x06policy\x18\x05 \x01(\v2\x14.zqnt.PolicyProtoDTOH\x00R\x06policyB\n" +
+	"\n" +
+	"\bresponse\"\xe3\x01\n" +
+	"\x1dConnectorDeletePolicyResponse\x12\x10\n" +
+	"\x03tid\x18\x01 \x01(\tR\x03tid\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x02 \x01(\bR\thasErrors\x128\n" +
+	"\ttimestamp\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x12\x18\n" +
+	"\adeleted\x18\x04 \x01(\bR\adeleted\x123\n" +
+	"\x05error\x18\x05 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x88\x01\x01B\b\n" +
+	"\x06_error\"L\n" +
+	"#ConnectorGetAllOrganizationsRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\"S\n" +
+	"\x1aGetOrganizationByIdRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\"\x82\x01\n" +
+	"\x19CreateOrganizationRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12>\n" +
+	"\forganization\x18\x02 \x01(\v2\x1a.zqnt.OrganizationProtoDTOR\forganization\"\x92\x01\n" +
+	"\x19UpdateOrganizationRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\x12>\n" +
+	"\forganization\x18\x03 \x01(\v2\x1a.zqnt.OrganizationProtoDTOR\forganization\"R\n" +
+	"\x19DeleteOrganizationRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\"\\\n" +
+	"\x18OrganizationProtoDTOList\x12@\n" +
+	"\rorganizations\x18\x01 \x03(\v2\x1a.zqnt.OrganizationProtoDTOR\rorganizations\"\x97\x02\n" +
+	"\x1dConnectorOrganizationResponse\x12\x10\n" +
+	"\x03tid\x18\x01 \x01(\tR\x03tid\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x02 \x01(\bR\thasErrors\x128\n" +
+	"\ttimestamp\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x120\n" +
+	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x12M\n" +
+	"\x11organization_list\x18\x05 \x01(\v2\x1e.zqnt.OrganizationProtoDTOListH\x00R\x10organizationListB\n" +
+	"\n" +
+	"\bresponse\"\x90\x02\n" +
+	"#ConnectorOrganizationSingleResponse\x12\x10\n" +
+	"\x03tid\x18\x01 \x01(\tR\x03tid\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x02 \x01(\bR\thasErrors\x128\n" +
+	"\ttimestamp\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x120\n" +
+	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x12@\n" +
+	"\forganization\x18\x05 \x01(\v2\x1a.zqnt.OrganizationProtoDTOH\x00R\forganizationB\n" +
+	"\n" +
+	"\bresponse\"\xe9\x01\n" +
+	"#ConnectorDeleteOrganizationResponse\x12\x10\n" +
+	"\x03tid\x18\x01 \x01(\tR\x03tid\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x02 \x01(\bR\thasErrors\x128\n" +
+	"\ttimestamp\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x12\x18\n" +
+	"\adeleted\x18\x04 \x01(\bR\adeleted\x123\n" +
+	"\x05error\x18\x05 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x88\x01\x01B\b\n" +
+	"\x06_error\"\xfc\x03\n" +
+	"\x0fTheatreProtoDTO\x12\x13\n" +
+	"\x02id\x18\x01 \x01(\tH\x00R\x02id\x88\x01\x01\x12'\n" +
+	"\x0forganization_id\x18\x02 \x01(\tR\x0eorganizationId\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x04 \x01(\tR\vdescription\x125\n" +
+	"\bgeo_zone\x18\x05 \x01(\v2\x15.zqnt.GeoAreaProtoDTOH\x01R\ageoZone\x88\x01\x01\x12\x16\n" +
+	"\x06assets\x18\x06 \x03(\tR\x06assets\x12*\n" +
+	"\x11assigned_user_ids\x18\a \x03(\tR\x0fassignedUserIds\x12>\n" +
+	"\n" +
+	"created_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampH\x02R\tcreatedAt\x88\x01\x01\x12@\n" +
+	"\vmodified_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampH\x03R\n" +
+	"modifiedAt\x88\x01\x01\x12/\n" +
+	"\x11parent_theatre_id\x18\n" +
+	" \x01(\tH\x04R\x0fparentTheatreId\x88\x01\x01B\x05\n" +
+	"\x03_idB\v\n" +
+	"\t_geo_zoneB\r\n" +
+	"\v_created_atB\x0e\n" +
+	"\f_modified_atB\x14\n" +
+	"\x12_parent_theatre_id\"H\n" +
+	"\x13TheatreProtoDTOList\x121\n" +
+	"\btheatres\x18\x01 \x03(\v2\x15.zqnt.TheatreProtoDTOR\btheatres\"\x89\x01\n" +
+	"\x1eConnectorGetAllTheatresRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12,\n" +
+	"\x0forganization_id\x18\x02 \x01(\tH\x00R\x0eorganizationId\x88\x01\x01B\x12\n" +
+	"\x10_organization_id\"N\n" +
+	"\x15GetTheatreByIdRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\"n\n" +
+	"\x14CreateTheatreRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12/\n" +
+	"\atheatre\x18\x02 \x01(\v2\x15.zqnt.TheatreProtoDTOR\atheatre\"~\n" +
+	"\x14UpdateTheatreRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\x12/\n" +
+	"\atheatre\x18\x03 \x01(\v2\x15.zqnt.TheatreProtoDTOR\atheatre\"M\n" +
+	"\x14DeleteTheatreRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\"\x83\x02\n" +
+	"\x18ConnectorTheatreResponse\x12\x10\n" +
+	"\x03tid\x18\x01 \x01(\tR\x03tid\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x02 \x01(\bR\thasErrors\x128\n" +
+	"\ttimestamp\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x120\n" +
+	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x12>\n" +
+	"\ftheatre_list\x18\x05 \x01(\v2\x19.zqnt.TheatreProtoDTOListH\x00R\vtheatreListB\n" +
+	"\n" +
+	"\bresponse\"\xfc\x01\n" +
+	"\x1eConnectorTheatreSingleResponse\x12\x10\n" +
+	"\x03tid\x18\x01 \x01(\tR\x03tid\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x02 \x01(\bR\thasErrors\x128\n" +
+	"\ttimestamp\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x120\n" +
+	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x121\n" +
+	"\atheatre\x18\x05 \x01(\v2\x15.zqnt.TheatreProtoDTOH\x00R\atheatreB\n" +
+	"\n" +
+	"\bresponse\"\xe4\x01\n" +
+	"\x1eConnectorDeleteTheatreResponse\x12\x10\n" +
+	"\x03tid\x18\x01 \x01(\tR\x03tid\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x02 \x01(\bR\thasErrors\x128\n" +
+	"\ttimestamp\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x12\x18\n" +
+	"\adeleted\x18\x04 \x01(\bR\adeleted\x123\n" +
+	"\x05error\x18\x05 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x88\x01\x01B\b\n" +
+	"\x06_error\"{\n" +
+	"\x1aAssignUserToTheatreRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x1d\n" +
+	"\n" +
+	"theatre_id\x18\x03 \x01(\tR\ttheatreId\"}\n" +
+	"\x1cRemoveUserFromTheatreRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x1d\n" +
+	"\n" +
+	"theatre_id\x18\x03 \x01(\tR\ttheatreId\"\xc5\x01\n" +
+	"\x19TheatreAssignmentResponse\x12\x10\n" +
+	"\x03tid\x18\x01 \x01(\tR\x03tid\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x02 \x01(\bR\thasErrors\x128\n" +
+	"\ttimestamp\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x123\n" +
+	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x88\x01\x01B\b\n" +
+	"\x06_error\"\x9d\x01\n" +
+	"\x15ListNoFlyZonesRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12'\n" +
+	"\x0forganization_id\x18\x02 \x01(\tR\x0eorganizationId\x12$\n" +
+	"\vactive_only\x18\x03 \x01(\bH\x00R\n" +
+	"activeOnly\x88\x01\x01B\x0e\n" +
+	"\f_active_only\"n\n" +
+	"\x16UpsertNoFlyZoneRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12-\n" +
+	"\x04zone\x18\x02 \x01(\v2\x19.zqnt.MissionZoneProtoDTOR\x04zone\"x\n" +
+	"\x16DeleteNoFlyZoneRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\x12'\n" +
+	"\x0forganization_id\x18\x03 \x01(\tR\x0eorganizationId\"\xf2\x01\n" +
+	"\x15NoFlyZoneListResponse\x12\x10\n" +
+	"\x03tid\x18\x01 \x01(\tR\x03tid\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x02 \x01(\bR\thasErrors\x128\n" +
+	"\ttimestamp\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x123\n" +
+	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x88\x01\x01\x12/\n" +
+	"\x05zones\x18\x05 \x03(\v2\x19.zqnt.MissionZoneProtoDTOR\x05zonesB\b\n" +
+	"\x06_error\"\x80\x02\n" +
+	"\x17NoFlyZoneSingleResponse\x12\x10\n" +
+	"\x03tid\x18\x01 \x01(\tR\x03tid\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x02 \x01(\bR\thasErrors\x128\n" +
+	"\ttimestamp\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x123\n" +
+	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x88\x01\x01\x122\n" +
+	"\x04zone\x18\x05 \x01(\v2\x19.zqnt.MissionZoneProtoDTOH\x01R\x04zone\x88\x01\x01B\b\n" +
+	"\x06_errorB\a\n" +
+	"\x05_zone\"\xdd\x01\n" +
+	"\x17DeleteNoFlyZoneResponse\x12\x10\n" +
+	"\x03tid\x18\x01 \x01(\tR\x03tid\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x02 \x01(\bR\thasErrors\x128\n" +
+	"\ttimestamp\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x123\n" +
+	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x88\x01\x01\x12\x18\n" +
+	"\adeleted\x18\x05 \x01(\bR\adeletedB\b\n" +
+	"\x06_error\"\xfa\x01\n" +
+	"$ProvisionLicensedOrganizationRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12'\n" +
+	"\x0forganization_id\x18\x02 \x01(\tR\x0eorganizationId\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x04 \x01(\tR\vdescription\x12L\n" +
+	"\vcredentials\x18\x05 \x01(\v2*.zqnt.LicenseActivationCredentialsProtoDTOR\vcredentials\"\xce\x02\n" +
+	"%ProvisionLicensedOrganizationResponse\x12\x10\n" +
+	"\x03tid\x18\x01 \x01(\tR\x03tid\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x02 \x01(\bR\thasErrors\x128\n" +
+	"\ttimestamp\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x123\n" +
+	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x88\x01\x01\x12C\n" +
+	"\forganization\x18\x05 \x01(\v2\x1a.zqnt.OrganizationProtoDTOH\x01R\forganization\x88\x01\x01\x12%\n" +
+	"\x0ealready_exists\x18\x06 \x01(\bR\ralreadyExistsB\b\n" +
+	"\x06_errorB\x0f\n" +
+	"\r_organization\"\xdf\x02\n" +
+	"$LicenseActivationCredentialsProtoDTO\x12'\n" +
+	"\x0forganization_id\x18\x01 \x01(\tR\x0eorganizationId\x12#\n" +
+	"\ractivation_id\x18\x02 \x01(\tR\factivationId\x12!\n" +
+	"\fsealed_token\x18\x03 \x01(\fR\vsealedToken\x12%\n" +
+	"\x0esealing_scheme\x18\x04 \x01(\tR\rsealingScheme\x12>\n" +
+	"\n" +
+	"created_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampH\x00R\tcreatedAt\x88\x01\x01\x12@\n" +
+	"\vmodified_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampH\x01R\n" +
+	"modifiedAt\x88\x01\x01B\r\n" +
+	"\v_created_atB\x0e\n" +
+	"\f_modified_at\"P\n" +
+	"'ListLicenseActivationCredentialsRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\"x\n" +
+	"&GetLicenseActivationCredentialsRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12'\n" +
+	"\x0forganization_id\x18\x02 \x01(\tR\x0eorganizationId\"\x9d\x01\n" +
+	"&PutLicenseActivationCredentialsRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12L\n" +
+	"\vcredentials\x18\x02 \x01(\v2*.zqnt.LicenseActivationCredentialsProtoDTOR\vcredentials\"{\n" +
+	")DeleteLicenseActivationCredentialsRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12'\n" +
+	"\x0forganization_id\x18\x02 \x01(\tR\x0eorganizationId\"\xa2\x02\n" +
+	"(LicenseActivationCredentialsListResponse\x12\x10\n" +
+	"\x03tid\x18\x01 \x01(\tR\x03tid\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x02 \x01(\bR\thasErrors\x128\n" +
+	"\ttimestamp\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x123\n" +
+	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x88\x01\x01\x12L\n" +
+	"\vcredentials\x18\x05 \x03(\v2*.zqnt.LicenseActivationCredentialsProtoDTOR\vcredentialsB\b\n" +
+	"\x06_error\"\xb9\x02\n" +
+	"*LicenseActivationCredentialsSingleResponse\x12\x10\n" +
+	"\x03tid\x18\x01 \x01(\tR\x03tid\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x02 \x01(\bR\thasErrors\x128\n" +
+	"\ttimestamp\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x123\n" +
+	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x88\x01\x01\x12Q\n" +
+	"\vcredentials\x18\x05 \x01(\v2*.zqnt.LicenseActivationCredentialsProtoDTOH\x01R\vcredentials\x88\x01\x01B\b\n" +
+	"\x06_errorB\x0e\n" +
+	"\f_credentials\"\xf0\x01\n" +
+	"*DeleteLicenseActivationCredentialsResponse\x12\x10\n" +
+	"\x03tid\x18\x01 \x01(\tR\x03tid\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x02 \x01(\bR\thasErrors\x128\n" +
+	"\ttimestamp\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x123\n" +
+	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x88\x01\x01\x12\x18\n" +
+	"\adeleted\x18\x05 \x01(\bR\adeletedB\b\n" +
+	"\x06_error\"\xd0\n" +
+	"\n" +
+	"\x14EventTriggerProtoDTO\x12\x13\n" +
+	"\x02id\x18\x01 \x01(\tH\x00R\x02id\x88\x01\x01\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
+	"\x06active\x18\x03 \x01(\bR\x06active\x12\x1d\n" +
+	"\n" +
+	"event_type\x18\x04 \x01(\tR\teventType\x12\x1e\n" +
+	"\basset_sn\x18\x05 \x01(\tH\x01R\aassetSn\x88\x01\x01\x12$\n" +
+	"\vobject_type\x18\x06 \x01(\tH\x02R\n" +
+	"objectType\x88\x01\x01\x12*\n" +
+	"\x0emin_confidence\x18\a \x01(\x02H\x03R\rminConfidence\x88\x01\x01\x12,\n" +
+	"\x0ftelemetry_field\x18\b \x01(\tH\x04R\x0etelemetryField\x88\x01\x01\x12/\n" +
+	"\x13comparison_operator\x18\t \x01(\tR\x12comparisonOperator\x12.\n" +
+	"\x10comparison_value\x18\n" +
+	" \x01(\tH\x05R\x0fcomparisonValue\x88\x01\x01\x12(\n" +
+	"\rwebhook_token\x18\v \x01(\tH\x06R\fwebhookToken\x88\x01\x01\x12%\n" +
+	"\x0eapplication_id\x18\f \x01(\tR\rapplicationId\x12\x19\n" +
+	"\bskill_id\x18\r \x01(\tR\askillId\x12?\n" +
+	"\x19execution_parameters_json\x18\x0e \x01(\tH\aR\x17executionParametersJson\x88\x01\x01\x12\x1d\n" +
+	"\n" +
+	"auto_start\x18\x0f \x01(\bR\tautoStart\x12)\n" +
+	"\x10cooldown_seconds\x18\x10 \x01(\x05R\x0fcooldownSeconds\x12C\n" +
+	"\rlast_fired_at\x18\x11 \x01(\v2\x1a.google.protobuf.TimestampH\bR\vlastFiredAt\x88\x01\x01\x12>\n" +
+	"\n" +
+	"created_at\x18\x12 \x01(\v2\x1a.google.protobuf.TimestampH\tR\tcreatedAt\x88\x01\x01\x12@\n" +
+	"\vmodified_at\x18\x13 \x01(\v2\x1a.google.protobuf.TimestampH\n" +
+	"R\n" +
+	"modifiedAt\x88\x01\x01\x12 \n" +
+	"\tbridge_id\x18\x14 \x01(\tH\vR\bbridgeId\x88\x01\x01\x12,\n" +
+	"\x0fdispatch_target\x18\x15 \x01(\tH\fR\x0edispatchTarget\x88\x01\x01\x12\x1f\n" +
+	"\bpriority\x18\x16 \x01(\x05H\rR\bpriority\x88\x01\x01\x12,\n" +
+	"\x0forganization_id\x18\x17 \x01(\tH\x0eR\x0eorganizationId\x88\x01\x01\x12\"\n" +
+	"\n" +
+	"theatre_id\x18\x18 \x01(\tH\x0fR\ttheatreId\x88\x01\x01\x12.\n" +
+	"\x10attention_reason\x18\x19 \x01(\tH\x10R\x0fattentionReason\x88\x01\x01B\x05\n" +
+	"\x03_idB\v\n" +
+	"\t_asset_snB\x0e\n" +
+	"\f_object_typeB\x11\n" +
+	"\x0f_min_confidenceB\x12\n" +
+	"\x10_telemetry_fieldB\x13\n" +
+	"\x11_comparison_valueB\x10\n" +
+	"\x0e_webhook_tokenB\x1c\n" +
+	"\x1a_execution_parameters_jsonB\x10\n" +
+	"\x0e_last_fired_atB\r\n" +
+	"\v_created_atB\x0e\n" +
+	"\f_modified_atB\f\n" +
+	"\n" +
+	"_bridge_idB\x12\n" +
+	"\x10_dispatch_targetB\v\n" +
+	"\t_priorityB\x12\n" +
+	"\x10_organization_idB\r\n" +
+	"\v_theatre_idB\x13\n" +
+	"\x11_attention_reason\"]\n" +
+	"\x18EventTriggerProtoDTOList\x12A\n" +
+	"\x0eevent_triggers\x18\x01 \x03(\v2\x1a.zqnt.EventTriggerProtoDTOR\reventTriggers\"m\n" +
+	"#ConnectorGetAllEventTriggersRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x1f\n" +
+	"\vactive_only\x18\x02 \x01(\bR\n" +
+	"activeOnly\"S\n" +
+	"\x1aGetEventTriggerByIdRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\"\x83\x01\n" +
+	"\x19CreateEventTriggerRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12?\n" +
+	"\revent_trigger\x18\x02 \x01(\v2\x1a.zqnt.EventTriggerProtoDTOR\feventTrigger\"\x93\x01\n" +
+	"\x19UpdateEventTriggerRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\x12?\n" +
+	"\revent_trigger\x18\x03 \x01(\v2\x1a.zqnt.EventTriggerProtoDTOR\feventTrigger\"R\n" +
+	"\x19DeleteEventTriggerRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\"W\n" +
+	"\x1eRecordEventTriggerFiredRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\"b\n" +
+	")RegenerateEventTriggerWebhookTokenRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\"c\n" +
+	"$GetEventTriggerByWebhookTokenRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x14\n" +
+	"\x05token\x18\x02 \x01(\tR\x05token\"\x98\x02\n" +
+	"\x1dConnectorEventTriggerResponse\x12\x10\n" +
+	"\x03tid\x18\x01 \x01(\tR\x03tid\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x02 \x01(\bR\thasErrors\x128\n" +
+	"\ttimestamp\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x120\n" +
+	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x12N\n" +
+	"\x12event_trigger_list\x18\x05 \x01(\v2\x1e.zqnt.EventTriggerProtoDTOListH\x00R\x10eventTriggerListB\n" +
+	"\n" +
+	"\bresponse\"\x91\x02\n" +
+	"#ConnectorEventTriggerSingleResponse\x12\x10\n" +
+	"\x03tid\x18\x01 \x01(\tR\x03tid\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x02 \x01(\bR\thasErrors\x128\n" +
+	"\ttimestamp\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x120\n" +
+	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x12A\n" +
+	"\revent_trigger\x18\x05 \x01(\v2\x1a.zqnt.EventTriggerProtoDTOH\x00R\feventTriggerB\n" +
+	"\n" +
+	"\bresponse\"\xe9\x01\n" +
+	"#ConnectorDeleteEventTriggerResponse\x12\x10\n" +
+	"\x03tid\x18\x01 \x01(\tR\x03tid\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x02 \x01(\bR\thasErrors\x128\n" +
+	"\ttimestamp\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x12\x18\n" +
+	"\adeleted\x18\x04 \x01(\bR\adeleted\x123\n" +
+	"\x05error\x18\x05 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x88\x01\x01B\b\n" +
+	"\x06_error\"\xce\x02\n" +
+	"\x18DetectionSummaryProtoDTO\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x19\n" +
+	"\basset_sn\x18\x02 \x01(\tR\aassetSn\x12\x1f\n" +
+	"\vobject_type\x18\x03 \x01(\tR\n" +
+	"objectType\x12#\n" +
+	"\n" +
+	"confidence\x18\x04 \x01(\x02H\x00R\n" +
+	"confidence\x88\x01\x01\x12;\n" +
+	"\vdetected_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
+	"detectedAt\x12 \n" +
+	"\tobject_id\x18\x06 \x01(\tH\x01R\bobjectId\x88\x01\x01\x128\n" +
+	"\bposition\x18\a \x01(\v2\x17.zqnt.DetectionPositionH\x02R\bposition\x88\x01\x01B\r\n" +
+	"\v_confidenceB\f\n" +
+	"\n" +
+	"_object_idB\v\n" +
+	"\t_position\"\x98\x02\n" +
+	"\x1bListRecentDetectionsRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x120\n" +
+	"\x05since\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\x05since\x12\x1e\n" +
+	"\basset_sn\x18\x03 \x01(\tH\x00R\aassetSn\x88\x01\x01\x12$\n" +
+	"\vobject_type\x18\x04 \x01(\tH\x01R\n" +
+	"objectType\x88\x01\x01\x12*\n" +
+	"\x0emin_confidence\x18\x05 \x01(\x02H\x02R\rminConfidence\x88\x01\x01B\v\n" +
+	"\t_asset_snB\x0e\n" +
+	"\f_object_typeB\x11\n" +
+	"\x0f_min_confidence\"\x8a\x02\n" +
+	"\x1eConnectorDetectionListResponse\x12\x10\n" +
+	"\x03tid\x18\x01 \x01(\tR\x03tid\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x02 \x01(\bR\thasErrors\x128\n" +
+	"\ttimestamp\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x12>\n" +
+	"\n" +
+	"detections\x18\x04 \x03(\v2\x1e.zqnt.DetectionSummaryProtoDTOR\n" +
+	"detections\x123\n" +
+	"\x05error\x18\x05 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x88\x01\x01B\b\n" +
+	"\x06_error\"e\n" +
+	"!GetLatestTelemetryForAssetRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x19\n" +
+	"\basset_sn\x18\x02 \x01(\tR\aassetSn\"\x86\x02\n" +
+	" ConnectorTelemetrySingleResponse\x12\x10\n" +
+	"\x03tid\x18\x01 \x01(\tR\x03tid\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x02 \x01(\bR\thasErrors\x128\n" +
+	"\ttimestamp\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x120\n" +
+	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x129\n" +
+	"\ttelemetry\x18\x05 \x01(\v2\x19.zqnt.AssetTelemetryProtoH\x00R\ttelemetryB\n" +
+	"\n" +
+	"\bresponse\"\xa1\x04\n" +
 	"\x17TechnicalConfigProtoDTO\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -2640,16 +11811,26 @@ const file_connector_proto_rawDesc = "" +
 	"\x05scope\x18\x05 \x01(\tR\x05scope\x12&\n" +
 	"\fscope_target\x18\x06 \x01(\tH\x01R\vscopeTarget\x88\x01\x01\x12\x16\n" +
 	"\x06active\x18\a \x01(\bR\x06active\x12%\n" +
-	"\vdescription\x18\b \x01(\tH\x02R\vdescription\x88\x01\x01B\x0f\n" +
+	"\vdescription\x18\b \x01(\tH\x02R\vdescription\x88\x01\x01\x12,\n" +
+	"\x0forganization_id\x18\t \x01(\tH\x03R\x0eorganizationId\x88\x01\x01\x12>\n" +
+	"\n" +
+	"created_at\x18\n" +
+	" \x01(\v2\x1a.google.protobuf.TimestampH\x04R\tcreatedAt\x88\x01\x01\x12@\n" +
+	"\vmodified_at\x18\v \x01(\v2\x1a.google.protobuf.TimestampH\x05R\n" +
+	"modifiedAt\x88\x01\x01B\x0f\n" +
 	"\r_config_valueB\x0f\n" +
 	"\r_scope_targetB\x0e\n" +
-	"\f_description\"V\n" +
+	"\f_descriptionB\x12\n" +
+	"\x10_organization_idB\r\n" +
+	"\v_created_atB\x0e\n" +
+	"\f_modified_at\"V\n" +
 	"\x1bTechnicalConfigProtoDTOList\x127\n" +
-	"\aconfigs\x18\x01 \x03(\v2\x1d.zqnt.TechnicalConfigProtoDTOR\aconfigs\"\xa1\x01\n" +
+	"\aconfigs\x18\x01 \x03(\v2\x1d.zqnt.TechnicalConfigProtoDTOR\aconfigs\"\xcc\x01\n" +
 	"\x1aConnectorGetConfigsRequest\x12%\n" +
 	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x19\n" +
 	"\x05scope\x18\x02 \x01(\tH\x00R\x05scope\x88\x01\x01\x12&\n" +
-	"\fscope_target\x18\x03 \x01(\tH\x01R\vscopeTarget\x88\x01\x01B\b\n" +
+	"\fscope_target\x18\x03 \x01(\tH\x01R\vscopeTarget\x88\x01\x01\x12)\n" +
+	"\x10include_inactive\x18\x04 \x01(\bR\x0fincludeInactiveB\b\n" +
 	"\x06_scopeB\x0f\n" +
 	"\r_scope_target\"\x88\x02\n" +
 	"\x17ConnectorConfigResponse\x12\x10\n" +
@@ -2661,11 +11842,51 @@ const file_connector_proto_rawDesc = "" +
 	"\vconfig_list\x18\x05 \x01(\v2!.zqnt.TechnicalConfigProtoDTOListH\x00R\n" +
 	"configListB\n" +
 	"\n" +
-	"\bresponse*f\n" +
+	"\bresponse\"V\n" +
+	"\x1dGetTechnicalConfigByIdRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\"|\n" +
+	"\x1cCreateTechnicalConfigRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x125\n" +
+	"\x06config\x18\x02 \x01(\v2\x1d.zqnt.TechnicalConfigProtoDTOR\x06config\"\x8c\x01\n" +
+	"\x1cUpdateTechnicalConfigRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\x125\n" +
+	"\x06config\x18\x03 \x01(\v2\x1d.zqnt.TechnicalConfigProtoDTOR\x06config\"U\n" +
+	"\x1cDeleteTechnicalConfigRequest\x12%\n" +
+	"\x04base\x18\x01 \x01(\v2\x11.zqnt.RequestBaseR\x04base\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\"\x81\x02\n" +
+	"\x1dConnectorConfigSingleResponse\x12\x10\n" +
+	"\x03tid\x18\x01 \x01(\tR\x03tid\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x02 \x01(\bR\thasErrors\x128\n" +
+	"\ttimestamp\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x120\n" +
+	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x127\n" +
+	"\x06config\x18\x05 \x01(\v2\x1d.zqnt.TechnicalConfigProtoDTOH\x00R\x06configB\n" +
+	"\n" +
+	"\bresponse\"\xe3\x01\n" +
+	"\x1dConnectorDeleteConfigResponse\x12\x10\n" +
+	"\x03tid\x18\x01 \x01(\tR\x03tid\x12\x1d\n" +
+	"\n" +
+	"has_errors\x18\x02 \x01(\bR\thasErrors\x128\n" +
+	"\ttimestamp\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x12\x18\n" +
+	"\adeleted\x18\x04 \x01(\bR\adeleted\x123\n" +
+	"\x05error\x18\x05 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x88\x01\x01B\b\n" +
+	"\x06_error*\xa1\x01\n" +
+	"\x13SkillContractStatus\x12 \n" +
+	"\x1cSKILL_CONTRACT_STATUS_ACTIVE\x10\x00\x12\x1f\n" +
+	"\x1bSKILL_CONTRACT_STATUS_DRAFT\x10\x01\x12$\n" +
+	" SKILL_CONTRACT_STATUS_DEPRECATED\x10\x02\x12!\n" +
+	"\x1dSKILL_CONTRACT_STATUS_RETIRED\x10\x03*\xc4\x01\n" +
+	"\x1aSkillContractCompatibility\x12(\n" +
+	"$SKILL_CONTRACT_COMPATIBILITY_UNKNOWN\x10\x00\x12$\n" +
+	" SKILL_CONTRACT_COMPATIBILITY_NEW\x10\x01\x12+\n" +
+	"'SKILL_CONTRACT_COMPATIBILITY_COMPATIBLE\x10\x02\x12)\n" +
+	"%SKILL_CONTRACT_COMPATIBILITY_BREAKING\x10\x03*f\n" +
 	"\rTelemetryType\x12\x1e\n" +
 	"\x1aTELEMETRY_TYPE_UNSPECIFIED\x10\x00\x12\x18\n" +
 	"\x14TELEMETRY_TYPE_ASSET\x10\x01\x12\x1b\n" +
-	"\x17TELEMETRY_TYPE_SUBASSET\x10\x022\xa5\x15\n" +
+	"\x17TELEMETRY_TYPE_SUBASSET\x10\x022\xbfI\n" +
 	"\x10ConnectorService\x12M\n" +
 	"\rRegisterAsset\x12#.zqnt.ConnectorRegisterAssetRequest\x1a\x17.zqnt.ConnectorResponse\x12=\n" +
 	"\x0fDeregisterAsset\x12\x11.zqnt.RequestBase\x1a\x17.zqnt.ConnectorResponse\x12E\n" +
@@ -2674,39 +11895,108 @@ const file_connector_proto_rawDesc = "" +
 	"\x0eUpdateSubAsset\x12$.zqnt.ConnectorUpdateSubAssetRequest\x1a\x17.zqnt.ConnectorResponse\x12:\n" +
 	"\fGetAssetBySn\x12\x11.zqnt.RequestBase\x1a\x17.zqnt.ConnectorResponse\x12K\n" +
 	"\fGetAssetById\x12\".zqnt.ConnectorGetAssetByIdRequest\x1a\x17.zqnt.ConnectorResponse\x12=\n" +
-	"\x0fGetSubAssetBySn\x12\x11.zqnt.RequestBase\x1a\x17.zqnt.ConnectorResponse\x12Q\n" +
+	"\x0fGetSubAssetBySn\x12\x11.zqnt.RequestBase\x1a\x17.zqnt.ConnectorResponse\x12>\n" +
+	"\n" +
+	"ListAssets\x12\x17.zqnt.ListAssetsRequest\x1a\x17.zqnt.AssetListResponse\x12K\n" +
+	"\x10CreateAssetClaim\x12\x1d.zqnt.CreateAssetClaimRequest\x1a\x18.zqnt.AssetClaimResponse\x12J\n" +
+	"\x10RedeemAssetClaim\x12\x1d.zqnt.RedeemAssetClaimRequest\x1a\x17.zqnt.ConnectorResponse\x12Z\n" +
+	"\x12DescribeAssetClaim\x12\x1f.zqnt.DescribeAssetClaimRequest\x1a#.zqnt.AssetClaimDescriptionResponse\x12M\n" +
+	"\x0fListAssetClaims\x12\x1c.zqnt.ListAssetClaimsRequest\x1a\x1c.zqnt.AssetClaimListResponse\x12K\n" +
+	"\x10RevokeAssetClaim\x12\x1d.zqnt.RevokeAssetClaimRequest\x1a\x18.zqnt.AssetClaimResponse\x12Q\n" +
 	"\x12UpsertAssetPayload\x12\x1f.zqnt.UpsertAssetPayloadRequest\x1a\x1a.zqnt.AssetPayloadResponse\x12S\n" +
 	"\x11ListAssetPayloads\x12\x1e.zqnt.ListAssetPayloadsRequest\x1a\x1e.zqnt.AssetPayloadListResponse\x12Q\n" +
-	"\x12DeleteAssetPayload\x12\x1f.zqnt.DeleteAssetPayloadRequest\x1a\x1a.zqnt.AssetPayloadResponse\x12Q\n" +
-	"\x0fGetOrganization\x12%.zqnt.ConnectorGetOrganizationRequest\x1a\x17.zqnt.ConnectorResponse\x12<\n" +
-	"\n" +
-	"GetMission\x12\x17.zqnt.GetMissionRequest\x1a\x15.zqnt.MissionResponse\x12B\n" +
-	"\rCreateMission\x12\x1a.zqnt.CreateMissionRequest\x1a\x15.zqnt.MissionResponse\x12B\n" +
-	"\rUpdateMission\x12\x1a.zqnt.UpdateMissionRequest\x1a\x15.zqnt.MissionResponse\x12B\n" +
-	"\rDeleteMission\x12\x1a.zqnt.DeleteMissionRequest\x1a\x15.zqnt.MissionResponse\x12R\n" +
-	"\x15UploadMissionNfzZones\x12\".zqnt.UploadMissionNfzZonesRequest\x1a\x15.zqnt.MissionResponse\x123\n" +
-	"\aGetTask\x12\x14.zqnt.GetTaskRequest\x1a\x12.zqnt.TaskResponse\x12G\n" +
-	"\x11GetTaskByFlightId\x12\x1e.zqnt.GetTaskByFlightIdRequest\x1a\x12.zqnt.TaskResponse\x12R\n" +
-	"\x14GetWaypointsByTaskId\x12!.zqnt.GetWaypointsByTaskIdRequest\x1a\x17.zqnt.WaypointsResponse\x129\n" +
-	"\n" +
-	"CreateTask\x12\x17.zqnt.CreateTaskRequest\x1a\x12.zqnt.TaskResponse\x129\n" +
-	"\n" +
-	"UpdateTask\x12\x17.zqnt.UpdateTaskRequest\x1a\x12.zqnt.TaskResponse\x129\n" +
-	"\n" +
-	"DeleteTask\x12\x17.zqnt.DeleteTaskRequest\x1a\x12.zqnt.TaskResponse\x12B\n" +
+	"\x12DeleteAssetPayload\x12\x1f.zqnt.DeleteAssetPayloadRequest\x1a\x1a.zqnt.AssetPayloadResponse\x12N\n" +
+	"\x10SetAssetProperty\x12\x1d.zqnt.SetAssetPropertyRequest\x1a\x1b.zqnt.AssetPropertyResponse\x12X\n" +
+	"\x13ListAssetProperties\x12 .zqnt.ListAssetPropertiesRequest\x1a\x1f.zqnt.AssetPropertyListResponse\x12T\n" +
+	"\x13DeleteAssetProperty\x12 .zqnt.DeleteAssetPropertyRequest\x1a\x1b.zqnt.AssetPropertyResponse\x12Q\n" +
+	"\x0fGetOrganization\x12%.zqnt.ConnectorGetOrganizationRequest\x1a\x17.zqnt.ConnectorResponse\x12F\n" +
+	"\x0eListSchedulers\x12\x1b.zqnt.ListSchedulersRequest\x1a\x17.zqnt.SchedulerResponse\x12B\n" +
 	"\fGetScheduler\x12\x19.zqnt.GetSchedulerRequest\x1a\x17.zqnt.SchedulerResponse\x12H\n" +
 	"\x0fCreateScheduler\x12\x1c.zqnt.CreateSchedulerRequest\x1a\x17.zqnt.SchedulerResponse\x12J\n" +
 	"\x10CreateSchedulers\x12\x1d.zqnt.CreateSchedulersRequest\x1a\x17.zqnt.SchedulerResponse\x12H\n" +
 	"\x0fUpdateScheduler\x12\x1c.zqnt.UpdateSchedulerRequest\x1a\x17.zqnt.SchedulerResponse\x12H\n" +
 	"\x0fDeleteScheduler\x12\x1c.zqnt.DeleteSchedulerRequest\x1a\x17.zqnt.SchedulerResponse\x12J\n" +
-	"\x10DeleteSchedulers\x12\x1d.zqnt.DeleteSchedulersRequest\x1a\x17.zqnt.SchedulerResponse\x12V\n" +
-	"\x16DeleteSchedulersByTask\x12#.zqnt.DeleteSchedulersByTaskRequest\x1a\x17.zqnt.SchedulerResponse\x12V\n" +
+	"\x10DeleteSchedulers\x12\x1d.zqnt.DeleteSchedulersRequest\x1a\x17.zqnt.SchedulerResponse\x12T\n" +
+	"\x15RecordSchedulerFiring\x12\".zqnt.RecordSchedulerFiringRequest\x1a\x17.zqnt.SchedulerResponse\x12V\n" +
 	"\x13StoreTelemetryBatch\x12$.zqnt.ConnectorStoreTelemetryRequest\x1a\x17.zqnt.ConnectorResponse(\x01\x12V\n" +
 	"\x13StoreDetectionBatch\x12$.zqnt.ConnectorStoreDetectionRequest\x1a\x17.zqnt.ConnectorResponse(\x01\x12U\n" +
-	"\x16StoreNotificationBatch\x12 .zqnt.ProduceNotificationRequest\x1a\x17.zqnt.ConnectorResponse(\x01\x12[\n" +
+	"\x16StoreNotificationBatch\x12 .zqnt.ProduceNotificationRequest\x1a\x17.zqnt.ConnectorResponse(\x01\x12L\n" +
+	"\x11RegisterMediaFile\x12\x1e.zqnt.RegisterMediaFileRequest\x1a\x17.zqnt.MediaFileProtoDTO\x12K\n" +
+	"\x0eListMediaFiles\x12\x1b.zqnt.ListMediaFilesRequest\x1a\x1c.zqnt.ListMediaFilesResponse\x12B\n" +
+	"\fGetMediaFile\x12\x19.zqnt.GetMediaFileRequest\x1a\x17.zqnt.MediaFileProtoDTO\x12[\n" +
 	"\x17GetActivePoliciesByType\x12!.zqnt.ConnectorGetPoliciesRequest\x1a\x1d.zqnt.ConnectorPolicyResponse\x12[\n" +
-	"\x14GetAllActivePolicies\x12$.zqnt.ConnectorGetAllPoliciesRequest\x1a\x1d.zqnt.ConnectorPolicyResponse\x12V\n" +
-	"\x13GetTechnicalConfigs\x12 .zqnt.ConnectorGetConfigsRequest\x1a\x1d.zqnt.ConnectorConfigResponseBG\n" +
+	"\x14GetAllActivePolicies\x12$.zqnt.ConnectorGetAllPoliciesRequest\x1a\x1d.zqnt.ConnectorPolicyResponse\x12P\n" +
+	"\rGetPolicyById\x12\x1a.zqnt.GetPolicyByIdRequest\x1a#.zqnt.ConnectorPolicySingleResponse\x12N\n" +
+	"\fCreatePolicy\x12\x19.zqnt.CreatePolicyRequest\x1a#.zqnt.ConnectorPolicySingleResponse\x12N\n" +
+	"\fUpdatePolicy\x12\x19.zqnt.UpdatePolicyRequest\x1a#.zqnt.ConnectorPolicySingleResponse\x12N\n" +
+	"\fDeletePolicy\x12\x19.zqnt.DeletePolicyRequest\x1a#.zqnt.ConnectorDeletePolicyResponse\x12e\n" +
+	"\x13GetAllOrganizations\x12).zqnt.ConnectorGetAllOrganizationsRequest\x1a#.zqnt.ConnectorOrganizationResponse\x12b\n" +
+	"\x13GetOrganizationById\x12 .zqnt.GetOrganizationByIdRequest\x1a).zqnt.ConnectorOrganizationSingleResponse\x12`\n" +
+	"\x12CreateOrganization\x12\x1f.zqnt.CreateOrganizationRequest\x1a).zqnt.ConnectorOrganizationSingleResponse\x12`\n" +
+	"\x12UpdateOrganization\x12\x1f.zqnt.UpdateOrganizationRequest\x1a).zqnt.ConnectorOrganizationSingleResponse\x12`\n" +
+	"\x12DeleteOrganization\x12\x1f.zqnt.DeleteOrganizationRequest\x1a).zqnt.ConnectorDeleteOrganizationResponse\x12x\n" +
+	"\x1dProvisionLicensedOrganization\x12*.zqnt.ProvisionLicensedOrganizationRequest\x1a+.zqnt.ProvisionLicensedOrganizationResponse\x12V\n" +
+	"\x0eGetAllTheatres\x12$.zqnt.ConnectorGetAllTheatresRequest\x1a\x1e.zqnt.ConnectorTheatreResponse\x12S\n" +
+	"\x0eGetTheatreById\x12\x1b.zqnt.GetTheatreByIdRequest\x1a$.zqnt.ConnectorTheatreSingleResponse\x12Q\n" +
+	"\rCreateTheatre\x12\x1a.zqnt.CreateTheatreRequest\x1a$.zqnt.ConnectorTheatreSingleResponse\x12Q\n" +
+	"\rUpdateTheatre\x12\x1a.zqnt.UpdateTheatreRequest\x1a$.zqnt.ConnectorTheatreSingleResponse\x12Q\n" +
+	"\rDeleteTheatre\x12\x1a.zqnt.DeleteTheatreRequest\x1a$.zqnt.ConnectorDeleteTheatreResponse\x12X\n" +
+	"\x13AssignUserToTheatre\x12 .zqnt.AssignUserToTheatreRequest\x1a\x1f.zqnt.TheatreAssignmentResponse\x12\\\n" +
+	"\x15RemoveUserFromTheatre\x12\".zqnt.RemoveUserFromTheatreRequest\x1a\x1f.zqnt.TheatreAssignmentResponse\x12J\n" +
+	"\x0eListNoFlyZones\x12\x1b.zqnt.ListNoFlyZonesRequest\x1a\x1b.zqnt.NoFlyZoneListResponse\x12N\n" +
+	"\x0fUpsertNoFlyZone\x12\x1c.zqnt.UpsertNoFlyZoneRequest\x1a\x1d.zqnt.NoFlyZoneSingleResponse\x12N\n" +
+	"\x0fDeleteNoFlyZone\x12\x1c.zqnt.DeleteNoFlyZoneRequest\x1a\x1d.zqnt.DeleteNoFlyZoneResponse\x12\x81\x01\n" +
+	" ListLicenseActivationCredentials\x12-.zqnt.ListLicenseActivationCredentialsRequest\x1a..zqnt.LicenseActivationCredentialsListResponse\x12\x81\x01\n" +
+	"\x1fGetLicenseActivationCredentials\x12,.zqnt.GetLicenseActivationCredentialsRequest\x1a0.zqnt.LicenseActivationCredentialsSingleResponse\x12\x81\x01\n" +
+	"\x1fPutLicenseActivationCredentials\x12,.zqnt.PutLicenseActivationCredentialsRequest\x1a0.zqnt.LicenseActivationCredentialsSingleResponse\x12\x87\x01\n" +
+	"\"DeleteLicenseActivationCredentials\x12/.zqnt.DeleteLicenseActivationCredentialsRequest\x1a0.zqnt.DeleteLicenseActivationCredentialsResponse\x12e\n" +
+	"\x13GetAllEventTriggers\x12).zqnt.ConnectorGetAllEventTriggersRequest\x1a#.zqnt.ConnectorEventTriggerResponse\x12b\n" +
+	"\x13GetEventTriggerById\x12 .zqnt.GetEventTriggerByIdRequest\x1a).zqnt.ConnectorEventTriggerSingleResponse\x12`\n" +
+	"\x12CreateEventTrigger\x12\x1f.zqnt.CreateEventTriggerRequest\x1a).zqnt.ConnectorEventTriggerSingleResponse\x12`\n" +
+	"\x12UpdateEventTrigger\x12\x1f.zqnt.UpdateEventTriggerRequest\x1a).zqnt.ConnectorEventTriggerSingleResponse\x12`\n" +
+	"\x12DeleteEventTrigger\x12\x1f.zqnt.DeleteEventTriggerRequest\x1a).zqnt.ConnectorDeleteEventTriggerResponse\x12j\n" +
+	"\x17RecordEventTriggerFired\x12$.zqnt.RecordEventTriggerFiredRequest\x1a).zqnt.ConnectorEventTriggerSingleResponse\x12\x80\x01\n" +
+	"\"RegenerateEventTriggerWebhookToken\x12/.zqnt.RegenerateEventTriggerWebhookTokenRequest\x1a).zqnt.ConnectorEventTriggerSingleResponse\x12v\n" +
+	"\x1dGetEventTriggerByWebhookToken\x12*.zqnt.GetEventTriggerByWebhookTokenRequest\x1a).zqnt.ConnectorEventTriggerSingleResponse\x12_\n" +
+	"\x14ListRecentDetections\x12!.zqnt.ListRecentDetectionsRequest\x1a$.zqnt.ConnectorDetectionListResponse\x12m\n" +
+	"\x1aGetLatestTelemetryForAsset\x12'.zqnt.GetLatestTelemetryForAssetRequest\x1a&.zqnt.ConnectorTelemetrySingleResponse\x12V\n" +
+	"\x13GetTechnicalConfigs\x12 .zqnt.ConnectorGetConfigsRequest\x1a\x1d.zqnt.ConnectorConfigResponse\x12b\n" +
+	"\x16GetTechnicalConfigById\x12#.zqnt.GetTechnicalConfigByIdRequest\x1a#.zqnt.ConnectorConfigSingleResponse\x12`\n" +
+	"\x15CreateTechnicalConfig\x12\".zqnt.CreateTechnicalConfigRequest\x1a#.zqnt.ConnectorConfigSingleResponse\x12`\n" +
+	"\x15UpdateTechnicalConfig\x12\".zqnt.UpdateTechnicalConfigRequest\x1a#.zqnt.ConnectorConfigSingleResponse\x12`\n" +
+	"\x15DeleteTechnicalConfig\x12\".zqnt.DeleteTechnicalConfigRequest\x1a#.zqnt.ConnectorDeleteConfigResponse\x12O\n" +
+	"\x12PersistApplication\x12\x1e.zqnt.UpsertApplicationRequest\x1a\x19.zqnt.ApplicationResponse\x12Q\n" +
+	"\x17GetPersistedApplication\x12\x1b.zqnt.GetApplicationRequest\x1a\x19.zqnt.ApplicationResponse\x12Y\n" +
+	"\x19ListPersistedApplications\x12\x1d.zqnt.ListApplicationsRequest\x1a\x1d.zqnt.ApplicationListResponse\x12W\n" +
+	"\x1aDeletePersistedApplication\x12\x1e.zqnt.DeleteApplicationRequest\x1a\x19.zqnt.ApplicationResponse\x12[\n" +
+	"\x13SetApplicationPause\x12 .zqnt.SetApplicationPauseRequest\x1a\".zqnt.ApplicationPauseListResponse\x12_\n" +
+	"\x15ListApplicationPauses\x12\".zqnt.ListApplicationPausesRequest\x1a\".zqnt.ApplicationPauseListResponse\x12s\n" +
+	"!GetApplicationEnvironmentPointers\x12'.zqnt.GetApplicationEnvironmentsRequest\x1a%.zqnt.ApplicationEnvironmentsResponse\x12j\n" +
+	"\x19PromoteApplicationVersion\x12&.zqnt.PromoteApplicationVersionRequest\x1a%.zqnt.ApplicationEnvironmentsResponse\x12Y\n" +
+	"\x15PersistSkillExecution\x12\".zqnt.PersistSkillExecutionRequest\x1a\x1c.zqnt.SkillExecutionResponse\x12Z\n" +
+	"\x1aGetPersistedSkillExecution\x12\x1e.zqnt.GetSkillExecutionRequest\x1a\x1c.zqnt.SkillExecutionResponse\x12b\n" +
+	"\x1cListPersistedSkillExecutions\x12 .zqnt.ListSkillExecutionsRequest\x1a .zqnt.SkillExecutionListResponse\x12[\n" +
+	"\x19AppendSkillExecutionEvent\x12&.zqnt.AppendSkillExecutionEventRequest\x1a\x16.google.protobuf.Empty\x12U\n" +
+	"\x14ObserveSkillContract\x12 .zqnt.UpsertSkillContractRequest\x1a\x1b.zqnt.SkillContractResponse\x12V\n" +
+	"\x12ListSkillContracts\x12\x1f.zqnt.ListSkillContractsRequest\x1a\x1f.zqnt.SkillContractListResponse\x12Z\n" +
+	"\x16SetSkillContractStatus\x12#.zqnt.SetSkillContractStatusRequest\x1a\x1b.zqnt.SkillContractResponse\x12d\n" +
+	"\x1bSetSkillContractPermissions\x12(.zqnt.SetSkillContractPermissionsRequest\x1a\x1b.zqnt.SkillContractResponse\x12Q\n" +
+	"\x10AuthenticateUser\x12\x1d.zqnt.AuthenticateUserRequest\x1a\x1e.zqnt.AuthenticateUserResponse\x12?\n" +
+	"\n" +
+	"CreateUser\x12\x17.zqnt.CreateUserRequest\x1a\x18.zqnt.CreateUserResponse\x12H\n" +
+	"\rResetPassword\x12\x1a.zqnt.ResetPasswordRequest\x1a\x1b.zqnt.ResetPasswordResponse\x12Q\n" +
+	"\x14RecordAuthAuditEvent\x12!.zqnt.RecordAuthAuditEventRequest\x1a\x16.google.protobuf.Empty\x12<\n" +
+	"\tListUsers\x12\x16.zqnt.ListUsersRequest\x1a\x17.zqnt.ListUsersResponse\x12G\n" +
+	"\vGetUserById\x12\x18.zqnt.GetUserByIdRequest\x1a\x1e.zqnt.AuthenticateUserResponse\x12O\n" +
+	"\x0fUpdateUserRoles\x12\x1c.zqnt.UpdateUserRolesRequest\x1a\x1e.zqnt.AuthenticateUserResponse\x12M\n" +
+	"\x0eSetUserEnabled\x12\x1b.zqnt.SetUserEnabledRequest\x1a\x1e.zqnt.AuthenticateUserResponse\x12E\n" +
+	"\n" +
+	"DeleteUser\x12\x17.zqnt.DeleteUserRequest\x1a\x1e.zqnt.AuthenticateUserResponse\x12]\n" +
+	"\x16UpsertIdentityProvider\x12#.zqnt.UpsertIdentityProviderRequest\x1a\x1e.zqnt.IdentityProviderResponse\x12W\n" +
+	"\x13GetIdentityProvider\x12 .zqnt.GetIdentityProviderRequest\x1a\x1e.zqnt.IdentityProviderResponse\x12s\n" +
+	"!FindIdentityProviderByEmailDomain\x12..zqnt.FindIdentityProviderByEmailDomainRequest\x1a\x1e.zqnt.IdentityProviderResponse\x12I\n" +
+	"\fFindOidcUser\x12\x19.zqnt.FindOidcUserRequest\x1a\x1e.zqnt.AuthenticateUserResponse\x12M\n" +
+	"\x0eUpsertOidcUser\x12\x1b.zqnt.UpsertOidcUserRequest\x1a\x1e.zqnt.AuthenticateUserResponseBG\n" +
 	"\x1ecom.zqnt.utils.connector.protoB\x0eConnectorProtoP\x01Z\x13gen/connector/protob\x06proto3"
 
 var (
@@ -2721,204 +12011,705 @@ func file_connector_proto_rawDescGZIP() []byte {
 	return file_connector_proto_rawDescData
 }
 
-var file_connector_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_connector_proto_msgTypes = make([]protoimpl.MessageInfo, 29)
+var file_connector_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
+var file_connector_proto_msgTypes = make([]protoimpl.MessageInfo, 145)
 var file_connector_proto_goTypes = []any{
-	(TelemetryType)(0),                           // 0: zqnt.TelemetryType
-	(*UpsertAssetPayloadRequest)(nil),            // 1: zqnt.UpsertAssetPayloadRequest
-	(*AssetPayloadOwner)(nil),                    // 2: zqnt.AssetPayloadOwner
-	(*ListAssetPayloadsRequest)(nil),             // 3: zqnt.ListAssetPayloadsRequest
-	(*DeleteAssetPayloadRequest)(nil),            // 4: zqnt.DeleteAssetPayloadRequest
-	(*AssetPayloadResponse)(nil),                 // 5: zqnt.AssetPayloadResponse
-	(*AssetPayloadListResponse)(nil),             // 6: zqnt.AssetPayloadListResponse
-	(*ConnectorGetAssetByIdRequest)(nil),         // 7: zqnt.ConnectorGetAssetByIdRequest
-	(*ConnectorAssetList)(nil),                   // 8: zqnt.ConnectorAssetList
-	(*ConnectorRegisterAssetRequest)(nil),        // 9: zqnt.ConnectorRegisterAssetRequest
-	(*ConnectorUpdateAssetRequest)(nil),          // 10: zqnt.ConnectorUpdateAssetRequest
-	(*ConnectorUpdateSubAssetRequest)(nil),       // 11: zqnt.ConnectorUpdateSubAssetRequest
-	(*ConnectorResponse)(nil),                    // 12: zqnt.ConnectorResponse
-	(*AssetMonitoringResponse)(nil),              // 13: zqnt.AssetMonitoringResponse
-	(*ConnectorGetOrganizationRequest)(nil),      // 14: zqnt.ConnectorGetOrganizationRequest
-	(*ConnectorStoreTelemetryRequest)(nil),       // 15: zqnt.ConnectorStoreTelemetryRequest
-	(*ConnectorStoreDetectionRequest)(nil),       // 16: zqnt.ConnectorStoreDetectionRequest
-	(*AssetTelemetryProto)(nil),                  // 17: zqnt.AssetTelemetryProto
-	(*SubAssetTelemetryProto)(nil),               // 18: zqnt.SubAssetTelemetryProto
-	(*PolicyProtoDTO)(nil),                       // 19: zqnt.PolicyProtoDTO
-	(*PolicyProtoDTOList)(nil),                   // 20: zqnt.PolicyProtoDTOList
-	(*ConnectorGetPoliciesRequest)(nil),          // 21: zqnt.ConnectorGetPoliciesRequest
-	(*ConnectorGetAllPoliciesRequest)(nil),       // 22: zqnt.ConnectorGetAllPoliciesRequest
-	(*ConnectorPolicyResponse)(nil),              // 23: zqnt.ConnectorPolicyResponse
-	(*TechnicalConfigProtoDTO)(nil),              // 24: zqnt.TechnicalConfigProtoDTO
-	(*TechnicalConfigProtoDTOList)(nil),          // 25: zqnt.TechnicalConfigProtoDTOList
-	(*ConnectorGetConfigsRequest)(nil),           // 26: zqnt.ConnectorGetConfigsRequest
-	(*ConnectorConfigResponse)(nil),              // 27: zqnt.ConnectorConfigResponse
-	nil,                                          // 28: zqnt.AssetTelemetryProto.TelemetryDataEntry
-	nil,                                          // 29: zqnt.SubAssetTelemetryProto.TelemetryDataEntry
-	(*proto.RequestBase)(nil),                    // 30: zqnt.RequestBase
-	(*proto1.AssetPayloadProtoDTO)(nil),          // 31: zqnt.AssetPayloadProtoDTO
-	(*fieldmaskpb.FieldMask)(nil),                // 32: google.protobuf.FieldMask
-	(*proto.GlobalErrorMessage)(nil),             // 33: zqnt.GlobalErrorMessage
-	(*proto1.AssetProtoDTO)(nil),                 // 34: zqnt.AssetProtoDTO
-	(*proto1.SubAssetProtoDTO)(nil),              // 35: zqnt.SubAssetProtoDTO
-	(*timestamppb.Timestamp)(nil),                // 36: google.protobuf.Timestamp
-	(*emptypb.Empty)(nil),                        // 37: google.protobuf.Empty
-	(*proto1.OrganizationProtoDTO)(nil),          // 38: zqnt.OrganizationProtoDTO
-	(*proto2.GetMissionRequest)(nil),             // 39: zqnt.GetMissionRequest
-	(*proto2.CreateMissionRequest)(nil),          // 40: zqnt.CreateMissionRequest
-	(*proto2.UpdateMissionRequest)(nil),          // 41: zqnt.UpdateMissionRequest
-	(*proto2.DeleteMissionRequest)(nil),          // 42: zqnt.DeleteMissionRequest
-	(*proto2.UploadMissionNfzZonesRequest)(nil),  // 43: zqnt.UploadMissionNfzZonesRequest
-	(*proto2.GetTaskRequest)(nil),                // 44: zqnt.GetTaskRequest
-	(*proto2.GetTaskByFlightIdRequest)(nil),      // 45: zqnt.GetTaskByFlightIdRequest
-	(*proto2.GetWaypointsByTaskIdRequest)(nil),   // 46: zqnt.GetWaypointsByTaskIdRequest
-	(*proto2.CreateTaskRequest)(nil),             // 47: zqnt.CreateTaskRequest
-	(*proto2.UpdateTaskRequest)(nil),             // 48: zqnt.UpdateTaskRequest
-	(*proto2.DeleteTaskRequest)(nil),             // 49: zqnt.DeleteTaskRequest
-	(*proto2.GetSchedulerRequest)(nil),           // 50: zqnt.GetSchedulerRequest
-	(*proto2.CreateSchedulerRequest)(nil),        // 51: zqnt.CreateSchedulerRequest
-	(*proto2.CreateSchedulersRequest)(nil),       // 52: zqnt.CreateSchedulersRequest
-	(*proto2.UpdateSchedulerRequest)(nil),        // 53: zqnt.UpdateSchedulerRequest
-	(*proto2.DeleteSchedulerRequest)(nil),        // 54: zqnt.DeleteSchedulerRequest
-	(*proto2.DeleteSchedulersRequest)(nil),       // 55: zqnt.DeleteSchedulersRequest
-	(*proto2.DeleteSchedulersByTaskRequest)(nil), // 56: zqnt.DeleteSchedulersByTaskRequest
-	(*proto3.ProduceNotificationRequest)(nil),    // 57: zqnt.ProduceNotificationRequest
-	(*proto2.MissionResponse)(nil),               // 58: zqnt.MissionResponse
-	(*proto2.TaskResponse)(nil),                  // 59: zqnt.TaskResponse
-	(*proto2.WaypointsResponse)(nil),             // 60: zqnt.WaypointsResponse
-	(*proto2.SchedulerResponse)(nil),             // 61: zqnt.SchedulerResponse
+	(SkillContractStatus)(0),                           // 0: zqnt.SkillContractStatus
+	(SkillContractCompatibility)(0),                    // 1: zqnt.SkillContractCompatibility
+	(TelemetryType)(0),                                 // 2: zqnt.TelemetryType
+	(*AuthenticateUserRequest)(nil),                    // 3: zqnt.AuthenticateUserRequest
+	(*AuthenticatedUserProtoDTO)(nil),                  // 4: zqnt.AuthenticatedUserProtoDTO
+	(*AuthenticateUserResponse)(nil),                   // 5: zqnt.AuthenticateUserResponse
+	(*CreateUserRequest)(nil),                          // 6: zqnt.CreateUserRequest
+	(*CreateUserResponse)(nil),                         // 7: zqnt.CreateUserResponse
+	(*ResetPasswordRequest)(nil),                       // 8: zqnt.ResetPasswordRequest
+	(*ResetPasswordResponse)(nil),                      // 9: zqnt.ResetPasswordResponse
+	(*RecordAuthAuditEventRequest)(nil),                // 10: zqnt.RecordAuthAuditEventRequest
+	(*ListUsersRequest)(nil),                           // 11: zqnt.ListUsersRequest
+	(*ListUsersResponse)(nil),                          // 12: zqnt.ListUsersResponse
+	(*GetUserByIdRequest)(nil),                         // 13: zqnt.GetUserByIdRequest
+	(*UpdateUserRolesRequest)(nil),                     // 14: zqnt.UpdateUserRolesRequest
+	(*SetUserEnabledRequest)(nil),                      // 15: zqnt.SetUserEnabledRequest
+	(*DeleteUserRequest)(nil),                          // 16: zqnt.DeleteUserRequest
+	(*IdentityProviderConfigProtoDTO)(nil),             // 17: zqnt.IdentityProviderConfigProtoDTO
+	(*UpsertIdentityProviderRequest)(nil),              // 18: zqnt.UpsertIdentityProviderRequest
+	(*GetIdentityProviderRequest)(nil),                 // 19: zqnt.GetIdentityProviderRequest
+	(*FindIdentityProviderByEmailDomainRequest)(nil),   // 20: zqnt.FindIdentityProviderByEmailDomainRequest
+	(*IdentityProviderResponse)(nil),                   // 21: zqnt.IdentityProviderResponse
+	(*FindOidcUserRequest)(nil),                        // 22: zqnt.FindOidcUserRequest
+	(*UpsertOidcUserRequest)(nil),                      // 23: zqnt.UpsertOidcUserRequest
+	(*PersistSkillExecutionRequest)(nil),               // 24: zqnt.PersistSkillExecutionRequest
+	(*AppendSkillExecutionEventRequest)(nil),           // 25: zqnt.AppendSkillExecutionEventRequest
+	(*UpsertAssetPayloadRequest)(nil),                  // 26: zqnt.UpsertAssetPayloadRequest
+	(*AssetPayloadOwner)(nil),                          // 27: zqnt.AssetPayloadOwner
+	(*ListAssetPayloadsRequest)(nil),                   // 28: zqnt.ListAssetPayloadsRequest
+	(*DeleteAssetPayloadRequest)(nil),                  // 29: zqnt.DeleteAssetPayloadRequest
+	(*AssetPayloadResponse)(nil),                       // 30: zqnt.AssetPayloadResponse
+	(*AssetPayloadListResponse)(nil),                   // 31: zqnt.AssetPayloadListResponse
+	(*SetAssetPropertyRequest)(nil),                    // 32: zqnt.SetAssetPropertyRequest
+	(*ListAssetPropertiesRequest)(nil),                 // 33: zqnt.ListAssetPropertiesRequest
+	(*DeleteAssetPropertyRequest)(nil),                 // 34: zqnt.DeleteAssetPropertyRequest
+	(*AssetPropertyResponse)(nil),                      // 35: zqnt.AssetPropertyResponse
+	(*AssetPropertyListResponse)(nil),                  // 36: zqnt.AssetPropertyListResponse
+	(*SkillContractProtoDTO)(nil),                      // 37: zqnt.SkillContractProtoDTO
+	(*UpsertSkillContractRequest)(nil),                 // 38: zqnt.UpsertSkillContractRequest
+	(*ListSkillContractsRequest)(nil),                  // 39: zqnt.ListSkillContractsRequest
+	(*SetSkillContractStatusRequest)(nil),              // 40: zqnt.SetSkillContractStatusRequest
+	(*SetSkillContractPermissionsRequest)(nil),         // 41: zqnt.SetSkillContractPermissionsRequest
+	(*SkillContractResponse)(nil),                      // 42: zqnt.SkillContractResponse
+	(*SkillContractListResponse)(nil),                  // 43: zqnt.SkillContractListResponse
+	(*ConnectorGetAssetByIdRequest)(nil),               // 44: zqnt.ConnectorGetAssetByIdRequest
+	(*ConnectorAssetList)(nil),                         // 45: zqnt.ConnectorAssetList
+	(*ListAssetsRequest)(nil),                          // 46: zqnt.ListAssetsRequest
+	(*AssetListResponse)(nil),                          // 47: zqnt.AssetListResponse
+	(*ConnectorRegisterAssetRequest)(nil),              // 48: zqnt.ConnectorRegisterAssetRequest
+	(*AssetClaimProtoDTO)(nil),                         // 49: zqnt.AssetClaimProtoDTO
+	(*AssetClaimRedemptionProtoDTO)(nil),               // 50: zqnt.AssetClaimRedemptionProtoDTO
+	(*CreateAssetClaimRequest)(nil),                    // 51: zqnt.CreateAssetClaimRequest
+	(*AssetClaimResponse)(nil),                         // 52: zqnt.AssetClaimResponse
+	(*RedeemAssetClaimRequest)(nil),                    // 53: zqnt.RedeemAssetClaimRequest
+	(*DescribeAssetClaimRequest)(nil),                  // 54: zqnt.DescribeAssetClaimRequest
+	(*AssetClaimDescriptionResponse)(nil),              // 55: zqnt.AssetClaimDescriptionResponse
+	(*ListAssetClaimsRequest)(nil),                     // 56: zqnt.ListAssetClaimsRequest
+	(*AssetClaimListResponse)(nil),                     // 57: zqnt.AssetClaimListResponse
+	(*RevokeAssetClaimRequest)(nil),                    // 58: zqnt.RevokeAssetClaimRequest
+	(*ConnectorUpdateAssetRequest)(nil),                // 59: zqnt.ConnectorUpdateAssetRequest
+	(*ConnectorUpdateSubAssetRequest)(nil),             // 60: zqnt.ConnectorUpdateSubAssetRequest
+	(*ConnectorResponse)(nil),                          // 61: zqnt.ConnectorResponse
+	(*AssetMonitoringResponse)(nil),                    // 62: zqnt.AssetMonitoringResponse
+	(*ConnectorGetOrganizationRequest)(nil),            // 63: zqnt.ConnectorGetOrganizationRequest
+	(*ConnectorStoreTelemetryRequest)(nil),             // 64: zqnt.ConnectorStoreTelemetryRequest
+	(*ConnectorStoreDetectionRequest)(nil),             // 65: zqnt.ConnectorStoreDetectionRequest
+	(*AssetTelemetryProto)(nil),                        // 66: zqnt.AssetTelemetryProto
+	(*SubAssetTelemetryProto)(nil),                     // 67: zqnt.SubAssetTelemetryProto
+	(*PolicyProtoDTO)(nil),                             // 68: zqnt.PolicyProtoDTO
+	(*PolicyProtoDTOList)(nil),                         // 69: zqnt.PolicyProtoDTOList
+	(*ConnectorGetPoliciesRequest)(nil),                // 70: zqnt.ConnectorGetPoliciesRequest
+	(*ConnectorGetAllPoliciesRequest)(nil),             // 71: zqnt.ConnectorGetAllPoliciesRequest
+	(*ConnectorPolicyResponse)(nil),                    // 72: zqnt.ConnectorPolicyResponse
+	(*GetPolicyByIdRequest)(nil),                       // 73: zqnt.GetPolicyByIdRequest
+	(*CreatePolicyRequest)(nil),                        // 74: zqnt.CreatePolicyRequest
+	(*UpdatePolicyRequest)(nil),                        // 75: zqnt.UpdatePolicyRequest
+	(*DeletePolicyRequest)(nil),                        // 76: zqnt.DeletePolicyRequest
+	(*ConnectorPolicySingleResponse)(nil),              // 77: zqnt.ConnectorPolicySingleResponse
+	(*ConnectorDeletePolicyResponse)(nil),              // 78: zqnt.ConnectorDeletePolicyResponse
+	(*ConnectorGetAllOrganizationsRequest)(nil),        // 79: zqnt.ConnectorGetAllOrganizationsRequest
+	(*GetOrganizationByIdRequest)(nil),                 // 80: zqnt.GetOrganizationByIdRequest
+	(*CreateOrganizationRequest)(nil),                  // 81: zqnt.CreateOrganizationRequest
+	(*UpdateOrganizationRequest)(nil),                  // 82: zqnt.UpdateOrganizationRequest
+	(*DeleteOrganizationRequest)(nil),                  // 83: zqnt.DeleteOrganizationRequest
+	(*OrganizationProtoDTOList)(nil),                   // 84: zqnt.OrganizationProtoDTOList
+	(*ConnectorOrganizationResponse)(nil),              // 85: zqnt.ConnectorOrganizationResponse
+	(*ConnectorOrganizationSingleResponse)(nil),        // 86: zqnt.ConnectorOrganizationSingleResponse
+	(*ConnectorDeleteOrganizationResponse)(nil),        // 87: zqnt.ConnectorDeleteOrganizationResponse
+	(*TheatreProtoDTO)(nil),                            // 88: zqnt.TheatreProtoDTO
+	(*TheatreProtoDTOList)(nil),                        // 89: zqnt.TheatreProtoDTOList
+	(*ConnectorGetAllTheatresRequest)(nil),             // 90: zqnt.ConnectorGetAllTheatresRequest
+	(*GetTheatreByIdRequest)(nil),                      // 91: zqnt.GetTheatreByIdRequest
+	(*CreateTheatreRequest)(nil),                       // 92: zqnt.CreateTheatreRequest
+	(*UpdateTheatreRequest)(nil),                       // 93: zqnt.UpdateTheatreRequest
+	(*DeleteTheatreRequest)(nil),                       // 94: zqnt.DeleteTheatreRequest
+	(*ConnectorTheatreResponse)(nil),                   // 95: zqnt.ConnectorTheatreResponse
+	(*ConnectorTheatreSingleResponse)(nil),             // 96: zqnt.ConnectorTheatreSingleResponse
+	(*ConnectorDeleteTheatreResponse)(nil),             // 97: zqnt.ConnectorDeleteTheatreResponse
+	(*AssignUserToTheatreRequest)(nil),                 // 98: zqnt.AssignUserToTheatreRequest
+	(*RemoveUserFromTheatreRequest)(nil),               // 99: zqnt.RemoveUserFromTheatreRequest
+	(*TheatreAssignmentResponse)(nil),                  // 100: zqnt.TheatreAssignmentResponse
+	(*ListNoFlyZonesRequest)(nil),                      // 101: zqnt.ListNoFlyZonesRequest
+	(*UpsertNoFlyZoneRequest)(nil),                     // 102: zqnt.UpsertNoFlyZoneRequest
+	(*DeleteNoFlyZoneRequest)(nil),                     // 103: zqnt.DeleteNoFlyZoneRequest
+	(*NoFlyZoneListResponse)(nil),                      // 104: zqnt.NoFlyZoneListResponse
+	(*NoFlyZoneSingleResponse)(nil),                    // 105: zqnt.NoFlyZoneSingleResponse
+	(*DeleteNoFlyZoneResponse)(nil),                    // 106: zqnt.DeleteNoFlyZoneResponse
+	(*ProvisionLicensedOrganizationRequest)(nil),       // 107: zqnt.ProvisionLicensedOrganizationRequest
+	(*ProvisionLicensedOrganizationResponse)(nil),      // 108: zqnt.ProvisionLicensedOrganizationResponse
+	(*LicenseActivationCredentialsProtoDTO)(nil),       // 109: zqnt.LicenseActivationCredentialsProtoDTO
+	(*ListLicenseActivationCredentialsRequest)(nil),    // 110: zqnt.ListLicenseActivationCredentialsRequest
+	(*GetLicenseActivationCredentialsRequest)(nil),     // 111: zqnt.GetLicenseActivationCredentialsRequest
+	(*PutLicenseActivationCredentialsRequest)(nil),     // 112: zqnt.PutLicenseActivationCredentialsRequest
+	(*DeleteLicenseActivationCredentialsRequest)(nil),  // 113: zqnt.DeleteLicenseActivationCredentialsRequest
+	(*LicenseActivationCredentialsListResponse)(nil),   // 114: zqnt.LicenseActivationCredentialsListResponse
+	(*LicenseActivationCredentialsSingleResponse)(nil), // 115: zqnt.LicenseActivationCredentialsSingleResponse
+	(*DeleteLicenseActivationCredentialsResponse)(nil), // 116: zqnt.DeleteLicenseActivationCredentialsResponse
+	(*EventTriggerProtoDTO)(nil),                       // 117: zqnt.EventTriggerProtoDTO
+	(*EventTriggerProtoDTOList)(nil),                   // 118: zqnt.EventTriggerProtoDTOList
+	(*ConnectorGetAllEventTriggersRequest)(nil),        // 119: zqnt.ConnectorGetAllEventTriggersRequest
+	(*GetEventTriggerByIdRequest)(nil),                 // 120: zqnt.GetEventTriggerByIdRequest
+	(*CreateEventTriggerRequest)(nil),                  // 121: zqnt.CreateEventTriggerRequest
+	(*UpdateEventTriggerRequest)(nil),                  // 122: zqnt.UpdateEventTriggerRequest
+	(*DeleteEventTriggerRequest)(nil),                  // 123: zqnt.DeleteEventTriggerRequest
+	(*RecordEventTriggerFiredRequest)(nil),             // 124: zqnt.RecordEventTriggerFiredRequest
+	(*RegenerateEventTriggerWebhookTokenRequest)(nil),  // 125: zqnt.RegenerateEventTriggerWebhookTokenRequest
+	(*GetEventTriggerByWebhookTokenRequest)(nil),       // 126: zqnt.GetEventTriggerByWebhookTokenRequest
+	(*ConnectorEventTriggerResponse)(nil),              // 127: zqnt.ConnectorEventTriggerResponse
+	(*ConnectorEventTriggerSingleResponse)(nil),        // 128: zqnt.ConnectorEventTriggerSingleResponse
+	(*ConnectorDeleteEventTriggerResponse)(nil),        // 129: zqnt.ConnectorDeleteEventTriggerResponse
+	(*DetectionSummaryProtoDTO)(nil),                   // 130: zqnt.DetectionSummaryProtoDTO
+	(*ListRecentDetectionsRequest)(nil),                // 131: zqnt.ListRecentDetectionsRequest
+	(*ConnectorDetectionListResponse)(nil),             // 132: zqnt.ConnectorDetectionListResponse
+	(*GetLatestTelemetryForAssetRequest)(nil),          // 133: zqnt.GetLatestTelemetryForAssetRequest
+	(*ConnectorTelemetrySingleResponse)(nil),           // 134: zqnt.ConnectorTelemetrySingleResponse
+	(*TechnicalConfigProtoDTO)(nil),                    // 135: zqnt.TechnicalConfigProtoDTO
+	(*TechnicalConfigProtoDTOList)(nil),                // 136: zqnt.TechnicalConfigProtoDTOList
+	(*ConnectorGetConfigsRequest)(nil),                 // 137: zqnt.ConnectorGetConfigsRequest
+	(*ConnectorConfigResponse)(nil),                    // 138: zqnt.ConnectorConfigResponse
+	(*GetTechnicalConfigByIdRequest)(nil),              // 139: zqnt.GetTechnicalConfigByIdRequest
+	(*CreateTechnicalConfigRequest)(nil),               // 140: zqnt.CreateTechnicalConfigRequest
+	(*UpdateTechnicalConfigRequest)(nil),               // 141: zqnt.UpdateTechnicalConfigRequest
+	(*DeleteTechnicalConfigRequest)(nil),               // 142: zqnt.DeleteTechnicalConfigRequest
+	(*ConnectorConfigSingleResponse)(nil),              // 143: zqnt.ConnectorConfigSingleResponse
+	(*ConnectorDeleteConfigResponse)(nil),              // 144: zqnt.ConnectorDeleteConfigResponse
+	nil,                                                // 145: zqnt.IdentityProviderConfigProtoDTO.ClaimRoleMappingEntry
+	nil,                                                // 146: zqnt.AssetTelemetryProto.TelemetryDataEntry
+	nil,                                                // 147: zqnt.SubAssetTelemetryProto.TelemetryDataEntry
+	(*proto.RequestBase)(nil),                          // 148: zqnt.RequestBase
+	(*timestamppb.Timestamp)(nil),                      // 149: google.protobuf.Timestamp
+	(*proto.ResponseMeta)(nil),                         // 150: zqnt.ResponseMeta
+	(*proto.GlobalErrorMessage)(nil),                   // 151: zqnt.GlobalErrorMessage
+	(*proto1.SkillExecutionProtoDTO)(nil),              // 152: zqnt.SkillExecutionProtoDTO
+	(*proto1.SkillExecutionEventProto)(nil),            // 153: zqnt.SkillExecutionEventProto
+	(*proto2.AssetPayloadProtoDTO)(nil),                // 154: zqnt.AssetPayloadProtoDTO
+	(*fieldmaskpb.FieldMask)(nil),                      // 155: google.protobuf.FieldMask
+	(*structpb.Value)(nil),                             // 156: google.protobuf.Value
+	(*proto2.AssetPropertyProtoDTO)(nil),               // 157: zqnt.AssetPropertyProtoDTO
+	(*structpb.Struct)(nil),                            // 158: google.protobuf.Struct
+	(*proto3.CapabilityErrorProto)(nil),                // 159: zqnt.CapabilityErrorProto
+	(*proto3.CapabilityEventProto)(nil),                // 160: zqnt.CapabilityEventProto
+	(*proto3.CapabilityRequirementsProto)(nil),         // 161: zqnt.CapabilityRequirementsProto
+	(proto3.CapabilitySourceProto)(0),                  // 162: zqnt.CapabilitySourceProto
+	(*proto2.AssetProtoDTO)(nil),                       // 163: zqnt.AssetProtoDTO
+	(proto2.AssetVendor)(0),                            // 164: zqnt.AssetVendor
+	(proto2.AssetTypeEnum)(0),                          // 165: zqnt.AssetTypeEnum
+	(*proto2.SubAssetProtoDTO)(nil),                    // 166: zqnt.SubAssetProtoDTO
+	(*emptypb.Empty)(nil),                              // 167: google.protobuf.Empty
+	(*proto2.OrganizationProtoDTO)(nil),                // 168: zqnt.OrganizationProtoDTO
+	(*proto4.DetectionPosition)(nil),                   // 169: zqnt.DetectionPosition
+	(*proto5.GeoAreaProtoDTO)(nil),                     // 170: zqnt.GeoAreaProtoDTO
+	(*proto5.MissionZoneProtoDTO)(nil),                 // 171: zqnt.MissionZoneProtoDTO
+	(*proto6.ListSchedulersRequest)(nil),               // 172: zqnt.ListSchedulersRequest
+	(*proto6.GetSchedulerRequest)(nil),                 // 173: zqnt.GetSchedulerRequest
+	(*proto6.CreateSchedulerRequest)(nil),              // 174: zqnt.CreateSchedulerRequest
+	(*proto6.CreateSchedulersRequest)(nil),             // 175: zqnt.CreateSchedulersRequest
+	(*proto6.UpdateSchedulerRequest)(nil),              // 176: zqnt.UpdateSchedulerRequest
+	(*proto6.DeleteSchedulerRequest)(nil),              // 177: zqnt.DeleteSchedulerRequest
+	(*proto6.DeleteSchedulersRequest)(nil),             // 178: zqnt.DeleteSchedulersRequest
+	(*proto6.RecordSchedulerFiringRequest)(nil),        // 179: zqnt.RecordSchedulerFiringRequest
+	(*proto7.ProduceNotificationRequest)(nil),          // 180: zqnt.ProduceNotificationRequest
+	(*proto8.RegisterMediaFileRequest)(nil),            // 181: zqnt.RegisterMediaFileRequest
+	(*proto8.ListMediaFilesRequest)(nil),               // 182: zqnt.ListMediaFilesRequest
+	(*proto8.GetMediaFileRequest)(nil),                 // 183: zqnt.GetMediaFileRequest
+	(*proto9.UpsertApplicationRequest)(nil),            // 184: zqnt.UpsertApplicationRequest
+	(*proto9.GetApplicationRequest)(nil),               // 185: zqnt.GetApplicationRequest
+	(*proto9.ListApplicationsRequest)(nil),             // 186: zqnt.ListApplicationsRequest
+	(*proto9.DeleteApplicationRequest)(nil),            // 187: zqnt.DeleteApplicationRequest
+	(*proto9.SetApplicationPauseRequest)(nil),          // 188: zqnt.SetApplicationPauseRequest
+	(*proto9.ListApplicationPausesRequest)(nil),        // 189: zqnt.ListApplicationPausesRequest
+	(*proto9.GetApplicationEnvironmentsRequest)(nil),   // 190: zqnt.GetApplicationEnvironmentsRequest
+	(*proto9.PromoteApplicationVersionRequest)(nil),    // 191: zqnt.PromoteApplicationVersionRequest
+	(*proto9.GetSkillExecutionRequest)(nil),            // 192: zqnt.GetSkillExecutionRequest
+	(*proto9.ListSkillExecutionsRequest)(nil),          // 193: zqnt.ListSkillExecutionsRequest
+	(*proto6.SchedulerResponse)(nil),                   // 194: zqnt.SchedulerResponse
+	(*proto8.MediaFileProtoDTO)(nil),                   // 195: zqnt.MediaFileProtoDTO
+	(*proto8.ListMediaFilesResponse)(nil),              // 196: zqnt.ListMediaFilesResponse
+	(*proto9.ApplicationResponse)(nil),                 // 197: zqnt.ApplicationResponse
+	(*proto9.ApplicationListResponse)(nil),             // 198: zqnt.ApplicationListResponse
+	(*proto9.ApplicationPauseListResponse)(nil),        // 199: zqnt.ApplicationPauseListResponse
+	(*proto9.ApplicationEnvironmentsResponse)(nil),     // 200: zqnt.ApplicationEnvironmentsResponse
+	(*proto9.SkillExecutionResponse)(nil),              // 201: zqnt.SkillExecutionResponse
+	(*proto9.SkillExecutionListResponse)(nil),          // 202: zqnt.SkillExecutionListResponse
 }
 var file_connector_proto_depIdxs = []int32{
-	30, // 0: zqnt.UpsertAssetPayloadRequest.base:type_name -> zqnt.RequestBase
-	31, // 1: zqnt.UpsertAssetPayloadRequest.payload:type_name -> zqnt.AssetPayloadProtoDTO
-	2,  // 2: zqnt.UpsertAssetPayloadRequest.owner:type_name -> zqnt.AssetPayloadOwner
-	32, // 3: zqnt.UpsertAssetPayloadRequest.update_mask:type_name -> google.protobuf.FieldMask
-	30, // 4: zqnt.ListAssetPayloadsRequest.base:type_name -> zqnt.RequestBase
-	2,  // 5: zqnt.ListAssetPayloadsRequest.owner:type_name -> zqnt.AssetPayloadOwner
-	30, // 6: zqnt.DeleteAssetPayloadRequest.base:type_name -> zqnt.RequestBase
-	2,  // 7: zqnt.DeleteAssetPayloadRequest.owner:type_name -> zqnt.AssetPayloadOwner
-	31, // 8: zqnt.AssetPayloadResponse.payload:type_name -> zqnt.AssetPayloadProtoDTO
-	33, // 9: zqnt.AssetPayloadResponse.error:type_name -> zqnt.GlobalErrorMessage
-	31, // 10: zqnt.AssetPayloadListResponse.payloads:type_name -> zqnt.AssetPayloadProtoDTO
-	33, // 11: zqnt.AssetPayloadListResponse.error:type_name -> zqnt.GlobalErrorMessage
-	30, // 12: zqnt.ConnectorGetAssetByIdRequest.base:type_name -> zqnt.RequestBase
-	34, // 13: zqnt.ConnectorAssetList.assets:type_name -> zqnt.AssetProtoDTO
-	30, // 14: zqnt.ConnectorRegisterAssetRequest.base:type_name -> zqnt.RequestBase
-	34, // 15: zqnt.ConnectorRegisterAssetRequest.asset:type_name -> zqnt.AssetProtoDTO
-	30, // 16: zqnt.ConnectorUpdateAssetRequest.base:type_name -> zqnt.RequestBase
-	34, // 17: zqnt.ConnectorUpdateAssetRequest.asset:type_name -> zqnt.AssetProtoDTO
-	32, // 18: zqnt.ConnectorUpdateAssetRequest.update_mask:type_name -> google.protobuf.FieldMask
-	30, // 19: zqnt.ConnectorUpdateSubAssetRequest.base:type_name -> zqnt.RequestBase
-	35, // 20: zqnt.ConnectorUpdateSubAssetRequest.sub_asset:type_name -> zqnt.SubAssetProtoDTO
-	32, // 21: zqnt.ConnectorUpdateSubAssetRequest.update_mask:type_name -> google.protobuf.FieldMask
-	36, // 22: zqnt.ConnectorResponse.timestamp:type_name -> google.protobuf.Timestamp
-	37, // 23: zqnt.ConnectorResponse.empty:type_name -> google.protobuf.Empty
-	33, // 24: zqnt.ConnectorResponse.error:type_name -> zqnt.GlobalErrorMessage
-	34, // 25: zqnt.ConnectorResponse.asset:type_name -> zqnt.AssetProtoDTO
-	35, // 26: zqnt.ConnectorResponse.sub_asset:type_name -> zqnt.SubAssetProtoDTO
-	38, // 27: zqnt.ConnectorResponse.organization:type_name -> zqnt.OrganizationProtoDTO
-	36, // 28: zqnt.AssetMonitoringResponse.timestamp:type_name -> google.protobuf.Timestamp
-	37, // 29: zqnt.AssetMonitoringResponse.empty:type_name -> google.protobuf.Empty
-	33, // 30: zqnt.AssetMonitoringResponse.error:type_name -> zqnt.GlobalErrorMessage
-	8,  // 31: zqnt.AssetMonitoringResponse.assets:type_name -> zqnt.ConnectorAssetList
-	30, // 32: zqnt.ConnectorGetOrganizationRequest.base:type_name -> zqnt.RequestBase
-	30, // 33: zqnt.ConnectorStoreTelemetryRequest.base:type_name -> zqnt.RequestBase
-	0,  // 34: zqnt.ConnectorStoreTelemetryRequest.type:type_name -> zqnt.TelemetryType
-	17, // 35: zqnt.ConnectorStoreTelemetryRequest.asset_telemetry:type_name -> zqnt.AssetTelemetryProto
-	18, // 36: zqnt.ConnectorStoreTelemetryRequest.sub_asset_telemetry:type_name -> zqnt.SubAssetTelemetryProto
-	30, // 37: zqnt.ConnectorStoreDetectionRequest.base:type_name -> zqnt.RequestBase
-	36, // 38: zqnt.ConnectorStoreDetectionRequest.detected_at:type_name -> google.protobuf.Timestamp
-	36, // 39: zqnt.AssetTelemetryProto.timestamp:type_name -> google.protobuf.Timestamp
-	28, // 40: zqnt.AssetTelemetryProto.telemetry_data:type_name -> zqnt.AssetTelemetryProto.TelemetryDataEntry
-	36, // 41: zqnt.SubAssetTelemetryProto.timestamp:type_name -> google.protobuf.Timestamp
-	29, // 42: zqnt.SubAssetTelemetryProto.telemetry_data:type_name -> zqnt.SubAssetTelemetryProto.TelemetryDataEntry
-	19, // 43: zqnt.PolicyProtoDTOList.policies:type_name -> zqnt.PolicyProtoDTO
-	30, // 44: zqnt.ConnectorGetPoliciesRequest.base:type_name -> zqnt.RequestBase
-	30, // 45: zqnt.ConnectorGetAllPoliciesRequest.base:type_name -> zqnt.RequestBase
-	36, // 46: zqnt.ConnectorPolicyResponse.timestamp:type_name -> google.protobuf.Timestamp
-	33, // 47: zqnt.ConnectorPolicyResponse.error:type_name -> zqnt.GlobalErrorMessage
-	20, // 48: zqnt.ConnectorPolicyResponse.policy_list:type_name -> zqnt.PolicyProtoDTOList
-	24, // 49: zqnt.TechnicalConfigProtoDTOList.configs:type_name -> zqnt.TechnicalConfigProtoDTO
-	30, // 50: zqnt.ConnectorGetConfigsRequest.base:type_name -> zqnt.RequestBase
-	36, // 51: zqnt.ConnectorConfigResponse.timestamp:type_name -> google.protobuf.Timestamp
-	33, // 52: zqnt.ConnectorConfigResponse.error:type_name -> zqnt.GlobalErrorMessage
-	25, // 53: zqnt.ConnectorConfigResponse.config_list:type_name -> zqnt.TechnicalConfigProtoDTOList
-	9,  // 54: zqnt.ConnectorService.RegisterAsset:input_type -> zqnt.ConnectorRegisterAssetRequest
-	30, // 55: zqnt.ConnectorService.DeregisterAsset:input_type -> zqnt.RequestBase
-	30, // 56: zqnt.ConnectorService.AssetMonitoring:input_type -> zqnt.RequestBase
-	10, // 57: zqnt.ConnectorService.UpdateAsset:input_type -> zqnt.ConnectorUpdateAssetRequest
-	11, // 58: zqnt.ConnectorService.UpdateSubAsset:input_type -> zqnt.ConnectorUpdateSubAssetRequest
-	30, // 59: zqnt.ConnectorService.GetAssetBySn:input_type -> zqnt.RequestBase
-	7,  // 60: zqnt.ConnectorService.GetAssetById:input_type -> zqnt.ConnectorGetAssetByIdRequest
-	30, // 61: zqnt.ConnectorService.GetSubAssetBySn:input_type -> zqnt.RequestBase
-	1,  // 62: zqnt.ConnectorService.UpsertAssetPayload:input_type -> zqnt.UpsertAssetPayloadRequest
-	3,  // 63: zqnt.ConnectorService.ListAssetPayloads:input_type -> zqnt.ListAssetPayloadsRequest
-	4,  // 64: zqnt.ConnectorService.DeleteAssetPayload:input_type -> zqnt.DeleteAssetPayloadRequest
-	14, // 65: zqnt.ConnectorService.GetOrganization:input_type -> zqnt.ConnectorGetOrganizationRequest
-	39, // 66: zqnt.ConnectorService.GetMission:input_type -> zqnt.GetMissionRequest
-	40, // 67: zqnt.ConnectorService.CreateMission:input_type -> zqnt.CreateMissionRequest
-	41, // 68: zqnt.ConnectorService.UpdateMission:input_type -> zqnt.UpdateMissionRequest
-	42, // 69: zqnt.ConnectorService.DeleteMission:input_type -> zqnt.DeleteMissionRequest
-	43, // 70: zqnt.ConnectorService.UploadMissionNfzZones:input_type -> zqnt.UploadMissionNfzZonesRequest
-	44, // 71: zqnt.ConnectorService.GetTask:input_type -> zqnt.GetTaskRequest
-	45, // 72: zqnt.ConnectorService.GetTaskByFlightId:input_type -> zqnt.GetTaskByFlightIdRequest
-	46, // 73: zqnt.ConnectorService.GetWaypointsByTaskId:input_type -> zqnt.GetWaypointsByTaskIdRequest
-	47, // 74: zqnt.ConnectorService.CreateTask:input_type -> zqnt.CreateTaskRequest
-	48, // 75: zqnt.ConnectorService.UpdateTask:input_type -> zqnt.UpdateTaskRequest
-	49, // 76: zqnt.ConnectorService.DeleteTask:input_type -> zqnt.DeleteTaskRequest
-	50, // 77: zqnt.ConnectorService.GetScheduler:input_type -> zqnt.GetSchedulerRequest
-	51, // 78: zqnt.ConnectorService.CreateScheduler:input_type -> zqnt.CreateSchedulerRequest
-	52, // 79: zqnt.ConnectorService.CreateSchedulers:input_type -> zqnt.CreateSchedulersRequest
-	53, // 80: zqnt.ConnectorService.UpdateScheduler:input_type -> zqnt.UpdateSchedulerRequest
-	54, // 81: zqnt.ConnectorService.DeleteScheduler:input_type -> zqnt.DeleteSchedulerRequest
-	55, // 82: zqnt.ConnectorService.DeleteSchedulers:input_type -> zqnt.DeleteSchedulersRequest
-	56, // 83: zqnt.ConnectorService.DeleteSchedulersByTask:input_type -> zqnt.DeleteSchedulersByTaskRequest
-	15, // 84: zqnt.ConnectorService.StoreTelemetryBatch:input_type -> zqnt.ConnectorStoreTelemetryRequest
-	16, // 85: zqnt.ConnectorService.StoreDetectionBatch:input_type -> zqnt.ConnectorStoreDetectionRequest
-	57, // 86: zqnt.ConnectorService.StoreNotificationBatch:input_type -> zqnt.ProduceNotificationRequest
-	21, // 87: zqnt.ConnectorService.GetActivePoliciesByType:input_type -> zqnt.ConnectorGetPoliciesRequest
-	22, // 88: zqnt.ConnectorService.GetAllActivePolicies:input_type -> zqnt.ConnectorGetAllPoliciesRequest
-	26, // 89: zqnt.ConnectorService.GetTechnicalConfigs:input_type -> zqnt.ConnectorGetConfigsRequest
-	12, // 90: zqnt.ConnectorService.RegisterAsset:output_type -> zqnt.ConnectorResponse
-	12, // 91: zqnt.ConnectorService.DeregisterAsset:output_type -> zqnt.ConnectorResponse
-	13, // 92: zqnt.ConnectorService.AssetMonitoring:output_type -> zqnt.AssetMonitoringResponse
-	12, // 93: zqnt.ConnectorService.UpdateAsset:output_type -> zqnt.ConnectorResponse
-	12, // 94: zqnt.ConnectorService.UpdateSubAsset:output_type -> zqnt.ConnectorResponse
-	12, // 95: zqnt.ConnectorService.GetAssetBySn:output_type -> zqnt.ConnectorResponse
-	12, // 96: zqnt.ConnectorService.GetAssetById:output_type -> zqnt.ConnectorResponse
-	12, // 97: zqnt.ConnectorService.GetSubAssetBySn:output_type -> zqnt.ConnectorResponse
-	5,  // 98: zqnt.ConnectorService.UpsertAssetPayload:output_type -> zqnt.AssetPayloadResponse
-	6,  // 99: zqnt.ConnectorService.ListAssetPayloads:output_type -> zqnt.AssetPayloadListResponse
-	5,  // 100: zqnt.ConnectorService.DeleteAssetPayload:output_type -> zqnt.AssetPayloadResponse
-	12, // 101: zqnt.ConnectorService.GetOrganization:output_type -> zqnt.ConnectorResponse
-	58, // 102: zqnt.ConnectorService.GetMission:output_type -> zqnt.MissionResponse
-	58, // 103: zqnt.ConnectorService.CreateMission:output_type -> zqnt.MissionResponse
-	58, // 104: zqnt.ConnectorService.UpdateMission:output_type -> zqnt.MissionResponse
-	58, // 105: zqnt.ConnectorService.DeleteMission:output_type -> zqnt.MissionResponse
-	58, // 106: zqnt.ConnectorService.UploadMissionNfzZones:output_type -> zqnt.MissionResponse
-	59, // 107: zqnt.ConnectorService.GetTask:output_type -> zqnt.TaskResponse
-	59, // 108: zqnt.ConnectorService.GetTaskByFlightId:output_type -> zqnt.TaskResponse
-	60, // 109: zqnt.ConnectorService.GetWaypointsByTaskId:output_type -> zqnt.WaypointsResponse
-	59, // 110: zqnt.ConnectorService.CreateTask:output_type -> zqnt.TaskResponse
-	59, // 111: zqnt.ConnectorService.UpdateTask:output_type -> zqnt.TaskResponse
-	59, // 112: zqnt.ConnectorService.DeleteTask:output_type -> zqnt.TaskResponse
-	61, // 113: zqnt.ConnectorService.GetScheduler:output_type -> zqnt.SchedulerResponse
-	61, // 114: zqnt.ConnectorService.CreateScheduler:output_type -> zqnt.SchedulerResponse
-	61, // 115: zqnt.ConnectorService.CreateSchedulers:output_type -> zqnt.SchedulerResponse
-	61, // 116: zqnt.ConnectorService.UpdateScheduler:output_type -> zqnt.SchedulerResponse
-	61, // 117: zqnt.ConnectorService.DeleteScheduler:output_type -> zqnt.SchedulerResponse
-	61, // 118: zqnt.ConnectorService.DeleteSchedulers:output_type -> zqnt.SchedulerResponse
-	61, // 119: zqnt.ConnectorService.DeleteSchedulersByTask:output_type -> zqnt.SchedulerResponse
-	12, // 120: zqnt.ConnectorService.StoreTelemetryBatch:output_type -> zqnt.ConnectorResponse
-	12, // 121: zqnt.ConnectorService.StoreDetectionBatch:output_type -> zqnt.ConnectorResponse
-	12, // 122: zqnt.ConnectorService.StoreNotificationBatch:output_type -> zqnt.ConnectorResponse
-	23, // 123: zqnt.ConnectorService.GetActivePoliciesByType:output_type -> zqnt.ConnectorPolicyResponse
-	23, // 124: zqnt.ConnectorService.GetAllActivePolicies:output_type -> zqnt.ConnectorPolicyResponse
-	27, // 125: zqnt.ConnectorService.GetTechnicalConfigs:output_type -> zqnt.ConnectorConfigResponse
-	90, // [90:126] is the sub-list for method output_type
-	54, // [54:90] is the sub-list for method input_type
-	54, // [54:54] is the sub-list for extension type_name
-	54, // [54:54] is the sub-list for extension extendee
-	0,  // [0:54] is the sub-list for field type_name
+	148, // 0: zqnt.AuthenticateUserRequest.base:type_name -> zqnt.RequestBase
+	149, // 1: zqnt.AuthenticatedUserProtoDTO.created_at:type_name -> google.protobuf.Timestamp
+	150, // 2: zqnt.AuthenticateUserResponse.meta:type_name -> zqnt.ResponseMeta
+	4,   // 3: zqnt.AuthenticateUserResponse.user:type_name -> zqnt.AuthenticatedUserProtoDTO
+	151, // 4: zqnt.AuthenticateUserResponse.error:type_name -> zqnt.GlobalErrorMessage
+	148, // 5: zqnt.CreateUserRequest.base:type_name -> zqnt.RequestBase
+	150, // 6: zqnt.CreateUserResponse.meta:type_name -> zqnt.ResponseMeta
+	4,   // 7: zqnt.CreateUserResponse.user:type_name -> zqnt.AuthenticatedUserProtoDTO
+	151, // 8: zqnt.CreateUserResponse.error:type_name -> zqnt.GlobalErrorMessage
+	148, // 9: zqnt.ResetPasswordRequest.base:type_name -> zqnt.RequestBase
+	150, // 10: zqnt.ResetPasswordResponse.meta:type_name -> zqnt.ResponseMeta
+	151, // 11: zqnt.ResetPasswordResponse.error:type_name -> zqnt.GlobalErrorMessage
+	148, // 12: zqnt.RecordAuthAuditEventRequest.base:type_name -> zqnt.RequestBase
+	148, // 13: zqnt.ListUsersRequest.base:type_name -> zqnt.RequestBase
+	150, // 14: zqnt.ListUsersResponse.meta:type_name -> zqnt.ResponseMeta
+	4,   // 15: zqnt.ListUsersResponse.users:type_name -> zqnt.AuthenticatedUserProtoDTO
+	151, // 16: zqnt.ListUsersResponse.error:type_name -> zqnt.GlobalErrorMessage
+	148, // 17: zqnt.GetUserByIdRequest.base:type_name -> zqnt.RequestBase
+	148, // 18: zqnt.UpdateUserRolesRequest.base:type_name -> zqnt.RequestBase
+	148, // 19: zqnt.SetUserEnabledRequest.base:type_name -> zqnt.RequestBase
+	148, // 20: zqnt.DeleteUserRequest.base:type_name -> zqnt.RequestBase
+	145, // 21: zqnt.IdentityProviderConfigProtoDTO.claim_role_mapping:type_name -> zqnt.IdentityProviderConfigProtoDTO.ClaimRoleMappingEntry
+	149, // 22: zqnt.IdentityProviderConfigProtoDTO.created_at:type_name -> google.protobuf.Timestamp
+	149, // 23: zqnt.IdentityProviderConfigProtoDTO.updated_at:type_name -> google.protobuf.Timestamp
+	148, // 24: zqnt.UpsertIdentityProviderRequest.base:type_name -> zqnt.RequestBase
+	17,  // 25: zqnt.UpsertIdentityProviderRequest.config:type_name -> zqnt.IdentityProviderConfigProtoDTO
+	148, // 26: zqnt.GetIdentityProviderRequest.base:type_name -> zqnt.RequestBase
+	148, // 27: zqnt.FindIdentityProviderByEmailDomainRequest.base:type_name -> zqnt.RequestBase
+	150, // 28: zqnt.IdentityProviderResponse.meta:type_name -> zqnt.ResponseMeta
+	17,  // 29: zqnt.IdentityProviderResponse.config:type_name -> zqnt.IdentityProviderConfigProtoDTO
+	151, // 30: zqnt.IdentityProviderResponse.error:type_name -> zqnt.GlobalErrorMessage
+	148, // 31: zqnt.FindOidcUserRequest.base:type_name -> zqnt.RequestBase
+	148, // 32: zqnt.UpsertOidcUserRequest.base:type_name -> zqnt.RequestBase
+	148, // 33: zqnt.PersistSkillExecutionRequest.base:type_name -> zqnt.RequestBase
+	152, // 34: zqnt.PersistSkillExecutionRequest.execution:type_name -> zqnt.SkillExecutionProtoDTO
+	148, // 35: zqnt.AppendSkillExecutionEventRequest.base:type_name -> zqnt.RequestBase
+	153, // 36: zqnt.AppendSkillExecutionEventRequest.event:type_name -> zqnt.SkillExecutionEventProto
+	148, // 37: zqnt.UpsertAssetPayloadRequest.base:type_name -> zqnt.RequestBase
+	154, // 38: zqnt.UpsertAssetPayloadRequest.payload:type_name -> zqnt.AssetPayloadProtoDTO
+	27,  // 39: zqnt.UpsertAssetPayloadRequest.owner:type_name -> zqnt.AssetPayloadOwner
+	155, // 40: zqnt.UpsertAssetPayloadRequest.update_mask:type_name -> google.protobuf.FieldMask
+	148, // 41: zqnt.ListAssetPayloadsRequest.base:type_name -> zqnt.RequestBase
+	27,  // 42: zqnt.ListAssetPayloadsRequest.owner:type_name -> zqnt.AssetPayloadOwner
+	148, // 43: zqnt.DeleteAssetPayloadRequest.base:type_name -> zqnt.RequestBase
+	27,  // 44: zqnt.DeleteAssetPayloadRequest.owner:type_name -> zqnt.AssetPayloadOwner
+	154, // 45: zqnt.AssetPayloadResponse.payload:type_name -> zqnt.AssetPayloadProtoDTO
+	151, // 46: zqnt.AssetPayloadResponse.error:type_name -> zqnt.GlobalErrorMessage
+	154, // 47: zqnt.AssetPayloadListResponse.payloads:type_name -> zqnt.AssetPayloadProtoDTO
+	151, // 48: zqnt.AssetPayloadListResponse.error:type_name -> zqnt.GlobalErrorMessage
+	148, // 49: zqnt.SetAssetPropertyRequest.base:type_name -> zqnt.RequestBase
+	156, // 50: zqnt.SetAssetPropertyRequest.value:type_name -> google.protobuf.Value
+	148, // 51: zqnt.ListAssetPropertiesRequest.base:type_name -> zqnt.RequestBase
+	148, // 52: zqnt.DeleteAssetPropertyRequest.base:type_name -> zqnt.RequestBase
+	157, // 53: zqnt.AssetPropertyResponse.property:type_name -> zqnt.AssetPropertyProtoDTO
+	151, // 54: zqnt.AssetPropertyResponse.error:type_name -> zqnt.GlobalErrorMessage
+	157, // 55: zqnt.AssetPropertyListResponse.properties:type_name -> zqnt.AssetPropertyProtoDTO
+	151, // 56: zqnt.AssetPropertyListResponse.error:type_name -> zqnt.GlobalErrorMessage
+	158, // 57: zqnt.SkillContractProtoDTO.input_schema:type_name -> google.protobuf.Struct
+	158, // 58: zqnt.SkillContractProtoDTO.output_schema:type_name -> google.protobuf.Struct
+	159, // 59: zqnt.SkillContractProtoDTO.errors:type_name -> zqnt.CapabilityErrorProto
+	160, // 60: zqnt.SkillContractProtoDTO.events:type_name -> zqnt.CapabilityEventProto
+	161, // 61: zqnt.SkillContractProtoDTO.requirements:type_name -> zqnt.CapabilityRequirementsProto
+	162, // 62: zqnt.SkillContractProtoDTO.source:type_name -> zqnt.CapabilitySourceProto
+	0,   // 63: zqnt.SkillContractProtoDTO.status:type_name -> zqnt.SkillContractStatus
+	149, // 64: zqnt.SkillContractProtoDTO.first_seen_at:type_name -> google.protobuf.Timestamp
+	149, // 65: zqnt.SkillContractProtoDTO.last_seen_at:type_name -> google.protobuf.Timestamp
+	1,   // 66: zqnt.SkillContractProtoDTO.compatibility:type_name -> zqnt.SkillContractCompatibility
+	148, // 67: zqnt.UpsertSkillContractRequest.base:type_name -> zqnt.RequestBase
+	37,  // 68: zqnt.UpsertSkillContractRequest.contract:type_name -> zqnt.SkillContractProtoDTO
+	148, // 69: zqnt.ListSkillContractsRequest.base:type_name -> zqnt.RequestBase
+	0,   // 70: zqnt.ListSkillContractsRequest.status:type_name -> zqnt.SkillContractStatus
+	148, // 71: zqnt.SetSkillContractStatusRequest.base:type_name -> zqnt.RequestBase
+	0,   // 72: zqnt.SetSkillContractStatusRequest.status:type_name -> zqnt.SkillContractStatus
+	148, // 73: zqnt.SetSkillContractPermissionsRequest.base:type_name -> zqnt.RequestBase
+	37,  // 74: zqnt.SkillContractResponse.contract:type_name -> zqnt.SkillContractProtoDTO
+	151, // 75: zqnt.SkillContractResponse.error:type_name -> zqnt.GlobalErrorMessage
+	37,  // 76: zqnt.SkillContractListResponse.contracts:type_name -> zqnt.SkillContractProtoDTO
+	151, // 77: zqnt.SkillContractListResponse.error:type_name -> zqnt.GlobalErrorMessage
+	148, // 78: zqnt.ConnectorGetAssetByIdRequest.base:type_name -> zqnt.RequestBase
+	163, // 79: zqnt.ConnectorAssetList.assets:type_name -> zqnt.AssetProtoDTO
+	148, // 80: zqnt.ListAssetsRequest.base:type_name -> zqnt.RequestBase
+	163, // 81: zqnt.AssetListResponse.assets:type_name -> zqnt.AssetProtoDTO
+	151, // 82: zqnt.AssetListResponse.error:type_name -> zqnt.GlobalErrorMessage
+	148, // 83: zqnt.ConnectorRegisterAssetRequest.base:type_name -> zqnt.RequestBase
+	163, // 84: zqnt.ConnectorRegisterAssetRequest.asset:type_name -> zqnt.AssetProtoDTO
+	164, // 85: zqnt.AssetClaimProtoDTO.allowed_vendor:type_name -> zqnt.AssetVendor
+	165, // 86: zqnt.AssetClaimProtoDTO.allowed_type:type_name -> zqnt.AssetTypeEnum
+	149, // 87: zqnt.AssetClaimProtoDTO.expires_at:type_name -> google.protobuf.Timestamp
+	149, // 88: zqnt.AssetClaimProtoDTO.revoked_at:type_name -> google.protobuf.Timestamp
+	149, // 89: zqnt.AssetClaimProtoDTO.created_at:type_name -> google.protobuf.Timestamp
+	50,  // 90: zqnt.AssetClaimProtoDTO.redemptions:type_name -> zqnt.AssetClaimRedemptionProtoDTO
+	149, // 91: zqnt.AssetClaimRedemptionProtoDTO.redeemed_at:type_name -> google.protobuf.Timestamp
+	148, // 92: zqnt.CreateAssetClaimRequest.base:type_name -> zqnt.RequestBase
+	164, // 93: zqnt.CreateAssetClaimRequest.allowed_vendor:type_name -> zqnt.AssetVendor
+	165, // 94: zqnt.CreateAssetClaimRequest.allowed_type:type_name -> zqnt.AssetTypeEnum
+	151, // 95: zqnt.AssetClaimResponse.error:type_name -> zqnt.GlobalErrorMessage
+	49,  // 96: zqnt.AssetClaimResponse.claim:type_name -> zqnt.AssetClaimProtoDTO
+	148, // 97: zqnt.RedeemAssetClaimRequest.base:type_name -> zqnt.RequestBase
+	163, // 98: zqnt.RedeemAssetClaimRequest.asset:type_name -> zqnt.AssetProtoDTO
+	148, // 99: zqnt.DescribeAssetClaimRequest.base:type_name -> zqnt.RequestBase
+	151, // 100: zqnt.AssetClaimDescriptionResponse.error:type_name -> zqnt.GlobalErrorMessage
+	148, // 101: zqnt.ListAssetClaimsRequest.base:type_name -> zqnt.RequestBase
+	49,  // 102: zqnt.AssetClaimListResponse.claims:type_name -> zqnt.AssetClaimProtoDTO
+	151, // 103: zqnt.AssetClaimListResponse.error:type_name -> zqnt.GlobalErrorMessage
+	148, // 104: zqnt.RevokeAssetClaimRequest.base:type_name -> zqnt.RequestBase
+	148, // 105: zqnt.ConnectorUpdateAssetRequest.base:type_name -> zqnt.RequestBase
+	163, // 106: zqnt.ConnectorUpdateAssetRequest.asset:type_name -> zqnt.AssetProtoDTO
+	155, // 107: zqnt.ConnectorUpdateAssetRequest.update_mask:type_name -> google.protobuf.FieldMask
+	148, // 108: zqnt.ConnectorUpdateSubAssetRequest.base:type_name -> zqnt.RequestBase
+	166, // 109: zqnt.ConnectorUpdateSubAssetRequest.sub_asset:type_name -> zqnt.SubAssetProtoDTO
+	155, // 110: zqnt.ConnectorUpdateSubAssetRequest.update_mask:type_name -> google.protobuf.FieldMask
+	149, // 111: zqnt.ConnectorResponse.timestamp:type_name -> google.protobuf.Timestamp
+	167, // 112: zqnt.ConnectorResponse.empty:type_name -> google.protobuf.Empty
+	151, // 113: zqnt.ConnectorResponse.error:type_name -> zqnt.GlobalErrorMessage
+	163, // 114: zqnt.ConnectorResponse.asset:type_name -> zqnt.AssetProtoDTO
+	166, // 115: zqnt.ConnectorResponse.sub_asset:type_name -> zqnt.SubAssetProtoDTO
+	168, // 116: zqnt.ConnectorResponse.organization:type_name -> zqnt.OrganizationProtoDTO
+	149, // 117: zqnt.AssetMonitoringResponse.timestamp:type_name -> google.protobuf.Timestamp
+	167, // 118: zqnt.AssetMonitoringResponse.empty:type_name -> google.protobuf.Empty
+	151, // 119: zqnt.AssetMonitoringResponse.error:type_name -> zqnt.GlobalErrorMessage
+	45,  // 120: zqnt.AssetMonitoringResponse.assets:type_name -> zqnt.ConnectorAssetList
+	148, // 121: zqnt.ConnectorGetOrganizationRequest.base:type_name -> zqnt.RequestBase
+	148, // 122: zqnt.ConnectorStoreTelemetryRequest.base:type_name -> zqnt.RequestBase
+	2,   // 123: zqnt.ConnectorStoreTelemetryRequest.type:type_name -> zqnt.TelemetryType
+	66,  // 124: zqnt.ConnectorStoreTelemetryRequest.asset_telemetry:type_name -> zqnt.AssetTelemetryProto
+	67,  // 125: zqnt.ConnectorStoreTelemetryRequest.sub_asset_telemetry:type_name -> zqnt.SubAssetTelemetryProto
+	148, // 126: zqnt.ConnectorStoreDetectionRequest.base:type_name -> zqnt.RequestBase
+	149, // 127: zqnt.ConnectorStoreDetectionRequest.detected_at:type_name -> google.protobuf.Timestamp
+	169, // 128: zqnt.ConnectorStoreDetectionRequest.position:type_name -> zqnt.DetectionPosition
+	149, // 129: zqnt.AssetTelemetryProto.timestamp:type_name -> google.protobuf.Timestamp
+	146, // 130: zqnt.AssetTelemetryProto.telemetry_data:type_name -> zqnt.AssetTelemetryProto.TelemetryDataEntry
+	149, // 131: zqnt.SubAssetTelemetryProto.timestamp:type_name -> google.protobuf.Timestamp
+	147, // 132: zqnt.SubAssetTelemetryProto.telemetry_data:type_name -> zqnt.SubAssetTelemetryProto.TelemetryDataEntry
+	149, // 133: zqnt.PolicyProtoDTO.created_at:type_name -> google.protobuf.Timestamp
+	149, // 134: zqnt.PolicyProtoDTO.modified_at:type_name -> google.protobuf.Timestamp
+	68,  // 135: zqnt.PolicyProtoDTOList.policies:type_name -> zqnt.PolicyProtoDTO
+	148, // 136: zqnt.ConnectorGetPoliciesRequest.base:type_name -> zqnt.RequestBase
+	148, // 137: zqnt.ConnectorGetAllPoliciesRequest.base:type_name -> zqnt.RequestBase
+	149, // 138: zqnt.ConnectorPolicyResponse.timestamp:type_name -> google.protobuf.Timestamp
+	151, // 139: zqnt.ConnectorPolicyResponse.error:type_name -> zqnt.GlobalErrorMessage
+	69,  // 140: zqnt.ConnectorPolicyResponse.policy_list:type_name -> zqnt.PolicyProtoDTOList
+	148, // 141: zqnt.GetPolicyByIdRequest.base:type_name -> zqnt.RequestBase
+	148, // 142: zqnt.CreatePolicyRequest.base:type_name -> zqnt.RequestBase
+	68,  // 143: zqnt.CreatePolicyRequest.policy:type_name -> zqnt.PolicyProtoDTO
+	148, // 144: zqnt.UpdatePolicyRequest.base:type_name -> zqnt.RequestBase
+	68,  // 145: zqnt.UpdatePolicyRequest.policy:type_name -> zqnt.PolicyProtoDTO
+	148, // 146: zqnt.DeletePolicyRequest.base:type_name -> zqnt.RequestBase
+	149, // 147: zqnt.ConnectorPolicySingleResponse.timestamp:type_name -> google.protobuf.Timestamp
+	151, // 148: zqnt.ConnectorPolicySingleResponse.error:type_name -> zqnt.GlobalErrorMessage
+	68,  // 149: zqnt.ConnectorPolicySingleResponse.policy:type_name -> zqnt.PolicyProtoDTO
+	149, // 150: zqnt.ConnectorDeletePolicyResponse.timestamp:type_name -> google.protobuf.Timestamp
+	151, // 151: zqnt.ConnectorDeletePolicyResponse.error:type_name -> zqnt.GlobalErrorMessage
+	148, // 152: zqnt.ConnectorGetAllOrganizationsRequest.base:type_name -> zqnt.RequestBase
+	148, // 153: zqnt.GetOrganizationByIdRequest.base:type_name -> zqnt.RequestBase
+	148, // 154: zqnt.CreateOrganizationRequest.base:type_name -> zqnt.RequestBase
+	168, // 155: zqnt.CreateOrganizationRequest.organization:type_name -> zqnt.OrganizationProtoDTO
+	148, // 156: zqnt.UpdateOrganizationRequest.base:type_name -> zqnt.RequestBase
+	168, // 157: zqnt.UpdateOrganizationRequest.organization:type_name -> zqnt.OrganizationProtoDTO
+	148, // 158: zqnt.DeleteOrganizationRequest.base:type_name -> zqnt.RequestBase
+	168, // 159: zqnt.OrganizationProtoDTOList.organizations:type_name -> zqnt.OrganizationProtoDTO
+	149, // 160: zqnt.ConnectorOrganizationResponse.timestamp:type_name -> google.protobuf.Timestamp
+	151, // 161: zqnt.ConnectorOrganizationResponse.error:type_name -> zqnt.GlobalErrorMessage
+	84,  // 162: zqnt.ConnectorOrganizationResponse.organization_list:type_name -> zqnt.OrganizationProtoDTOList
+	149, // 163: zqnt.ConnectorOrganizationSingleResponse.timestamp:type_name -> google.protobuf.Timestamp
+	151, // 164: zqnt.ConnectorOrganizationSingleResponse.error:type_name -> zqnt.GlobalErrorMessage
+	168, // 165: zqnt.ConnectorOrganizationSingleResponse.organization:type_name -> zqnt.OrganizationProtoDTO
+	149, // 166: zqnt.ConnectorDeleteOrganizationResponse.timestamp:type_name -> google.protobuf.Timestamp
+	151, // 167: zqnt.ConnectorDeleteOrganizationResponse.error:type_name -> zqnt.GlobalErrorMessage
+	170, // 168: zqnt.TheatreProtoDTO.geo_zone:type_name -> zqnt.GeoAreaProtoDTO
+	149, // 169: zqnt.TheatreProtoDTO.created_at:type_name -> google.protobuf.Timestamp
+	149, // 170: zqnt.TheatreProtoDTO.modified_at:type_name -> google.protobuf.Timestamp
+	88,  // 171: zqnt.TheatreProtoDTOList.theatres:type_name -> zqnt.TheatreProtoDTO
+	148, // 172: zqnt.ConnectorGetAllTheatresRequest.base:type_name -> zqnt.RequestBase
+	148, // 173: zqnt.GetTheatreByIdRequest.base:type_name -> zqnt.RequestBase
+	148, // 174: zqnt.CreateTheatreRequest.base:type_name -> zqnt.RequestBase
+	88,  // 175: zqnt.CreateTheatreRequest.theatre:type_name -> zqnt.TheatreProtoDTO
+	148, // 176: zqnt.UpdateTheatreRequest.base:type_name -> zqnt.RequestBase
+	88,  // 177: zqnt.UpdateTheatreRequest.theatre:type_name -> zqnt.TheatreProtoDTO
+	148, // 178: zqnt.DeleteTheatreRequest.base:type_name -> zqnt.RequestBase
+	149, // 179: zqnt.ConnectorTheatreResponse.timestamp:type_name -> google.protobuf.Timestamp
+	151, // 180: zqnt.ConnectorTheatreResponse.error:type_name -> zqnt.GlobalErrorMessage
+	89,  // 181: zqnt.ConnectorTheatreResponse.theatre_list:type_name -> zqnt.TheatreProtoDTOList
+	149, // 182: zqnt.ConnectorTheatreSingleResponse.timestamp:type_name -> google.protobuf.Timestamp
+	151, // 183: zqnt.ConnectorTheatreSingleResponse.error:type_name -> zqnt.GlobalErrorMessage
+	88,  // 184: zqnt.ConnectorTheatreSingleResponse.theatre:type_name -> zqnt.TheatreProtoDTO
+	149, // 185: zqnt.ConnectorDeleteTheatreResponse.timestamp:type_name -> google.protobuf.Timestamp
+	151, // 186: zqnt.ConnectorDeleteTheatreResponse.error:type_name -> zqnt.GlobalErrorMessage
+	148, // 187: zqnt.AssignUserToTheatreRequest.base:type_name -> zqnt.RequestBase
+	148, // 188: zqnt.RemoveUserFromTheatreRequest.base:type_name -> zqnt.RequestBase
+	149, // 189: zqnt.TheatreAssignmentResponse.timestamp:type_name -> google.protobuf.Timestamp
+	151, // 190: zqnt.TheatreAssignmentResponse.error:type_name -> zqnt.GlobalErrorMessage
+	148, // 191: zqnt.ListNoFlyZonesRequest.base:type_name -> zqnt.RequestBase
+	148, // 192: zqnt.UpsertNoFlyZoneRequest.base:type_name -> zqnt.RequestBase
+	171, // 193: zqnt.UpsertNoFlyZoneRequest.zone:type_name -> zqnt.MissionZoneProtoDTO
+	148, // 194: zqnt.DeleteNoFlyZoneRequest.base:type_name -> zqnt.RequestBase
+	149, // 195: zqnt.NoFlyZoneListResponse.timestamp:type_name -> google.protobuf.Timestamp
+	151, // 196: zqnt.NoFlyZoneListResponse.error:type_name -> zqnt.GlobalErrorMessage
+	171, // 197: zqnt.NoFlyZoneListResponse.zones:type_name -> zqnt.MissionZoneProtoDTO
+	149, // 198: zqnt.NoFlyZoneSingleResponse.timestamp:type_name -> google.protobuf.Timestamp
+	151, // 199: zqnt.NoFlyZoneSingleResponse.error:type_name -> zqnt.GlobalErrorMessage
+	171, // 200: zqnt.NoFlyZoneSingleResponse.zone:type_name -> zqnt.MissionZoneProtoDTO
+	149, // 201: zqnt.DeleteNoFlyZoneResponse.timestamp:type_name -> google.protobuf.Timestamp
+	151, // 202: zqnt.DeleteNoFlyZoneResponse.error:type_name -> zqnt.GlobalErrorMessage
+	148, // 203: zqnt.ProvisionLicensedOrganizationRequest.base:type_name -> zqnt.RequestBase
+	109, // 204: zqnt.ProvisionLicensedOrganizationRequest.credentials:type_name -> zqnt.LicenseActivationCredentialsProtoDTO
+	149, // 205: zqnt.ProvisionLicensedOrganizationResponse.timestamp:type_name -> google.protobuf.Timestamp
+	151, // 206: zqnt.ProvisionLicensedOrganizationResponse.error:type_name -> zqnt.GlobalErrorMessage
+	168, // 207: zqnt.ProvisionLicensedOrganizationResponse.organization:type_name -> zqnt.OrganizationProtoDTO
+	149, // 208: zqnt.LicenseActivationCredentialsProtoDTO.created_at:type_name -> google.protobuf.Timestamp
+	149, // 209: zqnt.LicenseActivationCredentialsProtoDTO.modified_at:type_name -> google.protobuf.Timestamp
+	148, // 210: zqnt.ListLicenseActivationCredentialsRequest.base:type_name -> zqnt.RequestBase
+	148, // 211: zqnt.GetLicenseActivationCredentialsRequest.base:type_name -> zqnt.RequestBase
+	148, // 212: zqnt.PutLicenseActivationCredentialsRequest.base:type_name -> zqnt.RequestBase
+	109, // 213: zqnt.PutLicenseActivationCredentialsRequest.credentials:type_name -> zqnt.LicenseActivationCredentialsProtoDTO
+	148, // 214: zqnt.DeleteLicenseActivationCredentialsRequest.base:type_name -> zqnt.RequestBase
+	149, // 215: zqnt.LicenseActivationCredentialsListResponse.timestamp:type_name -> google.protobuf.Timestamp
+	151, // 216: zqnt.LicenseActivationCredentialsListResponse.error:type_name -> zqnt.GlobalErrorMessage
+	109, // 217: zqnt.LicenseActivationCredentialsListResponse.credentials:type_name -> zqnt.LicenseActivationCredentialsProtoDTO
+	149, // 218: zqnt.LicenseActivationCredentialsSingleResponse.timestamp:type_name -> google.protobuf.Timestamp
+	151, // 219: zqnt.LicenseActivationCredentialsSingleResponse.error:type_name -> zqnt.GlobalErrorMessage
+	109, // 220: zqnt.LicenseActivationCredentialsSingleResponse.credentials:type_name -> zqnt.LicenseActivationCredentialsProtoDTO
+	149, // 221: zqnt.DeleteLicenseActivationCredentialsResponse.timestamp:type_name -> google.protobuf.Timestamp
+	151, // 222: zqnt.DeleteLicenseActivationCredentialsResponse.error:type_name -> zqnt.GlobalErrorMessage
+	149, // 223: zqnt.EventTriggerProtoDTO.last_fired_at:type_name -> google.protobuf.Timestamp
+	149, // 224: zqnt.EventTriggerProtoDTO.created_at:type_name -> google.protobuf.Timestamp
+	149, // 225: zqnt.EventTriggerProtoDTO.modified_at:type_name -> google.protobuf.Timestamp
+	117, // 226: zqnt.EventTriggerProtoDTOList.event_triggers:type_name -> zqnt.EventTriggerProtoDTO
+	148, // 227: zqnt.ConnectorGetAllEventTriggersRequest.base:type_name -> zqnt.RequestBase
+	148, // 228: zqnt.GetEventTriggerByIdRequest.base:type_name -> zqnt.RequestBase
+	148, // 229: zqnt.CreateEventTriggerRequest.base:type_name -> zqnt.RequestBase
+	117, // 230: zqnt.CreateEventTriggerRequest.event_trigger:type_name -> zqnt.EventTriggerProtoDTO
+	148, // 231: zqnt.UpdateEventTriggerRequest.base:type_name -> zqnt.RequestBase
+	117, // 232: zqnt.UpdateEventTriggerRequest.event_trigger:type_name -> zqnt.EventTriggerProtoDTO
+	148, // 233: zqnt.DeleteEventTriggerRequest.base:type_name -> zqnt.RequestBase
+	148, // 234: zqnt.RecordEventTriggerFiredRequest.base:type_name -> zqnt.RequestBase
+	148, // 235: zqnt.RegenerateEventTriggerWebhookTokenRequest.base:type_name -> zqnt.RequestBase
+	148, // 236: zqnt.GetEventTriggerByWebhookTokenRequest.base:type_name -> zqnt.RequestBase
+	149, // 237: zqnt.ConnectorEventTriggerResponse.timestamp:type_name -> google.protobuf.Timestamp
+	151, // 238: zqnt.ConnectorEventTriggerResponse.error:type_name -> zqnt.GlobalErrorMessage
+	118, // 239: zqnt.ConnectorEventTriggerResponse.event_trigger_list:type_name -> zqnt.EventTriggerProtoDTOList
+	149, // 240: zqnt.ConnectorEventTriggerSingleResponse.timestamp:type_name -> google.protobuf.Timestamp
+	151, // 241: zqnt.ConnectorEventTriggerSingleResponse.error:type_name -> zqnt.GlobalErrorMessage
+	117, // 242: zqnt.ConnectorEventTriggerSingleResponse.event_trigger:type_name -> zqnt.EventTriggerProtoDTO
+	149, // 243: zqnt.ConnectorDeleteEventTriggerResponse.timestamp:type_name -> google.protobuf.Timestamp
+	151, // 244: zqnt.ConnectorDeleteEventTriggerResponse.error:type_name -> zqnt.GlobalErrorMessage
+	149, // 245: zqnt.DetectionSummaryProtoDTO.detected_at:type_name -> google.protobuf.Timestamp
+	169, // 246: zqnt.DetectionSummaryProtoDTO.position:type_name -> zqnt.DetectionPosition
+	148, // 247: zqnt.ListRecentDetectionsRequest.base:type_name -> zqnt.RequestBase
+	149, // 248: zqnt.ListRecentDetectionsRequest.since:type_name -> google.protobuf.Timestamp
+	149, // 249: zqnt.ConnectorDetectionListResponse.timestamp:type_name -> google.protobuf.Timestamp
+	130, // 250: zqnt.ConnectorDetectionListResponse.detections:type_name -> zqnt.DetectionSummaryProtoDTO
+	151, // 251: zqnt.ConnectorDetectionListResponse.error:type_name -> zqnt.GlobalErrorMessage
+	148, // 252: zqnt.GetLatestTelemetryForAssetRequest.base:type_name -> zqnt.RequestBase
+	149, // 253: zqnt.ConnectorTelemetrySingleResponse.timestamp:type_name -> google.protobuf.Timestamp
+	151, // 254: zqnt.ConnectorTelemetrySingleResponse.error:type_name -> zqnt.GlobalErrorMessage
+	66,  // 255: zqnt.ConnectorTelemetrySingleResponse.telemetry:type_name -> zqnt.AssetTelemetryProto
+	149, // 256: zqnt.TechnicalConfigProtoDTO.created_at:type_name -> google.protobuf.Timestamp
+	149, // 257: zqnt.TechnicalConfigProtoDTO.modified_at:type_name -> google.protobuf.Timestamp
+	135, // 258: zqnt.TechnicalConfigProtoDTOList.configs:type_name -> zqnt.TechnicalConfigProtoDTO
+	148, // 259: zqnt.ConnectorGetConfigsRequest.base:type_name -> zqnt.RequestBase
+	149, // 260: zqnt.ConnectorConfigResponse.timestamp:type_name -> google.protobuf.Timestamp
+	151, // 261: zqnt.ConnectorConfigResponse.error:type_name -> zqnt.GlobalErrorMessage
+	136, // 262: zqnt.ConnectorConfigResponse.config_list:type_name -> zqnt.TechnicalConfigProtoDTOList
+	148, // 263: zqnt.GetTechnicalConfigByIdRequest.base:type_name -> zqnt.RequestBase
+	148, // 264: zqnt.CreateTechnicalConfigRequest.base:type_name -> zqnt.RequestBase
+	135, // 265: zqnt.CreateTechnicalConfigRequest.config:type_name -> zqnt.TechnicalConfigProtoDTO
+	148, // 266: zqnt.UpdateTechnicalConfigRequest.base:type_name -> zqnt.RequestBase
+	135, // 267: zqnt.UpdateTechnicalConfigRequest.config:type_name -> zqnt.TechnicalConfigProtoDTO
+	148, // 268: zqnt.DeleteTechnicalConfigRequest.base:type_name -> zqnt.RequestBase
+	149, // 269: zqnt.ConnectorConfigSingleResponse.timestamp:type_name -> google.protobuf.Timestamp
+	151, // 270: zqnt.ConnectorConfigSingleResponse.error:type_name -> zqnt.GlobalErrorMessage
+	135, // 271: zqnt.ConnectorConfigSingleResponse.config:type_name -> zqnt.TechnicalConfigProtoDTO
+	149, // 272: zqnt.ConnectorDeleteConfigResponse.timestamp:type_name -> google.protobuf.Timestamp
+	151, // 273: zqnt.ConnectorDeleteConfigResponse.error:type_name -> zqnt.GlobalErrorMessage
+	48,  // 274: zqnt.ConnectorService.RegisterAsset:input_type -> zqnt.ConnectorRegisterAssetRequest
+	148, // 275: zqnt.ConnectorService.DeregisterAsset:input_type -> zqnt.RequestBase
+	148, // 276: zqnt.ConnectorService.AssetMonitoring:input_type -> zqnt.RequestBase
+	59,  // 277: zqnt.ConnectorService.UpdateAsset:input_type -> zqnt.ConnectorUpdateAssetRequest
+	60,  // 278: zqnt.ConnectorService.UpdateSubAsset:input_type -> zqnt.ConnectorUpdateSubAssetRequest
+	148, // 279: zqnt.ConnectorService.GetAssetBySn:input_type -> zqnt.RequestBase
+	44,  // 280: zqnt.ConnectorService.GetAssetById:input_type -> zqnt.ConnectorGetAssetByIdRequest
+	148, // 281: zqnt.ConnectorService.GetSubAssetBySn:input_type -> zqnt.RequestBase
+	46,  // 282: zqnt.ConnectorService.ListAssets:input_type -> zqnt.ListAssetsRequest
+	51,  // 283: zqnt.ConnectorService.CreateAssetClaim:input_type -> zqnt.CreateAssetClaimRequest
+	53,  // 284: zqnt.ConnectorService.RedeemAssetClaim:input_type -> zqnt.RedeemAssetClaimRequest
+	54,  // 285: zqnt.ConnectorService.DescribeAssetClaim:input_type -> zqnt.DescribeAssetClaimRequest
+	56,  // 286: zqnt.ConnectorService.ListAssetClaims:input_type -> zqnt.ListAssetClaimsRequest
+	58,  // 287: zqnt.ConnectorService.RevokeAssetClaim:input_type -> zqnt.RevokeAssetClaimRequest
+	26,  // 288: zqnt.ConnectorService.UpsertAssetPayload:input_type -> zqnt.UpsertAssetPayloadRequest
+	28,  // 289: zqnt.ConnectorService.ListAssetPayloads:input_type -> zqnt.ListAssetPayloadsRequest
+	29,  // 290: zqnt.ConnectorService.DeleteAssetPayload:input_type -> zqnt.DeleteAssetPayloadRequest
+	32,  // 291: zqnt.ConnectorService.SetAssetProperty:input_type -> zqnt.SetAssetPropertyRequest
+	33,  // 292: zqnt.ConnectorService.ListAssetProperties:input_type -> zqnt.ListAssetPropertiesRequest
+	34,  // 293: zqnt.ConnectorService.DeleteAssetProperty:input_type -> zqnt.DeleteAssetPropertyRequest
+	63,  // 294: zqnt.ConnectorService.GetOrganization:input_type -> zqnt.ConnectorGetOrganizationRequest
+	172, // 295: zqnt.ConnectorService.ListSchedulers:input_type -> zqnt.ListSchedulersRequest
+	173, // 296: zqnt.ConnectorService.GetScheduler:input_type -> zqnt.GetSchedulerRequest
+	174, // 297: zqnt.ConnectorService.CreateScheduler:input_type -> zqnt.CreateSchedulerRequest
+	175, // 298: zqnt.ConnectorService.CreateSchedulers:input_type -> zqnt.CreateSchedulersRequest
+	176, // 299: zqnt.ConnectorService.UpdateScheduler:input_type -> zqnt.UpdateSchedulerRequest
+	177, // 300: zqnt.ConnectorService.DeleteScheduler:input_type -> zqnt.DeleteSchedulerRequest
+	178, // 301: zqnt.ConnectorService.DeleteSchedulers:input_type -> zqnt.DeleteSchedulersRequest
+	179, // 302: zqnt.ConnectorService.RecordSchedulerFiring:input_type -> zqnt.RecordSchedulerFiringRequest
+	64,  // 303: zqnt.ConnectorService.StoreTelemetryBatch:input_type -> zqnt.ConnectorStoreTelemetryRequest
+	65,  // 304: zqnt.ConnectorService.StoreDetectionBatch:input_type -> zqnt.ConnectorStoreDetectionRequest
+	180, // 305: zqnt.ConnectorService.StoreNotificationBatch:input_type -> zqnt.ProduceNotificationRequest
+	181, // 306: zqnt.ConnectorService.RegisterMediaFile:input_type -> zqnt.RegisterMediaFileRequest
+	182, // 307: zqnt.ConnectorService.ListMediaFiles:input_type -> zqnt.ListMediaFilesRequest
+	183, // 308: zqnt.ConnectorService.GetMediaFile:input_type -> zqnt.GetMediaFileRequest
+	70,  // 309: zqnt.ConnectorService.GetActivePoliciesByType:input_type -> zqnt.ConnectorGetPoliciesRequest
+	71,  // 310: zqnt.ConnectorService.GetAllActivePolicies:input_type -> zqnt.ConnectorGetAllPoliciesRequest
+	73,  // 311: zqnt.ConnectorService.GetPolicyById:input_type -> zqnt.GetPolicyByIdRequest
+	74,  // 312: zqnt.ConnectorService.CreatePolicy:input_type -> zqnt.CreatePolicyRequest
+	75,  // 313: zqnt.ConnectorService.UpdatePolicy:input_type -> zqnt.UpdatePolicyRequest
+	76,  // 314: zqnt.ConnectorService.DeletePolicy:input_type -> zqnt.DeletePolicyRequest
+	79,  // 315: zqnt.ConnectorService.GetAllOrganizations:input_type -> zqnt.ConnectorGetAllOrganizationsRequest
+	80,  // 316: zqnt.ConnectorService.GetOrganizationById:input_type -> zqnt.GetOrganizationByIdRequest
+	81,  // 317: zqnt.ConnectorService.CreateOrganization:input_type -> zqnt.CreateOrganizationRequest
+	82,  // 318: zqnt.ConnectorService.UpdateOrganization:input_type -> zqnt.UpdateOrganizationRequest
+	83,  // 319: zqnt.ConnectorService.DeleteOrganization:input_type -> zqnt.DeleteOrganizationRequest
+	107, // 320: zqnt.ConnectorService.ProvisionLicensedOrganization:input_type -> zqnt.ProvisionLicensedOrganizationRequest
+	90,  // 321: zqnt.ConnectorService.GetAllTheatres:input_type -> zqnt.ConnectorGetAllTheatresRequest
+	91,  // 322: zqnt.ConnectorService.GetTheatreById:input_type -> zqnt.GetTheatreByIdRequest
+	92,  // 323: zqnt.ConnectorService.CreateTheatre:input_type -> zqnt.CreateTheatreRequest
+	93,  // 324: zqnt.ConnectorService.UpdateTheatre:input_type -> zqnt.UpdateTheatreRequest
+	94,  // 325: zqnt.ConnectorService.DeleteTheatre:input_type -> zqnt.DeleteTheatreRequest
+	98,  // 326: zqnt.ConnectorService.AssignUserToTheatre:input_type -> zqnt.AssignUserToTheatreRequest
+	99,  // 327: zqnt.ConnectorService.RemoveUserFromTheatre:input_type -> zqnt.RemoveUserFromTheatreRequest
+	101, // 328: zqnt.ConnectorService.ListNoFlyZones:input_type -> zqnt.ListNoFlyZonesRequest
+	102, // 329: zqnt.ConnectorService.UpsertNoFlyZone:input_type -> zqnt.UpsertNoFlyZoneRequest
+	103, // 330: zqnt.ConnectorService.DeleteNoFlyZone:input_type -> zqnt.DeleteNoFlyZoneRequest
+	110, // 331: zqnt.ConnectorService.ListLicenseActivationCredentials:input_type -> zqnt.ListLicenseActivationCredentialsRequest
+	111, // 332: zqnt.ConnectorService.GetLicenseActivationCredentials:input_type -> zqnt.GetLicenseActivationCredentialsRequest
+	112, // 333: zqnt.ConnectorService.PutLicenseActivationCredentials:input_type -> zqnt.PutLicenseActivationCredentialsRequest
+	113, // 334: zqnt.ConnectorService.DeleteLicenseActivationCredentials:input_type -> zqnt.DeleteLicenseActivationCredentialsRequest
+	119, // 335: zqnt.ConnectorService.GetAllEventTriggers:input_type -> zqnt.ConnectorGetAllEventTriggersRequest
+	120, // 336: zqnt.ConnectorService.GetEventTriggerById:input_type -> zqnt.GetEventTriggerByIdRequest
+	121, // 337: zqnt.ConnectorService.CreateEventTrigger:input_type -> zqnt.CreateEventTriggerRequest
+	122, // 338: zqnt.ConnectorService.UpdateEventTrigger:input_type -> zqnt.UpdateEventTriggerRequest
+	123, // 339: zqnt.ConnectorService.DeleteEventTrigger:input_type -> zqnt.DeleteEventTriggerRequest
+	124, // 340: zqnt.ConnectorService.RecordEventTriggerFired:input_type -> zqnt.RecordEventTriggerFiredRequest
+	125, // 341: zqnt.ConnectorService.RegenerateEventTriggerWebhookToken:input_type -> zqnt.RegenerateEventTriggerWebhookTokenRequest
+	126, // 342: zqnt.ConnectorService.GetEventTriggerByWebhookToken:input_type -> zqnt.GetEventTriggerByWebhookTokenRequest
+	131, // 343: zqnt.ConnectorService.ListRecentDetections:input_type -> zqnt.ListRecentDetectionsRequest
+	133, // 344: zqnt.ConnectorService.GetLatestTelemetryForAsset:input_type -> zqnt.GetLatestTelemetryForAssetRequest
+	137, // 345: zqnt.ConnectorService.GetTechnicalConfigs:input_type -> zqnt.ConnectorGetConfigsRequest
+	139, // 346: zqnt.ConnectorService.GetTechnicalConfigById:input_type -> zqnt.GetTechnicalConfigByIdRequest
+	140, // 347: zqnt.ConnectorService.CreateTechnicalConfig:input_type -> zqnt.CreateTechnicalConfigRequest
+	141, // 348: zqnt.ConnectorService.UpdateTechnicalConfig:input_type -> zqnt.UpdateTechnicalConfigRequest
+	142, // 349: zqnt.ConnectorService.DeleteTechnicalConfig:input_type -> zqnt.DeleteTechnicalConfigRequest
+	184, // 350: zqnt.ConnectorService.PersistApplication:input_type -> zqnt.UpsertApplicationRequest
+	185, // 351: zqnt.ConnectorService.GetPersistedApplication:input_type -> zqnt.GetApplicationRequest
+	186, // 352: zqnt.ConnectorService.ListPersistedApplications:input_type -> zqnt.ListApplicationsRequest
+	187, // 353: zqnt.ConnectorService.DeletePersistedApplication:input_type -> zqnt.DeleteApplicationRequest
+	188, // 354: zqnt.ConnectorService.SetApplicationPause:input_type -> zqnt.SetApplicationPauseRequest
+	189, // 355: zqnt.ConnectorService.ListApplicationPauses:input_type -> zqnt.ListApplicationPausesRequest
+	190, // 356: zqnt.ConnectorService.GetApplicationEnvironmentPointers:input_type -> zqnt.GetApplicationEnvironmentsRequest
+	191, // 357: zqnt.ConnectorService.PromoteApplicationVersion:input_type -> zqnt.PromoteApplicationVersionRequest
+	24,  // 358: zqnt.ConnectorService.PersistSkillExecution:input_type -> zqnt.PersistSkillExecutionRequest
+	192, // 359: zqnt.ConnectorService.GetPersistedSkillExecution:input_type -> zqnt.GetSkillExecutionRequest
+	193, // 360: zqnt.ConnectorService.ListPersistedSkillExecutions:input_type -> zqnt.ListSkillExecutionsRequest
+	25,  // 361: zqnt.ConnectorService.AppendSkillExecutionEvent:input_type -> zqnt.AppendSkillExecutionEventRequest
+	38,  // 362: zqnt.ConnectorService.ObserveSkillContract:input_type -> zqnt.UpsertSkillContractRequest
+	39,  // 363: zqnt.ConnectorService.ListSkillContracts:input_type -> zqnt.ListSkillContractsRequest
+	40,  // 364: zqnt.ConnectorService.SetSkillContractStatus:input_type -> zqnt.SetSkillContractStatusRequest
+	41,  // 365: zqnt.ConnectorService.SetSkillContractPermissions:input_type -> zqnt.SetSkillContractPermissionsRequest
+	3,   // 366: zqnt.ConnectorService.AuthenticateUser:input_type -> zqnt.AuthenticateUserRequest
+	6,   // 367: zqnt.ConnectorService.CreateUser:input_type -> zqnt.CreateUserRequest
+	8,   // 368: zqnt.ConnectorService.ResetPassword:input_type -> zqnt.ResetPasswordRequest
+	10,  // 369: zqnt.ConnectorService.RecordAuthAuditEvent:input_type -> zqnt.RecordAuthAuditEventRequest
+	11,  // 370: zqnt.ConnectorService.ListUsers:input_type -> zqnt.ListUsersRequest
+	13,  // 371: zqnt.ConnectorService.GetUserById:input_type -> zqnt.GetUserByIdRequest
+	14,  // 372: zqnt.ConnectorService.UpdateUserRoles:input_type -> zqnt.UpdateUserRolesRequest
+	15,  // 373: zqnt.ConnectorService.SetUserEnabled:input_type -> zqnt.SetUserEnabledRequest
+	16,  // 374: zqnt.ConnectorService.DeleteUser:input_type -> zqnt.DeleteUserRequest
+	18,  // 375: zqnt.ConnectorService.UpsertIdentityProvider:input_type -> zqnt.UpsertIdentityProviderRequest
+	19,  // 376: zqnt.ConnectorService.GetIdentityProvider:input_type -> zqnt.GetIdentityProviderRequest
+	20,  // 377: zqnt.ConnectorService.FindIdentityProviderByEmailDomain:input_type -> zqnt.FindIdentityProviderByEmailDomainRequest
+	22,  // 378: zqnt.ConnectorService.FindOidcUser:input_type -> zqnt.FindOidcUserRequest
+	23,  // 379: zqnt.ConnectorService.UpsertOidcUser:input_type -> zqnt.UpsertOidcUserRequest
+	61,  // 380: zqnt.ConnectorService.RegisterAsset:output_type -> zqnt.ConnectorResponse
+	61,  // 381: zqnt.ConnectorService.DeregisterAsset:output_type -> zqnt.ConnectorResponse
+	62,  // 382: zqnt.ConnectorService.AssetMonitoring:output_type -> zqnt.AssetMonitoringResponse
+	61,  // 383: zqnt.ConnectorService.UpdateAsset:output_type -> zqnt.ConnectorResponse
+	61,  // 384: zqnt.ConnectorService.UpdateSubAsset:output_type -> zqnt.ConnectorResponse
+	61,  // 385: zqnt.ConnectorService.GetAssetBySn:output_type -> zqnt.ConnectorResponse
+	61,  // 386: zqnt.ConnectorService.GetAssetById:output_type -> zqnt.ConnectorResponse
+	61,  // 387: zqnt.ConnectorService.GetSubAssetBySn:output_type -> zqnt.ConnectorResponse
+	47,  // 388: zqnt.ConnectorService.ListAssets:output_type -> zqnt.AssetListResponse
+	52,  // 389: zqnt.ConnectorService.CreateAssetClaim:output_type -> zqnt.AssetClaimResponse
+	61,  // 390: zqnt.ConnectorService.RedeemAssetClaim:output_type -> zqnt.ConnectorResponse
+	55,  // 391: zqnt.ConnectorService.DescribeAssetClaim:output_type -> zqnt.AssetClaimDescriptionResponse
+	57,  // 392: zqnt.ConnectorService.ListAssetClaims:output_type -> zqnt.AssetClaimListResponse
+	52,  // 393: zqnt.ConnectorService.RevokeAssetClaim:output_type -> zqnt.AssetClaimResponse
+	30,  // 394: zqnt.ConnectorService.UpsertAssetPayload:output_type -> zqnt.AssetPayloadResponse
+	31,  // 395: zqnt.ConnectorService.ListAssetPayloads:output_type -> zqnt.AssetPayloadListResponse
+	30,  // 396: zqnt.ConnectorService.DeleteAssetPayload:output_type -> zqnt.AssetPayloadResponse
+	35,  // 397: zqnt.ConnectorService.SetAssetProperty:output_type -> zqnt.AssetPropertyResponse
+	36,  // 398: zqnt.ConnectorService.ListAssetProperties:output_type -> zqnt.AssetPropertyListResponse
+	35,  // 399: zqnt.ConnectorService.DeleteAssetProperty:output_type -> zqnt.AssetPropertyResponse
+	61,  // 400: zqnt.ConnectorService.GetOrganization:output_type -> zqnt.ConnectorResponse
+	194, // 401: zqnt.ConnectorService.ListSchedulers:output_type -> zqnt.SchedulerResponse
+	194, // 402: zqnt.ConnectorService.GetScheduler:output_type -> zqnt.SchedulerResponse
+	194, // 403: zqnt.ConnectorService.CreateScheduler:output_type -> zqnt.SchedulerResponse
+	194, // 404: zqnt.ConnectorService.CreateSchedulers:output_type -> zqnt.SchedulerResponse
+	194, // 405: zqnt.ConnectorService.UpdateScheduler:output_type -> zqnt.SchedulerResponse
+	194, // 406: zqnt.ConnectorService.DeleteScheduler:output_type -> zqnt.SchedulerResponse
+	194, // 407: zqnt.ConnectorService.DeleteSchedulers:output_type -> zqnt.SchedulerResponse
+	194, // 408: zqnt.ConnectorService.RecordSchedulerFiring:output_type -> zqnt.SchedulerResponse
+	61,  // 409: zqnt.ConnectorService.StoreTelemetryBatch:output_type -> zqnt.ConnectorResponse
+	61,  // 410: zqnt.ConnectorService.StoreDetectionBatch:output_type -> zqnt.ConnectorResponse
+	61,  // 411: zqnt.ConnectorService.StoreNotificationBatch:output_type -> zqnt.ConnectorResponse
+	195, // 412: zqnt.ConnectorService.RegisterMediaFile:output_type -> zqnt.MediaFileProtoDTO
+	196, // 413: zqnt.ConnectorService.ListMediaFiles:output_type -> zqnt.ListMediaFilesResponse
+	195, // 414: zqnt.ConnectorService.GetMediaFile:output_type -> zqnt.MediaFileProtoDTO
+	72,  // 415: zqnt.ConnectorService.GetActivePoliciesByType:output_type -> zqnt.ConnectorPolicyResponse
+	72,  // 416: zqnt.ConnectorService.GetAllActivePolicies:output_type -> zqnt.ConnectorPolicyResponse
+	77,  // 417: zqnt.ConnectorService.GetPolicyById:output_type -> zqnt.ConnectorPolicySingleResponse
+	77,  // 418: zqnt.ConnectorService.CreatePolicy:output_type -> zqnt.ConnectorPolicySingleResponse
+	77,  // 419: zqnt.ConnectorService.UpdatePolicy:output_type -> zqnt.ConnectorPolicySingleResponse
+	78,  // 420: zqnt.ConnectorService.DeletePolicy:output_type -> zqnt.ConnectorDeletePolicyResponse
+	85,  // 421: zqnt.ConnectorService.GetAllOrganizations:output_type -> zqnt.ConnectorOrganizationResponse
+	86,  // 422: zqnt.ConnectorService.GetOrganizationById:output_type -> zqnt.ConnectorOrganizationSingleResponse
+	86,  // 423: zqnt.ConnectorService.CreateOrganization:output_type -> zqnt.ConnectorOrganizationSingleResponse
+	86,  // 424: zqnt.ConnectorService.UpdateOrganization:output_type -> zqnt.ConnectorOrganizationSingleResponse
+	87,  // 425: zqnt.ConnectorService.DeleteOrganization:output_type -> zqnt.ConnectorDeleteOrganizationResponse
+	108, // 426: zqnt.ConnectorService.ProvisionLicensedOrganization:output_type -> zqnt.ProvisionLicensedOrganizationResponse
+	95,  // 427: zqnt.ConnectorService.GetAllTheatres:output_type -> zqnt.ConnectorTheatreResponse
+	96,  // 428: zqnt.ConnectorService.GetTheatreById:output_type -> zqnt.ConnectorTheatreSingleResponse
+	96,  // 429: zqnt.ConnectorService.CreateTheatre:output_type -> zqnt.ConnectorTheatreSingleResponse
+	96,  // 430: zqnt.ConnectorService.UpdateTheatre:output_type -> zqnt.ConnectorTheatreSingleResponse
+	97,  // 431: zqnt.ConnectorService.DeleteTheatre:output_type -> zqnt.ConnectorDeleteTheatreResponse
+	100, // 432: zqnt.ConnectorService.AssignUserToTheatre:output_type -> zqnt.TheatreAssignmentResponse
+	100, // 433: zqnt.ConnectorService.RemoveUserFromTheatre:output_type -> zqnt.TheatreAssignmentResponse
+	104, // 434: zqnt.ConnectorService.ListNoFlyZones:output_type -> zqnt.NoFlyZoneListResponse
+	105, // 435: zqnt.ConnectorService.UpsertNoFlyZone:output_type -> zqnt.NoFlyZoneSingleResponse
+	106, // 436: zqnt.ConnectorService.DeleteNoFlyZone:output_type -> zqnt.DeleteNoFlyZoneResponse
+	114, // 437: zqnt.ConnectorService.ListLicenseActivationCredentials:output_type -> zqnt.LicenseActivationCredentialsListResponse
+	115, // 438: zqnt.ConnectorService.GetLicenseActivationCredentials:output_type -> zqnt.LicenseActivationCredentialsSingleResponse
+	115, // 439: zqnt.ConnectorService.PutLicenseActivationCredentials:output_type -> zqnt.LicenseActivationCredentialsSingleResponse
+	116, // 440: zqnt.ConnectorService.DeleteLicenseActivationCredentials:output_type -> zqnt.DeleteLicenseActivationCredentialsResponse
+	127, // 441: zqnt.ConnectorService.GetAllEventTriggers:output_type -> zqnt.ConnectorEventTriggerResponse
+	128, // 442: zqnt.ConnectorService.GetEventTriggerById:output_type -> zqnt.ConnectorEventTriggerSingleResponse
+	128, // 443: zqnt.ConnectorService.CreateEventTrigger:output_type -> zqnt.ConnectorEventTriggerSingleResponse
+	128, // 444: zqnt.ConnectorService.UpdateEventTrigger:output_type -> zqnt.ConnectorEventTriggerSingleResponse
+	129, // 445: zqnt.ConnectorService.DeleteEventTrigger:output_type -> zqnt.ConnectorDeleteEventTriggerResponse
+	128, // 446: zqnt.ConnectorService.RecordEventTriggerFired:output_type -> zqnt.ConnectorEventTriggerSingleResponse
+	128, // 447: zqnt.ConnectorService.RegenerateEventTriggerWebhookToken:output_type -> zqnt.ConnectorEventTriggerSingleResponse
+	128, // 448: zqnt.ConnectorService.GetEventTriggerByWebhookToken:output_type -> zqnt.ConnectorEventTriggerSingleResponse
+	132, // 449: zqnt.ConnectorService.ListRecentDetections:output_type -> zqnt.ConnectorDetectionListResponse
+	134, // 450: zqnt.ConnectorService.GetLatestTelemetryForAsset:output_type -> zqnt.ConnectorTelemetrySingleResponse
+	138, // 451: zqnt.ConnectorService.GetTechnicalConfigs:output_type -> zqnt.ConnectorConfigResponse
+	143, // 452: zqnt.ConnectorService.GetTechnicalConfigById:output_type -> zqnt.ConnectorConfigSingleResponse
+	143, // 453: zqnt.ConnectorService.CreateTechnicalConfig:output_type -> zqnt.ConnectorConfigSingleResponse
+	143, // 454: zqnt.ConnectorService.UpdateTechnicalConfig:output_type -> zqnt.ConnectorConfigSingleResponse
+	144, // 455: zqnt.ConnectorService.DeleteTechnicalConfig:output_type -> zqnt.ConnectorDeleteConfigResponse
+	197, // 456: zqnt.ConnectorService.PersistApplication:output_type -> zqnt.ApplicationResponse
+	197, // 457: zqnt.ConnectorService.GetPersistedApplication:output_type -> zqnt.ApplicationResponse
+	198, // 458: zqnt.ConnectorService.ListPersistedApplications:output_type -> zqnt.ApplicationListResponse
+	197, // 459: zqnt.ConnectorService.DeletePersistedApplication:output_type -> zqnt.ApplicationResponse
+	199, // 460: zqnt.ConnectorService.SetApplicationPause:output_type -> zqnt.ApplicationPauseListResponse
+	199, // 461: zqnt.ConnectorService.ListApplicationPauses:output_type -> zqnt.ApplicationPauseListResponse
+	200, // 462: zqnt.ConnectorService.GetApplicationEnvironmentPointers:output_type -> zqnt.ApplicationEnvironmentsResponse
+	200, // 463: zqnt.ConnectorService.PromoteApplicationVersion:output_type -> zqnt.ApplicationEnvironmentsResponse
+	201, // 464: zqnt.ConnectorService.PersistSkillExecution:output_type -> zqnt.SkillExecutionResponse
+	201, // 465: zqnt.ConnectorService.GetPersistedSkillExecution:output_type -> zqnt.SkillExecutionResponse
+	202, // 466: zqnt.ConnectorService.ListPersistedSkillExecutions:output_type -> zqnt.SkillExecutionListResponse
+	167, // 467: zqnt.ConnectorService.AppendSkillExecutionEvent:output_type -> google.protobuf.Empty
+	42,  // 468: zqnt.ConnectorService.ObserveSkillContract:output_type -> zqnt.SkillContractResponse
+	43,  // 469: zqnt.ConnectorService.ListSkillContracts:output_type -> zqnt.SkillContractListResponse
+	42,  // 470: zqnt.ConnectorService.SetSkillContractStatus:output_type -> zqnt.SkillContractResponse
+	42,  // 471: zqnt.ConnectorService.SetSkillContractPermissions:output_type -> zqnt.SkillContractResponse
+	5,   // 472: zqnt.ConnectorService.AuthenticateUser:output_type -> zqnt.AuthenticateUserResponse
+	7,   // 473: zqnt.ConnectorService.CreateUser:output_type -> zqnt.CreateUserResponse
+	9,   // 474: zqnt.ConnectorService.ResetPassword:output_type -> zqnt.ResetPasswordResponse
+	167, // 475: zqnt.ConnectorService.RecordAuthAuditEvent:output_type -> google.protobuf.Empty
+	12,  // 476: zqnt.ConnectorService.ListUsers:output_type -> zqnt.ListUsersResponse
+	5,   // 477: zqnt.ConnectorService.GetUserById:output_type -> zqnt.AuthenticateUserResponse
+	5,   // 478: zqnt.ConnectorService.UpdateUserRoles:output_type -> zqnt.AuthenticateUserResponse
+	5,   // 479: zqnt.ConnectorService.SetUserEnabled:output_type -> zqnt.AuthenticateUserResponse
+	5,   // 480: zqnt.ConnectorService.DeleteUser:output_type -> zqnt.AuthenticateUserResponse
+	21,  // 481: zqnt.ConnectorService.UpsertIdentityProvider:output_type -> zqnt.IdentityProviderResponse
+	21,  // 482: zqnt.ConnectorService.GetIdentityProvider:output_type -> zqnt.IdentityProviderResponse
+	21,  // 483: zqnt.ConnectorService.FindIdentityProviderByEmailDomain:output_type -> zqnt.IdentityProviderResponse
+	5,   // 484: zqnt.ConnectorService.FindOidcUser:output_type -> zqnt.AuthenticateUserResponse
+	5,   // 485: zqnt.ConnectorService.UpsertOidcUser:output_type -> zqnt.AuthenticateUserResponse
+	380, // [380:486] is the sub-list for method output_type
+	274, // [274:380] is the sub-list for method input_type
+	274, // [274:274] is the sub-list for extension type_name
+	274, // [274:274] is the sub-list for extension extendee
+	0,   // [0:274] is the sub-list for field type_name
 }
 
 func init() { file_connector_proto_init() }
@@ -2926,51 +12717,139 @@ func file_connector_proto_init() {
 	if File_connector_proto != nil {
 		return
 	}
-	file_connector_proto_msgTypes[0].OneofWrappers = []any{}
-	file_connector_proto_msgTypes[1].OneofWrappers = []any{
+	file_connector_proto_msgTypes[1].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[2].OneofWrappers = []any{
+		(*AuthenticateUserResponse_User)(nil),
+		(*AuthenticateUserResponse_Error)(nil),
+	}
+	file_connector_proto_msgTypes[3].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[4].OneofWrappers = []any{
+		(*CreateUserResponse_User)(nil),
+		(*CreateUserResponse_Error)(nil),
+	}
+	file_connector_proto_msgTypes[6].OneofWrappers = []any{
+		(*ResetPasswordResponse_NewPassword)(nil),
+		(*ResetPasswordResponse_Error)(nil),
+	}
+	file_connector_proto_msgTypes[7].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[18].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[20].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[23].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[24].OneofWrappers = []any{
 		(*AssetPayloadOwner_AssetId)(nil),
 		(*AssetPayloadOwner_SubAssetId)(nil),
 	}
-	file_connector_proto_msgTypes[4].OneofWrappers = []any{}
-	file_connector_proto_msgTypes[5].OneofWrappers = []any{}
-	file_connector_proto_msgTypes[11].OneofWrappers = []any{
+	file_connector_proto_msgTypes[27].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[28].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[29].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[32].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[33].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[34].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[36].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[39].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[40].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[44].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[46].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[48].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[49].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[52].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[53].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[54].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[58].OneofWrappers = []any{
 		(*ConnectorResponse_Empty)(nil),
 		(*ConnectorResponse_Error)(nil),
 		(*ConnectorResponse_Asset)(nil),
 		(*ConnectorResponse_SubAsset)(nil),
 		(*ConnectorResponse_Organization)(nil),
 	}
-	file_connector_proto_msgTypes[12].OneofWrappers = []any{
+	file_connector_proto_msgTypes[59].OneofWrappers = []any{
 		(*AssetMonitoringResponse_Empty)(nil),
 		(*AssetMonitoringResponse_Error)(nil),
 		(*AssetMonitoringResponse_Assets)(nil),
 	}
-	file_connector_proto_msgTypes[13].OneofWrappers = []any{}
-	file_connector_proto_msgTypes[14].OneofWrappers = []any{
+	file_connector_proto_msgTypes[60].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[61].OneofWrappers = []any{
 		(*ConnectorStoreTelemetryRequest_AssetTelemetry)(nil),
 		(*ConnectorStoreTelemetryRequest_SubAssetTelemetry)(nil),
 	}
-	file_connector_proto_msgTypes[15].OneofWrappers = []any{}
-	file_connector_proto_msgTypes[16].OneofWrappers = []any{}
-	file_connector_proto_msgTypes[17].OneofWrappers = []any{}
-	file_connector_proto_msgTypes[18].OneofWrappers = []any{}
-	file_connector_proto_msgTypes[22].OneofWrappers = []any{
+	file_connector_proto_msgTypes[62].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[63].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[64].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[65].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[69].OneofWrappers = []any{
 		(*ConnectorPolicyResponse_Error)(nil),
 		(*ConnectorPolicyResponse_PolicyList)(nil),
 	}
-	file_connector_proto_msgTypes[23].OneofWrappers = []any{}
-	file_connector_proto_msgTypes[25].OneofWrappers = []any{}
-	file_connector_proto_msgTypes[26].OneofWrappers = []any{
+	file_connector_proto_msgTypes[74].OneofWrappers = []any{
+		(*ConnectorPolicySingleResponse_Error)(nil),
+		(*ConnectorPolicySingleResponse_Policy)(nil),
+	}
+	file_connector_proto_msgTypes[75].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[82].OneofWrappers = []any{
+		(*ConnectorOrganizationResponse_Error)(nil),
+		(*ConnectorOrganizationResponse_OrganizationList)(nil),
+	}
+	file_connector_proto_msgTypes[83].OneofWrappers = []any{
+		(*ConnectorOrganizationSingleResponse_Error)(nil),
+		(*ConnectorOrganizationSingleResponse_Organization)(nil),
+	}
+	file_connector_proto_msgTypes[84].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[85].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[87].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[92].OneofWrappers = []any{
+		(*ConnectorTheatreResponse_Error)(nil),
+		(*ConnectorTheatreResponse_TheatreList)(nil),
+	}
+	file_connector_proto_msgTypes[93].OneofWrappers = []any{
+		(*ConnectorTheatreSingleResponse_Error)(nil),
+		(*ConnectorTheatreSingleResponse_Theatre)(nil),
+	}
+	file_connector_proto_msgTypes[94].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[97].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[98].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[101].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[102].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[103].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[105].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[106].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[111].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[112].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[113].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[114].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[124].OneofWrappers = []any{
+		(*ConnectorEventTriggerResponse_Error)(nil),
+		(*ConnectorEventTriggerResponse_EventTriggerList)(nil),
+	}
+	file_connector_proto_msgTypes[125].OneofWrappers = []any{
+		(*ConnectorEventTriggerSingleResponse_Error)(nil),
+		(*ConnectorEventTriggerSingleResponse_EventTrigger)(nil),
+	}
+	file_connector_proto_msgTypes[126].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[127].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[128].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[129].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[131].OneofWrappers = []any{
+		(*ConnectorTelemetrySingleResponse_Error)(nil),
+		(*ConnectorTelemetrySingleResponse_Telemetry)(nil),
+	}
+	file_connector_proto_msgTypes[132].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[134].OneofWrappers = []any{}
+	file_connector_proto_msgTypes[135].OneofWrappers = []any{
 		(*ConnectorConfigResponse_Error)(nil),
 		(*ConnectorConfigResponse_ConfigList)(nil),
 	}
+	file_connector_proto_msgTypes[140].OneofWrappers = []any{
+		(*ConnectorConfigSingleResponse_Error)(nil),
+		(*ConnectorConfigSingleResponse_Config)(nil),
+	}
+	file_connector_proto_msgTypes[141].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_connector_proto_rawDesc), len(file_connector_proto_rawDesc)),
-			NumEnums:      1,
-			NumMessages:   29,
+			NumEnums:      3,
+			NumMessages:   145,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

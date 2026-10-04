@@ -8,12 +8,15 @@ package proto
 
 import (
 	context "context"
-	proto "github.com/Zequent/zqnt-client-sdk-go/gen/common/base/proto"
-	proto2 "github.com/Zequent/zqnt-client-sdk-go/gen/events/proto"
-	proto1 "github.com/Zequent/zqnt-client-sdk-go/gen/missionautonomy/contracts/proto"
+	proto "github.com/Zequent/zqnt-client-sdk-go/v2/gen/common/base/proto"
+	proto2 "github.com/Zequent/zqnt-client-sdk-go/v2/gen/events/proto"
+	proto4 "github.com/Zequent/zqnt-client-sdk-go/v2/gen/execution/contracts/proto"
+	proto3 "github.com/Zequent/zqnt-client-sdk-go/v2/gen/media/proto"
+	proto1 "github.com/Zequent/zqnt-client-sdk-go/v2/gen/missionautonomy/contracts/proto"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -22,42 +25,112 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ConnectorService_RegisterAsset_FullMethodName           = "/zqnt.ConnectorService/RegisterAsset"
-	ConnectorService_DeregisterAsset_FullMethodName         = "/zqnt.ConnectorService/DeregisterAsset"
-	ConnectorService_AssetMonitoring_FullMethodName         = "/zqnt.ConnectorService/AssetMonitoring"
-	ConnectorService_UpdateAsset_FullMethodName             = "/zqnt.ConnectorService/UpdateAsset"
-	ConnectorService_UpdateSubAsset_FullMethodName          = "/zqnt.ConnectorService/UpdateSubAsset"
-	ConnectorService_GetAssetBySn_FullMethodName            = "/zqnt.ConnectorService/GetAssetBySn"
-	ConnectorService_GetAssetById_FullMethodName            = "/zqnt.ConnectorService/GetAssetById"
-	ConnectorService_GetSubAssetBySn_FullMethodName         = "/zqnt.ConnectorService/GetSubAssetBySn"
-	ConnectorService_UpsertAssetPayload_FullMethodName      = "/zqnt.ConnectorService/UpsertAssetPayload"
-	ConnectorService_ListAssetPayloads_FullMethodName       = "/zqnt.ConnectorService/ListAssetPayloads"
-	ConnectorService_DeleteAssetPayload_FullMethodName      = "/zqnt.ConnectorService/DeleteAssetPayload"
-	ConnectorService_GetOrganization_FullMethodName         = "/zqnt.ConnectorService/GetOrganization"
-	ConnectorService_GetMission_FullMethodName              = "/zqnt.ConnectorService/GetMission"
-	ConnectorService_CreateMission_FullMethodName           = "/zqnt.ConnectorService/CreateMission"
-	ConnectorService_UpdateMission_FullMethodName           = "/zqnt.ConnectorService/UpdateMission"
-	ConnectorService_DeleteMission_FullMethodName           = "/zqnt.ConnectorService/DeleteMission"
-	ConnectorService_UploadMissionNfzZones_FullMethodName   = "/zqnt.ConnectorService/UploadMissionNfzZones"
-	ConnectorService_GetTask_FullMethodName                 = "/zqnt.ConnectorService/GetTask"
-	ConnectorService_GetTaskByFlightId_FullMethodName       = "/zqnt.ConnectorService/GetTaskByFlightId"
-	ConnectorService_GetWaypointsByTaskId_FullMethodName    = "/zqnt.ConnectorService/GetWaypointsByTaskId"
-	ConnectorService_CreateTask_FullMethodName              = "/zqnt.ConnectorService/CreateTask"
-	ConnectorService_UpdateTask_FullMethodName              = "/zqnt.ConnectorService/UpdateTask"
-	ConnectorService_DeleteTask_FullMethodName              = "/zqnt.ConnectorService/DeleteTask"
-	ConnectorService_GetScheduler_FullMethodName            = "/zqnt.ConnectorService/GetScheduler"
-	ConnectorService_CreateScheduler_FullMethodName         = "/zqnt.ConnectorService/CreateScheduler"
-	ConnectorService_CreateSchedulers_FullMethodName        = "/zqnt.ConnectorService/CreateSchedulers"
-	ConnectorService_UpdateScheduler_FullMethodName         = "/zqnt.ConnectorService/UpdateScheduler"
-	ConnectorService_DeleteScheduler_FullMethodName         = "/zqnt.ConnectorService/DeleteScheduler"
-	ConnectorService_DeleteSchedulers_FullMethodName        = "/zqnt.ConnectorService/DeleteSchedulers"
-	ConnectorService_DeleteSchedulersByTask_FullMethodName  = "/zqnt.ConnectorService/DeleteSchedulersByTask"
-	ConnectorService_StoreTelemetryBatch_FullMethodName     = "/zqnt.ConnectorService/StoreTelemetryBatch"
-	ConnectorService_StoreDetectionBatch_FullMethodName     = "/zqnt.ConnectorService/StoreDetectionBatch"
-	ConnectorService_StoreNotificationBatch_FullMethodName  = "/zqnt.ConnectorService/StoreNotificationBatch"
-	ConnectorService_GetActivePoliciesByType_FullMethodName = "/zqnt.ConnectorService/GetActivePoliciesByType"
-	ConnectorService_GetAllActivePolicies_FullMethodName    = "/zqnt.ConnectorService/GetAllActivePolicies"
-	ConnectorService_GetTechnicalConfigs_FullMethodName     = "/zqnt.ConnectorService/GetTechnicalConfigs"
+	ConnectorService_RegisterAsset_FullMethodName                      = "/zqnt.ConnectorService/RegisterAsset"
+	ConnectorService_DeregisterAsset_FullMethodName                    = "/zqnt.ConnectorService/DeregisterAsset"
+	ConnectorService_AssetMonitoring_FullMethodName                    = "/zqnt.ConnectorService/AssetMonitoring"
+	ConnectorService_UpdateAsset_FullMethodName                        = "/zqnt.ConnectorService/UpdateAsset"
+	ConnectorService_UpdateSubAsset_FullMethodName                     = "/zqnt.ConnectorService/UpdateSubAsset"
+	ConnectorService_GetAssetBySn_FullMethodName                       = "/zqnt.ConnectorService/GetAssetBySn"
+	ConnectorService_GetAssetById_FullMethodName                       = "/zqnt.ConnectorService/GetAssetById"
+	ConnectorService_GetSubAssetBySn_FullMethodName                    = "/zqnt.ConnectorService/GetSubAssetBySn"
+	ConnectorService_ListAssets_FullMethodName                         = "/zqnt.ConnectorService/ListAssets"
+	ConnectorService_CreateAssetClaim_FullMethodName                   = "/zqnt.ConnectorService/CreateAssetClaim"
+	ConnectorService_RedeemAssetClaim_FullMethodName                   = "/zqnt.ConnectorService/RedeemAssetClaim"
+	ConnectorService_DescribeAssetClaim_FullMethodName                 = "/zqnt.ConnectorService/DescribeAssetClaim"
+	ConnectorService_ListAssetClaims_FullMethodName                    = "/zqnt.ConnectorService/ListAssetClaims"
+	ConnectorService_RevokeAssetClaim_FullMethodName                   = "/zqnt.ConnectorService/RevokeAssetClaim"
+	ConnectorService_UpsertAssetPayload_FullMethodName                 = "/zqnt.ConnectorService/UpsertAssetPayload"
+	ConnectorService_ListAssetPayloads_FullMethodName                  = "/zqnt.ConnectorService/ListAssetPayloads"
+	ConnectorService_DeleteAssetPayload_FullMethodName                 = "/zqnt.ConnectorService/DeleteAssetPayload"
+	ConnectorService_SetAssetProperty_FullMethodName                   = "/zqnt.ConnectorService/SetAssetProperty"
+	ConnectorService_ListAssetProperties_FullMethodName                = "/zqnt.ConnectorService/ListAssetProperties"
+	ConnectorService_DeleteAssetProperty_FullMethodName                = "/zqnt.ConnectorService/DeleteAssetProperty"
+	ConnectorService_GetOrganization_FullMethodName                    = "/zqnt.ConnectorService/GetOrganization"
+	ConnectorService_ListSchedulers_FullMethodName                     = "/zqnt.ConnectorService/ListSchedulers"
+	ConnectorService_GetScheduler_FullMethodName                       = "/zqnt.ConnectorService/GetScheduler"
+	ConnectorService_CreateScheduler_FullMethodName                    = "/zqnt.ConnectorService/CreateScheduler"
+	ConnectorService_CreateSchedulers_FullMethodName                   = "/zqnt.ConnectorService/CreateSchedulers"
+	ConnectorService_UpdateScheduler_FullMethodName                    = "/zqnt.ConnectorService/UpdateScheduler"
+	ConnectorService_DeleteScheduler_FullMethodName                    = "/zqnt.ConnectorService/DeleteScheduler"
+	ConnectorService_DeleteSchedulers_FullMethodName                   = "/zqnt.ConnectorService/DeleteSchedulers"
+	ConnectorService_RecordSchedulerFiring_FullMethodName              = "/zqnt.ConnectorService/RecordSchedulerFiring"
+	ConnectorService_StoreTelemetryBatch_FullMethodName                = "/zqnt.ConnectorService/StoreTelemetryBatch"
+	ConnectorService_StoreDetectionBatch_FullMethodName                = "/zqnt.ConnectorService/StoreDetectionBatch"
+	ConnectorService_StoreNotificationBatch_FullMethodName             = "/zqnt.ConnectorService/StoreNotificationBatch"
+	ConnectorService_RegisterMediaFile_FullMethodName                  = "/zqnt.ConnectorService/RegisterMediaFile"
+	ConnectorService_ListMediaFiles_FullMethodName                     = "/zqnt.ConnectorService/ListMediaFiles"
+	ConnectorService_GetMediaFile_FullMethodName                       = "/zqnt.ConnectorService/GetMediaFile"
+	ConnectorService_GetActivePoliciesByType_FullMethodName            = "/zqnt.ConnectorService/GetActivePoliciesByType"
+	ConnectorService_GetAllActivePolicies_FullMethodName               = "/zqnt.ConnectorService/GetAllActivePolicies"
+	ConnectorService_GetPolicyById_FullMethodName                      = "/zqnt.ConnectorService/GetPolicyById"
+	ConnectorService_CreatePolicy_FullMethodName                       = "/zqnt.ConnectorService/CreatePolicy"
+	ConnectorService_UpdatePolicy_FullMethodName                       = "/zqnt.ConnectorService/UpdatePolicy"
+	ConnectorService_DeletePolicy_FullMethodName                       = "/zqnt.ConnectorService/DeletePolicy"
+	ConnectorService_GetAllOrganizations_FullMethodName                = "/zqnt.ConnectorService/GetAllOrganizations"
+	ConnectorService_GetOrganizationById_FullMethodName                = "/zqnt.ConnectorService/GetOrganizationById"
+	ConnectorService_CreateOrganization_FullMethodName                 = "/zqnt.ConnectorService/CreateOrganization"
+	ConnectorService_UpdateOrganization_FullMethodName                 = "/zqnt.ConnectorService/UpdateOrganization"
+	ConnectorService_DeleteOrganization_FullMethodName                 = "/zqnt.ConnectorService/DeleteOrganization"
+	ConnectorService_ProvisionLicensedOrganization_FullMethodName      = "/zqnt.ConnectorService/ProvisionLicensedOrganization"
+	ConnectorService_GetAllTheatres_FullMethodName                     = "/zqnt.ConnectorService/GetAllTheatres"
+	ConnectorService_GetTheatreById_FullMethodName                     = "/zqnt.ConnectorService/GetTheatreById"
+	ConnectorService_CreateTheatre_FullMethodName                      = "/zqnt.ConnectorService/CreateTheatre"
+	ConnectorService_UpdateTheatre_FullMethodName                      = "/zqnt.ConnectorService/UpdateTheatre"
+	ConnectorService_DeleteTheatre_FullMethodName                      = "/zqnt.ConnectorService/DeleteTheatre"
+	ConnectorService_AssignUserToTheatre_FullMethodName                = "/zqnt.ConnectorService/AssignUserToTheatre"
+	ConnectorService_RemoveUserFromTheatre_FullMethodName              = "/zqnt.ConnectorService/RemoveUserFromTheatre"
+	ConnectorService_ListNoFlyZones_FullMethodName                     = "/zqnt.ConnectorService/ListNoFlyZones"
+	ConnectorService_UpsertNoFlyZone_FullMethodName                    = "/zqnt.ConnectorService/UpsertNoFlyZone"
+	ConnectorService_DeleteNoFlyZone_FullMethodName                    = "/zqnt.ConnectorService/DeleteNoFlyZone"
+	ConnectorService_ListLicenseActivationCredentials_FullMethodName   = "/zqnt.ConnectorService/ListLicenseActivationCredentials"
+	ConnectorService_GetLicenseActivationCredentials_FullMethodName    = "/zqnt.ConnectorService/GetLicenseActivationCredentials"
+	ConnectorService_PutLicenseActivationCredentials_FullMethodName    = "/zqnt.ConnectorService/PutLicenseActivationCredentials"
+	ConnectorService_DeleteLicenseActivationCredentials_FullMethodName = "/zqnt.ConnectorService/DeleteLicenseActivationCredentials"
+	ConnectorService_GetAllEventTriggers_FullMethodName                = "/zqnt.ConnectorService/GetAllEventTriggers"
+	ConnectorService_GetEventTriggerById_FullMethodName                = "/zqnt.ConnectorService/GetEventTriggerById"
+	ConnectorService_CreateEventTrigger_FullMethodName                 = "/zqnt.ConnectorService/CreateEventTrigger"
+	ConnectorService_UpdateEventTrigger_FullMethodName                 = "/zqnt.ConnectorService/UpdateEventTrigger"
+	ConnectorService_DeleteEventTrigger_FullMethodName                 = "/zqnt.ConnectorService/DeleteEventTrigger"
+	ConnectorService_RecordEventTriggerFired_FullMethodName            = "/zqnt.ConnectorService/RecordEventTriggerFired"
+	ConnectorService_RegenerateEventTriggerWebhookToken_FullMethodName = "/zqnt.ConnectorService/RegenerateEventTriggerWebhookToken"
+	ConnectorService_GetEventTriggerByWebhookToken_FullMethodName      = "/zqnt.ConnectorService/GetEventTriggerByWebhookToken"
+	ConnectorService_ListRecentDetections_FullMethodName               = "/zqnt.ConnectorService/ListRecentDetections"
+	ConnectorService_GetLatestTelemetryForAsset_FullMethodName         = "/zqnt.ConnectorService/GetLatestTelemetryForAsset"
+	ConnectorService_GetTechnicalConfigs_FullMethodName                = "/zqnt.ConnectorService/GetTechnicalConfigs"
+	ConnectorService_GetTechnicalConfigById_FullMethodName             = "/zqnt.ConnectorService/GetTechnicalConfigById"
+	ConnectorService_CreateTechnicalConfig_FullMethodName              = "/zqnt.ConnectorService/CreateTechnicalConfig"
+	ConnectorService_UpdateTechnicalConfig_FullMethodName              = "/zqnt.ConnectorService/UpdateTechnicalConfig"
+	ConnectorService_DeleteTechnicalConfig_FullMethodName              = "/zqnt.ConnectorService/DeleteTechnicalConfig"
+	ConnectorService_PersistApplication_FullMethodName                 = "/zqnt.ConnectorService/PersistApplication"
+	ConnectorService_GetPersistedApplication_FullMethodName            = "/zqnt.ConnectorService/GetPersistedApplication"
+	ConnectorService_ListPersistedApplications_FullMethodName          = "/zqnt.ConnectorService/ListPersistedApplications"
+	ConnectorService_DeletePersistedApplication_FullMethodName         = "/zqnt.ConnectorService/DeletePersistedApplication"
+	ConnectorService_SetApplicationPause_FullMethodName                = "/zqnt.ConnectorService/SetApplicationPause"
+	ConnectorService_ListApplicationPauses_FullMethodName              = "/zqnt.ConnectorService/ListApplicationPauses"
+	ConnectorService_GetApplicationEnvironmentPointers_FullMethodName  = "/zqnt.ConnectorService/GetApplicationEnvironmentPointers"
+	ConnectorService_PromoteApplicationVersion_FullMethodName          = "/zqnt.ConnectorService/PromoteApplicationVersion"
+	ConnectorService_PersistSkillExecution_FullMethodName              = "/zqnt.ConnectorService/PersistSkillExecution"
+	ConnectorService_GetPersistedSkillExecution_FullMethodName         = "/zqnt.ConnectorService/GetPersistedSkillExecution"
+	ConnectorService_ListPersistedSkillExecutions_FullMethodName       = "/zqnt.ConnectorService/ListPersistedSkillExecutions"
+	ConnectorService_AppendSkillExecutionEvent_FullMethodName          = "/zqnt.ConnectorService/AppendSkillExecutionEvent"
+	ConnectorService_ObserveSkillContract_FullMethodName               = "/zqnt.ConnectorService/ObserveSkillContract"
+	ConnectorService_ListSkillContracts_FullMethodName                 = "/zqnt.ConnectorService/ListSkillContracts"
+	ConnectorService_SetSkillContractStatus_FullMethodName             = "/zqnt.ConnectorService/SetSkillContractStatus"
+	ConnectorService_SetSkillContractPermissions_FullMethodName        = "/zqnt.ConnectorService/SetSkillContractPermissions"
+	ConnectorService_AuthenticateUser_FullMethodName                   = "/zqnt.ConnectorService/AuthenticateUser"
+	ConnectorService_CreateUser_FullMethodName                         = "/zqnt.ConnectorService/CreateUser"
+	ConnectorService_ResetPassword_FullMethodName                      = "/zqnt.ConnectorService/ResetPassword"
+	ConnectorService_RecordAuthAuditEvent_FullMethodName               = "/zqnt.ConnectorService/RecordAuthAuditEvent"
+	ConnectorService_ListUsers_FullMethodName                          = "/zqnt.ConnectorService/ListUsers"
+	ConnectorService_GetUserById_FullMethodName                        = "/zqnt.ConnectorService/GetUserById"
+	ConnectorService_UpdateUserRoles_FullMethodName                    = "/zqnt.ConnectorService/UpdateUserRoles"
+	ConnectorService_SetUserEnabled_FullMethodName                     = "/zqnt.ConnectorService/SetUserEnabled"
+	ConnectorService_DeleteUser_FullMethodName                         = "/zqnt.ConnectorService/DeleteUser"
+	ConnectorService_UpsertIdentityProvider_FullMethodName             = "/zqnt.ConnectorService/UpsertIdentityProvider"
+	ConnectorService_GetIdentityProvider_FullMethodName                = "/zqnt.ConnectorService/GetIdentityProvider"
+	ConnectorService_FindIdentityProviderByEmailDomain_FullMethodName  = "/zqnt.ConnectorService/FindIdentityProviderByEmailDomain"
+	ConnectorService_FindOidcUser_FullMethodName                       = "/zqnt.ConnectorService/FindOidcUser"
+	ConnectorService_UpsertOidcUser_FullMethodName                     = "/zqnt.ConnectorService/UpsertOidcUser"
 )
 
 // ConnectorServiceClient is the client API for ConnectorService service.
@@ -75,39 +148,229 @@ type ConnectorServiceClient interface {
 	GetAssetBySn(ctx context.Context, in *proto.RequestBase, opts ...grpc.CallOption) (*ConnectorResponse, error)
 	GetAssetById(ctx context.Context, in *ConnectorGetAssetByIdRequest, opts ...grpc.CallOption) (*ConnectorResponse, error)
 	GetSubAssetBySn(ctx context.Context, in *proto.RequestBase, opts ...grpc.CallOption) (*ConnectorResponse, error)
+	// Every asset that exists for the caller's organization (every asset platform-wide for a
+	// system_admin caller — same bypass-tenant-filtering rule as everywhere else), regardless of
+	// whether it's currently reporting itself online. Distinct from AssetMonitoring's streamed
+	// ConnectorAssetList (that's live/cached status snapshots for already-known SNs); this is the
+	// actual system-of-record enumeration — there was no way to list assets at all before this RPC,
+	// only look one up by a SN you already knew.
+	ListAssets(ctx context.Context, in *ListAssetsRequest, opts ...grpc.CallOption) (*AssetListResponse, error)
+	// Asset claims — one-time provisioning codes. An asset's organization is decided once and can
+	// never be changed (ListAssets filters on asset.organization.id, and UpdateAsset pins the field),
+	// so a device that registers itself must be told which tenant it belongs to before the asset
+	// exists. A claim carries that decision from the operator who made it to the device that
+	// redeems it.
+	CreateAssetClaim(ctx context.Context, in *CreateAssetClaimRequest, opts ...grpc.CallOption) (*AssetClaimResponse, error)
+	// The one RPC here that does not resolve its organization from the caller's token: the claim
+	// code IS the credential, which is what lets an edge adapter with no platform identity redeem
+	// one. Refusals are deliberately indistinguishable from one another — an expired code and an
+	// unknown code answer alike, or this becomes an oracle for guessing codes.
+	RedeemAssetClaim(ctx context.Context, in *RedeemAssetClaimRequest, opts ...grpc.CallOption) (*ConnectorResponse, error)
+	// Read a code without spending it, so a device can show its operator which organization they are
+	// about to bind into before anything is created. DJI's dock asks for exactly this: it resolves a
+	// typed code to an organization name for confirmation, and only the following bind carries the
+	// device serials. Untokened like RedeemAssetClaim, and refuses identically — but it returns the
+	// organization's NAME and nothing else, so a correct guess reveals a label the operator was
+	// about to be shown anyway rather than an id anything can be done with.
+	DescribeAssetClaim(ctx context.Context, in *DescribeAssetClaimRequest, opts ...grpc.CallOption) (*AssetClaimDescriptionResponse, error)
+	ListAssetClaims(ctx context.Context, in *ListAssetClaimsRequest, opts ...grpc.CallOption) (*AssetClaimListResponse, error)
+	RevokeAssetClaim(ctx context.Context, in *RevokeAssetClaimRequest, opts ...grpc.CallOption) (*AssetClaimResponse, error)
 	UpsertAssetPayload(ctx context.Context, in *UpsertAssetPayloadRequest, opts ...grpc.CallOption) (*AssetPayloadResponse, error)
 	ListAssetPayloads(ctx context.Context, in *ListAssetPayloadsRequest, opts ...grpc.CallOption) (*AssetPayloadListResponse, error)
 	DeleteAssetPayload(ctx context.Context, in *DeleteAssetPayloadRequest, opts ...grpc.CallOption) (*AssetPayloadResponse, error)
+	// Dynamic per-asset property bag (system-integrator metadata) — free key/value pairs, no schema
+	// change needed to add a new one. SetAssetProperty upserts by (asset, key).
+	SetAssetProperty(ctx context.Context, in *SetAssetPropertyRequest, opts ...grpc.CallOption) (*AssetPropertyResponse, error)
+	ListAssetProperties(ctx context.Context, in *ListAssetPropertiesRequest, opts ...grpc.CallOption) (*AssetPropertyListResponse, error)
+	DeleteAssetProperty(ctx context.Context, in *DeleteAssetPropertyRequest, opts ...grpc.CallOption) (*AssetPropertyResponse, error)
 	GetOrganization(ctx context.Context, in *ConnectorGetOrganizationRequest, opts ...grpc.CallOption) (*ConnectorResponse, error)
-	GetMission(ctx context.Context, in *proto1.GetMissionRequest, opts ...grpc.CallOption) (*proto1.MissionResponse, error)
-	CreateMission(ctx context.Context, in *proto1.CreateMissionRequest, opts ...grpc.CallOption) (*proto1.MissionResponse, error)
-	UpdateMission(ctx context.Context, in *proto1.UpdateMissionRequest, opts ...grpc.CallOption) (*proto1.MissionResponse, error)
-	DeleteMission(ctx context.Context, in *proto1.DeleteMissionRequest, opts ...grpc.CallOption) (*proto1.MissionResponse, error)
-	UploadMissionNfzZones(ctx context.Context, in *proto1.UploadMissionNfzZonesRequest, opts ...grpc.CallOption) (*proto1.MissionResponse, error)
-	GetTask(ctx context.Context, in *proto1.GetTaskRequest, opts ...grpc.CallOption) (*proto1.TaskResponse, error)
-	GetTaskByFlightId(ctx context.Context, in *proto1.GetTaskByFlightIdRequest, opts ...grpc.CallOption) (*proto1.TaskResponse, error)
-	GetWaypointsByTaskId(ctx context.Context, in *proto1.GetWaypointsByTaskIdRequest, opts ...grpc.CallOption) (*proto1.WaypointsResponse, error)
-	CreateTask(ctx context.Context, in *proto1.CreateTaskRequest, opts ...grpc.CallOption) (*proto1.TaskResponse, error)
-	UpdateTask(ctx context.Context, in *proto1.UpdateTaskRequest, opts ...grpc.CallOption) (*proto1.TaskResponse, error)
-	DeleteTask(ctx context.Context, in *proto1.DeleteTaskRequest, opts ...grpc.CallOption) (*proto1.TaskResponse, error)
+	ListSchedulers(ctx context.Context, in *proto1.ListSchedulersRequest, opts ...grpc.CallOption) (*proto1.SchedulerResponse, error)
 	GetScheduler(ctx context.Context, in *proto1.GetSchedulerRequest, opts ...grpc.CallOption) (*proto1.SchedulerResponse, error)
 	CreateScheduler(ctx context.Context, in *proto1.CreateSchedulerRequest, opts ...grpc.CallOption) (*proto1.SchedulerResponse, error)
 	CreateSchedulers(ctx context.Context, in *proto1.CreateSchedulersRequest, opts ...grpc.CallOption) (*proto1.SchedulerResponse, error)
 	UpdateScheduler(ctx context.Context, in *proto1.UpdateSchedulerRequest, opts ...grpc.CallOption) (*proto1.SchedulerResponse, error)
 	DeleteScheduler(ctx context.Context, in *proto1.DeleteSchedulerRequest, opts ...grpc.CallOption) (*proto1.SchedulerResponse, error)
 	DeleteSchedulers(ctx context.Context, in *proto1.DeleteSchedulersRequest, opts ...grpc.CallOption) (*proto1.SchedulerResponse, error)
-	DeleteSchedulersByTask(ctx context.Context, in *proto1.DeleteSchedulersByTaskRequest, opts ...grpc.CallOption) (*proto1.SchedulerResponse, error)
+	// What the last firing of a schedule did; see RecordSchedulerFiringRequest.
+	RecordSchedulerFiring(ctx context.Context, in *proto1.RecordSchedulerFiringRequest, opts ...grpc.CallOption) (*proto1.SchedulerResponse, error)
 	// Telemetry Storage - batch processing from live-data service
 	StoreTelemetryBatch(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[ConnectorStoreTelemetryRequest, ConnectorResponse], error)
 	// Detection Storage - batch processing from live-data service (high-frequency, TimescaleDB)
 	StoreDetectionBatch(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[ConnectorStoreDetectionRequest, ConnectorResponse], error)
 	// Notification Storage - batch processing from live-data service
 	StoreNotificationBatch(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[proto2.ProduceNotificationRequest, ConnectorResponse], error)
-	// Policy Management - fetched by Mission-Autonomy for decision engine cache
+	// Media a device uploaded to the inbox bucket (see media.proto): attributed, moved under its
+	// organization/application folder and recorded. Idempotent per source object key.
+	RegisterMediaFile(ctx context.Context, in *proto3.RegisterMediaFileRequest, opts ...grpc.CallOption) (*proto3.MediaFileProtoDTO, error)
+	ListMediaFiles(ctx context.Context, in *proto3.ListMediaFilesRequest, opts ...grpc.CallOption) (*proto3.ListMediaFilesResponse, error)
+	GetMediaFile(ctx context.Context, in *proto3.GetMediaFileRequest, opts ...grpc.CallOption) (*proto3.MediaFileProtoDTO, error)
+	// Policy Management - fetched by Mission-Autonomy for decision engine cache. Read-only RPCs
+	// existed first; the CRUD RPCs below back the admin-console "Operational Policies" management
+	// screen (previously a fully mocked/hardcoded frontend with no backend at all -- see
+	// OperationalPolicyService, which already did real persistence + push-invalidation eventing for
+	// the REST-only connector-internal API these now also front).
 	GetActivePoliciesByType(ctx context.Context, in *ConnectorGetPoliciesRequest, opts ...grpc.CallOption) (*ConnectorPolicyResponse, error)
 	GetAllActivePolicies(ctx context.Context, in *ConnectorGetAllPoliciesRequest, opts ...grpc.CallOption) (*ConnectorPolicyResponse, error)
-	// Technical Config - fetched by services for runtime configuration
+	GetPolicyById(ctx context.Context, in *GetPolicyByIdRequest, opts ...grpc.CallOption) (*ConnectorPolicySingleResponse, error)
+	CreatePolicy(ctx context.Context, in *CreatePolicyRequest, opts ...grpc.CallOption) (*ConnectorPolicySingleResponse, error)
+	UpdatePolicy(ctx context.Context, in *UpdatePolicyRequest, opts ...grpc.CallOption) (*ConnectorPolicySingleResponse, error)
+	DeletePolicy(ctx context.Context, in *DeletePolicyRequest, opts ...grpc.CallOption) (*ConnectorDeletePolicyResponse, error)
+	// Organization Management - connector's own OrganizationService already had full REST CRUD
+	// (/api/organization, orphaned/never called from outside connector, same shape as the old
+	// OperationalPolicy REST API) -- these RPCs are the real cross-service front door for it, backing
+	// the admin-console "Organizations" management screen.
+	GetAllOrganizations(ctx context.Context, in *ConnectorGetAllOrganizationsRequest, opts ...grpc.CallOption) (*ConnectorOrganizationResponse, error)
+	GetOrganizationById(ctx context.Context, in *GetOrganizationByIdRequest, opts ...grpc.CallOption) (*ConnectorOrganizationSingleResponse, error)
+	CreateOrganization(ctx context.Context, in *CreateOrganizationRequest, opts ...grpc.CallOption) (*ConnectorOrganizationSingleResponse, error)
+	UpdateOrganization(ctx context.Context, in *UpdateOrganizationRequest, opts ...grpc.CallOption) (*ConnectorOrganizationSingleResponse, error)
+	DeleteOrganization(ctx context.Context, in *DeleteOrganizationRequest, opts ...grpc.CallOption) (*ConnectorDeleteOrganizationResponse, error)
+	// Creates the organization a license names, with the id the license carries (the only way an
+	// organization gets a caller-chosen id), and stores that license's sealed activation credentials
+	// in the same transaction -- both or neither. An id that already exists is not changed and nothing
+	// is written: already_exists = true and organization holds the existing one, so the caller can
+	// treat it as activating a license for an existing organization.
+	ProvisionLicensedOrganization(ctx context.Context, in *ProvisionLicensedOrganizationRequest, opts ...grpc.CallOption) (*ProvisionLicensedOrganizationResponse, error)
+	// Theatre Management - a named operational site within one organization (optional geo zone, the
+	// assets stationed there, the users with access to it). Same CRUD shape as Organization above;
+	// AssignUserToTheatre/RemoveUserFromTheatre back the many-to-many user<->theatre join table
+	// (deliberately not a repeated field on TheatreProtoDTO -- resolved fresh per request, same
+	// "don't bake something that can change independently into a cached/long-lived value" reasoning
+	// as the refresh-token roles fix).
+	GetAllTheatres(ctx context.Context, in *ConnectorGetAllTheatresRequest, opts ...grpc.CallOption) (*ConnectorTheatreResponse, error)
+	GetTheatreById(ctx context.Context, in *GetTheatreByIdRequest, opts ...grpc.CallOption) (*ConnectorTheatreSingleResponse, error)
+	CreateTheatre(ctx context.Context, in *CreateTheatreRequest, opts ...grpc.CallOption) (*ConnectorTheatreSingleResponse, error)
+	UpdateTheatre(ctx context.Context, in *UpdateTheatreRequest, opts ...grpc.CallOption) (*ConnectorTheatreSingleResponse, error)
+	DeleteTheatre(ctx context.Context, in *DeleteTheatreRequest, opts ...grpc.CallOption) (*ConnectorDeleteTheatreResponse, error)
+	AssignUserToTheatre(ctx context.Context, in *AssignUserToTheatreRequest, opts ...grpc.CallOption) (*TheatreAssignmentResponse, error)
+	RemoveUserFromTheatre(ctx context.Context, in *RemoveUserFromTheatreRequest, opts ...grpc.CallOption) (*TheatreAssignmentResponse, error)
+	// No-fly zones -- the one store of an organization's no-fly zones. Mission-autonomy reads them to
+	// plan and refuse flights (RouteExecutionGraphExpander), admin-console to draw and edit them.
+	// Ids are chosen by the caller (the console's own ids survive the move from Redis). An id that
+	// belongs to another organization is answered as not found.
+	ListNoFlyZones(ctx context.Context, in *ListNoFlyZonesRequest, opts ...grpc.CallOption) (*NoFlyZoneListResponse, error)
+	UpsertNoFlyZone(ctx context.Context, in *UpsertNoFlyZoneRequest, opts ...grpc.CallOption) (*NoFlyZoneSingleResponse, error)
+	DeleteNoFlyZone(ctx context.Context, in *DeleteNoFlyZoneRequest, opts ...grpc.CallOption) (*DeleteNoFlyZoneResponse, error)
+	// License activation credentials -- the activation id and token admin-console received from the
+	// license hub when it activated an organization's license. Without them admin-console can neither
+	// refresh that organization's lease nor consume its seats, so they must survive a restart and be
+	// shared between replicas. admin-console seals the token before it gets here (AES-256-GCM under a
+	// per-organization key derived from the installation's platform key); connector stores the
+	// envelope and never sees the token itself. At most one record per organization; Put replaces it.
+	ListLicenseActivationCredentials(ctx context.Context, in *ListLicenseActivationCredentialsRequest, opts ...grpc.CallOption) (*LicenseActivationCredentialsListResponse, error)
+	GetLicenseActivationCredentials(ctx context.Context, in *GetLicenseActivationCredentialsRequest, opts ...grpc.CallOption) (*LicenseActivationCredentialsSingleResponse, error)
+	PutLicenseActivationCredentials(ctx context.Context, in *PutLicenseActivationCredentialsRequest, opts ...grpc.CallOption) (*LicenseActivationCredentialsSingleResponse, error)
+	DeleteLicenseActivationCredentials(ctx context.Context, in *DeleteLicenseActivationCredentialsRequest, opts ...grpc.CallOption) (*DeleteLicenseActivationCredentialsResponse, error)
+	// Event Triggers — "start Application X on event Y" (detection / telemetry threshold / asset
+	// status / inbound webhook). CRUD mirrors Theatre's shape; ListRecentDetections and
+	// GetLatestTelemetryForAsset back mission-autonomy's polling evaluator (EventTriggerEvaluationService),
+	// RecordEventTriggerFired stamps last_fired_at for cooldown bookkeeping after a real fire.
+	GetAllEventTriggers(ctx context.Context, in *ConnectorGetAllEventTriggersRequest, opts ...grpc.CallOption) (*ConnectorEventTriggerResponse, error)
+	GetEventTriggerById(ctx context.Context, in *GetEventTriggerByIdRequest, opts ...grpc.CallOption) (*ConnectorEventTriggerSingleResponse, error)
+	CreateEventTrigger(ctx context.Context, in *CreateEventTriggerRequest, opts ...grpc.CallOption) (*ConnectorEventTriggerSingleResponse, error)
+	UpdateEventTrigger(ctx context.Context, in *UpdateEventTriggerRequest, opts ...grpc.CallOption) (*ConnectorEventTriggerSingleResponse, error)
+	DeleteEventTrigger(ctx context.Context, in *DeleteEventTriggerRequest, opts ...grpc.CallOption) (*ConnectorDeleteEventTriggerResponse, error)
+	RecordEventTriggerFired(ctx context.Context, in *RecordEventTriggerFiredRequest, opts ...grpc.CallOption) (*ConnectorEventTriggerSingleResponse, error)
+	RegenerateEventTriggerWebhookToken(ctx context.Context, in *RegenerateEventTriggerWebhookTokenRequest, opts ...grpc.CallOption) (*ConnectorEventTriggerSingleResponse, error)
+	GetEventTriggerByWebhookToken(ctx context.Context, in *GetEventTriggerByWebhookTokenRequest, opts ...grpc.CallOption) (*ConnectorEventTriggerSingleResponse, error)
+	ListRecentDetections(ctx context.Context, in *ListRecentDetectionsRequest, opts ...grpc.CallOption) (*ConnectorDetectionListResponse, error)
+	GetLatestTelemetryForAsset(ctx context.Context, in *GetLatestTelemetryForAssetRequest, opts ...grpc.CallOption) (*ConnectorTelemetrySingleResponse, error)
+	// Technical Config - fetched by services for runtime configuration. Read-only GetTechnicalConfigs
+	// existed first (services reading their own settings); the CRUD RPCs below back the admin-console
+	// "Technical Config" management screen, so the config values these read-only fetches see can
+	// actually be changed by an admin without a redeploy.
 	GetTechnicalConfigs(ctx context.Context, in *ConnectorGetConfigsRequest, opts ...grpc.CallOption) (*ConnectorConfigResponse, error)
+	GetTechnicalConfigById(ctx context.Context, in *GetTechnicalConfigByIdRequest, opts ...grpc.CallOption) (*ConnectorConfigSingleResponse, error)
+	CreateTechnicalConfig(ctx context.Context, in *CreateTechnicalConfigRequest, opts ...grpc.CallOption) (*ConnectorConfigSingleResponse, error)
+	UpdateTechnicalConfig(ctx context.Context, in *UpdateTechnicalConfigRequest, opts ...grpc.CallOption) (*ConnectorConfigSingleResponse, error)
+	DeleteTechnicalConfig(ctx context.Context, in *DeleteTechnicalConfigRequest, opts ...grpc.CallOption) (*ConnectorDeleteConfigResponse, error)
+	// Application/Skill domain persistence. Mission Autonomy is the orchestration consumer.
+	PersistApplication(ctx context.Context, in *proto4.UpsertApplicationRequest, opts ...grpc.CallOption) (*proto4.ApplicationResponse, error)
+	GetPersistedApplication(ctx context.Context, in *proto4.GetApplicationRequest, opts ...grpc.CallOption) (*proto4.ApplicationResponse, error)
+	ListPersistedApplications(ctx context.Context, in *proto4.ListApplicationsRequest, opts ...grpc.CallOption) (*proto4.ApplicationListResponse, error)
+	DeletePersistedApplication(ctx context.Context, in *proto4.DeleteApplicationRequest, opts ...grpc.CallOption) (*proto4.ApplicationResponse, error)
+	// Pausing is operational state, not part of the versioned Application -- see ApplicationPauseProtoDTO.
+	// SetApplicationPause answers with every pause of that Application after the change.
+	SetApplicationPause(ctx context.Context, in *proto4.SetApplicationPauseRequest, opts ...grpc.CallOption) (*proto4.ApplicationPauseListResponse, error)
+	ListApplicationPauses(ctx context.Context, in *proto4.ListApplicationPausesRequest, opts ...grpc.CallOption) (*proto4.ApplicationPauseListResponse, error)
+	GetApplicationEnvironmentPointers(ctx context.Context, in *proto4.GetApplicationEnvironmentsRequest, opts ...grpc.CallOption) (*proto4.ApplicationEnvironmentsResponse, error)
+	PromoteApplicationVersion(ctx context.Context, in *proto4.PromoteApplicationVersionRequest, opts ...grpc.CallOption) (*proto4.ApplicationEnvironmentsResponse, error)
+	PersistSkillExecution(ctx context.Context, in *PersistSkillExecutionRequest, opts ...grpc.CallOption) (*proto4.SkillExecutionResponse, error)
+	GetPersistedSkillExecution(ctx context.Context, in *proto4.GetSkillExecutionRequest, opts ...grpc.CallOption) (*proto4.SkillExecutionResponse, error)
+	ListPersistedSkillExecutions(ctx context.Context, in *proto4.ListSkillExecutionsRequest, opts ...grpc.CallOption) (*proto4.SkillExecutionListResponse, error)
+	AppendSkillExecutionEvent(ctx context.Context, in *AppendSkillExecutionEventRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// Skill Registry: a persisted, de-duplicated view of every Skill/Capability contract ever
+	// observed from a connected asset, independent of which devices are currently online. Admin
+	// Console auto-upserts into this by (command_id, schema_version) whenever it aggregates a live
+	// capability snapshot; status is the one field a system integrator edits directly.
+	ObserveSkillContract(ctx context.Context, in *UpsertSkillContractRequest, opts ...grpc.CallOption) (*SkillContractResponse, error)
+	ListSkillContracts(ctx context.Context, in *ListSkillContractsRequest, opts ...grpc.CallOption) (*SkillContractListResponse, error)
+	SetSkillContractStatus(ctx context.Context, in *SetSkillContractStatusRequest, opts ...grpc.CallOption) (*SkillContractResponse, error)
+	// Declarative-only prep for future auth/RBAC — see SkillContractProtoDTO.required_permissions.
+	SetSkillContractPermissions(ctx context.Context, in *SetSkillContractPermissionsRequest, opts ...grpc.CallOption) (*SkillContractResponse, error)
+	// Platform-hosted authentication: verifies email+password against connector's own user store
+	// (the system of record) and returns the identity a caller (admin-console) mints a
+	// PlatformClaims-shaped auth token from. Connector never issues the token itself — it has no
+	// private signing key — it only ever confirms "this is who they say they are, in this org, with
+	// these roles."
+	AuthenticateUser(ctx context.Context, in *AuthenticateUserRequest, opts ...grpc.CallOption) (*AuthenticateUserResponse, error)
+	// Admin-driven user creation — the seat check (does this organization's license have room for
+	// one more user) happens one layer up, in admin-console's LicenseCoordinator, BEFORE this is
+	// ever called; connector itself has no concept of seats, it only persists the user once
+	// admin-console has already confirmed one is available.
+	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
+	// Admin-driven password reset — see ResetPasswordRequest's doc.
+	ResetPassword(ctx context.Context, in *ResetPasswordRequest, opts ...grpc.CallOption) (*ResetPasswordResponse, error)
+	// Durable audit trail for authentication-security-relevant events (login attempts, logout,
+	// admin-driven password resets/session revocations) — see the connector-side AuthAuditService's
+	// doc. Best-effort from the caller's point of view: a failure to record must never block the
+	// actual auth action it's describing, so every call site fires this without letting its outcome
+	// affect the real response.
+	RecordAuthAuditEvent(ctx context.Context, in *RecordAuthAuditEventRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// Every user in the caller's own organization (a system_admin caller instead gets every user,
+	// platform-wide — same bypass-tenant-filtering rule as everywhere else, see
+	// TenantScopedRepository#bypassTenantFilter). What the admin console's user-management screen
+	// lists against; there was no read path for the users CreateUser produces until this existed.
+	ListUsers(ctx context.Context, in *ListUsersRequest, opts ...grpc.CallOption) (*ListUsersResponse, error)
+	// Single-user lookup by id — what a "whoami" endpoint resolves an access token's subject claim
+	// (a user id, nothing else) into a displayable identity. AuthenticateUser can't serve this: it
+	// needs a password and is keyed by email, neither of which a bearer token carries.
+	GetUserById(ctx context.Context, in *GetUserByIdRequest, opts ...grpc.CallOption) (*AuthenticateUserResponse, error)
+	// Admin-driven user changes. Each answers with the user as it is afterwards (DeleteUser: as it was
+	// just before it went), so the caller knows the organization to act on -- revoking sessions,
+	// releasing the license seat -- without a second lookup. Same caller rules as CreateUser: an
+	// org-admin acts only inside their own organization and never on a system_admin; nobody acts on
+	// themselves, and the last enabled system_admin can be neither demoted, disabled nor deleted.
+	UpdateUserRoles(ctx context.Context, in *UpdateUserRolesRequest, opts ...grpc.CallOption) (*AuthenticateUserResponse, error)
+	// A disabled user can no longer sign in (password or SSO) and no refresh succeeds; the caller
+	// revokes live access tokens. Seats are a licensing concern one layer up: disabling keeps it.
+	SetUserEnabled(ctx context.Context, in *SetUserEnabledRequest, opts ...grpc.CallOption) (*AuthenticateUserResponse, error)
+	// Removes the user for good -- the email is free again. The auth audit trail keeps its rows.
+	DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*AuthenticateUserResponse, error)
+	// Pluggable SSO — an organization's own OIDC identity provider config (issuer, client
+	// credentials, which email domains it owns, how its claims map to platform roles). Local
+	// email+password (AuthenticateUser above) stays the default for every org with no config here;
+	// this only ever supplements it, never replaces AuthenticateUser for orgs that don't opt in.
+	UpsertIdentityProvider(ctx context.Context, in *UpsertIdentityProviderRequest, opts ...grpc.CallOption) (*IdentityProviderResponse, error)
+	GetIdentityProvider(ctx context.Context, in *GetIdentityProviderRequest, opts ...grpc.CallOption) (*IdentityProviderResponse, error)
+	// Login-screen discovery: given an email address, which org (if any) owns that domain and has
+	// SSO configured — admin-console calls this before showing a password field or redirecting to
+	// an IdP. Empty response (no error, no provider) means "no SSO for this domain, use local auth."
+	FindIdentityProviderByEmailDomain(ctx context.Context, in *FindIdentityProviderByEmailDomainRequest, opts ...grpc.CallOption) (*IdentityProviderResponse, error)
+	// Existence check by (organization_id, external_subject), used by admin-console to decide
+	// whether an SSO login needs a seat reserved before UpsertOidcUser below — same "reserve the
+	// seat, THEN create" ordering CreateUser's caller already follows for local users. Empty
+	// response (has_errors false, no user) means "not provisioned yet."
+	FindOidcUser(ctx context.Context, in *FindOidcUserRequest, opts ...grpc.CallOption) (*AuthenticateUserResponse, error)
+	// The OIDC counterpart to AuthenticateUser: admin-console has already completed the
+	// authorization-code exchange and verified the ID token against the org's own IdP by the time
+	// this is called — this only resolves the local user record admin-console mints a
+	// PlatformClaims-shaped token from, same as AuthenticateUser does for password logins. Finds by
+	// (organization_id, external_subject); auto-provisions on first login (a seat is expected to
+	// already be reserved via FindOidcUser+LicenseCoordinator, same division of responsibility as
+	// CreateUser — connector has no concept of seats), and re-stamps email/roles from the IdP's
+	// claims on every subsequent login so a role change in the customer's own directory takes
+	// effect without any action on this platform.
+	UpsertOidcUser(ctx context.Context, in *UpsertOidcUserRequest, opts ...grpc.CallOption) (*AuthenticateUserResponse, error)
 }
 
 type connectorServiceClient struct {
@@ -207,6 +470,66 @@ func (c *connectorServiceClient) GetSubAssetBySn(ctx context.Context, in *proto.
 	return out, nil
 }
 
+func (c *connectorServiceClient) ListAssets(ctx context.Context, in *ListAssetsRequest, opts ...grpc.CallOption) (*AssetListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AssetListResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_ListAssets_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) CreateAssetClaim(ctx context.Context, in *CreateAssetClaimRequest, opts ...grpc.CallOption) (*AssetClaimResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AssetClaimResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_CreateAssetClaim_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) RedeemAssetClaim(ctx context.Context, in *RedeemAssetClaimRequest, opts ...grpc.CallOption) (*ConnectorResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ConnectorResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_RedeemAssetClaim_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) DescribeAssetClaim(ctx context.Context, in *DescribeAssetClaimRequest, opts ...grpc.CallOption) (*AssetClaimDescriptionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AssetClaimDescriptionResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_DescribeAssetClaim_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) ListAssetClaims(ctx context.Context, in *ListAssetClaimsRequest, opts ...grpc.CallOption) (*AssetClaimListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AssetClaimListResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_ListAssetClaims_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) RevokeAssetClaim(ctx context.Context, in *RevokeAssetClaimRequest, opts ...grpc.CallOption) (*AssetClaimResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AssetClaimResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_RevokeAssetClaim_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *connectorServiceClient) UpsertAssetPayload(ctx context.Context, in *UpsertAssetPayloadRequest, opts ...grpc.CallOption) (*AssetPayloadResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(AssetPayloadResponse)
@@ -237,6 +560,36 @@ func (c *connectorServiceClient) DeleteAssetPayload(ctx context.Context, in *Del
 	return out, nil
 }
 
+func (c *connectorServiceClient) SetAssetProperty(ctx context.Context, in *SetAssetPropertyRequest, opts ...grpc.CallOption) (*AssetPropertyResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AssetPropertyResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_SetAssetProperty_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) ListAssetProperties(ctx context.Context, in *ListAssetPropertiesRequest, opts ...grpc.CallOption) (*AssetPropertyListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AssetPropertyListResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_ListAssetProperties_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) DeleteAssetProperty(ctx context.Context, in *DeleteAssetPropertyRequest, opts ...grpc.CallOption) (*AssetPropertyResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AssetPropertyResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_DeleteAssetProperty_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *connectorServiceClient) GetOrganization(ctx context.Context, in *ConnectorGetOrganizationRequest, opts ...grpc.CallOption) (*ConnectorResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ConnectorResponse)
@@ -247,110 +600,10 @@ func (c *connectorServiceClient) GetOrganization(ctx context.Context, in *Connec
 	return out, nil
 }
 
-func (c *connectorServiceClient) GetMission(ctx context.Context, in *proto1.GetMissionRequest, opts ...grpc.CallOption) (*proto1.MissionResponse, error) {
+func (c *connectorServiceClient) ListSchedulers(ctx context.Context, in *proto1.ListSchedulersRequest, opts ...grpc.CallOption) (*proto1.SchedulerResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(proto1.MissionResponse)
-	err := c.cc.Invoke(ctx, ConnectorService_GetMission_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *connectorServiceClient) CreateMission(ctx context.Context, in *proto1.CreateMissionRequest, opts ...grpc.CallOption) (*proto1.MissionResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(proto1.MissionResponse)
-	err := c.cc.Invoke(ctx, ConnectorService_CreateMission_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *connectorServiceClient) UpdateMission(ctx context.Context, in *proto1.UpdateMissionRequest, opts ...grpc.CallOption) (*proto1.MissionResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(proto1.MissionResponse)
-	err := c.cc.Invoke(ctx, ConnectorService_UpdateMission_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *connectorServiceClient) DeleteMission(ctx context.Context, in *proto1.DeleteMissionRequest, opts ...grpc.CallOption) (*proto1.MissionResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(proto1.MissionResponse)
-	err := c.cc.Invoke(ctx, ConnectorService_DeleteMission_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *connectorServiceClient) UploadMissionNfzZones(ctx context.Context, in *proto1.UploadMissionNfzZonesRequest, opts ...grpc.CallOption) (*proto1.MissionResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(proto1.MissionResponse)
-	err := c.cc.Invoke(ctx, ConnectorService_UploadMissionNfzZones_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *connectorServiceClient) GetTask(ctx context.Context, in *proto1.GetTaskRequest, opts ...grpc.CallOption) (*proto1.TaskResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(proto1.TaskResponse)
-	err := c.cc.Invoke(ctx, ConnectorService_GetTask_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *connectorServiceClient) GetTaskByFlightId(ctx context.Context, in *proto1.GetTaskByFlightIdRequest, opts ...grpc.CallOption) (*proto1.TaskResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(proto1.TaskResponse)
-	err := c.cc.Invoke(ctx, ConnectorService_GetTaskByFlightId_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *connectorServiceClient) GetWaypointsByTaskId(ctx context.Context, in *proto1.GetWaypointsByTaskIdRequest, opts ...grpc.CallOption) (*proto1.WaypointsResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(proto1.WaypointsResponse)
-	err := c.cc.Invoke(ctx, ConnectorService_GetWaypointsByTaskId_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *connectorServiceClient) CreateTask(ctx context.Context, in *proto1.CreateTaskRequest, opts ...grpc.CallOption) (*proto1.TaskResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(proto1.TaskResponse)
-	err := c.cc.Invoke(ctx, ConnectorService_CreateTask_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *connectorServiceClient) UpdateTask(ctx context.Context, in *proto1.UpdateTaskRequest, opts ...grpc.CallOption) (*proto1.TaskResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(proto1.TaskResponse)
-	err := c.cc.Invoke(ctx, ConnectorService_UpdateTask_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *connectorServiceClient) DeleteTask(ctx context.Context, in *proto1.DeleteTaskRequest, opts ...grpc.CallOption) (*proto1.TaskResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(proto1.TaskResponse)
-	err := c.cc.Invoke(ctx, ConnectorService_DeleteTask_FullMethodName, in, out, cOpts...)
+	out := new(proto1.SchedulerResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_ListSchedulers_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -417,10 +670,10 @@ func (c *connectorServiceClient) DeleteSchedulers(ctx context.Context, in *proto
 	return out, nil
 }
 
-func (c *connectorServiceClient) DeleteSchedulersByTask(ctx context.Context, in *proto1.DeleteSchedulersByTaskRequest, opts ...grpc.CallOption) (*proto1.SchedulerResponse, error) {
+func (c *connectorServiceClient) RecordSchedulerFiring(ctx context.Context, in *proto1.RecordSchedulerFiringRequest, opts ...grpc.CallOption) (*proto1.SchedulerResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(proto1.SchedulerResponse)
-	err := c.cc.Invoke(ctx, ConnectorService_DeleteSchedulersByTask_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, ConnectorService_RecordSchedulerFiring_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -466,6 +719,36 @@ func (c *connectorServiceClient) StoreNotificationBatch(ctx context.Context, opt
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type ConnectorService_StoreNotificationBatchClient = grpc.ClientStreamingClient[proto2.ProduceNotificationRequest, ConnectorResponse]
 
+func (c *connectorServiceClient) RegisterMediaFile(ctx context.Context, in *proto3.RegisterMediaFileRequest, opts ...grpc.CallOption) (*proto3.MediaFileProtoDTO, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(proto3.MediaFileProtoDTO)
+	err := c.cc.Invoke(ctx, ConnectorService_RegisterMediaFile_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) ListMediaFiles(ctx context.Context, in *proto3.ListMediaFilesRequest, opts ...grpc.CallOption) (*proto3.ListMediaFilesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(proto3.ListMediaFilesResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_ListMediaFiles_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) GetMediaFile(ctx context.Context, in *proto3.GetMediaFileRequest, opts ...grpc.CallOption) (*proto3.MediaFileProtoDTO, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(proto3.MediaFileProtoDTO)
+	err := c.cc.Invoke(ctx, ConnectorService_GetMediaFile_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *connectorServiceClient) GetActivePoliciesByType(ctx context.Context, in *ConnectorGetPoliciesRequest, opts ...grpc.CallOption) (*ConnectorPolicyResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ConnectorPolicyResponse)
@@ -486,10 +769,690 @@ func (c *connectorServiceClient) GetAllActivePolicies(ctx context.Context, in *C
 	return out, nil
 }
 
+func (c *connectorServiceClient) GetPolicyById(ctx context.Context, in *GetPolicyByIdRequest, opts ...grpc.CallOption) (*ConnectorPolicySingleResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ConnectorPolicySingleResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_GetPolicyById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) CreatePolicy(ctx context.Context, in *CreatePolicyRequest, opts ...grpc.CallOption) (*ConnectorPolicySingleResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ConnectorPolicySingleResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_CreatePolicy_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) UpdatePolicy(ctx context.Context, in *UpdatePolicyRequest, opts ...grpc.CallOption) (*ConnectorPolicySingleResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ConnectorPolicySingleResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_UpdatePolicy_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) DeletePolicy(ctx context.Context, in *DeletePolicyRequest, opts ...grpc.CallOption) (*ConnectorDeletePolicyResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ConnectorDeletePolicyResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_DeletePolicy_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) GetAllOrganizations(ctx context.Context, in *ConnectorGetAllOrganizationsRequest, opts ...grpc.CallOption) (*ConnectorOrganizationResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ConnectorOrganizationResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_GetAllOrganizations_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) GetOrganizationById(ctx context.Context, in *GetOrganizationByIdRequest, opts ...grpc.CallOption) (*ConnectorOrganizationSingleResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ConnectorOrganizationSingleResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_GetOrganizationById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) CreateOrganization(ctx context.Context, in *CreateOrganizationRequest, opts ...grpc.CallOption) (*ConnectorOrganizationSingleResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ConnectorOrganizationSingleResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_CreateOrganization_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) UpdateOrganization(ctx context.Context, in *UpdateOrganizationRequest, opts ...grpc.CallOption) (*ConnectorOrganizationSingleResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ConnectorOrganizationSingleResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_UpdateOrganization_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) DeleteOrganization(ctx context.Context, in *DeleteOrganizationRequest, opts ...grpc.CallOption) (*ConnectorDeleteOrganizationResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ConnectorDeleteOrganizationResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_DeleteOrganization_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) ProvisionLicensedOrganization(ctx context.Context, in *ProvisionLicensedOrganizationRequest, opts ...grpc.CallOption) (*ProvisionLicensedOrganizationResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ProvisionLicensedOrganizationResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_ProvisionLicensedOrganization_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) GetAllTheatres(ctx context.Context, in *ConnectorGetAllTheatresRequest, opts ...grpc.CallOption) (*ConnectorTheatreResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ConnectorTheatreResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_GetAllTheatres_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) GetTheatreById(ctx context.Context, in *GetTheatreByIdRequest, opts ...grpc.CallOption) (*ConnectorTheatreSingleResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ConnectorTheatreSingleResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_GetTheatreById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) CreateTheatre(ctx context.Context, in *CreateTheatreRequest, opts ...grpc.CallOption) (*ConnectorTheatreSingleResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ConnectorTheatreSingleResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_CreateTheatre_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) UpdateTheatre(ctx context.Context, in *UpdateTheatreRequest, opts ...grpc.CallOption) (*ConnectorTheatreSingleResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ConnectorTheatreSingleResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_UpdateTheatre_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) DeleteTheatre(ctx context.Context, in *DeleteTheatreRequest, opts ...grpc.CallOption) (*ConnectorDeleteTheatreResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ConnectorDeleteTheatreResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_DeleteTheatre_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) AssignUserToTheatre(ctx context.Context, in *AssignUserToTheatreRequest, opts ...grpc.CallOption) (*TheatreAssignmentResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TheatreAssignmentResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_AssignUserToTheatre_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) RemoveUserFromTheatre(ctx context.Context, in *RemoveUserFromTheatreRequest, opts ...grpc.CallOption) (*TheatreAssignmentResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TheatreAssignmentResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_RemoveUserFromTheatre_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) ListNoFlyZones(ctx context.Context, in *ListNoFlyZonesRequest, opts ...grpc.CallOption) (*NoFlyZoneListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(NoFlyZoneListResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_ListNoFlyZones_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) UpsertNoFlyZone(ctx context.Context, in *UpsertNoFlyZoneRequest, opts ...grpc.CallOption) (*NoFlyZoneSingleResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(NoFlyZoneSingleResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_UpsertNoFlyZone_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) DeleteNoFlyZone(ctx context.Context, in *DeleteNoFlyZoneRequest, opts ...grpc.CallOption) (*DeleteNoFlyZoneResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteNoFlyZoneResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_DeleteNoFlyZone_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) ListLicenseActivationCredentials(ctx context.Context, in *ListLicenseActivationCredentialsRequest, opts ...grpc.CallOption) (*LicenseActivationCredentialsListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LicenseActivationCredentialsListResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_ListLicenseActivationCredentials_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) GetLicenseActivationCredentials(ctx context.Context, in *GetLicenseActivationCredentialsRequest, opts ...grpc.CallOption) (*LicenseActivationCredentialsSingleResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LicenseActivationCredentialsSingleResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_GetLicenseActivationCredentials_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) PutLicenseActivationCredentials(ctx context.Context, in *PutLicenseActivationCredentialsRequest, opts ...grpc.CallOption) (*LicenseActivationCredentialsSingleResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LicenseActivationCredentialsSingleResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_PutLicenseActivationCredentials_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) DeleteLicenseActivationCredentials(ctx context.Context, in *DeleteLicenseActivationCredentialsRequest, opts ...grpc.CallOption) (*DeleteLicenseActivationCredentialsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteLicenseActivationCredentialsResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_DeleteLicenseActivationCredentials_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) GetAllEventTriggers(ctx context.Context, in *ConnectorGetAllEventTriggersRequest, opts ...grpc.CallOption) (*ConnectorEventTriggerResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ConnectorEventTriggerResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_GetAllEventTriggers_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) GetEventTriggerById(ctx context.Context, in *GetEventTriggerByIdRequest, opts ...grpc.CallOption) (*ConnectorEventTriggerSingleResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ConnectorEventTriggerSingleResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_GetEventTriggerById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) CreateEventTrigger(ctx context.Context, in *CreateEventTriggerRequest, opts ...grpc.CallOption) (*ConnectorEventTriggerSingleResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ConnectorEventTriggerSingleResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_CreateEventTrigger_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) UpdateEventTrigger(ctx context.Context, in *UpdateEventTriggerRequest, opts ...grpc.CallOption) (*ConnectorEventTriggerSingleResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ConnectorEventTriggerSingleResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_UpdateEventTrigger_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) DeleteEventTrigger(ctx context.Context, in *DeleteEventTriggerRequest, opts ...grpc.CallOption) (*ConnectorDeleteEventTriggerResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ConnectorDeleteEventTriggerResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_DeleteEventTrigger_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) RecordEventTriggerFired(ctx context.Context, in *RecordEventTriggerFiredRequest, opts ...grpc.CallOption) (*ConnectorEventTriggerSingleResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ConnectorEventTriggerSingleResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_RecordEventTriggerFired_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) RegenerateEventTriggerWebhookToken(ctx context.Context, in *RegenerateEventTriggerWebhookTokenRequest, opts ...grpc.CallOption) (*ConnectorEventTriggerSingleResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ConnectorEventTriggerSingleResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_RegenerateEventTriggerWebhookToken_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) GetEventTriggerByWebhookToken(ctx context.Context, in *GetEventTriggerByWebhookTokenRequest, opts ...grpc.CallOption) (*ConnectorEventTriggerSingleResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ConnectorEventTriggerSingleResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_GetEventTriggerByWebhookToken_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) ListRecentDetections(ctx context.Context, in *ListRecentDetectionsRequest, opts ...grpc.CallOption) (*ConnectorDetectionListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ConnectorDetectionListResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_ListRecentDetections_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) GetLatestTelemetryForAsset(ctx context.Context, in *GetLatestTelemetryForAssetRequest, opts ...grpc.CallOption) (*ConnectorTelemetrySingleResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ConnectorTelemetrySingleResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_GetLatestTelemetryForAsset_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *connectorServiceClient) GetTechnicalConfigs(ctx context.Context, in *ConnectorGetConfigsRequest, opts ...grpc.CallOption) (*ConnectorConfigResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ConnectorConfigResponse)
 	err := c.cc.Invoke(ctx, ConnectorService_GetTechnicalConfigs_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) GetTechnicalConfigById(ctx context.Context, in *GetTechnicalConfigByIdRequest, opts ...grpc.CallOption) (*ConnectorConfigSingleResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ConnectorConfigSingleResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_GetTechnicalConfigById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) CreateTechnicalConfig(ctx context.Context, in *CreateTechnicalConfigRequest, opts ...grpc.CallOption) (*ConnectorConfigSingleResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ConnectorConfigSingleResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_CreateTechnicalConfig_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) UpdateTechnicalConfig(ctx context.Context, in *UpdateTechnicalConfigRequest, opts ...grpc.CallOption) (*ConnectorConfigSingleResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ConnectorConfigSingleResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_UpdateTechnicalConfig_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) DeleteTechnicalConfig(ctx context.Context, in *DeleteTechnicalConfigRequest, opts ...grpc.CallOption) (*ConnectorDeleteConfigResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ConnectorDeleteConfigResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_DeleteTechnicalConfig_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) PersistApplication(ctx context.Context, in *proto4.UpsertApplicationRequest, opts ...grpc.CallOption) (*proto4.ApplicationResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(proto4.ApplicationResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_PersistApplication_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) GetPersistedApplication(ctx context.Context, in *proto4.GetApplicationRequest, opts ...grpc.CallOption) (*proto4.ApplicationResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(proto4.ApplicationResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_GetPersistedApplication_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) ListPersistedApplications(ctx context.Context, in *proto4.ListApplicationsRequest, opts ...grpc.CallOption) (*proto4.ApplicationListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(proto4.ApplicationListResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_ListPersistedApplications_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) DeletePersistedApplication(ctx context.Context, in *proto4.DeleteApplicationRequest, opts ...grpc.CallOption) (*proto4.ApplicationResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(proto4.ApplicationResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_DeletePersistedApplication_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) SetApplicationPause(ctx context.Context, in *proto4.SetApplicationPauseRequest, opts ...grpc.CallOption) (*proto4.ApplicationPauseListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(proto4.ApplicationPauseListResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_SetApplicationPause_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) ListApplicationPauses(ctx context.Context, in *proto4.ListApplicationPausesRequest, opts ...grpc.CallOption) (*proto4.ApplicationPauseListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(proto4.ApplicationPauseListResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_ListApplicationPauses_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) GetApplicationEnvironmentPointers(ctx context.Context, in *proto4.GetApplicationEnvironmentsRequest, opts ...grpc.CallOption) (*proto4.ApplicationEnvironmentsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(proto4.ApplicationEnvironmentsResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_GetApplicationEnvironmentPointers_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) PromoteApplicationVersion(ctx context.Context, in *proto4.PromoteApplicationVersionRequest, opts ...grpc.CallOption) (*proto4.ApplicationEnvironmentsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(proto4.ApplicationEnvironmentsResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_PromoteApplicationVersion_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) PersistSkillExecution(ctx context.Context, in *PersistSkillExecutionRequest, opts ...grpc.CallOption) (*proto4.SkillExecutionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(proto4.SkillExecutionResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_PersistSkillExecution_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) GetPersistedSkillExecution(ctx context.Context, in *proto4.GetSkillExecutionRequest, opts ...grpc.CallOption) (*proto4.SkillExecutionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(proto4.SkillExecutionResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_GetPersistedSkillExecution_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) ListPersistedSkillExecutions(ctx context.Context, in *proto4.ListSkillExecutionsRequest, opts ...grpc.CallOption) (*proto4.SkillExecutionListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(proto4.SkillExecutionListResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_ListPersistedSkillExecutions_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) AppendSkillExecutionEvent(ctx context.Context, in *AppendSkillExecutionEventRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, ConnectorService_AppendSkillExecutionEvent_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) ObserveSkillContract(ctx context.Context, in *UpsertSkillContractRequest, opts ...grpc.CallOption) (*SkillContractResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SkillContractResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_ObserveSkillContract_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) ListSkillContracts(ctx context.Context, in *ListSkillContractsRequest, opts ...grpc.CallOption) (*SkillContractListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SkillContractListResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_ListSkillContracts_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) SetSkillContractStatus(ctx context.Context, in *SetSkillContractStatusRequest, opts ...grpc.CallOption) (*SkillContractResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SkillContractResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_SetSkillContractStatus_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) SetSkillContractPermissions(ctx context.Context, in *SetSkillContractPermissionsRequest, opts ...grpc.CallOption) (*SkillContractResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SkillContractResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_SetSkillContractPermissions_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) AuthenticateUser(ctx context.Context, in *AuthenticateUserRequest, opts ...grpc.CallOption) (*AuthenticateUserResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AuthenticateUserResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_AuthenticateUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateUserResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_CreateUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) ResetPassword(ctx context.Context, in *ResetPasswordRequest, opts ...grpc.CallOption) (*ResetPasswordResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ResetPasswordResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_ResetPassword_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) RecordAuthAuditEvent(ctx context.Context, in *RecordAuthAuditEventRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, ConnectorService_RecordAuthAuditEvent_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) ListUsers(ctx context.Context, in *ListUsersRequest, opts ...grpc.CallOption) (*ListUsersResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListUsersResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_ListUsers_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) GetUserById(ctx context.Context, in *GetUserByIdRequest, opts ...grpc.CallOption) (*AuthenticateUserResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AuthenticateUserResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_GetUserById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) UpdateUserRoles(ctx context.Context, in *UpdateUserRolesRequest, opts ...grpc.CallOption) (*AuthenticateUserResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AuthenticateUserResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_UpdateUserRoles_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) SetUserEnabled(ctx context.Context, in *SetUserEnabledRequest, opts ...grpc.CallOption) (*AuthenticateUserResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AuthenticateUserResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_SetUserEnabled_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*AuthenticateUserResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AuthenticateUserResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_DeleteUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) UpsertIdentityProvider(ctx context.Context, in *UpsertIdentityProviderRequest, opts ...grpc.CallOption) (*IdentityProviderResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(IdentityProviderResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_UpsertIdentityProvider_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) GetIdentityProvider(ctx context.Context, in *GetIdentityProviderRequest, opts ...grpc.CallOption) (*IdentityProviderResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(IdentityProviderResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_GetIdentityProvider_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) FindIdentityProviderByEmailDomain(ctx context.Context, in *FindIdentityProviderByEmailDomainRequest, opts ...grpc.CallOption) (*IdentityProviderResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(IdentityProviderResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_FindIdentityProviderByEmailDomain_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) FindOidcUser(ctx context.Context, in *FindOidcUserRequest, opts ...grpc.CallOption) (*AuthenticateUserResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AuthenticateUserResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_FindOidcUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectorServiceClient) UpsertOidcUser(ctx context.Context, in *UpsertOidcUserRequest, opts ...grpc.CallOption) (*AuthenticateUserResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AuthenticateUserResponse)
+	err := c.cc.Invoke(ctx, ConnectorService_UpsertOidcUser_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -511,39 +1474,229 @@ type ConnectorServiceServer interface {
 	GetAssetBySn(context.Context, *proto.RequestBase) (*ConnectorResponse, error)
 	GetAssetById(context.Context, *ConnectorGetAssetByIdRequest) (*ConnectorResponse, error)
 	GetSubAssetBySn(context.Context, *proto.RequestBase) (*ConnectorResponse, error)
+	// Every asset that exists for the caller's organization (every asset platform-wide for a
+	// system_admin caller — same bypass-tenant-filtering rule as everywhere else), regardless of
+	// whether it's currently reporting itself online. Distinct from AssetMonitoring's streamed
+	// ConnectorAssetList (that's live/cached status snapshots for already-known SNs); this is the
+	// actual system-of-record enumeration — there was no way to list assets at all before this RPC,
+	// only look one up by a SN you already knew.
+	ListAssets(context.Context, *ListAssetsRequest) (*AssetListResponse, error)
+	// Asset claims — one-time provisioning codes. An asset's organization is decided once and can
+	// never be changed (ListAssets filters on asset.organization.id, and UpdateAsset pins the field),
+	// so a device that registers itself must be told which tenant it belongs to before the asset
+	// exists. A claim carries that decision from the operator who made it to the device that
+	// redeems it.
+	CreateAssetClaim(context.Context, *CreateAssetClaimRequest) (*AssetClaimResponse, error)
+	// The one RPC here that does not resolve its organization from the caller's token: the claim
+	// code IS the credential, which is what lets an edge adapter with no platform identity redeem
+	// one. Refusals are deliberately indistinguishable from one another — an expired code and an
+	// unknown code answer alike, or this becomes an oracle for guessing codes.
+	RedeemAssetClaim(context.Context, *RedeemAssetClaimRequest) (*ConnectorResponse, error)
+	// Read a code without spending it, so a device can show its operator which organization they are
+	// about to bind into before anything is created. DJI's dock asks for exactly this: it resolves a
+	// typed code to an organization name for confirmation, and only the following bind carries the
+	// device serials. Untokened like RedeemAssetClaim, and refuses identically — but it returns the
+	// organization's NAME and nothing else, so a correct guess reveals a label the operator was
+	// about to be shown anyway rather than an id anything can be done with.
+	DescribeAssetClaim(context.Context, *DescribeAssetClaimRequest) (*AssetClaimDescriptionResponse, error)
+	ListAssetClaims(context.Context, *ListAssetClaimsRequest) (*AssetClaimListResponse, error)
+	RevokeAssetClaim(context.Context, *RevokeAssetClaimRequest) (*AssetClaimResponse, error)
 	UpsertAssetPayload(context.Context, *UpsertAssetPayloadRequest) (*AssetPayloadResponse, error)
 	ListAssetPayloads(context.Context, *ListAssetPayloadsRequest) (*AssetPayloadListResponse, error)
 	DeleteAssetPayload(context.Context, *DeleteAssetPayloadRequest) (*AssetPayloadResponse, error)
+	// Dynamic per-asset property bag (system-integrator metadata) — free key/value pairs, no schema
+	// change needed to add a new one. SetAssetProperty upserts by (asset, key).
+	SetAssetProperty(context.Context, *SetAssetPropertyRequest) (*AssetPropertyResponse, error)
+	ListAssetProperties(context.Context, *ListAssetPropertiesRequest) (*AssetPropertyListResponse, error)
+	DeleteAssetProperty(context.Context, *DeleteAssetPropertyRequest) (*AssetPropertyResponse, error)
 	GetOrganization(context.Context, *ConnectorGetOrganizationRequest) (*ConnectorResponse, error)
-	GetMission(context.Context, *proto1.GetMissionRequest) (*proto1.MissionResponse, error)
-	CreateMission(context.Context, *proto1.CreateMissionRequest) (*proto1.MissionResponse, error)
-	UpdateMission(context.Context, *proto1.UpdateMissionRequest) (*proto1.MissionResponse, error)
-	DeleteMission(context.Context, *proto1.DeleteMissionRequest) (*proto1.MissionResponse, error)
-	UploadMissionNfzZones(context.Context, *proto1.UploadMissionNfzZonesRequest) (*proto1.MissionResponse, error)
-	GetTask(context.Context, *proto1.GetTaskRequest) (*proto1.TaskResponse, error)
-	GetTaskByFlightId(context.Context, *proto1.GetTaskByFlightIdRequest) (*proto1.TaskResponse, error)
-	GetWaypointsByTaskId(context.Context, *proto1.GetWaypointsByTaskIdRequest) (*proto1.WaypointsResponse, error)
-	CreateTask(context.Context, *proto1.CreateTaskRequest) (*proto1.TaskResponse, error)
-	UpdateTask(context.Context, *proto1.UpdateTaskRequest) (*proto1.TaskResponse, error)
-	DeleteTask(context.Context, *proto1.DeleteTaskRequest) (*proto1.TaskResponse, error)
+	ListSchedulers(context.Context, *proto1.ListSchedulersRequest) (*proto1.SchedulerResponse, error)
 	GetScheduler(context.Context, *proto1.GetSchedulerRequest) (*proto1.SchedulerResponse, error)
 	CreateScheduler(context.Context, *proto1.CreateSchedulerRequest) (*proto1.SchedulerResponse, error)
 	CreateSchedulers(context.Context, *proto1.CreateSchedulersRequest) (*proto1.SchedulerResponse, error)
 	UpdateScheduler(context.Context, *proto1.UpdateSchedulerRequest) (*proto1.SchedulerResponse, error)
 	DeleteScheduler(context.Context, *proto1.DeleteSchedulerRequest) (*proto1.SchedulerResponse, error)
 	DeleteSchedulers(context.Context, *proto1.DeleteSchedulersRequest) (*proto1.SchedulerResponse, error)
-	DeleteSchedulersByTask(context.Context, *proto1.DeleteSchedulersByTaskRequest) (*proto1.SchedulerResponse, error)
+	// What the last firing of a schedule did; see RecordSchedulerFiringRequest.
+	RecordSchedulerFiring(context.Context, *proto1.RecordSchedulerFiringRequest) (*proto1.SchedulerResponse, error)
 	// Telemetry Storage - batch processing from live-data service
 	StoreTelemetryBatch(grpc.ClientStreamingServer[ConnectorStoreTelemetryRequest, ConnectorResponse]) error
 	// Detection Storage - batch processing from live-data service (high-frequency, TimescaleDB)
 	StoreDetectionBatch(grpc.ClientStreamingServer[ConnectorStoreDetectionRequest, ConnectorResponse]) error
 	// Notification Storage - batch processing from live-data service
 	StoreNotificationBatch(grpc.ClientStreamingServer[proto2.ProduceNotificationRequest, ConnectorResponse]) error
-	// Policy Management - fetched by Mission-Autonomy for decision engine cache
+	// Media a device uploaded to the inbox bucket (see media.proto): attributed, moved under its
+	// organization/application folder and recorded. Idempotent per source object key.
+	RegisterMediaFile(context.Context, *proto3.RegisterMediaFileRequest) (*proto3.MediaFileProtoDTO, error)
+	ListMediaFiles(context.Context, *proto3.ListMediaFilesRequest) (*proto3.ListMediaFilesResponse, error)
+	GetMediaFile(context.Context, *proto3.GetMediaFileRequest) (*proto3.MediaFileProtoDTO, error)
+	// Policy Management - fetched by Mission-Autonomy for decision engine cache. Read-only RPCs
+	// existed first; the CRUD RPCs below back the admin-console "Operational Policies" management
+	// screen (previously a fully mocked/hardcoded frontend with no backend at all -- see
+	// OperationalPolicyService, which already did real persistence + push-invalidation eventing for
+	// the REST-only connector-internal API these now also front).
 	GetActivePoliciesByType(context.Context, *ConnectorGetPoliciesRequest) (*ConnectorPolicyResponse, error)
 	GetAllActivePolicies(context.Context, *ConnectorGetAllPoliciesRequest) (*ConnectorPolicyResponse, error)
-	// Technical Config - fetched by services for runtime configuration
+	GetPolicyById(context.Context, *GetPolicyByIdRequest) (*ConnectorPolicySingleResponse, error)
+	CreatePolicy(context.Context, *CreatePolicyRequest) (*ConnectorPolicySingleResponse, error)
+	UpdatePolicy(context.Context, *UpdatePolicyRequest) (*ConnectorPolicySingleResponse, error)
+	DeletePolicy(context.Context, *DeletePolicyRequest) (*ConnectorDeletePolicyResponse, error)
+	// Organization Management - connector's own OrganizationService already had full REST CRUD
+	// (/api/organization, orphaned/never called from outside connector, same shape as the old
+	// OperationalPolicy REST API) -- these RPCs are the real cross-service front door for it, backing
+	// the admin-console "Organizations" management screen.
+	GetAllOrganizations(context.Context, *ConnectorGetAllOrganizationsRequest) (*ConnectorOrganizationResponse, error)
+	GetOrganizationById(context.Context, *GetOrganizationByIdRequest) (*ConnectorOrganizationSingleResponse, error)
+	CreateOrganization(context.Context, *CreateOrganizationRequest) (*ConnectorOrganizationSingleResponse, error)
+	UpdateOrganization(context.Context, *UpdateOrganizationRequest) (*ConnectorOrganizationSingleResponse, error)
+	DeleteOrganization(context.Context, *DeleteOrganizationRequest) (*ConnectorDeleteOrganizationResponse, error)
+	// Creates the organization a license names, with the id the license carries (the only way an
+	// organization gets a caller-chosen id), and stores that license's sealed activation credentials
+	// in the same transaction -- both or neither. An id that already exists is not changed and nothing
+	// is written: already_exists = true and organization holds the existing one, so the caller can
+	// treat it as activating a license for an existing organization.
+	ProvisionLicensedOrganization(context.Context, *ProvisionLicensedOrganizationRequest) (*ProvisionLicensedOrganizationResponse, error)
+	// Theatre Management - a named operational site within one organization (optional geo zone, the
+	// assets stationed there, the users with access to it). Same CRUD shape as Organization above;
+	// AssignUserToTheatre/RemoveUserFromTheatre back the many-to-many user<->theatre join table
+	// (deliberately not a repeated field on TheatreProtoDTO -- resolved fresh per request, same
+	// "don't bake something that can change independently into a cached/long-lived value" reasoning
+	// as the refresh-token roles fix).
+	GetAllTheatres(context.Context, *ConnectorGetAllTheatresRequest) (*ConnectorTheatreResponse, error)
+	GetTheatreById(context.Context, *GetTheatreByIdRequest) (*ConnectorTheatreSingleResponse, error)
+	CreateTheatre(context.Context, *CreateTheatreRequest) (*ConnectorTheatreSingleResponse, error)
+	UpdateTheatre(context.Context, *UpdateTheatreRequest) (*ConnectorTheatreSingleResponse, error)
+	DeleteTheatre(context.Context, *DeleteTheatreRequest) (*ConnectorDeleteTheatreResponse, error)
+	AssignUserToTheatre(context.Context, *AssignUserToTheatreRequest) (*TheatreAssignmentResponse, error)
+	RemoveUserFromTheatre(context.Context, *RemoveUserFromTheatreRequest) (*TheatreAssignmentResponse, error)
+	// No-fly zones -- the one store of an organization's no-fly zones. Mission-autonomy reads them to
+	// plan and refuse flights (RouteExecutionGraphExpander), admin-console to draw and edit them.
+	// Ids are chosen by the caller (the console's own ids survive the move from Redis). An id that
+	// belongs to another organization is answered as not found.
+	ListNoFlyZones(context.Context, *ListNoFlyZonesRequest) (*NoFlyZoneListResponse, error)
+	UpsertNoFlyZone(context.Context, *UpsertNoFlyZoneRequest) (*NoFlyZoneSingleResponse, error)
+	DeleteNoFlyZone(context.Context, *DeleteNoFlyZoneRequest) (*DeleteNoFlyZoneResponse, error)
+	// License activation credentials -- the activation id and token admin-console received from the
+	// license hub when it activated an organization's license. Without them admin-console can neither
+	// refresh that organization's lease nor consume its seats, so they must survive a restart and be
+	// shared between replicas. admin-console seals the token before it gets here (AES-256-GCM under a
+	// per-organization key derived from the installation's platform key); connector stores the
+	// envelope and never sees the token itself. At most one record per organization; Put replaces it.
+	ListLicenseActivationCredentials(context.Context, *ListLicenseActivationCredentialsRequest) (*LicenseActivationCredentialsListResponse, error)
+	GetLicenseActivationCredentials(context.Context, *GetLicenseActivationCredentialsRequest) (*LicenseActivationCredentialsSingleResponse, error)
+	PutLicenseActivationCredentials(context.Context, *PutLicenseActivationCredentialsRequest) (*LicenseActivationCredentialsSingleResponse, error)
+	DeleteLicenseActivationCredentials(context.Context, *DeleteLicenseActivationCredentialsRequest) (*DeleteLicenseActivationCredentialsResponse, error)
+	// Event Triggers — "start Application X on event Y" (detection / telemetry threshold / asset
+	// status / inbound webhook). CRUD mirrors Theatre's shape; ListRecentDetections and
+	// GetLatestTelemetryForAsset back mission-autonomy's polling evaluator (EventTriggerEvaluationService),
+	// RecordEventTriggerFired stamps last_fired_at for cooldown bookkeeping after a real fire.
+	GetAllEventTriggers(context.Context, *ConnectorGetAllEventTriggersRequest) (*ConnectorEventTriggerResponse, error)
+	GetEventTriggerById(context.Context, *GetEventTriggerByIdRequest) (*ConnectorEventTriggerSingleResponse, error)
+	CreateEventTrigger(context.Context, *CreateEventTriggerRequest) (*ConnectorEventTriggerSingleResponse, error)
+	UpdateEventTrigger(context.Context, *UpdateEventTriggerRequest) (*ConnectorEventTriggerSingleResponse, error)
+	DeleteEventTrigger(context.Context, *DeleteEventTriggerRequest) (*ConnectorDeleteEventTriggerResponse, error)
+	RecordEventTriggerFired(context.Context, *RecordEventTriggerFiredRequest) (*ConnectorEventTriggerSingleResponse, error)
+	RegenerateEventTriggerWebhookToken(context.Context, *RegenerateEventTriggerWebhookTokenRequest) (*ConnectorEventTriggerSingleResponse, error)
+	GetEventTriggerByWebhookToken(context.Context, *GetEventTriggerByWebhookTokenRequest) (*ConnectorEventTriggerSingleResponse, error)
+	ListRecentDetections(context.Context, *ListRecentDetectionsRequest) (*ConnectorDetectionListResponse, error)
+	GetLatestTelemetryForAsset(context.Context, *GetLatestTelemetryForAssetRequest) (*ConnectorTelemetrySingleResponse, error)
+	// Technical Config - fetched by services for runtime configuration. Read-only GetTechnicalConfigs
+	// existed first (services reading their own settings); the CRUD RPCs below back the admin-console
+	// "Technical Config" management screen, so the config values these read-only fetches see can
+	// actually be changed by an admin without a redeploy.
 	GetTechnicalConfigs(context.Context, *ConnectorGetConfigsRequest) (*ConnectorConfigResponse, error)
+	GetTechnicalConfigById(context.Context, *GetTechnicalConfigByIdRequest) (*ConnectorConfigSingleResponse, error)
+	CreateTechnicalConfig(context.Context, *CreateTechnicalConfigRequest) (*ConnectorConfigSingleResponse, error)
+	UpdateTechnicalConfig(context.Context, *UpdateTechnicalConfigRequest) (*ConnectorConfigSingleResponse, error)
+	DeleteTechnicalConfig(context.Context, *DeleteTechnicalConfigRequest) (*ConnectorDeleteConfigResponse, error)
+	// Application/Skill domain persistence. Mission Autonomy is the orchestration consumer.
+	PersistApplication(context.Context, *proto4.UpsertApplicationRequest) (*proto4.ApplicationResponse, error)
+	GetPersistedApplication(context.Context, *proto4.GetApplicationRequest) (*proto4.ApplicationResponse, error)
+	ListPersistedApplications(context.Context, *proto4.ListApplicationsRequest) (*proto4.ApplicationListResponse, error)
+	DeletePersistedApplication(context.Context, *proto4.DeleteApplicationRequest) (*proto4.ApplicationResponse, error)
+	// Pausing is operational state, not part of the versioned Application -- see ApplicationPauseProtoDTO.
+	// SetApplicationPause answers with every pause of that Application after the change.
+	SetApplicationPause(context.Context, *proto4.SetApplicationPauseRequest) (*proto4.ApplicationPauseListResponse, error)
+	ListApplicationPauses(context.Context, *proto4.ListApplicationPausesRequest) (*proto4.ApplicationPauseListResponse, error)
+	GetApplicationEnvironmentPointers(context.Context, *proto4.GetApplicationEnvironmentsRequest) (*proto4.ApplicationEnvironmentsResponse, error)
+	PromoteApplicationVersion(context.Context, *proto4.PromoteApplicationVersionRequest) (*proto4.ApplicationEnvironmentsResponse, error)
+	PersistSkillExecution(context.Context, *PersistSkillExecutionRequest) (*proto4.SkillExecutionResponse, error)
+	GetPersistedSkillExecution(context.Context, *proto4.GetSkillExecutionRequest) (*proto4.SkillExecutionResponse, error)
+	ListPersistedSkillExecutions(context.Context, *proto4.ListSkillExecutionsRequest) (*proto4.SkillExecutionListResponse, error)
+	AppendSkillExecutionEvent(context.Context, *AppendSkillExecutionEventRequest) (*emptypb.Empty, error)
+	// Skill Registry: a persisted, de-duplicated view of every Skill/Capability contract ever
+	// observed from a connected asset, independent of which devices are currently online. Admin
+	// Console auto-upserts into this by (command_id, schema_version) whenever it aggregates a live
+	// capability snapshot; status is the one field a system integrator edits directly.
+	ObserveSkillContract(context.Context, *UpsertSkillContractRequest) (*SkillContractResponse, error)
+	ListSkillContracts(context.Context, *ListSkillContractsRequest) (*SkillContractListResponse, error)
+	SetSkillContractStatus(context.Context, *SetSkillContractStatusRequest) (*SkillContractResponse, error)
+	// Declarative-only prep for future auth/RBAC — see SkillContractProtoDTO.required_permissions.
+	SetSkillContractPermissions(context.Context, *SetSkillContractPermissionsRequest) (*SkillContractResponse, error)
+	// Platform-hosted authentication: verifies email+password against connector's own user store
+	// (the system of record) and returns the identity a caller (admin-console) mints a
+	// PlatformClaims-shaped auth token from. Connector never issues the token itself — it has no
+	// private signing key — it only ever confirms "this is who they say they are, in this org, with
+	// these roles."
+	AuthenticateUser(context.Context, *AuthenticateUserRequest) (*AuthenticateUserResponse, error)
+	// Admin-driven user creation — the seat check (does this organization's license have room for
+	// one more user) happens one layer up, in admin-console's LicenseCoordinator, BEFORE this is
+	// ever called; connector itself has no concept of seats, it only persists the user once
+	// admin-console has already confirmed one is available.
+	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
+	// Admin-driven password reset — see ResetPasswordRequest's doc.
+	ResetPassword(context.Context, *ResetPasswordRequest) (*ResetPasswordResponse, error)
+	// Durable audit trail for authentication-security-relevant events (login attempts, logout,
+	// admin-driven password resets/session revocations) — see the connector-side AuthAuditService's
+	// doc. Best-effort from the caller's point of view: a failure to record must never block the
+	// actual auth action it's describing, so every call site fires this without letting its outcome
+	// affect the real response.
+	RecordAuthAuditEvent(context.Context, *RecordAuthAuditEventRequest) (*emptypb.Empty, error)
+	// Every user in the caller's own organization (a system_admin caller instead gets every user,
+	// platform-wide — same bypass-tenant-filtering rule as everywhere else, see
+	// TenantScopedRepository#bypassTenantFilter). What the admin console's user-management screen
+	// lists against; there was no read path for the users CreateUser produces until this existed.
+	ListUsers(context.Context, *ListUsersRequest) (*ListUsersResponse, error)
+	// Single-user lookup by id — what a "whoami" endpoint resolves an access token's subject claim
+	// (a user id, nothing else) into a displayable identity. AuthenticateUser can't serve this: it
+	// needs a password and is keyed by email, neither of which a bearer token carries.
+	GetUserById(context.Context, *GetUserByIdRequest) (*AuthenticateUserResponse, error)
+	// Admin-driven user changes. Each answers with the user as it is afterwards (DeleteUser: as it was
+	// just before it went), so the caller knows the organization to act on -- revoking sessions,
+	// releasing the license seat -- without a second lookup. Same caller rules as CreateUser: an
+	// org-admin acts only inside their own organization and never on a system_admin; nobody acts on
+	// themselves, and the last enabled system_admin can be neither demoted, disabled nor deleted.
+	UpdateUserRoles(context.Context, *UpdateUserRolesRequest) (*AuthenticateUserResponse, error)
+	// A disabled user can no longer sign in (password or SSO) and no refresh succeeds; the caller
+	// revokes live access tokens. Seats are a licensing concern one layer up: disabling keeps it.
+	SetUserEnabled(context.Context, *SetUserEnabledRequest) (*AuthenticateUserResponse, error)
+	// Removes the user for good -- the email is free again. The auth audit trail keeps its rows.
+	DeleteUser(context.Context, *DeleteUserRequest) (*AuthenticateUserResponse, error)
+	// Pluggable SSO — an organization's own OIDC identity provider config (issuer, client
+	// credentials, which email domains it owns, how its claims map to platform roles). Local
+	// email+password (AuthenticateUser above) stays the default for every org with no config here;
+	// this only ever supplements it, never replaces AuthenticateUser for orgs that don't opt in.
+	UpsertIdentityProvider(context.Context, *UpsertIdentityProviderRequest) (*IdentityProviderResponse, error)
+	GetIdentityProvider(context.Context, *GetIdentityProviderRequest) (*IdentityProviderResponse, error)
+	// Login-screen discovery: given an email address, which org (if any) owns that domain and has
+	// SSO configured — admin-console calls this before showing a password field or redirecting to
+	// an IdP. Empty response (no error, no provider) means "no SSO for this domain, use local auth."
+	FindIdentityProviderByEmailDomain(context.Context, *FindIdentityProviderByEmailDomainRequest) (*IdentityProviderResponse, error)
+	// Existence check by (organization_id, external_subject), used by admin-console to decide
+	// whether an SSO login needs a seat reserved before UpsertOidcUser below — same "reserve the
+	// seat, THEN create" ordering CreateUser's caller already follows for local users. Empty
+	// response (has_errors false, no user) means "not provisioned yet."
+	FindOidcUser(context.Context, *FindOidcUserRequest) (*AuthenticateUserResponse, error)
+	// The OIDC counterpart to AuthenticateUser: admin-console has already completed the
+	// authorization-code exchange and verified the ID token against the org's own IdP by the time
+	// this is called — this only resolves the local user record admin-console mints a
+	// PlatformClaims-shaped token from, same as AuthenticateUser does for password logins. Finds by
+	// (organization_id, external_subject); auto-provisions on first login (a seat is expected to
+	// already be reserved via FindOidcUser+LicenseCoordinator, same division of responsibility as
+	// CreateUser — connector has no concept of seats), and re-stamps email/roles from the IdP's
+	// claims on every subsequent login so a role change in the customer's own directory takes
+	// effect without any action on this platform.
+	UpsertOidcUser(context.Context, *UpsertOidcUserRequest) (*AuthenticateUserResponse, error)
 	mustEmbedUnimplementedConnectorServiceServer()
 }
 
@@ -578,6 +1731,24 @@ func (UnimplementedConnectorServiceServer) GetAssetById(context.Context, *Connec
 func (UnimplementedConnectorServiceServer) GetSubAssetBySn(context.Context, *proto.RequestBase) (*ConnectorResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetSubAssetBySn not implemented")
 }
+func (UnimplementedConnectorServiceServer) ListAssets(context.Context, *ListAssetsRequest) (*AssetListResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListAssets not implemented")
+}
+func (UnimplementedConnectorServiceServer) CreateAssetClaim(context.Context, *CreateAssetClaimRequest) (*AssetClaimResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateAssetClaim not implemented")
+}
+func (UnimplementedConnectorServiceServer) RedeemAssetClaim(context.Context, *RedeemAssetClaimRequest) (*ConnectorResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RedeemAssetClaim not implemented")
+}
+func (UnimplementedConnectorServiceServer) DescribeAssetClaim(context.Context, *DescribeAssetClaimRequest) (*AssetClaimDescriptionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DescribeAssetClaim not implemented")
+}
+func (UnimplementedConnectorServiceServer) ListAssetClaims(context.Context, *ListAssetClaimsRequest) (*AssetClaimListResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListAssetClaims not implemented")
+}
+func (UnimplementedConnectorServiceServer) RevokeAssetClaim(context.Context, *RevokeAssetClaimRequest) (*AssetClaimResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RevokeAssetClaim not implemented")
+}
 func (UnimplementedConnectorServiceServer) UpsertAssetPayload(context.Context, *UpsertAssetPayloadRequest) (*AssetPayloadResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpsertAssetPayload not implemented")
 }
@@ -587,41 +1758,20 @@ func (UnimplementedConnectorServiceServer) ListAssetPayloads(context.Context, *L
 func (UnimplementedConnectorServiceServer) DeleteAssetPayload(context.Context, *DeleteAssetPayloadRequest) (*AssetPayloadResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteAssetPayload not implemented")
 }
+func (UnimplementedConnectorServiceServer) SetAssetProperty(context.Context, *SetAssetPropertyRequest) (*AssetPropertyResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method SetAssetProperty not implemented")
+}
+func (UnimplementedConnectorServiceServer) ListAssetProperties(context.Context, *ListAssetPropertiesRequest) (*AssetPropertyListResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListAssetProperties not implemented")
+}
+func (UnimplementedConnectorServiceServer) DeleteAssetProperty(context.Context, *DeleteAssetPropertyRequest) (*AssetPropertyResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteAssetProperty not implemented")
+}
 func (UnimplementedConnectorServiceServer) GetOrganization(context.Context, *ConnectorGetOrganizationRequest) (*ConnectorResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetOrganization not implemented")
 }
-func (UnimplementedConnectorServiceServer) GetMission(context.Context, *proto1.GetMissionRequest) (*proto1.MissionResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetMission not implemented")
-}
-func (UnimplementedConnectorServiceServer) CreateMission(context.Context, *proto1.CreateMissionRequest) (*proto1.MissionResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method CreateMission not implemented")
-}
-func (UnimplementedConnectorServiceServer) UpdateMission(context.Context, *proto1.UpdateMissionRequest) (*proto1.MissionResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method UpdateMission not implemented")
-}
-func (UnimplementedConnectorServiceServer) DeleteMission(context.Context, *proto1.DeleteMissionRequest) (*proto1.MissionResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method DeleteMission not implemented")
-}
-func (UnimplementedConnectorServiceServer) UploadMissionNfzZones(context.Context, *proto1.UploadMissionNfzZonesRequest) (*proto1.MissionResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method UploadMissionNfzZones not implemented")
-}
-func (UnimplementedConnectorServiceServer) GetTask(context.Context, *proto1.GetTaskRequest) (*proto1.TaskResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetTask not implemented")
-}
-func (UnimplementedConnectorServiceServer) GetTaskByFlightId(context.Context, *proto1.GetTaskByFlightIdRequest) (*proto1.TaskResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetTaskByFlightId not implemented")
-}
-func (UnimplementedConnectorServiceServer) GetWaypointsByTaskId(context.Context, *proto1.GetWaypointsByTaskIdRequest) (*proto1.WaypointsResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetWaypointsByTaskId not implemented")
-}
-func (UnimplementedConnectorServiceServer) CreateTask(context.Context, *proto1.CreateTaskRequest) (*proto1.TaskResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method CreateTask not implemented")
-}
-func (UnimplementedConnectorServiceServer) UpdateTask(context.Context, *proto1.UpdateTaskRequest) (*proto1.TaskResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method UpdateTask not implemented")
-}
-func (UnimplementedConnectorServiceServer) DeleteTask(context.Context, *proto1.DeleteTaskRequest) (*proto1.TaskResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method DeleteTask not implemented")
+func (UnimplementedConnectorServiceServer) ListSchedulers(context.Context, *proto1.ListSchedulersRequest) (*proto1.SchedulerResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListSchedulers not implemented")
 }
 func (UnimplementedConnectorServiceServer) GetScheduler(context.Context, *proto1.GetSchedulerRequest) (*proto1.SchedulerResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetScheduler not implemented")
@@ -641,8 +1791,8 @@ func (UnimplementedConnectorServiceServer) DeleteScheduler(context.Context, *pro
 func (UnimplementedConnectorServiceServer) DeleteSchedulers(context.Context, *proto1.DeleteSchedulersRequest) (*proto1.SchedulerResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteSchedulers not implemented")
 }
-func (UnimplementedConnectorServiceServer) DeleteSchedulersByTask(context.Context, *proto1.DeleteSchedulersByTaskRequest) (*proto1.SchedulerResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method DeleteSchedulersByTask not implemented")
+func (UnimplementedConnectorServiceServer) RecordSchedulerFiring(context.Context, *proto1.RecordSchedulerFiringRequest) (*proto1.SchedulerResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RecordSchedulerFiring not implemented")
 }
 func (UnimplementedConnectorServiceServer) StoreTelemetryBatch(grpc.ClientStreamingServer[ConnectorStoreTelemetryRequest, ConnectorResponse]) error {
 	return status.Error(codes.Unimplemented, "method StoreTelemetryBatch not implemented")
@@ -653,14 +1803,227 @@ func (UnimplementedConnectorServiceServer) StoreDetectionBatch(grpc.ClientStream
 func (UnimplementedConnectorServiceServer) StoreNotificationBatch(grpc.ClientStreamingServer[proto2.ProduceNotificationRequest, ConnectorResponse]) error {
 	return status.Error(codes.Unimplemented, "method StoreNotificationBatch not implemented")
 }
+func (UnimplementedConnectorServiceServer) RegisterMediaFile(context.Context, *proto3.RegisterMediaFileRequest) (*proto3.MediaFileProtoDTO, error) {
+	return nil, status.Error(codes.Unimplemented, "method RegisterMediaFile not implemented")
+}
+func (UnimplementedConnectorServiceServer) ListMediaFiles(context.Context, *proto3.ListMediaFilesRequest) (*proto3.ListMediaFilesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListMediaFiles not implemented")
+}
+func (UnimplementedConnectorServiceServer) GetMediaFile(context.Context, *proto3.GetMediaFileRequest) (*proto3.MediaFileProtoDTO, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetMediaFile not implemented")
+}
 func (UnimplementedConnectorServiceServer) GetActivePoliciesByType(context.Context, *ConnectorGetPoliciesRequest) (*ConnectorPolicyResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetActivePoliciesByType not implemented")
 }
 func (UnimplementedConnectorServiceServer) GetAllActivePolicies(context.Context, *ConnectorGetAllPoliciesRequest) (*ConnectorPolicyResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetAllActivePolicies not implemented")
 }
+func (UnimplementedConnectorServiceServer) GetPolicyById(context.Context, *GetPolicyByIdRequest) (*ConnectorPolicySingleResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetPolicyById not implemented")
+}
+func (UnimplementedConnectorServiceServer) CreatePolicy(context.Context, *CreatePolicyRequest) (*ConnectorPolicySingleResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreatePolicy not implemented")
+}
+func (UnimplementedConnectorServiceServer) UpdatePolicy(context.Context, *UpdatePolicyRequest) (*ConnectorPolicySingleResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdatePolicy not implemented")
+}
+func (UnimplementedConnectorServiceServer) DeletePolicy(context.Context, *DeletePolicyRequest) (*ConnectorDeletePolicyResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeletePolicy not implemented")
+}
+func (UnimplementedConnectorServiceServer) GetAllOrganizations(context.Context, *ConnectorGetAllOrganizationsRequest) (*ConnectorOrganizationResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetAllOrganizations not implemented")
+}
+func (UnimplementedConnectorServiceServer) GetOrganizationById(context.Context, *GetOrganizationByIdRequest) (*ConnectorOrganizationSingleResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetOrganizationById not implemented")
+}
+func (UnimplementedConnectorServiceServer) CreateOrganization(context.Context, *CreateOrganizationRequest) (*ConnectorOrganizationSingleResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateOrganization not implemented")
+}
+func (UnimplementedConnectorServiceServer) UpdateOrganization(context.Context, *UpdateOrganizationRequest) (*ConnectorOrganizationSingleResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateOrganization not implemented")
+}
+func (UnimplementedConnectorServiceServer) DeleteOrganization(context.Context, *DeleteOrganizationRequest) (*ConnectorDeleteOrganizationResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteOrganization not implemented")
+}
+func (UnimplementedConnectorServiceServer) ProvisionLicensedOrganization(context.Context, *ProvisionLicensedOrganizationRequest) (*ProvisionLicensedOrganizationResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ProvisionLicensedOrganization not implemented")
+}
+func (UnimplementedConnectorServiceServer) GetAllTheatres(context.Context, *ConnectorGetAllTheatresRequest) (*ConnectorTheatreResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetAllTheatres not implemented")
+}
+func (UnimplementedConnectorServiceServer) GetTheatreById(context.Context, *GetTheatreByIdRequest) (*ConnectorTheatreSingleResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetTheatreById not implemented")
+}
+func (UnimplementedConnectorServiceServer) CreateTheatre(context.Context, *CreateTheatreRequest) (*ConnectorTheatreSingleResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateTheatre not implemented")
+}
+func (UnimplementedConnectorServiceServer) UpdateTheatre(context.Context, *UpdateTheatreRequest) (*ConnectorTheatreSingleResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateTheatre not implemented")
+}
+func (UnimplementedConnectorServiceServer) DeleteTheatre(context.Context, *DeleteTheatreRequest) (*ConnectorDeleteTheatreResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteTheatre not implemented")
+}
+func (UnimplementedConnectorServiceServer) AssignUserToTheatre(context.Context, *AssignUserToTheatreRequest) (*TheatreAssignmentResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method AssignUserToTheatre not implemented")
+}
+func (UnimplementedConnectorServiceServer) RemoveUserFromTheatre(context.Context, *RemoveUserFromTheatreRequest) (*TheatreAssignmentResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RemoveUserFromTheatre not implemented")
+}
+func (UnimplementedConnectorServiceServer) ListNoFlyZones(context.Context, *ListNoFlyZonesRequest) (*NoFlyZoneListResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListNoFlyZones not implemented")
+}
+func (UnimplementedConnectorServiceServer) UpsertNoFlyZone(context.Context, *UpsertNoFlyZoneRequest) (*NoFlyZoneSingleResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpsertNoFlyZone not implemented")
+}
+func (UnimplementedConnectorServiceServer) DeleteNoFlyZone(context.Context, *DeleteNoFlyZoneRequest) (*DeleteNoFlyZoneResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteNoFlyZone not implemented")
+}
+func (UnimplementedConnectorServiceServer) ListLicenseActivationCredentials(context.Context, *ListLicenseActivationCredentialsRequest) (*LicenseActivationCredentialsListResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListLicenseActivationCredentials not implemented")
+}
+func (UnimplementedConnectorServiceServer) GetLicenseActivationCredentials(context.Context, *GetLicenseActivationCredentialsRequest) (*LicenseActivationCredentialsSingleResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetLicenseActivationCredentials not implemented")
+}
+func (UnimplementedConnectorServiceServer) PutLicenseActivationCredentials(context.Context, *PutLicenseActivationCredentialsRequest) (*LicenseActivationCredentialsSingleResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method PutLicenseActivationCredentials not implemented")
+}
+func (UnimplementedConnectorServiceServer) DeleteLicenseActivationCredentials(context.Context, *DeleteLicenseActivationCredentialsRequest) (*DeleteLicenseActivationCredentialsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteLicenseActivationCredentials not implemented")
+}
+func (UnimplementedConnectorServiceServer) GetAllEventTriggers(context.Context, *ConnectorGetAllEventTriggersRequest) (*ConnectorEventTriggerResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetAllEventTriggers not implemented")
+}
+func (UnimplementedConnectorServiceServer) GetEventTriggerById(context.Context, *GetEventTriggerByIdRequest) (*ConnectorEventTriggerSingleResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetEventTriggerById not implemented")
+}
+func (UnimplementedConnectorServiceServer) CreateEventTrigger(context.Context, *CreateEventTriggerRequest) (*ConnectorEventTriggerSingleResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateEventTrigger not implemented")
+}
+func (UnimplementedConnectorServiceServer) UpdateEventTrigger(context.Context, *UpdateEventTriggerRequest) (*ConnectorEventTriggerSingleResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateEventTrigger not implemented")
+}
+func (UnimplementedConnectorServiceServer) DeleteEventTrigger(context.Context, *DeleteEventTriggerRequest) (*ConnectorDeleteEventTriggerResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteEventTrigger not implemented")
+}
+func (UnimplementedConnectorServiceServer) RecordEventTriggerFired(context.Context, *RecordEventTriggerFiredRequest) (*ConnectorEventTriggerSingleResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RecordEventTriggerFired not implemented")
+}
+func (UnimplementedConnectorServiceServer) RegenerateEventTriggerWebhookToken(context.Context, *RegenerateEventTriggerWebhookTokenRequest) (*ConnectorEventTriggerSingleResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RegenerateEventTriggerWebhookToken not implemented")
+}
+func (UnimplementedConnectorServiceServer) GetEventTriggerByWebhookToken(context.Context, *GetEventTriggerByWebhookTokenRequest) (*ConnectorEventTriggerSingleResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetEventTriggerByWebhookToken not implemented")
+}
+func (UnimplementedConnectorServiceServer) ListRecentDetections(context.Context, *ListRecentDetectionsRequest) (*ConnectorDetectionListResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListRecentDetections not implemented")
+}
+func (UnimplementedConnectorServiceServer) GetLatestTelemetryForAsset(context.Context, *GetLatestTelemetryForAssetRequest) (*ConnectorTelemetrySingleResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetLatestTelemetryForAsset not implemented")
+}
 func (UnimplementedConnectorServiceServer) GetTechnicalConfigs(context.Context, *ConnectorGetConfigsRequest) (*ConnectorConfigResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetTechnicalConfigs not implemented")
+}
+func (UnimplementedConnectorServiceServer) GetTechnicalConfigById(context.Context, *GetTechnicalConfigByIdRequest) (*ConnectorConfigSingleResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetTechnicalConfigById not implemented")
+}
+func (UnimplementedConnectorServiceServer) CreateTechnicalConfig(context.Context, *CreateTechnicalConfigRequest) (*ConnectorConfigSingleResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateTechnicalConfig not implemented")
+}
+func (UnimplementedConnectorServiceServer) UpdateTechnicalConfig(context.Context, *UpdateTechnicalConfigRequest) (*ConnectorConfigSingleResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateTechnicalConfig not implemented")
+}
+func (UnimplementedConnectorServiceServer) DeleteTechnicalConfig(context.Context, *DeleteTechnicalConfigRequest) (*ConnectorDeleteConfigResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteTechnicalConfig not implemented")
+}
+func (UnimplementedConnectorServiceServer) PersistApplication(context.Context, *proto4.UpsertApplicationRequest) (*proto4.ApplicationResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method PersistApplication not implemented")
+}
+func (UnimplementedConnectorServiceServer) GetPersistedApplication(context.Context, *proto4.GetApplicationRequest) (*proto4.ApplicationResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetPersistedApplication not implemented")
+}
+func (UnimplementedConnectorServiceServer) ListPersistedApplications(context.Context, *proto4.ListApplicationsRequest) (*proto4.ApplicationListResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListPersistedApplications not implemented")
+}
+func (UnimplementedConnectorServiceServer) DeletePersistedApplication(context.Context, *proto4.DeleteApplicationRequest) (*proto4.ApplicationResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeletePersistedApplication not implemented")
+}
+func (UnimplementedConnectorServiceServer) SetApplicationPause(context.Context, *proto4.SetApplicationPauseRequest) (*proto4.ApplicationPauseListResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method SetApplicationPause not implemented")
+}
+func (UnimplementedConnectorServiceServer) ListApplicationPauses(context.Context, *proto4.ListApplicationPausesRequest) (*proto4.ApplicationPauseListResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListApplicationPauses not implemented")
+}
+func (UnimplementedConnectorServiceServer) GetApplicationEnvironmentPointers(context.Context, *proto4.GetApplicationEnvironmentsRequest) (*proto4.ApplicationEnvironmentsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetApplicationEnvironmentPointers not implemented")
+}
+func (UnimplementedConnectorServiceServer) PromoteApplicationVersion(context.Context, *proto4.PromoteApplicationVersionRequest) (*proto4.ApplicationEnvironmentsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method PromoteApplicationVersion not implemented")
+}
+func (UnimplementedConnectorServiceServer) PersistSkillExecution(context.Context, *PersistSkillExecutionRequest) (*proto4.SkillExecutionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method PersistSkillExecution not implemented")
+}
+func (UnimplementedConnectorServiceServer) GetPersistedSkillExecution(context.Context, *proto4.GetSkillExecutionRequest) (*proto4.SkillExecutionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetPersistedSkillExecution not implemented")
+}
+func (UnimplementedConnectorServiceServer) ListPersistedSkillExecutions(context.Context, *proto4.ListSkillExecutionsRequest) (*proto4.SkillExecutionListResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListPersistedSkillExecutions not implemented")
+}
+func (UnimplementedConnectorServiceServer) AppendSkillExecutionEvent(context.Context, *AppendSkillExecutionEventRequest) (*emptypb.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method AppendSkillExecutionEvent not implemented")
+}
+func (UnimplementedConnectorServiceServer) ObserveSkillContract(context.Context, *UpsertSkillContractRequest) (*SkillContractResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ObserveSkillContract not implemented")
+}
+func (UnimplementedConnectorServiceServer) ListSkillContracts(context.Context, *ListSkillContractsRequest) (*SkillContractListResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListSkillContracts not implemented")
+}
+func (UnimplementedConnectorServiceServer) SetSkillContractStatus(context.Context, *SetSkillContractStatusRequest) (*SkillContractResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method SetSkillContractStatus not implemented")
+}
+func (UnimplementedConnectorServiceServer) SetSkillContractPermissions(context.Context, *SetSkillContractPermissionsRequest) (*SkillContractResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method SetSkillContractPermissions not implemented")
+}
+func (UnimplementedConnectorServiceServer) AuthenticateUser(context.Context, *AuthenticateUserRequest) (*AuthenticateUserResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method AuthenticateUser not implemented")
+}
+func (UnimplementedConnectorServiceServer) CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateUser not implemented")
+}
+func (UnimplementedConnectorServiceServer) ResetPassword(context.Context, *ResetPasswordRequest) (*ResetPasswordResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ResetPassword not implemented")
+}
+func (UnimplementedConnectorServiceServer) RecordAuthAuditEvent(context.Context, *RecordAuthAuditEventRequest) (*emptypb.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method RecordAuthAuditEvent not implemented")
+}
+func (UnimplementedConnectorServiceServer) ListUsers(context.Context, *ListUsersRequest) (*ListUsersResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListUsers not implemented")
+}
+func (UnimplementedConnectorServiceServer) GetUserById(context.Context, *GetUserByIdRequest) (*AuthenticateUserResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetUserById not implemented")
+}
+func (UnimplementedConnectorServiceServer) UpdateUserRoles(context.Context, *UpdateUserRolesRequest) (*AuthenticateUserResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateUserRoles not implemented")
+}
+func (UnimplementedConnectorServiceServer) SetUserEnabled(context.Context, *SetUserEnabledRequest) (*AuthenticateUserResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method SetUserEnabled not implemented")
+}
+func (UnimplementedConnectorServiceServer) DeleteUser(context.Context, *DeleteUserRequest) (*AuthenticateUserResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteUser not implemented")
+}
+func (UnimplementedConnectorServiceServer) UpsertIdentityProvider(context.Context, *UpsertIdentityProviderRequest) (*IdentityProviderResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpsertIdentityProvider not implemented")
+}
+func (UnimplementedConnectorServiceServer) GetIdentityProvider(context.Context, *GetIdentityProviderRequest) (*IdentityProviderResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetIdentityProvider not implemented")
+}
+func (UnimplementedConnectorServiceServer) FindIdentityProviderByEmailDomain(context.Context, *FindIdentityProviderByEmailDomainRequest) (*IdentityProviderResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method FindIdentityProviderByEmailDomain not implemented")
+}
+func (UnimplementedConnectorServiceServer) FindOidcUser(context.Context, *FindOidcUserRequest) (*AuthenticateUserResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method FindOidcUser not implemented")
+}
+func (UnimplementedConnectorServiceServer) UpsertOidcUser(context.Context, *UpsertOidcUserRequest) (*AuthenticateUserResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpsertOidcUser not implemented")
 }
 func (UnimplementedConnectorServiceServer) mustEmbedUnimplementedConnectorServiceServer() {}
 func (UnimplementedConnectorServiceServer) testEmbeddedByValue()                          {}
@@ -820,6 +2183,114 @@ func _ConnectorService_GetSubAssetBySn_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ConnectorService_ListAssets_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListAssetsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).ListAssets(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_ListAssets_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).ListAssets(ctx, req.(*ListAssetsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_CreateAssetClaim_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateAssetClaimRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).CreateAssetClaim(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_CreateAssetClaim_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).CreateAssetClaim(ctx, req.(*CreateAssetClaimRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_RedeemAssetClaim_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RedeemAssetClaimRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).RedeemAssetClaim(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_RedeemAssetClaim_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).RedeemAssetClaim(ctx, req.(*RedeemAssetClaimRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_DescribeAssetClaim_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DescribeAssetClaimRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).DescribeAssetClaim(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_DescribeAssetClaim_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).DescribeAssetClaim(ctx, req.(*DescribeAssetClaimRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_ListAssetClaims_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListAssetClaimsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).ListAssetClaims(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_ListAssetClaims_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).ListAssetClaims(ctx, req.(*ListAssetClaimsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_RevokeAssetClaim_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RevokeAssetClaimRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).RevokeAssetClaim(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_RevokeAssetClaim_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).RevokeAssetClaim(ctx, req.(*RevokeAssetClaimRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ConnectorService_UpsertAssetPayload_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpsertAssetPayloadRequest)
 	if err := dec(in); err != nil {
@@ -874,6 +2345,60 @@ func _ConnectorService_DeleteAssetPayload_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ConnectorService_SetAssetProperty_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetAssetPropertyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).SetAssetProperty(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_SetAssetProperty_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).SetAssetProperty(ctx, req.(*SetAssetPropertyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_ListAssetProperties_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListAssetPropertiesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).ListAssetProperties(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_ListAssetProperties_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).ListAssetProperties(ctx, req.(*ListAssetPropertiesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_DeleteAssetProperty_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteAssetPropertyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).DeleteAssetProperty(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_DeleteAssetProperty_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).DeleteAssetProperty(ctx, req.(*DeleteAssetPropertyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ConnectorService_GetOrganization_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ConnectorGetOrganizationRequest)
 	if err := dec(in); err != nil {
@@ -892,200 +2417,20 @@ func _ConnectorService_GetOrganization_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ConnectorService_GetMission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(proto1.GetMissionRequest)
+func _ConnectorService_ListSchedulers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(proto1.ListSchedulersRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ConnectorServiceServer).GetMission(ctx, in)
+		return srv.(ConnectorServiceServer).ListSchedulers(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ConnectorService_GetMission_FullMethodName,
+		FullMethod: ConnectorService_ListSchedulers_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ConnectorServiceServer).GetMission(ctx, req.(*proto1.GetMissionRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ConnectorService_CreateMission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(proto1.CreateMissionRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ConnectorServiceServer).CreateMission(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ConnectorService_CreateMission_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ConnectorServiceServer).CreateMission(ctx, req.(*proto1.CreateMissionRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ConnectorService_UpdateMission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(proto1.UpdateMissionRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ConnectorServiceServer).UpdateMission(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ConnectorService_UpdateMission_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ConnectorServiceServer).UpdateMission(ctx, req.(*proto1.UpdateMissionRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ConnectorService_DeleteMission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(proto1.DeleteMissionRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ConnectorServiceServer).DeleteMission(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ConnectorService_DeleteMission_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ConnectorServiceServer).DeleteMission(ctx, req.(*proto1.DeleteMissionRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ConnectorService_UploadMissionNfzZones_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(proto1.UploadMissionNfzZonesRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ConnectorServiceServer).UploadMissionNfzZones(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ConnectorService_UploadMissionNfzZones_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ConnectorServiceServer).UploadMissionNfzZones(ctx, req.(*proto1.UploadMissionNfzZonesRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ConnectorService_GetTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(proto1.GetTaskRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ConnectorServiceServer).GetTask(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ConnectorService_GetTask_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ConnectorServiceServer).GetTask(ctx, req.(*proto1.GetTaskRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ConnectorService_GetTaskByFlightId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(proto1.GetTaskByFlightIdRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ConnectorServiceServer).GetTaskByFlightId(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ConnectorService_GetTaskByFlightId_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ConnectorServiceServer).GetTaskByFlightId(ctx, req.(*proto1.GetTaskByFlightIdRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ConnectorService_GetWaypointsByTaskId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(proto1.GetWaypointsByTaskIdRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ConnectorServiceServer).GetWaypointsByTaskId(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ConnectorService_GetWaypointsByTaskId_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ConnectorServiceServer).GetWaypointsByTaskId(ctx, req.(*proto1.GetWaypointsByTaskIdRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ConnectorService_CreateTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(proto1.CreateTaskRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ConnectorServiceServer).CreateTask(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ConnectorService_CreateTask_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ConnectorServiceServer).CreateTask(ctx, req.(*proto1.CreateTaskRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ConnectorService_UpdateTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(proto1.UpdateTaskRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ConnectorServiceServer).UpdateTask(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ConnectorService_UpdateTask_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ConnectorServiceServer).UpdateTask(ctx, req.(*proto1.UpdateTaskRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ConnectorService_DeleteTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(proto1.DeleteTaskRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ConnectorServiceServer).DeleteTask(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ConnectorService_DeleteTask_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ConnectorServiceServer).DeleteTask(ctx, req.(*proto1.DeleteTaskRequest))
+		return srv.(ConnectorServiceServer).ListSchedulers(ctx, req.(*proto1.ListSchedulersRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1198,20 +2543,20 @@ func _ConnectorService_DeleteSchedulers_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ConnectorService_DeleteSchedulersByTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(proto1.DeleteSchedulersByTaskRequest)
+func _ConnectorService_RecordSchedulerFiring_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(proto1.RecordSchedulerFiringRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ConnectorServiceServer).DeleteSchedulersByTask(ctx, in)
+		return srv.(ConnectorServiceServer).RecordSchedulerFiring(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ConnectorService_DeleteSchedulersByTask_FullMethodName,
+		FullMethod: ConnectorService_RecordSchedulerFiring_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ConnectorServiceServer).DeleteSchedulersByTask(ctx, req.(*proto1.DeleteSchedulersByTaskRequest))
+		return srv.(ConnectorServiceServer).RecordSchedulerFiring(ctx, req.(*proto1.RecordSchedulerFiringRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1236,6 +2581,60 @@ func _ConnectorService_StoreNotificationBatch_Handler(srv interface{}, stream gr
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type ConnectorService_StoreNotificationBatchServer = grpc.ClientStreamingServer[proto2.ProduceNotificationRequest, ConnectorResponse]
+
+func _ConnectorService_RegisterMediaFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(proto3.RegisterMediaFileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).RegisterMediaFile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_RegisterMediaFile_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).RegisterMediaFile(ctx, req.(*proto3.RegisterMediaFileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_ListMediaFiles_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(proto3.ListMediaFilesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).ListMediaFiles(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_ListMediaFiles_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).ListMediaFiles(ctx, req.(*proto3.ListMediaFilesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_GetMediaFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(proto3.GetMediaFileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).GetMediaFile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_GetMediaFile_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).GetMediaFile(ctx, req.(*proto3.GetMediaFileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
 
 func _ConnectorService_GetActivePoliciesByType_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ConnectorGetPoliciesRequest)
@@ -1273,6 +2672,618 @@ func _ConnectorService_GetAllActivePolicies_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ConnectorService_GetPolicyById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetPolicyByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).GetPolicyById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_GetPolicyById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).GetPolicyById(ctx, req.(*GetPolicyByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_CreatePolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreatePolicyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).CreatePolicy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_CreatePolicy_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).CreatePolicy(ctx, req.(*CreatePolicyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_UpdatePolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdatePolicyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).UpdatePolicy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_UpdatePolicy_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).UpdatePolicy(ctx, req.(*UpdatePolicyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_DeletePolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeletePolicyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).DeletePolicy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_DeletePolicy_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).DeletePolicy(ctx, req.(*DeletePolicyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_GetAllOrganizations_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ConnectorGetAllOrganizationsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).GetAllOrganizations(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_GetAllOrganizations_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).GetAllOrganizations(ctx, req.(*ConnectorGetAllOrganizationsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_GetOrganizationById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetOrganizationByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).GetOrganizationById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_GetOrganizationById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).GetOrganizationById(ctx, req.(*GetOrganizationByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_CreateOrganization_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateOrganizationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).CreateOrganization(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_CreateOrganization_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).CreateOrganization(ctx, req.(*CreateOrganizationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_UpdateOrganization_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateOrganizationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).UpdateOrganization(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_UpdateOrganization_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).UpdateOrganization(ctx, req.(*UpdateOrganizationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_DeleteOrganization_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteOrganizationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).DeleteOrganization(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_DeleteOrganization_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).DeleteOrganization(ctx, req.(*DeleteOrganizationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_ProvisionLicensedOrganization_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ProvisionLicensedOrganizationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).ProvisionLicensedOrganization(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_ProvisionLicensedOrganization_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).ProvisionLicensedOrganization(ctx, req.(*ProvisionLicensedOrganizationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_GetAllTheatres_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ConnectorGetAllTheatresRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).GetAllTheatres(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_GetAllTheatres_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).GetAllTheatres(ctx, req.(*ConnectorGetAllTheatresRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_GetTheatreById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTheatreByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).GetTheatreById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_GetTheatreById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).GetTheatreById(ctx, req.(*GetTheatreByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_CreateTheatre_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateTheatreRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).CreateTheatre(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_CreateTheatre_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).CreateTheatre(ctx, req.(*CreateTheatreRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_UpdateTheatre_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateTheatreRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).UpdateTheatre(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_UpdateTheatre_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).UpdateTheatre(ctx, req.(*UpdateTheatreRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_DeleteTheatre_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteTheatreRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).DeleteTheatre(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_DeleteTheatre_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).DeleteTheatre(ctx, req.(*DeleteTheatreRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_AssignUserToTheatre_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AssignUserToTheatreRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).AssignUserToTheatre(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_AssignUserToTheatre_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).AssignUserToTheatre(ctx, req.(*AssignUserToTheatreRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_RemoveUserFromTheatre_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RemoveUserFromTheatreRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).RemoveUserFromTheatre(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_RemoveUserFromTheatre_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).RemoveUserFromTheatre(ctx, req.(*RemoveUserFromTheatreRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_ListNoFlyZones_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListNoFlyZonesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).ListNoFlyZones(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_ListNoFlyZones_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).ListNoFlyZones(ctx, req.(*ListNoFlyZonesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_UpsertNoFlyZone_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpsertNoFlyZoneRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).UpsertNoFlyZone(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_UpsertNoFlyZone_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).UpsertNoFlyZone(ctx, req.(*UpsertNoFlyZoneRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_DeleteNoFlyZone_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteNoFlyZoneRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).DeleteNoFlyZone(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_DeleteNoFlyZone_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).DeleteNoFlyZone(ctx, req.(*DeleteNoFlyZoneRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_ListLicenseActivationCredentials_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListLicenseActivationCredentialsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).ListLicenseActivationCredentials(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_ListLicenseActivationCredentials_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).ListLicenseActivationCredentials(ctx, req.(*ListLicenseActivationCredentialsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_GetLicenseActivationCredentials_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetLicenseActivationCredentialsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).GetLicenseActivationCredentials(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_GetLicenseActivationCredentials_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).GetLicenseActivationCredentials(ctx, req.(*GetLicenseActivationCredentialsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_PutLicenseActivationCredentials_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PutLicenseActivationCredentialsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).PutLicenseActivationCredentials(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_PutLicenseActivationCredentials_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).PutLicenseActivationCredentials(ctx, req.(*PutLicenseActivationCredentialsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_DeleteLicenseActivationCredentials_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteLicenseActivationCredentialsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).DeleteLicenseActivationCredentials(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_DeleteLicenseActivationCredentials_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).DeleteLicenseActivationCredentials(ctx, req.(*DeleteLicenseActivationCredentialsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_GetAllEventTriggers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ConnectorGetAllEventTriggersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).GetAllEventTriggers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_GetAllEventTriggers_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).GetAllEventTriggers(ctx, req.(*ConnectorGetAllEventTriggersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_GetEventTriggerById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetEventTriggerByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).GetEventTriggerById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_GetEventTriggerById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).GetEventTriggerById(ctx, req.(*GetEventTriggerByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_CreateEventTrigger_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateEventTriggerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).CreateEventTrigger(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_CreateEventTrigger_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).CreateEventTrigger(ctx, req.(*CreateEventTriggerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_UpdateEventTrigger_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateEventTriggerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).UpdateEventTrigger(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_UpdateEventTrigger_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).UpdateEventTrigger(ctx, req.(*UpdateEventTriggerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_DeleteEventTrigger_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteEventTriggerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).DeleteEventTrigger(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_DeleteEventTrigger_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).DeleteEventTrigger(ctx, req.(*DeleteEventTriggerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_RecordEventTriggerFired_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RecordEventTriggerFiredRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).RecordEventTriggerFired(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_RecordEventTriggerFired_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).RecordEventTriggerFired(ctx, req.(*RecordEventTriggerFiredRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_RegenerateEventTriggerWebhookToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegenerateEventTriggerWebhookTokenRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).RegenerateEventTriggerWebhookToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_RegenerateEventTriggerWebhookToken_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).RegenerateEventTriggerWebhookToken(ctx, req.(*RegenerateEventTriggerWebhookTokenRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_GetEventTriggerByWebhookToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetEventTriggerByWebhookTokenRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).GetEventTriggerByWebhookToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_GetEventTriggerByWebhookToken_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).GetEventTriggerByWebhookToken(ctx, req.(*GetEventTriggerByWebhookTokenRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_ListRecentDetections_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListRecentDetectionsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).ListRecentDetections(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_ListRecentDetections_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).ListRecentDetections(ctx, req.(*ListRecentDetectionsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_GetLatestTelemetryForAsset_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetLatestTelemetryForAssetRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).GetLatestTelemetryForAsset(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_GetLatestTelemetryForAsset_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).GetLatestTelemetryForAsset(ctx, req.(*GetLatestTelemetryForAssetRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ConnectorService_GetTechnicalConfigs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ConnectorGetConfigsRequest)
 	if err := dec(in); err != nil {
@@ -1287,6 +3298,618 @@ func _ConnectorService_GetTechnicalConfigs_Handler(srv interface{}, ctx context.
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ConnectorServiceServer).GetTechnicalConfigs(ctx, req.(*ConnectorGetConfigsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_GetTechnicalConfigById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTechnicalConfigByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).GetTechnicalConfigById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_GetTechnicalConfigById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).GetTechnicalConfigById(ctx, req.(*GetTechnicalConfigByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_CreateTechnicalConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateTechnicalConfigRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).CreateTechnicalConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_CreateTechnicalConfig_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).CreateTechnicalConfig(ctx, req.(*CreateTechnicalConfigRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_UpdateTechnicalConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateTechnicalConfigRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).UpdateTechnicalConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_UpdateTechnicalConfig_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).UpdateTechnicalConfig(ctx, req.(*UpdateTechnicalConfigRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_DeleteTechnicalConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteTechnicalConfigRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).DeleteTechnicalConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_DeleteTechnicalConfig_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).DeleteTechnicalConfig(ctx, req.(*DeleteTechnicalConfigRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_PersistApplication_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(proto4.UpsertApplicationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).PersistApplication(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_PersistApplication_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).PersistApplication(ctx, req.(*proto4.UpsertApplicationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_GetPersistedApplication_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(proto4.GetApplicationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).GetPersistedApplication(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_GetPersistedApplication_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).GetPersistedApplication(ctx, req.(*proto4.GetApplicationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_ListPersistedApplications_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(proto4.ListApplicationsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).ListPersistedApplications(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_ListPersistedApplications_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).ListPersistedApplications(ctx, req.(*proto4.ListApplicationsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_DeletePersistedApplication_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(proto4.DeleteApplicationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).DeletePersistedApplication(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_DeletePersistedApplication_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).DeletePersistedApplication(ctx, req.(*proto4.DeleteApplicationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_SetApplicationPause_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(proto4.SetApplicationPauseRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).SetApplicationPause(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_SetApplicationPause_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).SetApplicationPause(ctx, req.(*proto4.SetApplicationPauseRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_ListApplicationPauses_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(proto4.ListApplicationPausesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).ListApplicationPauses(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_ListApplicationPauses_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).ListApplicationPauses(ctx, req.(*proto4.ListApplicationPausesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_GetApplicationEnvironmentPointers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(proto4.GetApplicationEnvironmentsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).GetApplicationEnvironmentPointers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_GetApplicationEnvironmentPointers_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).GetApplicationEnvironmentPointers(ctx, req.(*proto4.GetApplicationEnvironmentsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_PromoteApplicationVersion_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(proto4.PromoteApplicationVersionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).PromoteApplicationVersion(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_PromoteApplicationVersion_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).PromoteApplicationVersion(ctx, req.(*proto4.PromoteApplicationVersionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_PersistSkillExecution_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PersistSkillExecutionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).PersistSkillExecution(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_PersistSkillExecution_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).PersistSkillExecution(ctx, req.(*PersistSkillExecutionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_GetPersistedSkillExecution_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(proto4.GetSkillExecutionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).GetPersistedSkillExecution(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_GetPersistedSkillExecution_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).GetPersistedSkillExecution(ctx, req.(*proto4.GetSkillExecutionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_ListPersistedSkillExecutions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(proto4.ListSkillExecutionsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).ListPersistedSkillExecutions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_ListPersistedSkillExecutions_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).ListPersistedSkillExecutions(ctx, req.(*proto4.ListSkillExecutionsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_AppendSkillExecutionEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AppendSkillExecutionEventRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).AppendSkillExecutionEvent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_AppendSkillExecutionEvent_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).AppendSkillExecutionEvent(ctx, req.(*AppendSkillExecutionEventRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_ObserveSkillContract_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpsertSkillContractRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).ObserveSkillContract(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_ObserveSkillContract_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).ObserveSkillContract(ctx, req.(*UpsertSkillContractRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_ListSkillContracts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListSkillContractsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).ListSkillContracts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_ListSkillContracts_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).ListSkillContracts(ctx, req.(*ListSkillContractsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_SetSkillContractStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetSkillContractStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).SetSkillContractStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_SetSkillContractStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).SetSkillContractStatus(ctx, req.(*SetSkillContractStatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_SetSkillContractPermissions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetSkillContractPermissionsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).SetSkillContractPermissions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_SetSkillContractPermissions_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).SetSkillContractPermissions(ctx, req.(*SetSkillContractPermissionsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_AuthenticateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AuthenticateUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).AuthenticateUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_AuthenticateUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).AuthenticateUser(ctx, req.(*AuthenticateUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_CreateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).CreateUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_CreateUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).CreateUser(ctx, req.(*CreateUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_ResetPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResetPasswordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).ResetPassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_ResetPassword_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).ResetPassword(ctx, req.(*ResetPasswordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_RecordAuthAuditEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RecordAuthAuditEventRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).RecordAuthAuditEvent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_RecordAuthAuditEvent_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).RecordAuthAuditEvent(ctx, req.(*RecordAuthAuditEventRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_ListUsers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListUsersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).ListUsers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_ListUsers_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).ListUsers(ctx, req.(*ListUsersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_GetUserById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).GetUserById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_GetUserById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).GetUserById(ctx, req.(*GetUserByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_UpdateUserRoles_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateUserRolesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).UpdateUserRoles(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_UpdateUserRoles_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).UpdateUserRoles(ctx, req.(*UpdateUserRolesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_SetUserEnabled_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetUserEnabledRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).SetUserEnabled(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_SetUserEnabled_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).SetUserEnabled(ctx, req.(*SetUserEnabledRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_DeleteUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).DeleteUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_DeleteUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).DeleteUser(ctx, req.(*DeleteUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_UpsertIdentityProvider_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpsertIdentityProviderRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).UpsertIdentityProvider(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_UpsertIdentityProvider_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).UpsertIdentityProvider(ctx, req.(*UpsertIdentityProviderRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_GetIdentityProvider_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetIdentityProviderRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).GetIdentityProvider(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_GetIdentityProvider_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).GetIdentityProvider(ctx, req.(*GetIdentityProviderRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_FindIdentityProviderByEmailDomain_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FindIdentityProviderByEmailDomainRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).FindIdentityProviderByEmailDomain(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_FindIdentityProviderByEmailDomain_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).FindIdentityProviderByEmailDomain(ctx, req.(*FindIdentityProviderByEmailDomainRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_FindOidcUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FindOidcUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).FindOidcUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_FindOidcUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).FindOidcUser(ctx, req.(*FindOidcUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectorService_UpsertOidcUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpsertOidcUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectorServiceServer).UpsertOidcUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConnectorService_UpsertOidcUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectorServiceServer).UpsertOidcUser(ctx, req.(*UpsertOidcUserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1327,6 +3950,30 @@ var ConnectorService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ConnectorService_GetSubAssetBySn_Handler,
 		},
 		{
+			MethodName: "ListAssets",
+			Handler:    _ConnectorService_ListAssets_Handler,
+		},
+		{
+			MethodName: "CreateAssetClaim",
+			Handler:    _ConnectorService_CreateAssetClaim_Handler,
+		},
+		{
+			MethodName: "RedeemAssetClaim",
+			Handler:    _ConnectorService_RedeemAssetClaim_Handler,
+		},
+		{
+			MethodName: "DescribeAssetClaim",
+			Handler:    _ConnectorService_DescribeAssetClaim_Handler,
+		},
+		{
+			MethodName: "ListAssetClaims",
+			Handler:    _ConnectorService_ListAssetClaims_Handler,
+		},
+		{
+			MethodName: "RevokeAssetClaim",
+			Handler:    _ConnectorService_RevokeAssetClaim_Handler,
+		},
+		{
 			MethodName: "UpsertAssetPayload",
 			Handler:    _ConnectorService_UpsertAssetPayload_Handler,
 		},
@@ -1339,52 +3986,24 @@ var ConnectorService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ConnectorService_DeleteAssetPayload_Handler,
 		},
 		{
+			MethodName: "SetAssetProperty",
+			Handler:    _ConnectorService_SetAssetProperty_Handler,
+		},
+		{
+			MethodName: "ListAssetProperties",
+			Handler:    _ConnectorService_ListAssetProperties_Handler,
+		},
+		{
+			MethodName: "DeleteAssetProperty",
+			Handler:    _ConnectorService_DeleteAssetProperty_Handler,
+		},
+		{
 			MethodName: "GetOrganization",
 			Handler:    _ConnectorService_GetOrganization_Handler,
 		},
 		{
-			MethodName: "GetMission",
-			Handler:    _ConnectorService_GetMission_Handler,
-		},
-		{
-			MethodName: "CreateMission",
-			Handler:    _ConnectorService_CreateMission_Handler,
-		},
-		{
-			MethodName: "UpdateMission",
-			Handler:    _ConnectorService_UpdateMission_Handler,
-		},
-		{
-			MethodName: "DeleteMission",
-			Handler:    _ConnectorService_DeleteMission_Handler,
-		},
-		{
-			MethodName: "UploadMissionNfzZones",
-			Handler:    _ConnectorService_UploadMissionNfzZones_Handler,
-		},
-		{
-			MethodName: "GetTask",
-			Handler:    _ConnectorService_GetTask_Handler,
-		},
-		{
-			MethodName: "GetTaskByFlightId",
-			Handler:    _ConnectorService_GetTaskByFlightId_Handler,
-		},
-		{
-			MethodName: "GetWaypointsByTaskId",
-			Handler:    _ConnectorService_GetWaypointsByTaskId_Handler,
-		},
-		{
-			MethodName: "CreateTask",
-			Handler:    _ConnectorService_CreateTask_Handler,
-		},
-		{
-			MethodName: "UpdateTask",
-			Handler:    _ConnectorService_UpdateTask_Handler,
-		},
-		{
-			MethodName: "DeleteTask",
-			Handler:    _ConnectorService_DeleteTask_Handler,
+			MethodName: "ListSchedulers",
+			Handler:    _ConnectorService_ListSchedulers_Handler,
 		},
 		{
 			MethodName: "GetScheduler",
@@ -1411,8 +4030,20 @@ var ConnectorService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ConnectorService_DeleteSchedulers_Handler,
 		},
 		{
-			MethodName: "DeleteSchedulersByTask",
-			Handler:    _ConnectorService_DeleteSchedulersByTask_Handler,
+			MethodName: "RecordSchedulerFiring",
+			Handler:    _ConnectorService_RecordSchedulerFiring_Handler,
+		},
+		{
+			MethodName: "RegisterMediaFile",
+			Handler:    _ConnectorService_RegisterMediaFile_Handler,
+		},
+		{
+			MethodName: "ListMediaFiles",
+			Handler:    _ConnectorService_ListMediaFiles_Handler,
+		},
+		{
+			MethodName: "GetMediaFile",
+			Handler:    _ConnectorService_GetMediaFile_Handler,
 		},
 		{
 			MethodName: "GetActivePoliciesByType",
@@ -1423,8 +4054,280 @@ var ConnectorService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ConnectorService_GetAllActivePolicies_Handler,
 		},
 		{
+			MethodName: "GetPolicyById",
+			Handler:    _ConnectorService_GetPolicyById_Handler,
+		},
+		{
+			MethodName: "CreatePolicy",
+			Handler:    _ConnectorService_CreatePolicy_Handler,
+		},
+		{
+			MethodName: "UpdatePolicy",
+			Handler:    _ConnectorService_UpdatePolicy_Handler,
+		},
+		{
+			MethodName: "DeletePolicy",
+			Handler:    _ConnectorService_DeletePolicy_Handler,
+		},
+		{
+			MethodName: "GetAllOrganizations",
+			Handler:    _ConnectorService_GetAllOrganizations_Handler,
+		},
+		{
+			MethodName: "GetOrganizationById",
+			Handler:    _ConnectorService_GetOrganizationById_Handler,
+		},
+		{
+			MethodName: "CreateOrganization",
+			Handler:    _ConnectorService_CreateOrganization_Handler,
+		},
+		{
+			MethodName: "UpdateOrganization",
+			Handler:    _ConnectorService_UpdateOrganization_Handler,
+		},
+		{
+			MethodName: "DeleteOrganization",
+			Handler:    _ConnectorService_DeleteOrganization_Handler,
+		},
+		{
+			MethodName: "ProvisionLicensedOrganization",
+			Handler:    _ConnectorService_ProvisionLicensedOrganization_Handler,
+		},
+		{
+			MethodName: "GetAllTheatres",
+			Handler:    _ConnectorService_GetAllTheatres_Handler,
+		},
+		{
+			MethodName: "GetTheatreById",
+			Handler:    _ConnectorService_GetTheatreById_Handler,
+		},
+		{
+			MethodName: "CreateTheatre",
+			Handler:    _ConnectorService_CreateTheatre_Handler,
+		},
+		{
+			MethodName: "UpdateTheatre",
+			Handler:    _ConnectorService_UpdateTheatre_Handler,
+		},
+		{
+			MethodName: "DeleteTheatre",
+			Handler:    _ConnectorService_DeleteTheatre_Handler,
+		},
+		{
+			MethodName: "AssignUserToTheatre",
+			Handler:    _ConnectorService_AssignUserToTheatre_Handler,
+		},
+		{
+			MethodName: "RemoveUserFromTheatre",
+			Handler:    _ConnectorService_RemoveUserFromTheatre_Handler,
+		},
+		{
+			MethodName: "ListNoFlyZones",
+			Handler:    _ConnectorService_ListNoFlyZones_Handler,
+		},
+		{
+			MethodName: "UpsertNoFlyZone",
+			Handler:    _ConnectorService_UpsertNoFlyZone_Handler,
+		},
+		{
+			MethodName: "DeleteNoFlyZone",
+			Handler:    _ConnectorService_DeleteNoFlyZone_Handler,
+		},
+		{
+			MethodName: "ListLicenseActivationCredentials",
+			Handler:    _ConnectorService_ListLicenseActivationCredentials_Handler,
+		},
+		{
+			MethodName: "GetLicenseActivationCredentials",
+			Handler:    _ConnectorService_GetLicenseActivationCredentials_Handler,
+		},
+		{
+			MethodName: "PutLicenseActivationCredentials",
+			Handler:    _ConnectorService_PutLicenseActivationCredentials_Handler,
+		},
+		{
+			MethodName: "DeleteLicenseActivationCredentials",
+			Handler:    _ConnectorService_DeleteLicenseActivationCredentials_Handler,
+		},
+		{
+			MethodName: "GetAllEventTriggers",
+			Handler:    _ConnectorService_GetAllEventTriggers_Handler,
+		},
+		{
+			MethodName: "GetEventTriggerById",
+			Handler:    _ConnectorService_GetEventTriggerById_Handler,
+		},
+		{
+			MethodName: "CreateEventTrigger",
+			Handler:    _ConnectorService_CreateEventTrigger_Handler,
+		},
+		{
+			MethodName: "UpdateEventTrigger",
+			Handler:    _ConnectorService_UpdateEventTrigger_Handler,
+		},
+		{
+			MethodName: "DeleteEventTrigger",
+			Handler:    _ConnectorService_DeleteEventTrigger_Handler,
+		},
+		{
+			MethodName: "RecordEventTriggerFired",
+			Handler:    _ConnectorService_RecordEventTriggerFired_Handler,
+		},
+		{
+			MethodName: "RegenerateEventTriggerWebhookToken",
+			Handler:    _ConnectorService_RegenerateEventTriggerWebhookToken_Handler,
+		},
+		{
+			MethodName: "GetEventTriggerByWebhookToken",
+			Handler:    _ConnectorService_GetEventTriggerByWebhookToken_Handler,
+		},
+		{
+			MethodName: "ListRecentDetections",
+			Handler:    _ConnectorService_ListRecentDetections_Handler,
+		},
+		{
+			MethodName: "GetLatestTelemetryForAsset",
+			Handler:    _ConnectorService_GetLatestTelemetryForAsset_Handler,
+		},
+		{
 			MethodName: "GetTechnicalConfigs",
 			Handler:    _ConnectorService_GetTechnicalConfigs_Handler,
+		},
+		{
+			MethodName: "GetTechnicalConfigById",
+			Handler:    _ConnectorService_GetTechnicalConfigById_Handler,
+		},
+		{
+			MethodName: "CreateTechnicalConfig",
+			Handler:    _ConnectorService_CreateTechnicalConfig_Handler,
+		},
+		{
+			MethodName: "UpdateTechnicalConfig",
+			Handler:    _ConnectorService_UpdateTechnicalConfig_Handler,
+		},
+		{
+			MethodName: "DeleteTechnicalConfig",
+			Handler:    _ConnectorService_DeleteTechnicalConfig_Handler,
+		},
+		{
+			MethodName: "PersistApplication",
+			Handler:    _ConnectorService_PersistApplication_Handler,
+		},
+		{
+			MethodName: "GetPersistedApplication",
+			Handler:    _ConnectorService_GetPersistedApplication_Handler,
+		},
+		{
+			MethodName: "ListPersistedApplications",
+			Handler:    _ConnectorService_ListPersistedApplications_Handler,
+		},
+		{
+			MethodName: "DeletePersistedApplication",
+			Handler:    _ConnectorService_DeletePersistedApplication_Handler,
+		},
+		{
+			MethodName: "SetApplicationPause",
+			Handler:    _ConnectorService_SetApplicationPause_Handler,
+		},
+		{
+			MethodName: "ListApplicationPauses",
+			Handler:    _ConnectorService_ListApplicationPauses_Handler,
+		},
+		{
+			MethodName: "GetApplicationEnvironmentPointers",
+			Handler:    _ConnectorService_GetApplicationEnvironmentPointers_Handler,
+		},
+		{
+			MethodName: "PromoteApplicationVersion",
+			Handler:    _ConnectorService_PromoteApplicationVersion_Handler,
+		},
+		{
+			MethodName: "PersistSkillExecution",
+			Handler:    _ConnectorService_PersistSkillExecution_Handler,
+		},
+		{
+			MethodName: "GetPersistedSkillExecution",
+			Handler:    _ConnectorService_GetPersistedSkillExecution_Handler,
+		},
+		{
+			MethodName: "ListPersistedSkillExecutions",
+			Handler:    _ConnectorService_ListPersistedSkillExecutions_Handler,
+		},
+		{
+			MethodName: "AppendSkillExecutionEvent",
+			Handler:    _ConnectorService_AppendSkillExecutionEvent_Handler,
+		},
+		{
+			MethodName: "ObserveSkillContract",
+			Handler:    _ConnectorService_ObserveSkillContract_Handler,
+		},
+		{
+			MethodName: "ListSkillContracts",
+			Handler:    _ConnectorService_ListSkillContracts_Handler,
+		},
+		{
+			MethodName: "SetSkillContractStatus",
+			Handler:    _ConnectorService_SetSkillContractStatus_Handler,
+		},
+		{
+			MethodName: "SetSkillContractPermissions",
+			Handler:    _ConnectorService_SetSkillContractPermissions_Handler,
+		},
+		{
+			MethodName: "AuthenticateUser",
+			Handler:    _ConnectorService_AuthenticateUser_Handler,
+		},
+		{
+			MethodName: "CreateUser",
+			Handler:    _ConnectorService_CreateUser_Handler,
+		},
+		{
+			MethodName: "ResetPassword",
+			Handler:    _ConnectorService_ResetPassword_Handler,
+		},
+		{
+			MethodName: "RecordAuthAuditEvent",
+			Handler:    _ConnectorService_RecordAuthAuditEvent_Handler,
+		},
+		{
+			MethodName: "ListUsers",
+			Handler:    _ConnectorService_ListUsers_Handler,
+		},
+		{
+			MethodName: "GetUserById",
+			Handler:    _ConnectorService_GetUserById_Handler,
+		},
+		{
+			MethodName: "UpdateUserRoles",
+			Handler:    _ConnectorService_UpdateUserRoles_Handler,
+		},
+		{
+			MethodName: "SetUserEnabled",
+			Handler:    _ConnectorService_SetUserEnabled_Handler,
+		},
+		{
+			MethodName: "DeleteUser",
+			Handler:    _ConnectorService_DeleteUser_Handler,
+		},
+		{
+			MethodName: "UpsertIdentityProvider",
+			Handler:    _ConnectorService_UpsertIdentityProvider_Handler,
+		},
+		{
+			MethodName: "GetIdentityProvider",
+			Handler:    _ConnectorService_GetIdentityProvider_Handler,
+		},
+		{
+			MethodName: "FindIdentityProviderByEmailDomain",
+			Handler:    _ConnectorService_FindIdentityProviderByEmailDomain_Handler,
+		},
+		{
+			MethodName: "FindOidcUser",
+			Handler:    _ConnectorService_FindOidcUser_Handler,
+		},
+		{
+			MethodName: "UpsertOidcUser",
+			Handler:    _ConnectorService_UpsertOidcUser_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

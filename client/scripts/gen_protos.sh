@@ -1,16 +1,17 @@
 #!/usr/bin/env bash
-# Generate Go protobuf / gRPC stubs from the platform's canonical proto source, pinned to
-# zqnt-protos' `1.3.0` tag -- this repo's own feature/v1.3.0-proto branch is the client-go-sdk
-# counterpart of zqnt-utils-golang's feature/v1.3.0-proto, mirroring how it generates from a
-# sibling zqnt-utils checkout with a plain protoc invocation (this repo has no shared proto
-# module dependency -- gen/ is vendored directly, per its own README).
+# Generate Go protobuf / gRPC stubs from the platform's canonical proto source: zqnt-protos, which
+# this repo carries as its own `proto/` submodule -- the same layout zqnt-utils-golang uses. A plain
+# protoc invocation, no buf. This repo has no shared proto module dependency: gen/ is vendored
+# directly, per its own README.
 #
-# Source: ../../../utils/zqnt-utils/src/main/proto (this repo lives at
-# zqnt-platform/sdks/client/client-go-sdk). That directory is a git submodule pointing at
-# zqnt-protos, which carries its own version tags (see its README's "Versioning" section) -- this
-# script pins to zqnt-protos' own `1.3.0` tag by name, generates, and restores the submodule to
-# whatever it was checked out at before; it does not permanently move the shared monorepo
-# checkout other services rely on.
+# Owning the submodule, rather than reaching sideways into a sibling checkout, means the generated
+# output depends on one commit this repo records, generation works in any clone
+# (`git submodule update --init`), and it never checks out or restores a shared checkout other
+# services are using at the same time.
+#
+# To move to a new contract version: update the submodule (`git -C proto fetch && git -C proto
+# checkout <commit>`), update EXPECTED_PROTO_COMMIT below to match, re-run this script, and commit
+# the submodule pointer together with the regenerated gen/.
 #
 # Output: gen/ (module-relative -- each proto file's own `go_package` option, e.g.
 # "gen/edge/sdk/proto", is what actually places its output; the -M mappings below just supply the
@@ -20,50 +21,33 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PROTO_DIR="$(cd "$ROOT/../../../utils/zqnt-utils/src/main/proto" && pwd)"
+PROTO_DIR="$ROOT/proto"
 OUT_DIR="$ROOT"
-MODULE="github.com/Zequent/zqnt-client-sdk-go"
+MODULE="github.com/Zequent/zqnt-client-sdk-go/v2"
 
-# zqnt-protos' own `1.3.0` tag -- see its README's Versioning section. Verified below rather than
-# trusted blindly: an annotated tag is supposed to be immutable once published, so the real risk
-# here isn't "can't fetch the tag" -- it's "the tag got moved". Resolve it, then assert it's still
-# the exact commit zqnt-utils-java:1.3.0 (and thus edge-java-sdk v1.3.0) pins, and fail loudly if
-# not, rather than silently generating from whatever it now points to.
-PROTO_TAG="1.3.0"
-PROTO_TAG_COMMIT="0e072f869b650f3c3f769b89a677f23e8a1b0766"
+# The zqnt-protos commit gen/ is built from: the v2 line (branch refactoring/refactoring-ecosystem-v2),
+# the same commit zqnt-utils-golang generates from. The submodule pointer is the real pin; this
+# constant only asserts that what's checked out right now is still it, so a half-finished submodule
+# bump can't silently regenerate everything against an unintended contract.
+EXPECTED_PROTO_COMMIT="db104ba074bb76d8fee1a06dc9e59b9cc9ba51c6"
 
-if [ ! -d "$PROTO_DIR" ]; then
-  echo "Canonical proto source not found at $PROTO_DIR -- this script must be run from a" >&2
-  echo "checkout of zqnt-platform, with client-go-sdk at sdks/client/client-go-sdk (i.e. a" >&2
-  echo "descendant of the same monorepo utils/zqnt-utils lives in)." >&2
+if [ ! -f "$PROTO_DIR/common.proto" ]; then
+  echo "Proto submodule is not checked out at $PROTO_DIR -- run:" >&2
+  echo "  git submodule update --init proto" >&2
   exit 1
 fi
 
-ORIGINAL_COMMIT="$(git -C "$PROTO_DIR" rev-parse HEAD)"
-if ! git -C "$PROTO_DIR" rev-parse --verify --quiet "refs/tags/$PROTO_TAG" >/dev/null; then
-  echo "Fetching zqnt-protos tag $PROTO_TAG..."
-  git -C "$PROTO_DIR" fetch --quiet origin "refs/tags/$PROTO_TAG:refs/tags/$PROTO_TAG"
-fi
-
-RESOLVED_COMMIT="$(git -C "$PROTO_DIR" rev-parse "refs/tags/$PROTO_TAG^{commit}")"
-if [ "$RESOLVED_COMMIT" != "$PROTO_TAG_COMMIT" ]; then
-  echo "zqnt-protos tag $PROTO_TAG resolves to $RESOLVED_COMMIT, not the expected" >&2
-  echo "$PROTO_TAG_COMMIT -- the tag has moved since this script was last updated. Refusing to" >&2
-  echo "generate from an unverified commit; update PROTO_TAG_COMMIT above once you've confirmed" >&2
-  echo "the new target is actually what you want." >&2
+CURRENT_COMMIT="$(git -C "$PROTO_DIR" rev-parse HEAD)"
+if [ "$CURRENT_COMMIT" != "$EXPECTED_PROTO_COMMIT" ]; then
+  echo "The proto submodule is at $CURRENT_COMMIT, not the expected" >&2
+  echo "$EXPECTED_PROTO_COMMIT. Refusing to generate from an unverified contract: either run" >&2
+  echo "'git submodule update proto' to restore the recorded commit, or -- if you are" >&2
+  echo "deliberately moving to a new one -- update EXPECTED_PROTO_COMMIT in this script to match." >&2
   exit 1
 fi
-echo "Pinning proto submodule to zqnt-protos $PROTO_TAG ($RESOLVED_COMMIT, currently $ORIGINAL_COMMIT)..."
-git -C "$PROTO_DIR" checkout --quiet "$PROTO_TAG"
+echo "Generating from zqnt-protos $CURRENT_COMMIT (contract $(cat "$PROTO_DIR/PROTOCOL_VERSION" 2>/dev/null || echo "unknown"))..."
 
-restore() {
-  echo "Restoring proto submodule to $ORIGINAL_COMMIT..."
-  git -C "$PROTO_DIR" checkout --quiet "$ORIGINAL_COMMIT"
-}
-trap restore EXIT
-
-# capability-execution-*.proto don't exist at 1.3.0 -- no mapping for them here (that's the whole
-# point of this branch). See zqnt-utils-golang's own gen_protos.sh for the identical file list.
+# Identical file list to zqnt-utils-golang's gen_protos.sh, with this module's prefix.
 M_MAPPINGS=(
   "asset.proto=$MODULE/gen/common/asset/proto"
   "base.proto=$MODULE/gen/common/base/proto"
@@ -75,11 +59,16 @@ M_MAPPINGS=(
   "events.proto=$MODULE/gen/events/proto"
   "live-data-types.proto=$MODULE/gen/livedata/proto"
   "live-data.proto=$MODULE/gen/livedata/proto"
+  "media.proto=$MODULE/gen/media/proto"
   "mission-autonomy-contracts.proto=$MODULE/gen/missionautonomy/contracts/proto"
   "mission-autonomy-dto.proto=$MODULE/gen/missionautonomy/dto/proto"
   "mission-autonomy-types.proto=$MODULE/gen/missionautonomy/domain/types/proto"
   "mission-autonomy.proto=$MODULE/gen/missionautonomy/proto"
   "remote-control.proto=$MODULE/gen/remotecontrol/proto"
+  "simulator-control.proto=$MODULE/gen/simulatorcontrol/proto"
+  "capability-execution-contracts.proto=$MODULE/gen/execution/contracts/proto"
+  "capability-execution-types.proto=$MODULE/gen/execution/domain/types/proto"
+  "capability-execution-dto.proto=$MODULE/gen/execution/dto/proto"
 )
 
 GO_OPTS=("paths=import" "module=$MODULE")
@@ -89,6 +78,9 @@ done
 
 PROTO_FILES=("$PROTO_DIR"/*.proto)
 echo "Generating ${#PROTO_FILES[@]} proto file(s) -> $OUT_DIR/gen/"
+
+# Start from an empty gen/ so a proto file or message removed upstream leaves no stale stubs behind.
+rm -rf "$OUT_DIR/gen"
 
 go_opt_args=()
 for o in "${GO_OPTS[@]}"; do go_opt_args+=("--go_opt=$o"); done

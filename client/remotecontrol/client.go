@@ -9,9 +9,9 @@ import (
 	"fmt"
 	"time"
 
-	base "github.com/Zequent/zqnt-client-sdk-go/gen/common/base/proto"
-	devicecontrol "github.com/Zequent/zqnt-client-sdk-go/gen/devicecontrol/contracts/proto"
-	remotecontrolpb "github.com/Zequent/zqnt-client-sdk-go/gen/remotecontrol/proto"
+	base "github.com/Zequent/zqnt-client-sdk-go/v2/gen/common/base/proto"
+	devicecontrol "github.com/Zequent/zqnt-client-sdk-go/v2/gen/devicecontrol/contracts/proto"
+	remotecontrolpb "github.com/Zequent/zqnt-client-sdk-go/v2/gen/remotecontrol/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -90,7 +90,26 @@ func (c *Client) TakeOff(ctx context.Context, sn string, coordinate *devicecontr
 }
 
 func (c *Client) GoTo(ctx context.Context, sn string, coordinate *devicecontrol.GeoCoordinate) (*devicecontrol.CommandResponse, error) {
-	resp, err := c.grpc.GoTo(ctx, &devicecontrol.CoordinateCommandRequest{Base: requestBase(sn), Coordinate: coordinate})
+	return c.GoToWithOptions(ctx, sn, coordinate, GoToOptions{})
+}
+
+// GoToOptions are the optional parts of a fly-to.
+type GoToOptions struct {
+	// NoFlyZoneOverride flies straight through a HARD_BLOCK or REQUIRE_APPROVAL no-fly zone that
+	// would otherwise refuse the fly-to. The platform honours it only for an organization admin or
+	// a system admin (by the caller's own token) and refuses it for anybody else.
+	NoFlyZoneOverride bool
+}
+
+// GoToWithOptions is GoTo with options; GoTo is GoToWithOptions with none. The override is sent
+// only when asked for.
+func (c *Client) GoToWithOptions(ctx context.Context, sn string, coordinate *devicecontrol.GeoCoordinate, options GoToOptions) (*devicecontrol.CommandResponse, error) {
+	req := &devicecontrol.CoordinateCommandRequest{Base: requestBase(sn), Coordinate: coordinate}
+	if options.NoFlyZoneOverride {
+		override := true
+		req.NoFlyZoneOverride = &override
+	}
+	resp, err := c.grpc.GoTo(ctx, req)
 	return unwrap("GoTo", resp, err)
 }
 
@@ -138,11 +157,6 @@ func (c *Client) LookAt(ctx context.Context, sn string, coordinate *devicecontro
 func (c *Client) CapturePhoto(ctx context.Context, sn string) (*devicecontrol.CommandResponse, error) {
 	resp, err := c.grpc.CapturePhoto(ctx, &devicecontrol.EmptyCommandRequest{Base: requestBase(sn)})
 	return unwrap("CapturePhoto", resp, err)
-}
-
-func (c *Client) PlayTTSAudio(ctx context.Context, req *devicecontrol.TextToSpeechCommandRequest) (*devicecontrol.CommandResponse, error) {
-	resp, err := c.grpc.PlayTTSAudio(ctx, req)
-	return unwrap("PlayTTSAudio", resp, err)
 }
 
 func (c *Client) LiveStreamSplitScreen(ctx context.Context, sn string, enabled bool) (*devicecontrol.CommandResponse, error) {
@@ -217,6 +231,11 @@ func (c *Client) ChangeZoom(ctx context.Context, req *devicecontrol.ChangeCamera
 
 // ---- Custom / integrator-defined commands ----------------------------------------------
 
+// SendCustomCommand runs a command a device publishes as its own capability rather than as a typed
+// RPC -- vendor- and payload-specific ones above all. A loudspeaker is one: there is no typed
+// text-to-speech call any more, a DJI speaker payload publishes speaker.volume.set,
+// speaker.audio.play and speaker.audio.stop instead. GetCapabilities lists the command ids a device
+// offers, with the parameter schema of each.
 func (c *Client) SendCustomCommand(ctx context.Context, sn, commandID string, params *structpb.Struct, target *devicecontrol.CapabilityTarget) (*devicecontrol.CustomCommandResponse, error) {
 	req := &devicecontrol.CustomCommandRequest{Base: requestBase(sn), CommandId: commandID, Params: params, Target: target}
 	resp, err := c.grpc.SendCustomCommand(ctx, req)

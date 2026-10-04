@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	connectorpb "github.com/Zequent/zqnt-client-sdk-go/gen/connector/proto"
+	connectorpb "github.com/Zequent/zqnt-client-sdk-go/v2/gen/connector/proto"
 )
 
 type fakePolicyService struct {

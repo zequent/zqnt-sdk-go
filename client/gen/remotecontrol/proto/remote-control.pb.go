@@ -7,8 +7,8 @@
 package proto
 
 import (
-	_ "github.com/Zequent/zqnt-client-sdk-go/gen/common/proto"
-	proto "github.com/Zequent/zqnt-client-sdk-go/gen/devicecontrol/contracts/proto"
+	_ "github.com/Zequent/zqnt-client-sdk-go/v2/gen/common/proto"
+	proto "github.com/Zequent/zqnt-client-sdk-go/v2/gen/devicecontrol/contracts/proto"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -26,7 +26,7 @@ var File_remote_control_proto protoreflect.FileDescriptor
 
 const file_remote_control_proto_rawDesc = "" +
 	"\n" +
-	"\x14remote-control.proto\x12\x04zqnt\x1a\fcommon.proto2\xb8\x0e\n" +
+	"\x14remote-control.proto\x12\x04zqnt\x1a\fcommon.proto2\xef\r\n" +
 	"\x14RemoteControlService\x12W\n" +
 	"\x12ReportAssetRuntime\x12\x1f.zqnt.ReportAssetRuntimeRequest\x1a .zqnt.ReportAssetRuntimeResponse\x12K\n" +
 	"\x0fGetAssetRuntime\x12\x1c.zqnt.GetAssetRuntimeRequest\x1a\x1a.zqnt.AssetRuntimeResponse\x12R\n" +
@@ -38,8 +38,7 @@ const file_remote_control_proto_rawDesc = "" +
 	"\x11ExitManualControl\x12!.zqnt.ManualControlCommandRequest\x1a\x15.zqnt.CommandResponse\x12U\n" +
 	"\x12ManualControlInput\x12&.zqnt.ManualControlInputCommandRequest\x1a\x15.zqnt.CommandResponse(\x01\x12;\n" +
 	"\x06LookAt\x12\x1a.zqnt.LookAtCommandRequest\x1a\x15.zqnt.CommandResponse\x12@\n" +
-	"\fCapturePhoto\x12\x19.zqnt.EmptyCommandRequest\x1a\x15.zqnt.CommandResponse\x12G\n" +
-	"\fPlayTTSAudio\x12 .zqnt.TextToSpeechCommandRequest\x1a\x15.zqnt.CommandResponse\x12J\n" +
+	"\fCapturePhoto\x12\x19.zqnt.EmptyCommandRequest\x1a\x15.zqnt.CommandResponse\x12J\n" +
 	"\x15LiveStreamSplitScreen\x12\x1a.zqnt.ToggleCommandRequest\x1a\x15.zqnt.CommandResponse\x12O\n" +
 	"\x10ControlDetection\x12$.zqnt.DetectionControlCommandRequest\x1a\x15.zqnt.CommandResponse\x12=\n" +
 	"\tOpenCover\x12\x19.zqnt.EmptyCommandRequest\x1a\x15.zqnt.CommandResponse\x12C\n" +
@@ -68,19 +67,18 @@ var file_remote_control_proto_goTypes = []any{
 	(*proto.ManualControlInputCommandRequest)(nil), // 6: zqnt.ManualControlInputCommandRequest
 	(*proto.LookAtCommandRequest)(nil),             // 7: zqnt.LookAtCommandRequest
 	(*proto.EmptyCommandRequest)(nil),              // 8: zqnt.EmptyCommandRequest
-	(*proto.TextToSpeechCommandRequest)(nil),       // 9: zqnt.TextToSpeechCommandRequest
-	(*proto.ToggleCommandRequest)(nil),             // 10: zqnt.ToggleCommandRequest
-	(*proto.DetectionControlCommandRequest)(nil),   // 11: zqnt.DetectionControlCommandRequest
-	(*proto.CloseCoverCommandRequest)(nil),         // 12: zqnt.CloseCoverCommandRequest
-	(*proto.ChangeAcModeCommandRequest)(nil),       // 13: zqnt.ChangeAcModeCommandRequest
-	(*proto.ChangeCameraLensCommandRequest)(nil),   // 14: zqnt.ChangeCameraLensCommandRequest
-	(*proto.ChangeCameraZoomCommandRequest)(nil),   // 15: zqnt.ChangeCameraZoomCommandRequest
-	(*proto.CustomCommandRequest)(nil),             // 16: zqnt.CustomCommandRequest
-	(*proto.ReportAssetRuntimeResponse)(nil),       // 17: zqnt.ReportAssetRuntimeResponse
-	(*proto.AssetRuntimeResponse)(nil),             // 18: zqnt.AssetRuntimeResponse
-	(*proto.AssetCapabilitiesResponse)(nil),        // 19: zqnt.AssetCapabilitiesResponse
-	(*proto.CommandResponse)(nil),                  // 20: zqnt.CommandResponse
-	(*proto.CustomCommandResponse)(nil),            // 21: zqnt.CustomCommandResponse
+	(*proto.ToggleCommandRequest)(nil),             // 9: zqnt.ToggleCommandRequest
+	(*proto.DetectionControlCommandRequest)(nil),   // 10: zqnt.DetectionControlCommandRequest
+	(*proto.CloseCoverCommandRequest)(nil),         // 11: zqnt.CloseCoverCommandRequest
+	(*proto.ChangeAcModeCommandRequest)(nil),       // 12: zqnt.ChangeAcModeCommandRequest
+	(*proto.ChangeCameraLensCommandRequest)(nil),   // 13: zqnt.ChangeCameraLensCommandRequest
+	(*proto.ChangeCameraZoomCommandRequest)(nil),   // 14: zqnt.ChangeCameraZoomCommandRequest
+	(*proto.CustomCommandRequest)(nil),             // 15: zqnt.CustomCommandRequest
+	(*proto.ReportAssetRuntimeResponse)(nil),       // 16: zqnt.ReportAssetRuntimeResponse
+	(*proto.AssetRuntimeResponse)(nil),             // 17: zqnt.AssetRuntimeResponse
+	(*proto.AssetCapabilitiesResponse)(nil),        // 18: zqnt.AssetCapabilitiesResponse
+	(*proto.CommandResponse)(nil),                  // 19: zqnt.CommandResponse
+	(*proto.CustomCommandResponse)(nil),            // 20: zqnt.CustomCommandResponse
 }
 var file_remote_control_proto_depIdxs = []int32{
 	0,  // 0: zqnt.RemoteControlService.ReportAssetRuntime:input_type -> zqnt.ReportAssetRuntimeRequest
@@ -94,47 +92,45 @@ var file_remote_control_proto_depIdxs = []int32{
 	6,  // 8: zqnt.RemoteControlService.ManualControlInput:input_type -> zqnt.ManualControlInputCommandRequest
 	7,  // 9: zqnt.RemoteControlService.LookAt:input_type -> zqnt.LookAtCommandRequest
 	8,  // 10: zqnt.RemoteControlService.CapturePhoto:input_type -> zqnt.EmptyCommandRequest
-	9,  // 11: zqnt.RemoteControlService.PlayTTSAudio:input_type -> zqnt.TextToSpeechCommandRequest
-	10, // 12: zqnt.RemoteControlService.LiveStreamSplitScreen:input_type -> zqnt.ToggleCommandRequest
-	11, // 13: zqnt.RemoteControlService.ControlDetection:input_type -> zqnt.DetectionControlCommandRequest
-	8,  // 14: zqnt.RemoteControlService.OpenCover:input_type -> zqnt.EmptyCommandRequest
-	12, // 15: zqnt.RemoteControlService.CloseCover:input_type -> zqnt.CloseCoverCommandRequest
-	8,  // 16: zqnt.RemoteControlService.StartCharging:input_type -> zqnt.EmptyCommandRequest
-	8,  // 17: zqnt.RemoteControlService.StopCharging:input_type -> zqnt.EmptyCommandRequest
-	8,  // 18: zqnt.RemoteControlService.RebootAsset:input_type -> zqnt.EmptyCommandRequest
-	10, // 19: zqnt.RemoteControlService.BootSubAsset:input_type -> zqnt.ToggleCommandRequest
-	10, // 20: zqnt.RemoteControlService.SetRemoteDebugMode:input_type -> zqnt.ToggleCommandRequest
-	13, // 21: zqnt.RemoteControlService.ChangeAcMode:input_type -> zqnt.ChangeAcModeCommandRequest
-	14, // 22: zqnt.RemoteControlService.ChangeLens:input_type -> zqnt.ChangeCameraLensCommandRequest
-	15, // 23: zqnt.RemoteControlService.ChangeZoom:input_type -> zqnt.ChangeCameraZoomCommandRequest
-	16, // 24: zqnt.RemoteControlService.SendCustomCommand:input_type -> zqnt.CustomCommandRequest
-	17, // 25: zqnt.RemoteControlService.ReportAssetRuntime:output_type -> zqnt.ReportAssetRuntimeResponse
-	18, // 26: zqnt.RemoteControlService.GetAssetRuntime:output_type -> zqnt.AssetRuntimeResponse
-	19, // 27: zqnt.RemoteControlService.GetCapabilities:output_type -> zqnt.AssetCapabilitiesResponse
-	20, // 28: zqnt.RemoteControlService.TakeOff:output_type -> zqnt.CommandResponse
-	20, // 29: zqnt.RemoteControlService.GoTo:output_type -> zqnt.CommandResponse
-	20, // 30: zqnt.RemoteControlService.ReturnToHome:output_type -> zqnt.CommandResponse
-	20, // 31: zqnt.RemoteControlService.EnterManualControl:output_type -> zqnt.CommandResponse
-	20, // 32: zqnt.RemoteControlService.ExitManualControl:output_type -> zqnt.CommandResponse
-	20, // 33: zqnt.RemoteControlService.ManualControlInput:output_type -> zqnt.CommandResponse
-	20, // 34: zqnt.RemoteControlService.LookAt:output_type -> zqnt.CommandResponse
-	20, // 35: zqnt.RemoteControlService.CapturePhoto:output_type -> zqnt.CommandResponse
-	20, // 36: zqnt.RemoteControlService.PlayTTSAudio:output_type -> zqnt.CommandResponse
-	20, // 37: zqnt.RemoteControlService.LiveStreamSplitScreen:output_type -> zqnt.CommandResponse
-	20, // 38: zqnt.RemoteControlService.ControlDetection:output_type -> zqnt.CommandResponse
-	20, // 39: zqnt.RemoteControlService.OpenCover:output_type -> zqnt.CommandResponse
-	20, // 40: zqnt.RemoteControlService.CloseCover:output_type -> zqnt.CommandResponse
-	20, // 41: zqnt.RemoteControlService.StartCharging:output_type -> zqnt.CommandResponse
-	20, // 42: zqnt.RemoteControlService.StopCharging:output_type -> zqnt.CommandResponse
-	20, // 43: zqnt.RemoteControlService.RebootAsset:output_type -> zqnt.CommandResponse
-	20, // 44: zqnt.RemoteControlService.BootSubAsset:output_type -> zqnt.CommandResponse
-	20, // 45: zqnt.RemoteControlService.SetRemoteDebugMode:output_type -> zqnt.CommandResponse
-	20, // 46: zqnt.RemoteControlService.ChangeAcMode:output_type -> zqnt.CommandResponse
-	20, // 47: zqnt.RemoteControlService.ChangeLens:output_type -> zqnt.CommandResponse
-	20, // 48: zqnt.RemoteControlService.ChangeZoom:output_type -> zqnt.CommandResponse
-	21, // 49: zqnt.RemoteControlService.SendCustomCommand:output_type -> zqnt.CustomCommandResponse
-	25, // [25:50] is the sub-list for method output_type
-	0,  // [0:25] is the sub-list for method input_type
+	9,  // 11: zqnt.RemoteControlService.LiveStreamSplitScreen:input_type -> zqnt.ToggleCommandRequest
+	10, // 12: zqnt.RemoteControlService.ControlDetection:input_type -> zqnt.DetectionControlCommandRequest
+	8,  // 13: zqnt.RemoteControlService.OpenCover:input_type -> zqnt.EmptyCommandRequest
+	11, // 14: zqnt.RemoteControlService.CloseCover:input_type -> zqnt.CloseCoverCommandRequest
+	8,  // 15: zqnt.RemoteControlService.StartCharging:input_type -> zqnt.EmptyCommandRequest
+	8,  // 16: zqnt.RemoteControlService.StopCharging:input_type -> zqnt.EmptyCommandRequest
+	8,  // 17: zqnt.RemoteControlService.RebootAsset:input_type -> zqnt.EmptyCommandRequest
+	9,  // 18: zqnt.RemoteControlService.BootSubAsset:input_type -> zqnt.ToggleCommandRequest
+	9,  // 19: zqnt.RemoteControlService.SetRemoteDebugMode:input_type -> zqnt.ToggleCommandRequest
+	12, // 20: zqnt.RemoteControlService.ChangeAcMode:input_type -> zqnt.ChangeAcModeCommandRequest
+	13, // 21: zqnt.RemoteControlService.ChangeLens:input_type -> zqnt.ChangeCameraLensCommandRequest
+	14, // 22: zqnt.RemoteControlService.ChangeZoom:input_type -> zqnt.ChangeCameraZoomCommandRequest
+	15, // 23: zqnt.RemoteControlService.SendCustomCommand:input_type -> zqnt.CustomCommandRequest
+	16, // 24: zqnt.RemoteControlService.ReportAssetRuntime:output_type -> zqnt.ReportAssetRuntimeResponse
+	17, // 25: zqnt.RemoteControlService.GetAssetRuntime:output_type -> zqnt.AssetRuntimeResponse
+	18, // 26: zqnt.RemoteControlService.GetCapabilities:output_type -> zqnt.AssetCapabilitiesResponse
+	19, // 27: zqnt.RemoteControlService.TakeOff:output_type -> zqnt.CommandResponse
+	19, // 28: zqnt.RemoteControlService.GoTo:output_type -> zqnt.CommandResponse
+	19, // 29: zqnt.RemoteControlService.ReturnToHome:output_type -> zqnt.CommandResponse
+	19, // 30: zqnt.RemoteControlService.EnterManualControl:output_type -> zqnt.CommandResponse
+	19, // 31: zqnt.RemoteControlService.ExitManualControl:output_type -> zqnt.CommandResponse
+	19, // 32: zqnt.RemoteControlService.ManualControlInput:output_type -> zqnt.CommandResponse
+	19, // 33: zqnt.RemoteControlService.LookAt:output_type -> zqnt.CommandResponse
+	19, // 34: zqnt.RemoteControlService.CapturePhoto:output_type -> zqnt.CommandResponse
+	19, // 35: zqnt.RemoteControlService.LiveStreamSplitScreen:output_type -> zqnt.CommandResponse
+	19, // 36: zqnt.RemoteControlService.ControlDetection:output_type -> zqnt.CommandResponse
+	19, // 37: zqnt.RemoteControlService.OpenCover:output_type -> zqnt.CommandResponse
+	19, // 38: zqnt.RemoteControlService.CloseCover:output_type -> zqnt.CommandResponse
+	19, // 39: zqnt.RemoteControlService.StartCharging:output_type -> zqnt.CommandResponse
+	19, // 40: zqnt.RemoteControlService.StopCharging:output_type -> zqnt.CommandResponse
+	19, // 41: zqnt.RemoteControlService.RebootAsset:output_type -> zqnt.CommandResponse
+	19, // 42: zqnt.RemoteControlService.BootSubAsset:output_type -> zqnt.CommandResponse
+	19, // 43: zqnt.RemoteControlService.SetRemoteDebugMode:output_type -> zqnt.CommandResponse
+	19, // 44: zqnt.RemoteControlService.ChangeAcMode:output_type -> zqnt.CommandResponse
+	19, // 45: zqnt.RemoteControlService.ChangeLens:output_type -> zqnt.CommandResponse
+	19, // 46: zqnt.RemoteControlService.ChangeZoom:output_type -> zqnt.CommandResponse
+	20, // 47: zqnt.RemoteControlService.SendCustomCommand:output_type -> zqnt.CustomCommandResponse
+	24, // [24:48] is the sub-list for method output_type
+	0,  // [0:24] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
 	0,  // [0:0] is the sub-list for extension extendee
 	0,  // [0:0] is the sub-list for field type_name

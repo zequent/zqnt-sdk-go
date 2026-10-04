@@ -7,12 +7,12 @@
 package proto
 
 import (
-	proto1 "github.com/Zequent/zqnt-client-sdk-go/gen/common/asset/proto"
-	proto "github.com/Zequent/zqnt-client-sdk-go/gen/common/base/proto"
-	proto3 "github.com/Zequent/zqnt-client-sdk-go/gen/common/detection/proto"
-	proto2 "github.com/Zequent/zqnt-client-sdk-go/gen/devicecontrol/contracts/proto"
-	proto4 "github.com/Zequent/zqnt-client-sdk-go/gen/missionautonomy/domain/types/proto"
-	proto5 "github.com/Zequent/zqnt-client-sdk-go/gen/missionautonomy/dto/proto"
+	proto1 "github.com/Zequent/zqnt-client-sdk-go/v2/gen/common/asset/proto"
+	proto "github.com/Zequent/zqnt-client-sdk-go/v2/gen/common/base/proto"
+	proto3 "github.com/Zequent/zqnt-client-sdk-go/v2/gen/common/detection/proto"
+	proto2 "github.com/Zequent/zqnt-client-sdk-go/v2/gen/devicecontrol/contracts/proto"
+	proto4 "github.com/Zequent/zqnt-client-sdk-go/v2/gen/missionautonomy/domain/types/proto"
+	proto5 "github.com/Zequent/zqnt-client-sdk-go/v2/gen/missionautonomy/dto/proto"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -183,6 +183,8 @@ const AssetVendor_ASSET_VENDOR_RTMP_RTSP = proto1.AssetVendor_ASSET_VENDOR_RTMP_
 const AssetVendor_ASSET_VENDOR_SAPIENT = proto1.AssetVendor_ASSET_VENDOR_SAPIENT
 const AssetVendor_ASSET_VENDOR_BETAFLIGHT = proto1.AssetVendor_ASSET_VENDOR_BETAFLIGHT
 const AssetVendor_ASSET_VENDOR_RNS = proto1.AssetVendor_ASSET_VENDOR_RNS
+const AssetVendor_ASSET_VENDOR_ZQNT = proto1.AssetVendor_ASSET_VENDOR_ZQNT
+const AssetVendor_ASSET_VENDOR_SIMULATOR = proto1.AssetVendor_ASSET_VENDOR_SIMULATOR
 
 var AssetVendor_name = proto1.AssetVendor_name
 var AssetVendor_value = proto1.AssetVendor_value
@@ -207,6 +209,7 @@ var LiveStreamTypeEnum_name = proto1.LiveStreamTypeEnum_name
 var LiveStreamTypeEnum_value = proto1.LiveStreamTypeEnum_value
 
 type AssetProtoDTO = proto1.AssetProtoDTO
+type AssetPropertyProtoDTO = proto1.AssetPropertyProtoDTO
 type SubAssetProtoDTO = proto1.SubAssetProtoDTO
 type AssetPayloadProtoDTO = proto1.AssetPayloadProtoDTO
 type OrganizationProtoDTO = proto1.OrganizationProtoDTO
@@ -256,6 +259,20 @@ const CapabilityTargetType_CAPABILITY_TARGET_TYPE_COMPONENT = proto2.CapabilityT
 var CapabilityTargetType_name = proto2.CapabilityTargetType_name
 var CapabilityTargetType_value = proto2.CapabilityTargetType_value
 
+type CapabilitySourceProto = proto2.CapabilitySourceProto
+
+const CapabilitySourceProto_CAPABILITY_SOURCE_UNSPECIFIED = proto2.CapabilitySourceProto_CAPABILITY_SOURCE_UNSPECIFIED
+const CapabilitySourceProto_CAPABILITY_SOURCE_BUILT_IN = proto2.CapabilitySourceProto_CAPABILITY_SOURCE_BUILT_IN
+const CapabilitySourceProto_CAPABILITY_SOURCE_EDGE_ADAPTER = proto2.CapabilitySourceProto_CAPABILITY_SOURCE_EDGE_ADAPTER
+const CapabilitySourceProto_CAPABILITY_SOURCE_RUNTIME = proto2.CapabilitySourceProto_CAPABILITY_SOURCE_RUNTIME
+const CapabilitySourceProto_CAPABILITY_SOURCE_USER = proto2.CapabilitySourceProto_CAPABILITY_SOURCE_USER
+const CapabilitySourceProto_CAPABILITY_SOURCE_APPLICATION = proto2.CapabilitySourceProto_CAPABILITY_SOURCE_APPLICATION
+const CapabilitySourceProto_CAPABILITY_SOURCE_INTEGRATION = proto2.CapabilitySourceProto_CAPABILITY_SOURCE_INTEGRATION
+const CapabilitySourceProto_CAPABILITY_SOURCE_AI_GENERATED = proto2.CapabilitySourceProto_CAPABILITY_SOURCE_AI_GENERATED
+
+var CapabilitySourceProto_name = proto2.CapabilitySourceProto_name
+var CapabilitySourceProto_value = proto2.CapabilitySourceProto_value
+
 type CommandResponse = proto2.CommandResponse
 type CommandResponse_Empty = proto2.CommandResponse_Empty
 type CommandResponse_Error = proto2.CommandResponse_Error
@@ -268,6 +285,9 @@ type CustomCommandResponse_Empty = proto2.CustomCommandResponse_Empty
 type CustomCommandResponse_Error = proto2.CustomCommandResponse_Error
 type CustomCommandResponse_Progress = proto2.CustomCommandResponse_Progress
 type CapabilityTarget = proto2.CapabilityTarget
+type CapabilityErrorProto = proto2.CapabilityErrorProto
+type CapabilityEventProto = proto2.CapabilityEventProto
+type CapabilityRequirementsProto = proto2.CapabilityRequirementsProto
 type Capability = proto2.Capability
 type AssetCapabilities = proto2.AssetCapabilities
 type AssetCapabilitiesRequest = proto2.AssetCapabilitiesRequest
@@ -298,7 +318,6 @@ type ReturnToHomeCommandRequest = proto2.ReturnToHomeCommandRequest
 type ManualControlCommandRequest = proto2.ManualControlCommandRequest
 type ManualControlInputCommandRequest = proto2.ManualControlInputCommandRequest
 type ToggleCommandRequest = proto2.ToggleCommandRequest
-type TextToSpeechCommandRequest = proto2.TextToSpeechCommandRequest
 type SpotlightControlRequest = proto2.SpotlightControlRequest
 type TaskCommandRequest = proto2.TaskCommandRequest
 type CloseCoverCommandRequest = proto2.CloseCoverCommandRequest
@@ -324,12 +343,23 @@ var DetectionControlRequest_DetectionControlCommand_name = proto3.DetectionContr
 var DetectionControlRequest_DetectionControlCommand_value = proto3.DetectionControlRequest_DetectionControlCommand_value
 
 type BoundingBox = proto3.BoundingBox
+type DetectionPosition = proto3.DetectionPosition
 type DetectionResult = proto3.DetectionResult
 type DetectionBatch = proto3.DetectionBatch
 type DetectionControlRequest = proto3.DetectionControlRequest
 type DetectionStreamRequest = proto3.DetectionStreamRequest
 
 // Symbols defined in public import of mission-autonomy-types.proto.
+
+type SchedulerFiringOutcome = proto4.SchedulerFiringOutcome
+
+const SchedulerFiringOutcome_SCHEDULER_FIRING_OUTCOME_UNSPECIFIED = proto4.SchedulerFiringOutcome_SCHEDULER_FIRING_OUTCOME_UNSPECIFIED
+const SchedulerFiringOutcome_SCHEDULER_FIRING_OUTCOME_STARTED = proto4.SchedulerFiringOutcome_SCHEDULER_FIRING_OUTCOME_STARTED
+const SchedulerFiringOutcome_SCHEDULER_FIRING_OUTCOME_SKIPPED = proto4.SchedulerFiringOutcome_SCHEDULER_FIRING_OUTCOME_SKIPPED
+const SchedulerFiringOutcome_SCHEDULER_FIRING_OUTCOME_FAILED = proto4.SchedulerFiringOutcome_SCHEDULER_FIRING_OUTCOME_FAILED
+
+var SchedulerFiringOutcome_name = proto4.SchedulerFiringOutcome_name
+var SchedulerFiringOutcome_value = proto4.SchedulerFiringOutcome_value
 
 type SchedulerType = proto4.SchedulerType
 
