@@ -7,10 +7,10 @@
 package proto
 
 import (
-	proto "github.com/Zequent/zqnt-client-sdk-go/gen/common/base/proto"
-	_ "github.com/Zequent/zqnt-client-sdk-go/gen/common/proto"
-	proto2 "github.com/Zequent/zqnt-client-sdk-go/gen/missionautonomy/domain/types/proto"
-	proto1 "github.com/Zequent/zqnt-client-sdk-go/gen/missionautonomy/dto/proto"
+	proto "github.com/Zequent/zqnt-client-sdk-go/v2/gen/common/base/proto"
+	_ "github.com/Zequent/zqnt-client-sdk-go/v2/gen/common/proto"
+	proto2 "github.com/Zequent/zqnt-client-sdk-go/v2/gen/missionautonomy/domain/types/proto"
+	proto1 "github.com/Zequent/zqnt-client-sdk-go/v2/gen/missionautonomy/dto/proto"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"

@@ -5,9 +5,9 @@ import (
 	"net"
 	"testing"
 
-	base "github.com/Zequent/zqnt-client-sdk-go/gen/common/base/proto"
-	devicecontrol "github.com/Zequent/zqnt-client-sdk-go/gen/devicecontrol/contracts/proto"
-	livedatapb "github.com/Zequent/zqnt-client-sdk-go/gen/livedata/proto"
+	base "github.com/Zequent/zqnt-client-sdk-go/v2/gen/common/base/proto"
+	devicecontrol "github.com/Zequent/zqnt-client-sdk-go/v2/gen/devicecontrol/contracts/proto"
+	livedatapb "github.com/Zequent/zqnt-client-sdk-go/v2/gen/livedata/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )

@@ -23,13 +23,13 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PROTO_DIR="$ROOT/proto"
 OUT_DIR="$ROOT"
-MODULE="github.com/Zequent/zqnt-client-sdk-go"
+MODULE="github.com/Zequent/zqnt-client-sdk-go/v2"
 
 # The zqnt-protos commit gen/ is built from: the v2 line (branch refactoring/refactoring-ecosystem-v2),
 # the same commit zqnt-utils-golang generates from. The submodule pointer is the real pin; this
 # constant only asserts that what's checked out right now is still it, so a half-finished submodule
 # bump can't silently regenerate everything against an unintended contract.
-EXPECTED_PROTO_COMMIT="24ea6cb1703ef143f473b13c29249a807ae2b338"
+EXPECTED_PROTO_COMMIT="db104ba074bb76d8fee1a06dc9e59b9cc9ba51c6"
 
 if [ ! -f "$PROTO_DIR/common.proto" ]; then
   echo "Proto submodule is not checked out at $PROTO_DIR -- run:" >&2

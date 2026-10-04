@@ -7,9 +7,9 @@
 package proto
 
 import (
-	proto1 "github.com/Zequent/zqnt-client-sdk-go/gen/common/detection/proto"
-	_ "github.com/Zequent/zqnt-client-sdk-go/gen/common/proto"
-	proto "github.com/Zequent/zqnt-client-sdk-go/gen/devicecontrol/contracts/proto"
+	proto1 "github.com/Zequent/zqnt-client-sdk-go/v2/gen/common/detection/proto"
+	_ "github.com/Zequent/zqnt-client-sdk-go/v2/gen/common/proto"
+	proto "github.com/Zequent/zqnt-client-sdk-go/v2/gen/devicecontrol/contracts/proto"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"

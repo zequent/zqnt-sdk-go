@@ -8,8 +8,8 @@ package proto
 
 import (
 	context "context"
-	proto "github.com/Zequent/zqnt-client-sdk-go/gen/execution/contracts/proto"
-	proto1 "github.com/Zequent/zqnt-client-sdk-go/gen/missionautonomy/contracts/proto"
+	proto "github.com/Zequent/zqnt-client-sdk-go/v2/gen/execution/contracts/proto"
+	proto1 "github.com/Zequent/zqnt-client-sdk-go/v2/gen/missionautonomy/contracts/proto"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"

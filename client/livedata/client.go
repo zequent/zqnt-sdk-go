@@ -9,11 +9,11 @@ import (
 	"fmt"
 	"time"
 
-	base "github.com/Zequent/zqnt-client-sdk-go/gen/common/base/proto"
-	detectionpb "github.com/Zequent/zqnt-client-sdk-go/gen/common/detection/proto"
-	devicecontrol "github.com/Zequent/zqnt-client-sdk-go/gen/devicecontrol/contracts/proto"
-	eventspb "github.com/Zequent/zqnt-client-sdk-go/gen/events/proto"
-	livedatapb "github.com/Zequent/zqnt-client-sdk-go/gen/livedata/proto"
+	base "github.com/Zequent/zqnt-client-sdk-go/v2/gen/common/base/proto"
+	detectionpb "github.com/Zequent/zqnt-client-sdk-go/v2/gen/common/detection/proto"
+	devicecontrol "github.com/Zequent/zqnt-client-sdk-go/v2/gen/devicecontrol/contracts/proto"
+	eventspb "github.com/Zequent/zqnt-client-sdk-go/v2/gen/events/proto"
+	livedatapb "github.com/Zequent/zqnt-client-sdk-go/v2/gen/livedata/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )

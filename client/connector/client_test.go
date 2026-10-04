@@ -5,8 +5,8 @@ import (
 	"net"
 	"testing"
 
-	base "github.com/Zequent/zqnt-client-sdk-go/gen/common/base/proto"
-	connectorpb "github.com/Zequent/zqnt-client-sdk-go/gen/connector/proto"
+	base "github.com/Zequent/zqnt-client-sdk-go/v2/gen/common/base/proto"
+	connectorpb "github.com/Zequent/zqnt-client-sdk-go/v2/gen/connector/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )

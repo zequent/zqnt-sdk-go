@@ -7,17 +7,17 @@
 package proto
 
 import (
-	proto2 "github.com/Zequent/zqnt-client-sdk-go/gen/common/asset/proto"
-	proto "github.com/Zequent/zqnt-client-sdk-go/gen/common/base/proto"
-	proto4 "github.com/Zequent/zqnt-client-sdk-go/gen/common/detection/proto"
-	_ "github.com/Zequent/zqnt-client-sdk-go/gen/common/proto"
-	proto3 "github.com/Zequent/zqnt-client-sdk-go/gen/devicecontrol/contracts/proto"
-	proto7 "github.com/Zequent/zqnt-client-sdk-go/gen/events/proto"
-	proto9 "github.com/Zequent/zqnt-client-sdk-go/gen/execution/contracts/proto"
-	proto1 "github.com/Zequent/zqnt-client-sdk-go/gen/execution/dto/proto"
-	proto8 "github.com/Zequent/zqnt-client-sdk-go/gen/media/proto"
-	proto6 "github.com/Zequent/zqnt-client-sdk-go/gen/missionautonomy/contracts/proto"
-	proto5 "github.com/Zequent/zqnt-client-sdk-go/gen/missionautonomy/dto/proto"
+	proto2 "github.com/Zequent/zqnt-client-sdk-go/v2/gen/common/asset/proto"
+	proto "github.com/Zequent/zqnt-client-sdk-go/v2/gen/common/base/proto"
+	proto4 "github.com/Zequent/zqnt-client-sdk-go/v2/gen/common/detection/proto"
+	_ "github.com/Zequent/zqnt-client-sdk-go/v2/gen/common/proto"
+	proto3 "github.com/Zequent/zqnt-client-sdk-go/v2/gen/devicecontrol/contracts/proto"
+	proto7 "github.com/Zequent/zqnt-client-sdk-go/v2/gen/events/proto"
+	proto9 "github.com/Zequent/zqnt-client-sdk-go/v2/gen/execution/contracts/proto"
+	proto1 "github.com/Zequent/zqnt-client-sdk-go/v2/gen/execution/dto/proto"
+	proto8 "github.com/Zequent/zqnt-client-sdk-go/v2/gen/media/proto"
+	proto6 "github.com/Zequent/zqnt-client-sdk-go/v2/gen/missionautonomy/contracts/proto"
+	proto5 "github.com/Zequent/zqnt-client-sdk-go/v2/gen/missionautonomy/dto/proto"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
@@ -8677,9 +8677,13 @@ type EventTriggerProtoDTO struct {
 	// only events whose position lies inside that theatre's geo_zone fire it, and the run it starts
 	// records the theatre and chooses its assets from the site first. Unset = anywhere, as before.
 	// On an update: absent keeps the current site, present and blank clears it.
-	TheatreId     *string `protobuf:"bytes,24,opt,name=theatre_id,json=theatreId,proto3,oneof" json:"theatre_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	TheatreId *string `protobuf:"bytes,24,opt,name=theatre_id,json=theatreId,proto3,oneof" json:"theatre_id,omitempty"`
+	// Output only: why the platform switched this trigger off (its Application was deleted, its
+	// Skill is no longer in the version it would run, or that version needs an input the trigger
+	// never provides). Cleared when the trigger is switched on again.
+	AttentionReason *string `protobuf:"bytes,25,opt,name=attention_reason,json=attentionReason,proto3,oneof" json:"attention_reason,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *EventTriggerProtoDTO) Reset() {
@@ -8876,6 +8880,13 @@ func (x *EventTriggerProtoDTO) GetOrganizationId() string {
 func (x *EventTriggerProtoDTO) GetTheatreId() string {
 	if x != nil && x.TheatreId != nil {
 		return *x.TheatreId
+	}
+	return ""
+}
+
+func (x *EventTriggerProtoDTO) GetAttentionReason() string {
+	if x != nil && x.AttentionReason != nil {
+		return *x.AttentionReason
 	}
 	return ""
 }
@@ -11634,7 +11645,7 @@ const file_connector_proto_rawDesc = "" +
 	"\ttimestamp\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x123\n" +
 	"\x05error\x18\x04 \x01(\v2\x18.zqnt.GlobalErrorMessageH\x00R\x05error\x88\x01\x01\x12\x18\n" +
 	"\adeleted\x18\x05 \x01(\bR\adeletedB\b\n" +
-	"\x06_error\"\x8b\n" +
+	"\x06_error\"\xd0\n" +
 	"\n" +
 	"\x14EventTriggerProtoDTO\x12\x13\n" +
 	"\x02id\x18\x01 \x01(\tH\x00R\x02id\x88\x01\x01\x12\x12\n" +
@@ -11668,7 +11679,8 @@ const file_connector_proto_rawDesc = "" +
 	"\bpriority\x18\x16 \x01(\x05H\rR\bpriority\x88\x01\x01\x12,\n" +
 	"\x0forganization_id\x18\x17 \x01(\tH\x0eR\x0eorganizationId\x88\x01\x01\x12\"\n" +
 	"\n" +
-	"theatre_id\x18\x18 \x01(\tH\x0fR\ttheatreId\x88\x01\x01B\x05\n" +
+	"theatre_id\x18\x18 \x01(\tH\x0fR\ttheatreId\x88\x01\x01\x12.\n" +
+	"\x10attention_reason\x18\x19 \x01(\tH\x10R\x0fattentionReason\x88\x01\x01B\x05\n" +
 	"\x03_idB\v\n" +
 	"\t_asset_snB\x0e\n" +
 	"\f_object_typeB\x11\n" +
@@ -11685,7 +11697,8 @@ const file_connector_proto_rawDesc = "" +
 	"\x10_dispatch_targetB\v\n" +
 	"\t_priorityB\x12\n" +
 	"\x10_organization_idB\r\n" +
-	"\v_theatre_id\"]\n" +
+	"\v_theatre_idB\x13\n" +
+	"\x11_attention_reason\"]\n" +
 	"\x18EventTriggerProtoDTOList\x12A\n" +
 	"\x0eevent_triggers\x18\x01 \x03(\v2\x1a.zqnt.EventTriggerProtoDTOR\reventTriggers\"m\n" +
 	"#ConnectorGetAllEventTriggersRequest\x12%\n" +

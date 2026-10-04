@@ -8,11 +8,11 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/Zequent/zqnt-client-sdk-go/auth"
-	"github.com/Zequent/zqnt-client-sdk-go/config"
-	"github.com/Zequent/zqnt-client-sdk-go/connector"
-	base "github.com/Zequent/zqnt-client-sdk-go/gen/common/base/proto"
-	connectorpb "github.com/Zequent/zqnt-client-sdk-go/gen/connector/proto"
+	"github.com/Zequent/zqnt-client-sdk-go/v2/auth"
+	"github.com/Zequent/zqnt-client-sdk-go/v2/config"
+	"github.com/Zequent/zqnt-client-sdk-go/v2/connector"
+	base "github.com/Zequent/zqnt-client-sdk-go/v2/gen/common/base/proto"
+	connectorpb "github.com/Zequent/zqnt-client-sdk-go/v2/gen/connector/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )

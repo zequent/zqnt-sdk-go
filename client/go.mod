@@ -1,4 +1,4 @@
-module github.com/Zequent/zqnt-client-sdk-go
+module github.com/Zequent/zqnt-client-sdk-go/v2
 
 go 1.26.2
 

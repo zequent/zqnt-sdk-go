@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"time"
 
-	asset "github.com/Zequent/zqnt-client-sdk-go/gen/common/asset/proto"
-	base "github.com/Zequent/zqnt-client-sdk-go/gen/common/base/proto"
-	connectorpb "github.com/Zequent/zqnt-client-sdk-go/gen/connector/proto"
+	asset "github.com/Zequent/zqnt-client-sdk-go/v2/gen/common/asset/proto"
+	base "github.com/Zequent/zqnt-client-sdk-go/v2/gen/common/base/proto"
+	connectorpb "github.com/Zequent/zqnt-client-sdk-go/v2/gen/connector/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
