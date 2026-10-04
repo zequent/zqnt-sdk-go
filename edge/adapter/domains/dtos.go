@@ -85,19 +85,30 @@ type OrganizationDTO struct {
 
 // SchedulerDTO is the domain representation of a scheduler.
 //
-// v1.3.0 wire shape: schedulers are Mission/Task-bound (MissionID/TaskID) -- the current-schema
-// shape (AssetSN/CommandID/ApplicationID/SkillID/ExecutionParameters/AutoStart, no
-// MissionID/TaskID) doesn't exist yet on the v1.3.0-pinned SchedulerProtoDTO this branch depends
-// on (zqnt-utils-golang v1.3.0). See edge-go-sdk's main/2.0.0-track for the reshaped version.
+// Mission-free as of the 2.0.0 contract: MissionID/TaskID are gone (reserved 3, 4 on
+// SchedulerProtoDTO) along with Mission/Task themselves, and a schedule now names what to run
+// directly. Exactly one of CommandID or ApplicationID+SkillID is expected on a new schedule --
+// a single command, or one skill of a published Application.
 type SchedulerDTO struct {
 	ID             *string
 	Name           string
-	MissionID      *string
-	TaskID         *string
 	CronExpression string
 	Type           string
 	Active         *bool
 	ClientTimeZone *string
 	CreatedAt      *time.Time
 	ModifiedAt     *time.Time
+	// AssetSN is the asset the schedule fires against.
+	AssetSN *string
+	// CommandID is a single command id (e.g. "flight.return_to_home"), for a schedule that runs
+	// one command rather than an Application skill.
+	CommandID *string
+	// ApplicationID/SkillID name one skill of a published Application instead.
+	ApplicationID *string
+	SkillID       *string
+	// ExecutionParameters are the params handed to the command/skill, JSON-shaped
+	// (google.protobuf.Struct on the wire).
+	ExecutionParameters map[string]any
+	// AutoStart runs the resulting SkillExecution immediately instead of leaving it created.
+	AutoStart *bool
 }

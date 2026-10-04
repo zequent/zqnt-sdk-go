@@ -5,16 +5,17 @@ import (
 	"io"
 	"log/slog"
 
-	"github.com/Zequent/zqnt-edge-sdk-go/adapter"
-	"github.com/Zequent/zqnt-edge-sdk-go/adapter/domains"
-	"github.com/Zequent/zqnt-edge-sdk-go/internal/protohelpers"
-	detectionpb "github.com/zequent/zqnt-utils-golang/gen/common/detection/proto"
-	commonpb "github.com/zequent/zqnt-utils-golang/gen/common/proto"
-	devicecontrolpb "github.com/zequent/zqnt-utils-golang/gen/devicecontrol/contracts/proto"
-	edgepb "github.com/zequent/zqnt-utils-golang/gen/edge/sdk/proto"
+	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter"
+	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter/domains"
+	"github.com/Zequent/zqnt-edge-sdk-go/v2/internal/protohelpers"
+	detectionpb "github.com/zequent/zqnt-utils-golang/v2/gen/common/detection/proto"
+	commonpb "github.com/zequent/zqnt-utils-golang/v2/gen/common/proto"
+	devicecontrolpb "github.com/zequent/zqnt-utils-golang/v2/gen/devicecontrol/contracts/proto"
+	edgepb "github.com/zequent/zqnt-utils-golang/v2/gen/edge/sdk/proto"
 
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 // Server implements edgepb.EdgeAdapterServiceServer by delegating each RPC to the
@@ -432,6 +433,7 @@ func (s *Server) GetCapabilities(ctx context.Context, req *devicecontrolpb.Asset
 		if c.SchemaVersion != "" {
 			protoCap.SchemaVersion = &c.SchemaVersion
 		}
+		s.applyCommandContract(&c, protoCap)
 		protoCaps = append(protoCaps, protoCap)
 	}
 
@@ -443,6 +445,95 @@ func (s *Server) GetCapabilities(ctx context.Context, req *devicecontrolpb.Asset
 			Timestamp:    protohelpers.Now(),
 		},
 	}, nil
+}
+
+// applyCommandContract fills in the 2.0.0 additions to Capability (schemas, errors, events,
+// requirements, skill/source/provider) from the adapter's own domain value. Every one is
+// optional: a capability that sets none leaves the proto exactly as adapters that predate the
+// contract produce it, which is what the platform expects of them.
+//
+// A schema that can't be represented on the wire (a JSON Schema built from Go values
+// google.protobuf.Struct has no encoding for -- a channel, a func, a non-string map key) is
+// logged and dropped rather than failing the whole GetCapabilities call: one malformed schema in
+// an adapter's catalog must not make the device look capability-less to the platform.
+func (s *Server) applyCommandContract(c *domains.Capability, out *devicecontrolpb.Capability) {
+	out.InputSchema = s.schemaStruct(c.Command, "input_schema", c.InputSchema)
+	out.OutputSchema = s.schemaStruct(c.Command, "output_schema", c.OutputSchema)
+
+	for _, e := range c.Errors {
+		protoErr := &devicecontrolpb.CapabilityErrorProto{Code: e.Code}
+		if e.Description != "" {
+			protoErr.Description = &e.Description
+		}
+		out.Errors = append(out.Errors, protoErr)
+	}
+	for _, e := range c.Events {
+		protoEvent := &devicecontrolpb.CapabilityEventProto{
+			Name:          e.Name,
+			PayloadSchema: s.schemaStruct(c.Command, "event "+e.Name+" payload_schema", e.PayloadSchema),
+		}
+		if e.Description != "" {
+			protoEvent.Description = &e.Description
+		}
+		out.Events = append(out.Events, protoEvent)
+	}
+	if r := c.Requirements; r != nil {
+		out.Requirements = &devicecontrolpb.CapabilityRequirementsProto{
+			AssetTypes:      r.AssetTypes,
+			Payloads:        r.Payloads,
+			RuntimeFeatures: r.RuntimeFeatures,
+			Properties:      s.schemaStruct(c.Command, "requirements.properties", r.Properties),
+		}
+	}
+	if c.SkillID != "" {
+		out.SkillId = &c.SkillID
+	}
+	if c.Source != domains.CapabilitySourceUnspecified {
+		source := capabilitySourceToProto(c.Source)
+		out.Source = &source
+	}
+	if c.Provider != "" {
+		out.Provider = &c.Provider
+	}
+}
+
+// schemaStruct converts one JSON-shaped map to a google.protobuf.Struct, returning nil (the
+// "unset" wire state) for both an absent map and one that cannot be encoded.
+func (s *Server) schemaStruct(command, field string, m map[string]any) *structpb.Struct {
+	if len(m) == 0 {
+		return nil
+	}
+	encoded, err := structpb.NewStruct(m)
+	if err != nil {
+		s.log.Error("dropping capability schema that cannot be encoded",
+			"command", command, "field", field, "error", err)
+		return nil
+	}
+	return encoded
+}
+
+// capabilitySourceToProto maps domains.CapabilitySource to its wire enum. Kept an explicit switch
+// rather than a numeric cast for the same reason capabilityTargetTypeToProto is: a future
+// addition on either side should fail to compile here, not silently mean the wrong thing.
+func capabilitySourceToProto(source domains.CapabilitySource) devicecontrolpb.CapabilitySourceProto {
+	switch source {
+	case domains.CapabilitySourceBuiltIn:
+		return devicecontrolpb.CapabilitySourceProto_CAPABILITY_SOURCE_BUILT_IN
+	case domains.CapabilitySourceEdgeAdapter:
+		return devicecontrolpb.CapabilitySourceProto_CAPABILITY_SOURCE_EDGE_ADAPTER
+	case domains.CapabilitySourceRuntime:
+		return devicecontrolpb.CapabilitySourceProto_CAPABILITY_SOURCE_RUNTIME
+	case domains.CapabilitySourceUser:
+		return devicecontrolpb.CapabilitySourceProto_CAPABILITY_SOURCE_USER
+	case domains.CapabilitySourceApplication:
+		return devicecontrolpb.CapabilitySourceProto_CAPABILITY_SOURCE_APPLICATION
+	case domains.CapabilitySourceIntegration:
+		return devicecontrolpb.CapabilitySourceProto_CAPABILITY_SOURCE_INTEGRATION
+	case domains.CapabilitySourceAIGenerated:
+		return devicecontrolpb.CapabilitySourceProto_CAPABILITY_SOURCE_AI_GENERATED
+	default:
+		return devicecontrolpb.CapabilitySourceProto_CAPABILITY_SOURCE_UNSPECIFIED
+	}
 }
 
 // capabilityTargetTypeToProto maps domains.CapabilityTargetType to its wire enum -- a plain
@@ -466,7 +557,7 @@ func capabilityTargetTypeToProto(t domains.CapabilityTargetType) devicecontrolpb
 
 func (s *Server) PrepareTask(ctx context.Context, req *devicecontrolpb.TaskCommandRequest) (*devicecontrolpb.CommandResponse, error) {
 	s.log.Info("PrepareTask", "sn", req.Base.GetSn(), "taskId", req.TaskId)
-	result, err := s.adapter.PrepareTask(ctx, req.TaskId, req.Base.GetTid())
+	result, err := s.adapter.PrepareTask(ctx, req.Base.GetSn(), req.TaskId, req.Base.GetTid())
 	if err != nil {
 		return s.toErrorResponse(req.Base, err), nil
 	}
@@ -475,7 +566,7 @@ func (s *Server) PrepareTask(ctx context.Context, req *devicecontrolpb.TaskComma
 
 func (s *Server) StartTask(ctx context.Context, req *devicecontrolpb.TaskCommandRequest) (*devicecontrolpb.CommandResponse, error) {
 	s.log.Info("StartTask", "sn", req.Base.GetSn(), "taskId", req.TaskId)
-	result, err := s.adapter.StartTask(ctx, req.TaskId, req.Base.GetTid())
+	result, err := s.adapter.StartTask(ctx, req.Base.GetSn(), req.TaskId, req.Base.GetTid())
 	if err != nil {
 		return s.toErrorResponse(req.Base, err), nil
 	}
@@ -484,7 +575,7 @@ func (s *Server) StartTask(ctx context.Context, req *devicecontrolpb.TaskCommand
 
 func (s *Server) StopTask(ctx context.Context, req *devicecontrolpb.TaskCommandRequest) (*devicecontrolpb.CommandResponse, error) {
 	s.log.Warn("StopTask", "sn", req.Base.GetSn(), "taskId", req.TaskId)
-	result, err := s.adapter.StopTask(ctx, req.TaskId)
+	result, err := s.adapter.StopTask(ctx, req.Base.GetSn(), req.TaskId, req.Base.GetTid())
 	if err != nil {
 		return s.toErrorResponse(req.Base, err), nil
 	}
@@ -493,7 +584,7 @@ func (s *Server) StopTask(ctx context.Context, req *devicecontrolpb.TaskCommandR
 
 func (s *Server) PauseTask(ctx context.Context, req *devicecontrolpb.TaskCommandRequest) (*devicecontrolpb.CommandResponse, error) {
 	s.log.Info("PauseTask", "sn", req.Base.GetSn(), "taskId", req.TaskId)
-	result, err := s.adapter.PauseTask(ctx, req.TaskId, req.Base.GetTid())
+	result, err := s.adapter.PauseTask(ctx, req.Base.GetSn(), req.TaskId, req.Base.GetTid())
 	if err != nil {
 		return s.toErrorResponse(req.Base, err), nil
 	}
@@ -502,7 +593,7 @@ func (s *Server) PauseTask(ctx context.Context, req *devicecontrolpb.TaskCommand
 
 func (s *Server) ResumeTask(ctx context.Context, req *devicecontrolpb.TaskCommandRequest) (*devicecontrolpb.CommandResponse, error) {
 	s.log.Info("ResumeTask", "sn", req.Base.GetSn(), "taskId", req.TaskId)
-	result, err := s.adapter.ResumeTask(ctx, req.TaskId, req.Base.GetTid())
+	result, err := s.adapter.ResumeTask(ctx, req.Base.GetSn(), req.TaskId, req.Base.GetTid())
 	if err != nil {
 		return s.toErrorResponse(req.Base, err), nil
 	}

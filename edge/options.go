@@ -41,6 +41,24 @@ func WithLogger(l *slog.Logger) Option {
 	return func(c *config) { c.logger = l }
 }
 
+// WithEdgeToken sets the adapter's edge credential, attached to every call into the platform
+// (default: ZQNT_EDGE_TOKEN). The platform refuses calls without one, except claim redemption.
+func WithEdgeToken(token string) Option {
+	return func(c *config) { c.auth.EdgeToken = token }
+}
+
+// WithPlatformPublicKey sets the platform's service public key the adapter's server verifies
+// every command with (default: ZQNT_PLATFORM_PUBLIC_KEY / SERVICE_AUTH_PUBLIC_KEY).
+func WithPlatformPublicKey(key string) Option {
+	return func(c *config) { c.auth.PlatformPublicKey = key }
+}
+
+// WithoutPlatformAuth accepts commands from anyone who can reach the adapter's port. Local
+// SITL/simulators only -- the same as ZQNT_EDGE_AUTH_DISABLED=true.
+func WithoutPlatformAuth() Option {
+	return func(c *config) { c.auth.Disabled = true }
+}
+
 // WithConnectorAddr dials ConnectorService at addr instead of the main endpoint passed to
 // [NewEdgeClient]. Use this whenever connector isn't reachable at the same address as live-data/
 // mission-autonomy -- true of every real deployment topology in this monorepo (see config.go's

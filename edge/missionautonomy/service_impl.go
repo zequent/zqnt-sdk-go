@@ -5,14 +5,15 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/Zequent/zqnt-edge-sdk-go/adapter/domains"
-	"github.com/Zequent/zqnt-edge-sdk-go/internal/protohelpers"
-	"github.com/Zequent/zqnt-edge-sdk-go/internal/retry"
-	commonpb "github.com/zequent/zqnt-utils-golang/gen/common/proto"
-	missionautonomycontractspb "github.com/zequent/zqnt-utils-golang/gen/missionautonomy/contracts/proto"
-	missionautonomydtopb "github.com/zequent/zqnt-utils-golang/gen/missionautonomy/dto/proto"
-	missionautonomypb "github.com/zequent/zqnt-utils-golang/gen/missionautonomy/proto"
+	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter/domains"
+	"github.com/Zequent/zqnt-edge-sdk-go/v2/internal/protohelpers"
+	"github.com/Zequent/zqnt-edge-sdk-go/v2/internal/retry"
+	commonpb "github.com/zequent/zqnt-utils-golang/v2/gen/common/proto"
+	missionautonomycontractspb "github.com/zequent/zqnt-utils-golang/v2/gen/missionautonomy/contracts/proto"
+	missionautonomydtopb "github.com/zequent/zqnt-utils-golang/v2/gen/missionautonomy/dto/proto"
+	missionautonomypb "github.com/zequent/zqnt-utils-golang/v2/gen/missionautonomy/proto"
 
+	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -62,17 +63,30 @@ func schedulerFromProto(p *missionautonomydtopb.SchedulerProtoDTO) *domains.Sche
 		return nil
 	}
 	return &domains.SchedulerDTO{
-		ID:             p.Id,
-		Name:           p.Name,
-		MissionID:      p.MissionId,
-		TaskID:         p.TaskId,
-		CronExpression: p.CronExpression,
-		Type:           p.Type.String(),
-		Active:         p.Active,
-		ClientTimeZone: p.ClientTimeZone,
-		CreatedAt:      tPtr(p.CreatedAt),
-		ModifiedAt:     tPtr(p.ModifiedAt),
+		ID:                  p.Id,
+		Name:                p.Name,
+		CronExpression:      p.CronExpression,
+		Type:                p.Type.String(),
+		Active:              p.Active,
+		ClientTimeZone:      p.ClientTimeZone,
+		CreatedAt:           tPtr(p.CreatedAt),
+		ModifiedAt:          tPtr(p.ModifiedAt),
+		AssetSN:             p.AssetSn,
+		CommandID:           p.CommandId,
+		ApplicationID:       p.ApplicationId,
+		SkillID:             p.SkillId,
+		ExecutionParameters: structMap(p.GetExecutionParameters()),
+		AutoStart:           p.AutoStart,
 	}
+}
+
+// structMap keeps "unset" as a nil map rather than the empty one Struct.AsMap() returns for a nil
+// Struct, so a caller can tell "no execution parameters" from "an empty parameter object".
+func structMap(s *structpb.Struct) map[string]any {
+	if s == nil {
+		return nil
+	}
+	return s.AsMap()
 }
 
 func tPtr(ts *timestamppb.Timestamp) *time.Time {

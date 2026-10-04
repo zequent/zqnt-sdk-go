@@ -12,7 +12,7 @@ help:
 	@echo "  github.com/Zequent/zqnt-simulator"
 
 # v1.3.0-compat branch: no local proto generation here anymore -- proto stubs come from
-# github.com/zequent/zqnt-utils-golang v1.3.0 (a dependency, not generated in this repo), pinned
+# github.com/zequent/zqnt-utils-golang/v2 v1.3.0 (a dependency, not generated in this repo), pinned
 # to the exact zqnt-protos commit zqnt-utils-java:1.3.0 depends on. Regenerating that pin is
 # zqnt-utils-golang's own scripts/gen_protos.sh, not something this Makefile does.
 

@@ -3,8 +3,8 @@ package connector
 import (
 	"time"
 
-	"github.com/Zequent/zqnt-edge-sdk-go/adapter/domains"
-	assetpb "github.com/zequent/zqnt-utils-golang/gen/common/asset/proto"
+	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter/domains"
+	assetpb "github.com/zequent/zqnt-utils-golang/v2/gen/common/asset/proto"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -222,7 +222,7 @@ func enumString[T stringer](e *T) string {
 // UpdateAsset silently sent every asset with those three fields unset, which the backend reads as
 // the enum zero value (AssetTypeEnum_UNKNOWN / AssetVendor_DJI / AssetConnection's own zero) rather
 // than an error -- a real asset registered through this SDK would misreport as DJI regardless of
-// its actual vendor. Found while wiring the v1.3.0-compat simulator's own RegisterAsset call.
+// its actual vendor. Found while wiring the simulator's own RegisterAsset call.
 func parseEnum[T ~int32](values map[string]int32, s string) *T {
 	if s == "" {
 		return nil

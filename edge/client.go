@@ -5,18 +5,19 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/Zequent/zqnt-edge-sdk-go/adapter"
-	adaptergrpc "github.com/Zequent/zqnt-edge-sdk-go/adapter/grpc"
-	"github.com/Zequent/zqnt-edge-sdk-go/connector"
-	"github.com/Zequent/zqnt-edge-sdk-go/livedata"
-	"github.com/Zequent/zqnt-edge-sdk-go/missionautonomy"
+	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter"
+	adaptergrpc "github.com/Zequent/zqnt-edge-sdk-go/v2/adapter/grpc"
+	"github.com/Zequent/zqnt-edge-sdk-go/v2/auth"
+	"github.com/Zequent/zqnt-edge-sdk-go/v2/connector"
+	"github.com/Zequent/zqnt-edge-sdk-go/v2/livedata"
+	"github.com/Zequent/zqnt-edge-sdk-go/v2/missionautonomy"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	connectorpb "github.com/zequent/zqnt-utils-golang/gen/connector/proto"
-	livedatapb "github.com/zequent/zqnt-utils-golang/gen/livedata/proto"
-	missionautonomypb "github.com/zequent/zqnt-utils-golang/gen/missionautonomy/proto"
+	connectorpb "github.com/zequent/zqnt-utils-golang/v2/gen/connector/proto"
+	livedatapb "github.com/zequent/zqnt-utils-golang/v2/gen/livedata/proto"
+	missionautonomypb "github.com/zequent/zqnt-utils-golang/v2/gen/missionautonomy/proto"
 )
 
 // EdgeClient is the main entry point of the edge-go-sdk.
@@ -54,8 +55,9 @@ type EdgeClient struct {
 // edgeAdapter is the integrator-provided hardware control implementation.
 // opts are optional configuration overrides (see [Option] functions).
 //
-// The backend connection uses insecure credentials by default; wrap with
-// grpc.WithTransportCredentials for TLS in production.
+// The backend connection is plaintext; every call carries the adapter's edge credential
+// (ZQNT_EDGE_TOKEN / [WithEdgeToken]), and the adapter's own server only accepts commands signed
+// by the platform (ZQNT_PLATFORM_PUBLIC_KEY / [WithPlatformPublicKey]). See package auth.
 func NewEdgeClient(endpoint, sn string, edgeAdapter adapter.EdgeAdapter, opts ...Option) (*EdgeClient, error) {
 	cfg := defaultConfig(endpoint, sn)
 	for _, o := range opts {
@@ -66,19 +68,36 @@ func NewEdgeClient(endpoint, sn string, edgeAdapter adapter.EdgeAdapter, opts ..
 	// own address via WithConnectorAddr/WithLiveDataAddr/WithMissionAutonomyAddr uses this
 	// connection -- correct only if something in front of endpoint multiplexes all three (see
 	// config.go's doc comment on connectorAddr/liveDataAddr/missionAutonomyAddr).
-	conn, err := grpc.NewClient(endpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	log := cfg.logger
+
+	// Every call into the platform carries the adapter's edge credential; the platform refuses
+	// calls without one (see package auth).
+	dialOpts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
+	if cfg.auth.EdgeToken != "" {
+		dialOpts = append(dialOpts, grpc.WithPerRPCCredentials(auth.BearerCredentials{Token: cfg.auth.EdgeToken}))
+	} else {
+		log.Warn("no ZQNT_EDGE_TOKEN: calls to the platform carry no credential and will be refused " +
+			"(issue one in the console under Edge Credentials)")
+	}
+
+	// Only the platform may command the device: every inbound call must carry its service token.
+	guard, err := auth.NewGuard(cfg.auth, log)
+	if err != nil {
+		return nil, fmt.Errorf("edge-go-sdk: %w", err)
+	}
+
+	conn, err := grpc.NewClient(endpoint, dialOpts...)
 	if err != nil {
 		return nil, fmt.Errorf("edge-go-sdk: failed to connect to backend at %s: %w", endpoint, err)
 	}
 
-	log := cfg.logger
 	var extraConns []*grpc.ClientConn
 
 	dialOrShare := func(addr string) (*grpc.ClientConn, error) {
 		if addr == "" {
 			return conn, nil
 		}
-		c, dialErr := grpc.NewClient(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+		c, dialErr := grpc.NewClient(addr, dialOpts...)
 		if dialErr != nil {
 			return nil, fmt.Errorf("edge-go-sdk: failed to connect to %s: %w", addr, dialErr)
 		}
@@ -114,7 +133,10 @@ func NewEdgeClient(endpoint, sn string, edgeAdapter adapter.EdgeAdapter, opts ..
 	maSvc := missionautonomy.NewServiceImpl(missionautonomypb.NewMissionAutonomyServiceClient(missionConn), log)
 
 	// Build the inbound gRPC server for EdgeAdapterService.
-	grpcSrv := grpc.NewServer()
+	grpcSrv := grpc.NewServer(
+		grpc.ChainUnaryInterceptor(guard.UnaryServerInterceptor()),
+		grpc.ChainStreamInterceptor(guard.StreamServerInterceptor()),
+	)
 	adapterSrv := adaptergrpc.NewServer(edgeAdapter, log)
 	adapterSrv.RegisterWith(grpcSrv)
 

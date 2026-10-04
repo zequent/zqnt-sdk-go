@@ -21,21 +21,30 @@ package discovery
 import "fmt"
 
 const (
-	edgeEndpointKeyPrefix = "edge-endpoints:" // + {vendor}
-	edgeVendorKeyPrefix   = "edge-vendor:"    // + {sn}
+	edgeEndpointKeyPrefix = "zqnt:edge-endpoints:" // + {vendor}
+	edgeVendorKeyPrefix   = "zqnt:edge-vendor:"    // + {sn}
 )
 
+// The "zqnt:" prefix is not cosmetic and has moved once: com.zqnt.utils.caching.CacheKeys carries
+// it on the 2.0.0 line (EDGE_ENDPOINTS "zqnt:edge-endpoints:{vendor}", EDGE_VENDOR
+// "zqnt:edge-vendor:{sn}"), and did not on the 1.3.x line, where this package correctly dropped
+// it. These keys must match whichever platform line the adapter is deployed against exactly:
+// GrpcEndpointRouter.getEndpointForAsset resolves sn -> vendor -> endpoint through these two
+// lookups and fails both otherwise. The failure is quiet and misleading -- the adapter registers
+// its Asset with Connector and streams telemetry perfectly happily, while every command sent to it
+// comes back "Asset not connected: <sn>", because nothing it wrote is at a key the platform reads.
+//
+// Verified against a running 2.0.0 stack, not read off the source: with the unprefixed keys,
+// remote-control's own GetCapabilities returned "Asset not connected"; with these, it returns the
+// device's full capability snapshot.
+
 // endpointKey returns the Redis key holding the EdgeEndpoint JSON blob for a vendor.
-// Mirrors CacheKeys.EDGE_ENDPOINTS ("edge-endpoints:{vendor}") -- no "zqnt:" prefix; that was
-// wrong here (fixed alongside this comment) and never matched the real Java-side key CacheKeys
-// actually produces.
+// Mirrors CacheKeys.EDGE_ENDPOINTS.
 func endpointKey(vendor string) string {
 	return fmt.Sprintf("%s%s", edgeEndpointKeyPrefix, vendor)
 }
 
-// vendorKey returns the Redis key mapping one SN to its vendor.
-// Mirrors CacheKeys.EDGE_VENDOR ("edge-vendor:{sn}") -- no "zqnt:" prefix, same correction as
-// endpointKey above.
+// vendorKey returns the Redis key mapping one SN to its vendor. Mirrors CacheKeys.EDGE_VENDOR.
 func vendorKey(sn string) string {
 	return fmt.Sprintf("%s%s", edgeVendorKeyPrefix, sn)
 }
