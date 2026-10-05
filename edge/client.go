@@ -139,6 +139,8 @@ func NewEdgeClient(endpoint, sn string, edgeAdapter adapter.EdgeAdapter, opts ..
 	)
 	adapterSrv := adaptergrpc.NewServer(edgeAdapter, log)
 	adapterSrv.RegisterWith(grpcSrv)
+	// The v3 contract (ExecuteCommand only, no per-command RPCs) next to v2, same adapter.
+	adaptergrpc.NewServerV3(edgeAdapter, log).RegisterWith(grpcSrv)
 
 	return &EdgeClient{
 		cfg:           cfg,
