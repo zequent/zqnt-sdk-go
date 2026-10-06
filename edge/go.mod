@@ -5,7 +5,7 @@ go 1.25.0
 require (
 	github.com/google/uuid v1.6.0
 	github.com/redis/go-redis/v9 v9.22.0
-	github.com/zequent/zqnt-utils-golang/v2 v2.0.1-0.20261005225557-22fd6e365ad1
+	github.com/zequent/zqnt-utils-golang/v2 v2.0.1-0.20261006182603-2a087fc52850
 	google.golang.org/grpc v1.83.2
 	google.golang.org/protobuf v1.36.11
 )

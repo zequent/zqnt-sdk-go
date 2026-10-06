@@ -7,6 +7,8 @@ import (
 	"log/slog"
 	"math"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter"
 	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter/domains"
@@ -34,11 +36,23 @@ type ServerV3 struct {
 	edgev3.UnimplementedEdgeAdapterServiceServer
 	adapter adapter.EdgeAdapter
 	log     *slog.Logger
+
+	completionMu    sync.Mutex
+	completionCache map[string]cachedCompletion
+}
+
+// completionCacheTTL is how long the adapter's capability list is reused to look up a command's
+// completion mode.
+const completionCacheTTL = 30 * time.Second
+
+type cachedCompletion struct {
+	until time.Time
+	modes map[string]domains.CompletionMode
 }
 
 // NewServerV3 creates the v3 server for the given EdgeAdapter.
 func NewServerV3(a adapter.EdgeAdapter, log *slog.Logger) *ServerV3 {
-	return &ServerV3{adapter: a, log: log}
+	return &ServerV3{adapter: a, log: log, completionCache: map[string]cachedCompletion{}}
 }
 
 // RegisterWith registers the v3 service with the given gRPC server, alongside the v2 one.
@@ -96,6 +110,12 @@ func (s *ServerV3) capability(c domains.Capability) *capabilityv3.Capability {
 	for _, e := range c.Errors {
 		out.Errors = append(out.Errors, &capabilityv3.CapabilityErrorSpec{Code: e.Code, Description: e.Description})
 	}
+	for _, e := range c.Events {
+		out.Events = append(out.Events, &capabilityv3.CapabilityEventSpec{Name: e.Name, Description: e.Description,
+			PayloadSchema: s.schema(c.Command, "event "+e.Name, e.PayloadSchema)})
+	}
+	out.Completion = capabilityv3.CompletionMode(c.Completion)
+	out.CompletionEvent = c.CompletionEvent
 	return out
 }
 
@@ -123,7 +143,34 @@ func (s *ServerV3) ExecuteCommand(ctx context.Context, req *edgev3.ExecuteComman
 		s.log.Error("v3 ExecuteCommand failed", "command", cmd.GetCommandId(), "sn", sn, "error", err)
 		result = domains.Error(err.Error(), sn)
 	}
-	return &edgev3.ExecuteCommandResponse{Result: commandResult(cmd.GetCommandId(), req.GetCommandExecutionId(), result)}, nil
+	completion := s.completion(ctx, sn, cmd.GetCommandId(), result)
+	return &edgev3.ExecuteCommandResponse{Result: commandResultWith(cmd.GetCommandId(), req.GetCommandExecutionId(), result, completion)}, nil
+}
+
+// completion is the command's declared completion mode, looked up only when it decides something:
+// a success that did not bring its own ExternalExecutionID. It never fails the command: an adapter
+// whose capabilities cannot be read is left to its result.
+func (s *ServerV3) completion(ctx context.Context, sn, commandID string, r *domains.CommandResult) domains.CompletionMode {
+	if !r.IsSuccess() || r.ExternalExecutionID != "" {
+		return domains.CompletionUnspecified
+	}
+	s.completionMu.Lock()
+	cached, ok := s.completionCache[sn]
+	s.completionMu.Unlock()
+	if !ok || time.Now().After(cached.until) {
+		caps, err := s.adapter.GetCapabilities(ctx, sn)
+		if err != nil || caps == nil {
+			return domains.CompletionUnspecified
+		}
+		cached = cachedCompletion{until: time.Now().Add(completionCacheTTL), modes: map[string]domains.CompletionMode{}}
+		for _, c := range caps.Capabilities {
+			cached.modes[c.Command] = c.Completion
+		}
+		s.completionMu.Lock()
+		s.completionCache[sn] = cached
+		s.completionMu.Unlock()
+	}
+	return cached.modes[commandID]
 }
 
 func (s *ServerV3) dispatch(ctx context.Context, sn, tid string, cmd *capabilityv3.Command, params map[string]any) (*domains.CommandResult, error) {
@@ -196,8 +243,21 @@ func (s *ServerV3) StreamDetections(req *edgev3.StreamDetectionsRequest, stream 
 // REJECTED with NotSupportedCode, never an aborted call, so the platform can tell "this asset
 // cannot do that" from "it tried and failed".
 func commandResult(commandID, commandExecutionID string, r *domains.CommandResult) *capabilityv3.CommandResult {
+	return commandResultWith(commandID, commandExecutionID, r, domains.CompletionUnspecified)
+}
+
+// commandResultWith reports a success ACCEPTED -- the outcome follows as an event -- when the adapter
+// gave its own ExternalExecutionID or the capability declares CompletionAsynchronous; otherwise
+// SUCCEEDED. Before this the Go SDK could not report ACCEPTED at all, so a simulated take-off
+// counted as done while the aircraft was still climbing.
+func commandResultWith(commandID, commandExecutionID string, r *domains.CommandResult, completion domains.CompletionMode) *capabilityv3.CommandResult {
 	out := &capabilityv3.CommandResult{CommandExecutionId: commandExecutionID, CommandId: commandID}
 	switch {
+	case r.IsSuccess() && (r.ExternalExecutionID != "" || completion == domains.CompletionAsynchronous):
+		out.State = capabilityv3.CommandState_COMMAND_STATE_ACCEPTED
+		if r.ExternalExecutionID != "" {
+			out.Result, _ = structpb.NewStruct(map[string]any{"external_execution_id": r.ExternalExecutionID})
+		}
 	case r.IsSuccess():
 		out.State = capabilityv3.CommandState_COMMAND_STATE_SUCCEEDED
 	case r.IsNotImplemented():

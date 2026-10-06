@@ -67,7 +67,25 @@ type Capability struct {
 	Source CapabilitySource
 	// Provider is the human-readable origin shown in the catalog, e.g. "DJI Adapter".
 	Provider string
+	// Completion says whether the reply finishes the command (CompletionOnReply: a cover, a
+	// light) or a later CommandExecutionEvent does (CompletionAsynchronous: take-off, go-to, return
+	// home, a mission). Left unset, a result with an ExternalExecutionID waits and any other
+	// success is done. Not the same as Events, which list what a Skill can react to.
+	Completion CompletionMode
+	// CompletionEvent names, for CompletionAsynchronous, the event in Events that reports the
+	// outcome, e.g. "flight.takeoff.completed".
+	CompletionEvent string
 }
+
+// CompletionMode is when a command is finished, as far as the platform can tell. The values
+// match zqnt.capability.v3.CompletionMode.
+type CompletionMode int
+
+const (
+	CompletionUnspecified  CompletionMode = 0
+	CompletionOnReply      CompletionMode = 1
+	CompletionAsynchronous CompletionMode = 2
+)
 
 // CapabilityError is one failure code a command's execution can end in -- part of the contract
 // alongside the schemas, so a caller knows what can go wrong without probing the device.

@@ -30,6 +30,17 @@ type CommandResult struct {
 	TID        string
 	SN         string
 	ResultType ResultType
+	// ExternalExecutionID is the vendor's own id for a command that is accepted now and finishes
+	// later (a flight id). Set it, and the command is reported ACCEPTED: the platform waits for
+	// the CommandExecutionEvent carrying this id. Use Accepted to build such a result.
+	ExternalExecutionID string
+}
+
+// Accepted is a success that only started the command: its outcome follows as a
+// CommandExecutionEvent under externalExecutionID.
+func Accepted(message, externalExecutionID, sn string) *CommandResult {
+	return &CommandResult{Success: true, Message: message, SN: sn, ResultType: ResultTypeSuccess,
+		ExternalExecutionID: externalExecutionID}
 }
 
 // IsSuccess reports whether the command succeeded.

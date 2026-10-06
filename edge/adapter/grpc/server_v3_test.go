@@ -123,3 +123,83 @@ func TestV3CancelStopsTheExecution(t *testing.T) {
 		t.Fatalf("result = %+v, stopped = %v", resp.GetResult(), a.stopped)
 	}
 }
+
+// declaringAdapter declares take-off asynchronous; its typed TakeOff still answers a plain success.
+type declaringAdapter struct {
+	v3Adapter
+}
+
+func (a *declaringAdapter) GetCapabilities(_ context.Context, sn string) (*domains.CurrentCapabilities, error) {
+	return &domains.CurrentCapabilities{SN: sn, Capabilities: []domains.Capability{
+		{Command: "flight.takeoff", Available: true, Completion: domains.CompletionAsynchronous,
+			CompletionEvent: "flight.takeoff.completed",
+			Events:          []domains.CapabilityEvent{{Name: "flight.takeoff.completed", Description: "airborne"}}},
+		{Command: "vendor.acme.spray", Available: true, Completion: domains.CompletionOnReply},
+	}}, nil
+}
+
+func executeOn(t *testing.T, a adapter.EdgeAdapter, id string, params map[string]any) *capabilityv3.CommandResult {
+	t.Helper()
+	p, err := structpb.NewStruct(params)
+	if err != nil {
+		t.Fatal(err)
+	}
+	s := NewServerV3(a, slog.New(slog.NewTextHandler(io.Discard, nil)))
+	resp, err := s.ExecuteCommand(context.Background(), &edgev3.ExecuteCommandRequest{
+		CommandExecutionId: "cx-1",
+		Command:            &capabilityv3.Command{Asset: &commonv3.AssetRef{Sn: "SN-1"}, CommandId: id, Params: p},
+	})
+	if err != nil {
+		t.Fatalf("ExecuteCommand returned an error status: %v", err)
+	}
+	return resp.GetResult()
+}
+
+func TestV3DeclaredAsynchronousCommandWaitsEvenOnAPlainSuccess(t *testing.T) {
+	r := executeOn(t, &declaringAdapter{}, "flight.takeoff", map[string]any{"latitude": 52.5, "longitude": 13.4, "altitude": 40})
+	if r.GetState() != capabilityv3.CommandState_COMMAND_STATE_ACCEPTED {
+		t.Fatalf("state = %v, want ACCEPTED", r.GetState())
+	}
+	if r.GetCommandExecutionId() != "cx-1" {
+		t.Fatalf("command_execution_id = %q", r.GetCommandExecutionId())
+	}
+}
+
+func TestV3DeclaredOnReplyCommandIsDoneOnItsReply(t *testing.T) {
+	r := executeOn(t, &declaringAdapter{}, "vendor.acme.spray", map[string]any{})
+	if r.GetState() != capabilityv3.CommandState_COMMAND_STATE_SUCCEEDED {
+		t.Fatalf("state = %v, want SUCCEEDED", r.GetState())
+	}
+}
+
+// acceptingAdapter answers with its own execution id, the way a mission is started.
+type acceptingAdapter struct {
+	v3Adapter
+}
+
+func (a *acceptingAdapter) SendCustomCommand(_ context.Context, req *domains.CustomCommandRequest) (*domains.CommandResult, error) {
+	return domains.Accepted("flying", "sim-mission-7", req.SN), nil
+}
+
+func TestV3AnAdapterAcceptedResultCarriesItsOwnExecutionID(t *testing.T) {
+	r := executeOn(t, &acceptingAdapter{}, "mission.waypoint.execute", map[string]any{})
+	if r.GetState() != capabilityv3.CommandState_COMMAND_STATE_ACCEPTED {
+		t.Fatalf("state = %v, want ACCEPTED", r.GetState())
+	}
+	if got := r.GetResult().GetFields()["external_execution_id"].GetStringValue(); got != "sim-mission-7" {
+		t.Fatalf("external_execution_id = %q", got)
+	}
+}
+
+func TestV3CompletionModeIsPublishedWithTheCapability(t *testing.T) {
+	s := NewServerV3(&declaringAdapter{}, slog.New(slog.NewTextHandler(io.Discard, nil)))
+	resp, err := s.GetCapabilities(context.Background(), &edgev3.GetCapabilitiesRequest{Asset: &commonv3.AssetRef{Sn: "SN-1"}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	takeoff := resp.GetCapabilities().GetCapabilities()[0]
+	if takeoff.GetCompletion() != capabilityv3.CompletionMode_COMPLETION_MODE_ASYNCHRONOUS ||
+		takeoff.GetCompletionEvent() != "flight.takeoff.completed" || takeoff.GetEvents()[0].GetName() != "flight.takeoff.completed" {
+		t.Fatalf("capability = %v", takeoff)
+	}
+}
