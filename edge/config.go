@@ -32,6 +32,9 @@ type config struct {
 	connectorAddr       string
 	liveDataAddr        string
 	missionAutonomyAddr string
+	// remoteControlAddr is where remote-control serves the v3 EdgeGatewayService and v2
+	// ReportAssetRuntime.
+	remoteControlAddr string
 
 	// auth: the edge credential for calls into the platform, and how the platform's commands are
 	// verified. Defaults from the environment (see package auth).

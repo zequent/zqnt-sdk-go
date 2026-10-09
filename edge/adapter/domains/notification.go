@@ -39,20 +39,19 @@ func (s CommandExecutionStatus) String() string {
 
 // CommandExecutionEvent is one lifecycle report for a command the platform is waiting on.
 //
-// ExternalExecutionID is the key the platform correlates by, and for a command that arrived from
-// capability execution it is the id the platform itself sent: EdgeExecutionNodeDispatcher builds
-// "capexec:<executionId>:<nodeId>" and puts it in RequestBase.tid, which reaches the adapter as
-// the request's TID. Echoing that value back is what binds this event to the waiting node. An
-// adapter reporting a command it minted itself (a vendor flight id, say) may use that instead,
-// provided the same id was returned to the platform when the command was accepted.
+// The platform matches it to the waiting node by its id: on v3 the command_execution_id it sent
+// with ExecuteCommand (also the request's TID), on v2 the "capexec:<execution>:<node>" TID. An
+// adapter reporting a command under its own vendor id may use that instead, provided it returned
+// the same id when the command was accepted.
 //
-// SN, ExternalExecutionID and OccurredAt are all required on the wire -- live-data's
-// CommandExecutionEventPublisher rejects an event missing any of them. The rejection is invisible
-// from here, because notifications are published fire-and-forget over a stream: the publish call
-// succeeds and the event is simply dropped, leaving the node waiting. PublishCommandExecutionEvent
-// therefore defaults OccurredAt rather than letting a zero value through.
+// SN, the id and OccurredAt are required on the wire; the SDK sets OccurredAt to the publish time
+// when it is zero, because an event without it is refused (v3) or silently dropped (v2).
 type CommandExecutionEvent struct {
-	SN                  string
+	SN string
+	// CommandExecutionID is the platform's id of the run (v3 ExecuteCommand's
+	// command_execution_id, domains.CustomCommandRequest.CommandExecutionID). Takes precedence over
+	// ExternalExecutionID when both are set.
+	CommandExecutionID  string
 	ExternalExecutionID string
 	CommandID           string
 	Status              CommandExecutionStatus
@@ -63,6 +62,16 @@ type CommandExecutionEvent struct {
 	// Output is handed to the completing node as its result, for a SUCCEEDED event. Values must be
 	// JSON-shaped (the wire type is a google.protobuf.Struct).
 	Output map[string]any
+	// ErrorCode is a machine-readable code for a FAILED event, ideally one the capability declares.
+	ErrorCode string
 	// OccurredAt is when the adapter observed this. Defaults to publish time when zero.
 	OccurredAt time.Time
+}
+
+// ExecutionID is the id the platform matches this event by.
+func (e *CommandExecutionEvent) ExecutionID() string {
+	if e.CommandExecutionID != "" {
+		return e.CommandExecutionID
+	}
+	return e.ExternalExecutionID
 }

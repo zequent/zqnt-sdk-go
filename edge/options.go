@@ -78,3 +78,9 @@ func WithLiveDataAddr(addr string) Option {
 func WithMissionAutonomyAddr(addr string) Option {
 	return func(c *config) { c.missionAutonomyAddr = addr }
 }
+
+// WithRemoteControlAddr dials remote-control (v3 EdgeGatewayService: command events and
+// capability reports) at addr instead of the main endpoint. See WithConnectorAddr.
+func WithRemoteControlAddr(addr string) Option {
+	return func(c *config) { c.remoteControlAddr = addr }
+}

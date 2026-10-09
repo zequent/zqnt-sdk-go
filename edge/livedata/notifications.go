@@ -7,9 +7,14 @@ import (
 
 	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter/domains"
 	"github.com/Zequent/zqnt-edge-sdk-go/v2/internal/protohelpers"
+	"github.com/Zequent/zqnt-edge-sdk-go/v2/internal/retry"
+	"github.com/Zequent/zqnt-edge-sdk-go/v2/internal/v3compat"
 	commonpb "github.com/zequent/zqnt-utils-golang/v2/gen/common/proto"
 	eventspb "github.com/zequent/zqnt-utils-golang/v2/gen/events/proto"
 	livedatapb "github.com/zequent/zqnt-utils-golang/v2/gen/livedata/proto"
+	capabilityv3 "github.com/zequent/zqnt-utils-golang/v2/gen/zqnt/capability/v3"
+	commonv3 "github.com/zequent/zqnt-utils-golang/v2/gen/zqnt/common/v3"
+	edgev3 "github.com/zequent/zqnt-utils-golang/v2/gen/zqnt/edge/v3"
 
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -23,13 +28,13 @@ import (
 // intact across devices, which matters when a command's RUNNING and SUCCEEDED land close together.
 
 // PublishCommandExecutionEvent reports one stage of a physical command's lifecycle to the
-// platform. mission-autonomy correlates the event to the waiting skill node by
-// ExternalExecutionID; see domains.CommandExecutionEvent for where that id comes from.
+// platform, which matches it to the waiting skill node by its id (see
+// domains.CommandExecutionEvent).
 //
-// Delivery is fire-and-forget by design (a client-streaming RPC answers once, at the end), so a
-// nil error means "handed to the stream", not "the platform accepted it". What this method *can*
-// catch is the event being unusable before it leaves: the three fields live-data requires are
-// validated here rather than dropped silently downstream.
+// It goes over the v3 EdgeGatewayService (PublishCommandEvent, answered per event). A platform that
+// does not serve that yet answers UNIMPLEMENTED; the event then goes over the v2 notification
+// stream, and so does every event for the next v3compat.RetryAfter. OccurredAt is always set:
+// now when the adapter gave none.
 func (s *ServiceImpl) PublishCommandExecutionEvent(ctx context.Context, event *domains.CommandExecutionEvent) error {
 	if event == nil {
 		return nil
@@ -37,14 +42,81 @@ func (s *ServiceImpl) PublishCommandExecutionEvent(ctx context.Context, event *d
 	if event.SN == "" {
 		return fmt.Errorf("livedata: command execution event requires SN")
 	}
-	if event.ExternalExecutionID == "" {
-		return fmt.Errorf("livedata: command execution event requires ExternalExecutionID")
+	if event.ExecutionID() == "" {
+		return fmt.Errorf("livedata: command execution event requires CommandExecutionID or ExternalExecutionID")
+	}
+	if s.gateway != nil && s.gatewayV3.Available() {
+		v3Event, err := CommandEventV3(event)
+		if err != nil {
+			return err
+		}
+		_, err = retry.Do(ctx, func(c context.Context) (*edgev3.PublishCommandEventResponse, error) {
+			return s.gateway.PublishCommandEvent(c, &edgev3.PublishCommandEventRequest{Event: v3Event})
+		})
+		if !v3compat.Unimplemented(err) {
+			return err
+		}
+		if s.gatewayV3.MarkUnavailable() {
+			s.log.Warn("platform does not serve zqnt.edge.v3.EdgeGatewayService; command events go over v2",
+				"retry_after", v3compat.RetryAfter)
+		}
 	}
 	req, err := s.toNotificationRequest(event)
 	if err != nil {
 		return err
 	}
 	return s.ProduceNotification(ctx, req)
+}
+
+// CommandEventV3 is the v3 shape of a command event. The id is CommandExecutionID, or
+// ExternalExecutionID when the adapter only has its own.
+func CommandEventV3(event *domains.CommandExecutionEvent) (*capabilityv3.CommandEvent, error) {
+	occurredAt := time.Now()
+	if !event.OccurredAt.IsZero() {
+		occurredAt = event.OccurredAt
+	}
+	out := &capabilityv3.CommandEvent{
+		CommandExecutionId: event.ExecutionID(),
+		CommandId:          event.CommandID,
+		Asset:              &commonv3.AssetRef{Sn: event.SN},
+		State:              commandStateV3(event.Status),
+		Progress:           event.Progress,
+		Message:            event.Message,
+		OccurredAt:         timestamppb.New(occurredAt),
+	}
+	if len(event.Output) > 0 {
+		result, err := structpb.NewStruct(event.Output)
+		if err != nil {
+			return nil, fmt.Errorf("livedata: command execution event output is not JSON-shaped: %w", err)
+		}
+		out.Result = result
+	}
+	if event.Status == domains.CommandExecutionFailed {
+		msg := event.Message
+		if msg == "" {
+			msg = "command failed"
+		}
+		out.Error = &commonv3.Error{Category: commonv3.ErrorCategory_ERROR_CATEGORY_ASSET, Code: event.ErrorCode,
+			Message: msg, OccurredAt: out.OccurredAt}
+	}
+	return out, nil
+}
+
+func commandStateV3(status domains.CommandExecutionStatus) capabilityv3.CommandState {
+	switch status {
+	case domains.CommandExecutionAccepted:
+		return capabilityv3.CommandState_COMMAND_STATE_ACCEPTED
+	case domains.CommandExecutionRunning:
+		return capabilityv3.CommandState_COMMAND_STATE_RUNNING
+	case domains.CommandExecutionSucceeded:
+		return capabilityv3.CommandState_COMMAND_STATE_SUCCEEDED
+	case domains.CommandExecutionFailed:
+		return capabilityv3.CommandState_COMMAND_STATE_FAILED
+	case domains.CommandExecutionCancelled:
+		return capabilityv3.CommandState_COMMAND_STATE_CANCELLED
+	default:
+		return capabilityv3.CommandState_COMMAND_STATE_UNSPECIFIED
+	}
 }
 
 // ProduceNotification sends a pre-built notification over the shared stream, opening or reopening
@@ -202,7 +274,7 @@ func (s *ServiceImpl) toNotificationRequest(event *domains.CommandExecutionEvent
 	}
 
 	payload := &eventspb.CommandExecutionEvent{
-		ExternalExecutionId: event.ExternalExecutionID,
+		ExternalExecutionId: event.ExecutionID(),
 		Status:              toCommandExecutionStatus(event.Status),
 		AssetSn:             event.SN,
 		OccurredAt:          occurredAt,

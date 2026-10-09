@@ -9,7 +9,10 @@ import (
 	"time"
 
 	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter/domains"
+	"github.com/Zequent/zqnt-edge-sdk-go/v2/internal/v3compat"
 	livedatapb "github.com/zequent/zqnt-utils-golang/v2/gen/livedata/proto"
+	edgev3 "github.com/zequent/zqnt-utils-golang/v2/gen/zqnt/edge/v3"
+	telemetryv3 "github.com/zequent/zqnt-utils-golang/v2/gen/zqnt/telemetry/v3"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -49,17 +52,46 @@ type ServiceImpl struct {
 	notifyMu       sync.RWMutex
 	notifyStream   *notificationStream
 	notifyAttempts int
+
+	gateway   edgev3.EdgeGatewayServiceClient
+	gatewayV3 v3compat.Switch
+
+	ingest   telemetryv3.TelemetryIngestServiceClient
+	ingestV3 v3compat.Switch
+	v3       *v3Streams
+	v2       *v2Streams
+}
+
+// Option configures a ServiceImpl.
+type Option func(*ServiceImpl)
+
+// WithGateway sends command events over the v3 EdgeGatewayService, falling back to the v2
+// notification stream while the platform does not serve it.
+func WithGateway(c edgev3.EdgeGatewayServiceClient) Option {
+	return func(s *ServiceImpl) { s.gateway = c }
+}
+
+// WithTelemetryIngest sends v3 telemetry, detections and alerts over TelemetryIngestService,
+// falling back to v2 while the platform does not serve it.
+func WithTelemetryIngest(c telemetryv3.TelemetryIngestServiceClient) Option {
+	return func(s *ServiceImpl) { s.ingest = c }
 }
 
 // NewServiceImpl creates a new LiveDataService implementation.
-func NewServiceImpl(stub livedatapb.LiveDataServiceClient, log *slog.Logger) *ServiceImpl {
-	return &ServiceImpl{
+func NewServiceImpl(stub livedatapb.LiveDataServiceClient, log *slog.Logger, opts ...Option) *ServiceImpl {
+	s := &ServiceImpl{
 		stub:     stub,
 		mapper:   &Mapper{},
 		log:      log,
 		streams:  make(map[string]*streamEntry),
 		attempts: make(map[string]int),
 	}
+	for _, o := range opts {
+		o(s)
+	}
+	s.v3 = newV3Streams(s)
+	s.v2 = newV2Streams(s)
+	return s
 }
 
 func (s *ServiceImpl) ProduceTelemetryData(ctx context.Context, data *domains.TelemetryRequestData) error {
@@ -139,6 +171,8 @@ func (s *ServiceImpl) Shutdown(ctx context.Context) error {
 	if err := s.CloseNotificationStream(ctx); err != nil {
 		s.log.Warn("error closing notification stream during shutdown", "error", err)
 	}
+	s.v3.close()
+	s.v2.close()
 	return s.CloseAllStreams(ctx)
 }
 
