@@ -15,7 +15,6 @@ import (
 
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
-	"google.golang.org/protobuf/types/known/structpb"
 )
 
 // Server implements edgepb.EdgeAdapterServiceServer by delegating each RPC to the
@@ -54,7 +53,7 @@ func (s *Server) toCommandResponse(base *commonpb.RequestBase, result *domains.C
 	resp := &devicecontrolpb.CommandResponse{
 		Meta: &commonpb.ResponseMeta{Tid: base.GetTid(), Sn: base.GetSn(), Timestamp: protohelpers.Now()},
 	}
-	if result.IsNotImplemented() {
+	if result.IsNotImplemented() || result.IsRejected() {
 		hasErr := true
 		resp.HasErrors = &hasErr
 		resp.Response = &devicecontrolpb.CommandResponse_Error{
@@ -64,7 +63,7 @@ func (s *Server) toCommandResponse(base *commonpb.RequestBase, result *domains.C
 				Timestamp:    protohelpers.Now(),
 			},
 		}
-		s.log.Warn("command not implemented", "message", result.Message, "sn", base.GetSn())
+		s.log.Warn("command refused", "message", result.Message, "sn", base.GetSn())
 		return resp
 	}
 	if result.IsSuccess() {
@@ -94,7 +93,7 @@ func (s *Server) toCustomCommandResponse(base *commonpb.RequestBase, commandID s
 		Meta:      &commonpb.ResponseMeta{Tid: base.GetTid(), Sn: base.GetSn(), Timestamp: protohelpers.Now()},
 		CommandId: commandID,
 	}
-	if result.IsNotImplemented() {
+	if result.IsNotImplemented() || result.IsRejected() {
 		hasErr := true
 		resp.HasErrors = &hasErr
 		resp.Response = &devicecontrolpb.CustomCommandResponse_Error{
@@ -104,7 +103,7 @@ func (s *Server) toCustomCommandResponse(base *commonpb.RequestBase, commandID s
 				Timestamp:    protohelpers.Now(),
 			},
 		}
-		s.log.Warn("command not implemented", "message", result.Message, "sn", base.GetSn())
+		s.log.Warn("command refused", "message", result.Message, "sn", base.GetSn())
 		return resp
 	}
 	if result.IsSuccess() {
@@ -412,7 +411,19 @@ func (s *Server) GetCapabilities(ctx context.Context, req *devicecontrolpb.Asset
 		}, nil
 	}
 
-	protoCaps := make([]*devicecontrolpb.Capability, 0, len(caps.Capabilities))
+	return &devicecontrolpb.AssetCapabilitiesResponse{
+		Capabilities: &devicecontrolpb.AssetCapabilities{
+			AssetSn:      caps.SN,
+			AssetType:    caps.AssetType,
+			Capabilities: CapabilitiesV2(caps, s.log),
+			Timestamp:    protohelpers.Now(),
+		},
+	}, nil
+}
+
+// CapabilitiesV2 maps the adapter's capabilities onto the v2 wire shape.
+func CapabilitiesV2(caps *domains.CurrentCapabilities, log *slog.Logger) []*devicecontrolpb.Capability {
+	out := make([]*devicecontrolpb.Capability, 0, len(caps.Capabilities))
 	for _, c := range caps.Capabilities {
 		state := devicecontrolpb.CapabilityState_CAPABILITY_STATE_UNSUPPORTED
 		if c.Available {
@@ -433,18 +444,10 @@ func (s *Server) GetCapabilities(ctx context.Context, req *devicecontrolpb.Asset
 		if c.SchemaVersion != "" {
 			protoCap.SchemaVersion = &c.SchemaVersion
 		}
-		s.applyCommandContract(&c, protoCap)
-		protoCaps = append(protoCaps, protoCap)
+		applyCommandContract(log, &c, protoCap)
+		out = append(out, protoCap)
 	}
-
-	return &devicecontrolpb.AssetCapabilitiesResponse{
-		Capabilities: &devicecontrolpb.AssetCapabilities{
-			AssetSn:      caps.SN,
-			AssetType:    caps.AssetType,
-			Capabilities: protoCaps,
-			Timestamp:    protohelpers.Now(),
-		},
-	}, nil
+	return out
 }
 
 // applyCommandContract fills in the 2.0.0 additions to Capability (schemas, errors, events,
@@ -456,9 +459,9 @@ func (s *Server) GetCapabilities(ctx context.Context, req *devicecontrolpb.Asset
 // google.protobuf.Struct has no encoding for -- a channel, a func, a non-string map key) is
 // logged and dropped rather than failing the whole GetCapabilities call: one malformed schema in
 // an adapter's catalog must not make the device look capability-less to the platform.
-func (s *Server) applyCommandContract(c *domains.Capability, out *devicecontrolpb.Capability) {
-	out.InputSchema = s.schemaStruct(c.Command, "input_schema", c.InputSchema)
-	out.OutputSchema = s.schemaStruct(c.Command, "output_schema", c.OutputSchema)
+func applyCommandContract(log *slog.Logger, c *domains.Capability, out *devicecontrolpb.Capability) {
+	out.InputSchema = schemaStruct(log, c.Command, "input_schema", c.InputSchema)
+	out.OutputSchema = schemaStruct(log, c.Command, "output_schema", c.OutputSchema)
 
 	for _, e := range c.Errors {
 		protoErr := &devicecontrolpb.CapabilityErrorProto{Code: e.Code}
@@ -470,7 +473,7 @@ func (s *Server) applyCommandContract(c *domains.Capability, out *devicecontrolp
 	for _, e := range c.Events {
 		protoEvent := &devicecontrolpb.CapabilityEventProto{
 			Name:          e.Name,
-			PayloadSchema: s.schemaStruct(c.Command, "event "+e.Name+" payload_schema", e.PayloadSchema),
+			PayloadSchema: schemaStruct(log, c.Command, "event "+e.Name+" payload_schema", e.PayloadSchema),
 		}
 		if e.Description != "" {
 			protoEvent.Description = &e.Description
@@ -482,7 +485,7 @@ func (s *Server) applyCommandContract(c *domains.Capability, out *devicecontrolp
 			AssetTypes:      r.AssetTypes,
 			Payloads:        r.Payloads,
 			RuntimeFeatures: r.RuntimeFeatures,
-			Properties:      s.schemaStruct(c.Command, "requirements.properties", r.Properties),
+			Properties:      schemaStruct(log, c.Command, "requirements.properties", r.Properties),
 		}
 	}
 	if c.SkillID != "" {
@@ -495,21 +498,6 @@ func (s *Server) applyCommandContract(c *domains.Capability, out *devicecontrolp
 	if c.Provider != "" {
 		out.Provider = &c.Provider
 	}
-}
-
-// schemaStruct converts one JSON-shaped map to a google.protobuf.Struct, returning nil (the
-// "unset" wire state) for both an absent map and one that cannot be encoded.
-func (s *Server) schemaStruct(command, field string, m map[string]any) *structpb.Struct {
-	if len(m) == 0 {
-		return nil
-	}
-	encoded, err := structpb.NewStruct(m)
-	if err != nil {
-		s.log.Error("dropping capability schema that cannot be encoded",
-			"command", command, "field", field, "error", err)
-		return nil
-	}
-	return encoded
 }
 
 // capabilitySourceToProto maps domains.CapabilitySource to its wire enum. Kept an explicit switch

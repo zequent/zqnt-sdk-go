@@ -2,9 +2,11 @@ package adaptergrpc
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"log/slog"
 	"math"
+	"strings"
 	"testing"
 
 	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter"
@@ -201,5 +203,101 @@ func TestV3CompletionModeIsPublishedWithTheCapability(t *testing.T) {
 	if takeoff.GetCompletion() != capabilityv3.CompletionMode_COMPLETION_MODE_ASYNCHRONOUS ||
 		takeoff.GetCompletionEvent() != "flight.takeoff.completed" || takeoff.GetEvents()[0].GetName() != "flight.takeoff.completed" {
 		t.Fatalf("capability = %v", takeoff)
+	}
+}
+
+// registryDrone writes each command once; v3 and v2 both reach the same handler.
+type registryDrone struct {
+	adapter.Base
+	got []*domains.CustomCommandRequest
+}
+
+func newRegistryDrone() *registryDrone {
+	d := &registryDrone{}
+	d.MustRegisterCommand("flight.takeoff", map[string]any{
+		"type":       "object",
+		"required":   []any{"altitude"},
+		"properties": map[string]any{"altitude": map[string]any{"type": "number"}, "retries": map[string]any{"type": "integer"}},
+	}, map[string]any{"type": "object"}, func(_ context.Context, req *domains.CustomCommandRequest) (*domains.CommandResult, error) {
+		d.got = append(d.got, req)
+		return domains.SuccessWithOutput("airborne", req.SN, map[string]any{"altitude": req.Params["altitude"]}), nil
+	})
+	d.DeclareTelemetryField(domains.TelemetryField{Key: "drone.gear", Type: domains.TelemetryValueNumber, Unit: ""})
+	return d
+}
+
+func TestV3RegisteredCommandRunsItsHandlerWithTheExecutionID(t *testing.T) {
+	d := newRegistryDrone()
+	r := executeOn(t, d, "flight.takeoff", map[string]any{"altitude": 40, "retries": 2})
+	if r.GetState() != capabilityv3.CommandState_COMMAND_STATE_SUCCEEDED {
+		t.Fatalf("result = %v", r)
+	}
+	if r.GetResult().GetFields()["altitude"].GetNumberValue() != 40 {
+		t.Errorf("result struct = %v", r.GetResult())
+	}
+	if d.got[0].CommandExecutionID != "cx-1" || d.got[0].TID != "cx-1" {
+		t.Errorf("request = %+v", d.got[0])
+	}
+	if v, ok := d.got[0].Params["retries"].(int64); !ok || v != 2 {
+		t.Errorf("retries = %#v, want int64", d.got[0].Params["retries"])
+	}
+}
+
+func TestV3InvalidParamsAreRejectedWithAReadableMessage(t *testing.T) {
+	d := newRegistryDrone()
+	r := executeOn(t, d, "flight.takeoff", map[string]any{"altitude": "high"})
+	if r.GetState() != capabilityv3.CommandState_COMMAND_STATE_REJECTED || r.GetError().GetCode() != "command.invalid_params" {
+		t.Fatalf("result = %v", r)
+	}
+	if !strings.Contains(r.GetError().GetMessage(), "altitude") {
+		t.Errorf("message %q does not name the field", r.GetError().GetMessage())
+	}
+	if len(d.got) != 0 {
+		t.Fatal("handler ran on invalid params")
+	}
+}
+
+// schemaAdapter is a v2-style adapter that only advertises a schema; the SDK still validates.
+type schemaAdapter struct {
+	v3Adapter
+}
+
+func (a *schemaAdapter) GetCapabilities(_ context.Context, sn string) (*domains.CurrentCapabilities, error) {
+	return &domains.CurrentCapabilities{SN: sn, Capabilities: []domains.Capability{{
+		Command: "camera.change_zoom", Available: true,
+		InputSchema: map[string]any{"type": "object", "properties": map[string]any{"zoom": map[string]any{"type": "integer", "minimum": 1}}},
+	}}}, nil
+}
+
+func (a *schemaAdapter) ChangeZoom(_ context.Context, req *domains.ChangeZoomRequest) (*domains.CommandResult, error) {
+	return domains.Success(fmt.Sprint(*req.Zoom), req.SN), nil
+}
+
+func TestV3AdvertisedSchemaIsEnforcedForTypedAdapters(t *testing.T) {
+	if r := executeOn(t, &schemaAdapter{}, "camera.change_zoom", map[string]any{"zoom": 0}); r.GetState() != capabilityv3.CommandState_COMMAND_STATE_REJECTED {
+		t.Fatalf("zoom 0 = %v, want REJECTED", r.GetState())
+	}
+	if r := executeOn(t, &schemaAdapter{}, "camera.change_zoom", map[string]any{"zoom": 4}); r.GetState() != capabilityv3.CommandState_COMMAND_STATE_SUCCEEDED {
+		t.Fatalf("zoom 4 = %v, want SUCCEEDED", r)
+	}
+}
+
+func TestV2TypedRPCOnARegistryAdapterReachesTheSameHandler(t *testing.T) {
+	d := newRegistryDrone()
+	r, _ := d.TakeOff(context.Background(), &domains.TakeOffRequest{SN: "SN-1", Coordinates: domains.Coordinates{Lat: math.NaN(), Lon: math.NaN(), Alt: 25}})
+	if !r.IsSuccess() || d.got[0].Params["altitude"] != 25.0 {
+		t.Fatalf("result %+v, request %+v", r, d.got)
+	}
+}
+
+func TestV3TelemetryFieldsArePublishedWithTheCapabilities(t *testing.T) {
+	s := NewServerV3(newRegistryDrone(), slog.New(slog.NewTextHandler(io.Discard, nil)))
+	resp, err := s.GetCapabilities(context.Background(), &edgev3.GetCapabilitiesRequest{Asset: &commonv3.AssetRef{Sn: "SN-1"}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	fields := resp.GetCapabilities().GetTelemetryFields()
+	if len(fields) != 1 || fields[0].GetKey() != "drone.gear" || fields[0].GetType() != capabilityv3.TelemetryValueType_TELEMETRY_VALUE_TYPE_NUMBER {
+		t.Fatalf("telemetry fields = %v", fields)
 	}
 }

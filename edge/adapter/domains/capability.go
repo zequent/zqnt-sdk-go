@@ -136,6 +136,29 @@ type CurrentCapabilities struct {
 	AssetType    string
 	Capabilities []Capability
 	Timestamp    time.Time
+	// TelemetryFields are the device-specific values this asset sends in TelemetrySample.Details.
+	TelemetryFields []TelemetryField
+}
+
+// TelemetryValueType is the type of one declared telemetry detail.
+type TelemetryValueType int
+
+const (
+	TelemetryValueUnspecified TelemetryValueType = iota
+	TelemetryValueNumber
+	TelemetryValueString
+	TelemetryValueBoolean
+)
+
+// TelemetryField declares one key the asset sends in TelemetrySample.Details.
+type TelemetryField struct {
+	// Key is dotted, e.g. "dock.cover_state".
+	Key  string
+	Type TelemetryValueType
+	// Unit is SI or common, e.g. "m", "m/s", "%"; empty for strings and booleans.
+	Unit          string
+	Description   string
+	AllowedValues []string
 }
 
 // EmptyCapabilities returns an empty CurrentCapabilities for a given serial number.

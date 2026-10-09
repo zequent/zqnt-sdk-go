@@ -68,7 +68,7 @@ func TestApplyCommandContract(t *testing.T) {
 		Provider: "Zequent Simulator",
 	}
 	out := &devicecontrolpb.Capability{}
-	testServer().applyCommandContract(in, out)
+	applyCommandContract(testServer().log, in, out)
 
 	if out.GetInputSchema().GetFields()["type"].GetStringValue() != "object" {
 		t.Errorf("input schema not carried: %v", out.GetInputSchema())
@@ -103,7 +103,7 @@ func TestApplyCommandContract(t *testing.T) {
 // the proto it did before, with each new field left at its unset wire state.
 func TestApplyCommandContractLeavesUnsetFieldsAlone(t *testing.T) {
 	out := &devicecontrolpb.Capability{}
-	testServer().applyCommandContract(&domains.Capability{Command: "takeOff"}, out)
+	applyCommandContract(testServer().log, &domains.Capability{Command: "takeOff"}, out)
 
 	if out.InputSchema != nil || out.OutputSchema != nil || out.Requirements != nil ||
 		out.SkillId != nil || out.Source != nil || out.Provider != nil ||
@@ -115,7 +115,7 @@ func TestApplyCommandContractLeavesUnsetFieldsAlone(t *testing.T) {
 // One unencodable schema must cost only that schema, not the whole device's capability list.
 func TestApplyCommandContractDropsUnencodableSchema(t *testing.T) {
 	out := &devicecontrolpb.Capability{}
-	testServer().applyCommandContract(&domains.Capability{
+	applyCommandContract(testServer().log, &domains.Capability{
 		Command:      "broken",
 		InputSchema:  map[string]any{"bad": make(chan int)},
 		OutputSchema: map[string]any{"type": "object"},

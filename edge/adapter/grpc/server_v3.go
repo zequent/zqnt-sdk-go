@@ -12,6 +12,7 @@ import (
 
 	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter"
 	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter/domains"
+	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter/schema"
 	capabilityv3 "github.com/zequent/zqnt-utils-golang/v2/gen/zqnt/capability/v3"
 	commonv3 "github.com/zequent/zqnt-utils-golang/v2/gen/zqnt/common/v3"
 	edgev3 "github.com/zequent/zqnt-utils-golang/v2/gen/zqnt/edge/v3"
@@ -37,22 +38,27 @@ type ServerV3 struct {
 	adapter adapter.EdgeAdapter
 	log     *slog.Logger
 
-	completionMu    sync.Mutex
-	completionCache map[string]cachedCompletion
+	contractMu sync.Mutex
+	contracts  map[string]cachedContracts
 }
 
-// completionCacheTTL is how long the adapter's capability list is reused to look up a command's
-// completion mode.
-const completionCacheTTL = 30 * time.Second
+// contractCacheTTL is how long the adapter's capability list is reused to look up a command's
+// input schema and completion mode.
+const contractCacheTTL = 30 * time.Second
 
-type cachedCompletion struct {
-	until time.Time
-	modes map[string]domains.CompletionMode
+type commandContract struct {
+	input      *schema.Schema
+	completion domains.CompletionMode
+}
+
+type cachedContracts struct {
+	until    time.Time
+	commands map[string]commandContract
 }
 
 // NewServerV3 creates the v3 server for the given EdgeAdapter.
 func NewServerV3(a adapter.EdgeAdapter, log *slog.Logger) *ServerV3 {
-	return &ServerV3{adapter: a, log: log, completionCache: map[string]cachedCompletion{}}
+	return &ServerV3{adapter: a, log: log, contracts: map[string]cachedContracts{}}
 }
 
 // RegisterWith registers the v3 service with the given gRPC server, alongside the v2 one.
@@ -66,22 +72,38 @@ func (s *ServerV3) GetCapabilities(ctx context.Context, req *edgev3.GetCapabilit
 	if err != nil {
 		return nil, err
 	}
+	set := CapabilitySetV3(caps, s.log)
+	if set.AssetSn == "" {
+		set.AssetSn = req.GetAsset().GetSn()
+	}
+	return &edgev3.GetCapabilitiesResponse{Capabilities: set}, nil
+}
+
+// CapabilitySetV3 maps the adapter's capabilities onto the v3 CapabilitySet, including the
+// telemetry fields it declares. A schema that cannot be put on the wire is logged and dropped.
+func CapabilitySetV3(caps *domains.CurrentCapabilities, log *slog.Logger) *capabilityv3.CapabilitySet {
 	set := &capabilityv3.CapabilitySet{
 		AssetSn:       caps.SN,
 		AssetType:     caps.AssetType,
 		ObservedAt:    timestamppb.New(caps.Timestamp),
 		SnapshotState: capabilityv3.SnapshotState_SNAPSHOT_STATE_CURRENT,
 	}
-	if set.AssetSn == "" {
-		set.AssetSn = req.GetAsset().GetSn()
-	}
 	for _, c := range caps.Capabilities {
-		set.Capabilities = append(set.Capabilities, s.capability(c))
+		set.Capabilities = append(set.Capabilities, capabilityV3(c, log))
 	}
-	return &edgev3.GetCapabilitiesResponse{Capabilities: set}, nil
+	for _, f := range caps.TelemetryFields {
+		set.TelemetryFields = append(set.TelemetryFields, &capabilityv3.TelemetryField{
+			Key:           f.Key,
+			Type:          capabilityv3.TelemetryValueType(f.Type),
+			Unit:          f.Unit,
+			Description:   f.Description,
+			AllowedValues: f.AllowedValues,
+		})
+	}
+	return set
 }
 
-func (s *ServerV3) capability(c domains.Capability) *capabilityv3.Capability {
+func capabilityV3(c domains.Capability, log *slog.Logger) *capabilityv3.Capability {
 	state := capabilityv3.CapabilityState_CAPABILITY_STATE_UNSUPPORTED
 	if c.Available {
 		state = capabilityv3.CapabilityState_CAPABILITY_STATE_AVAILABLE
@@ -105,83 +127,111 @@ func (s *ServerV3) capability(c domains.Capability) *capabilityv3.Capability {
 	if c.TargetRef != nil {
 		out.Target.Ref = *c.TargetRef
 	}
-	out.InputSchema = s.schema(c.Command, "input_schema", c.InputSchema)
-	out.OutputSchema = s.schema(c.Command, "output_schema", c.OutputSchema)
+	out.InputSchema = schemaStruct(log, c.Command, "input_schema", c.InputSchema)
+	out.OutputSchema = schemaStruct(log, c.Command, "output_schema", c.OutputSchema)
 	for _, e := range c.Errors {
 		out.Errors = append(out.Errors, &capabilityv3.CapabilityErrorSpec{Code: e.Code, Description: e.Description})
 	}
 	for _, e := range c.Events {
 		out.Events = append(out.Events, &capabilityv3.CapabilityEventSpec{Name: e.Name, Description: e.Description,
-			PayloadSchema: s.schema(c.Command, "event "+e.Name, e.PayloadSchema)})
+			PayloadSchema: schemaStruct(log, c.Command, "event "+e.Name, e.PayloadSchema)})
+	}
+	if r := c.Requirements; r != nil {
+		out.Requirements = &capabilityv3.CapabilityRequirements{AssetTypes: r.AssetTypes, Payloads: r.Payloads,
+			RuntimeFeatures: r.RuntimeFeatures, Properties: schemaStruct(log, c.Command, "requirements", r.Properties)}
 	}
 	out.Completion = capabilityv3.CompletionMode(c.Completion)
 	out.CompletionEvent = c.CompletionEvent
 	return out
 }
 
-func (s *ServerV3) schema(command, field string, m map[string]any) *structpb.Struct {
+func schemaStruct(log *slog.Logger, command, field string, m map[string]any) *structpb.Struct {
 	if len(m) == 0 {
 		return nil
 	}
 	st, err := structpb.NewStruct(m)
 	if err != nil {
-		s.log.Warn("capability schema dropped: not representable on the wire", "command", command, "field", field, "error", err)
+		log.Warn("capability schema dropped: not representable on the wire", "command", command, "field", field, "error", err)
 		return nil
 	}
 	return st
 }
 
-// ExecuteCommand runs one command by its dotted id.
+// ExecuteCommand runs one command by its dotted id. The adapter sees the platform's
+// command_execution_id as the request's TID (and CommandExecutionID on a registered command), the
+// id it reports the command's events under.
 func (s *ServerV3) ExecuteCommand(ctx context.Context, req *edgev3.ExecuteCommandRequest) (*edgev3.ExecuteCommandResponse, error) {
 	cmd := req.GetCommand()
 	sn := cmd.GetAsset().GetSn()
-	tid := req.GetContext().GetRequestId()
-	params := cmd.GetParams().AsMap()
+	run := &domains.CustomCommandRequest{
+		SN:                 sn,
+		TID:                req.GetCommandExecutionId(),
+		CommandID:          cmd.GetCommandId(),
+		Params:             cmd.GetParams().AsMap(),
+		CommandExecutionID: req.GetCommandExecutionId(),
+	}
+	if run.TID == "" {
+		run.TID = req.GetContext().GetRequestId()
+	}
+	if ref := cmd.GetTarget().GetRef(); ref != "" {
+		run.TargetRef = &ref
+	}
 
-	result, err := s.dispatch(ctx, sn, tid, cmd, params)
+	result, err := s.dispatch(ctx, run)
 	if err != nil {
-		s.log.Error("v3 ExecuteCommand failed", "command", cmd.GetCommandId(), "sn", sn, "error", err)
+		s.log.Error("v3 ExecuteCommand failed", "command", run.CommandID, "sn", sn, "error", err)
 		result = domains.Error(err.Error(), sn)
 	}
-	completion := s.completion(ctx, sn, cmd.GetCommandId(), result)
-	return &edgev3.ExecuteCommandResponse{Result: commandResultWith(cmd.GetCommandId(), req.GetCommandExecutionId(), result, completion)}, nil
+	completion := domains.CompletionUnspecified
+	if result.IsSuccess() && result.ExternalExecutionID == "" {
+		completion = s.contract(ctx, sn, run.CommandID).completion
+	}
+	return &edgev3.ExecuteCommandResponse{Result: commandResultWith(run.CommandID, req.GetCommandExecutionId(), result, completion)}, nil
 }
 
-// completion is the command's declared completion mode, looked up only when it decides something:
-// a success that did not bring its own ExternalExecutionID. It never fails the command: an adapter
-// whose capabilities cannot be read is left to its result.
-func (s *ServerV3) completion(ctx context.Context, sn, commandID string, r *domains.CommandResult) domains.CompletionMode {
-	if !r.IsSuccess() || r.ExternalExecutionID != "" {
-		return domains.CompletionUnspecified
+// dispatch runs a registered command through the adapter's registry, which validates its params.
+// Anything else is validated against the schema the adapter advertises and goes to the typed
+// method of a built-in id or to SendCustomCommand.
+func (s *ServerV3) dispatch(ctx context.Context, run *domains.CustomCommandRequest) (*domains.CommandResult, error) {
+	if ra, ok := s.adapter.(adapter.RegistryAdapter); ok && ra.CommandRegistry().Has(run.CommandID) {
+		return ra.CommandRegistry().Execute(ctx, run)
 	}
-	s.completionMu.Lock()
-	cached, ok := s.completionCache[sn]
-	s.completionMu.Unlock()
+	params, err := s.contract(ctx, run.SN, run.CommandID).input.Prepare(run.Params)
+	if err != nil {
+		return domains.Rejected(schema.InvalidParamsCode, run.CommandID+": "+err.Error(), run.SN), nil
+	}
+	run.Params = params
+	if call, ok := builtIn(s.adapter, run.SN, run.TID, run.CommandID, params); ok {
+		return call(ctx)
+	}
+	return s.adapter.SendCustomCommand(ctx, run)
+}
+
+// contract is the command's advertised input schema and completion mode. It never fails the
+// command: an adapter whose capabilities cannot be read, or a schema that does not compile, leaves
+// the command unchecked.
+func (s *ServerV3) contract(ctx context.Context, sn, commandID string) commandContract {
+	s.contractMu.Lock()
+	cached, ok := s.contracts[sn]
+	s.contractMu.Unlock()
 	if !ok || time.Now().After(cached.until) {
 		caps, err := s.adapter.GetCapabilities(ctx, sn)
 		if err != nil || caps == nil {
-			return domains.CompletionUnspecified
+			return commandContract{}
 		}
-		cached = cachedCompletion{until: time.Now().Add(completionCacheTTL), modes: map[string]domains.CompletionMode{}}
+		cached = cachedContracts{until: time.Now().Add(contractCacheTTL), commands: map[string]commandContract{}}
 		for _, c := range caps.Capabilities {
-			cached.modes[c.Command] = c.Completion
+			input, err := schema.Compile(c.InputSchema)
+			if err != nil {
+				s.log.Warn("input schema does not compile; params of this command are not validated", "command", c.Command, "error", err)
+			}
+			cached.commands[c.Command] = commandContract{input: input, completion: c.Completion}
 		}
-		s.completionMu.Lock()
-		s.completionCache[sn] = cached
-		s.completionMu.Unlock()
+		s.contractMu.Lock()
+		s.contracts[sn] = cached
+		s.contractMu.Unlock()
 	}
-	return cached.modes[commandID]
-}
-
-func (s *ServerV3) dispatch(ctx context.Context, sn, tid string, cmd *capabilityv3.Command, params map[string]any) (*domains.CommandResult, error) {
-	if run, ok := builtIn(s.adapter, sn, tid, cmd.GetCommandId(), params); ok {
-		return run(ctx)
-	}
-	custom := &domains.CustomCommandRequest{SN: sn, TID: tid, CommandID: cmd.GetCommandId(), Params: params}
-	if ref := cmd.GetTarget().GetRef(); ref != "" {
-		custom.TargetRef = &ref
-	}
-	return s.adapter.SendCustomCommand(ctx, custom)
+	return cached.commands[commandID]
 }
 
 // CancelCommand stops a running command the way v2 does, through StopTask with the id the command
@@ -260,6 +310,22 @@ func commandResultWith(commandID, commandExecutionID string, r *domains.CommandR
 		}
 	case r.IsSuccess():
 		out.State = capabilityv3.CommandState_COMMAND_STATE_SUCCEEDED
+		if len(r.Output) > 0 {
+			var err error
+			if out.Result, err = structpb.NewStruct(r.Output); err != nil {
+				out.State = capabilityv3.CommandState_COMMAND_STATE_FAILED
+				out.Error = &commonv3.Error{Category: commonv3.ErrorCategory_ERROR_CATEGORY_ASSET,
+					Message: commandID + " returned a result that is not JSON: " + err.Error(), OccurredAt: timestamppb.Now()}
+			}
+		}
+	case r.IsRejected():
+		out.State = capabilityv3.CommandState_COMMAND_STATE_REJECTED
+		out.Error = &commonv3.Error{
+			Category:   commonv3.ErrorCategory_ERROR_CATEGORY_INVALID_ARGUMENT,
+			Code:       r.ErrorCode,
+			Message:    r.Message,
+			OccurredAt: timestamppb.Now(),
+		}
 	case r.IsNotImplemented():
 		out.State = capabilityv3.CommandState_COMMAND_STATE_REJECTED
 		out.Error = &commonv3.Error{
@@ -281,6 +347,9 @@ func commandResultWith(commandID, commandExecutionID string, r *domains.CommandR
 			Category:   commonv3.ErrorCategory_ERROR_CATEGORY_ASSET,
 			Message:    msg,
 			OccurredAt: timestamppb.Now(),
+		}
+		if r != nil {
+			out.Error.Code = r.ErrorCode
 		}
 	}
 	return out
@@ -419,8 +488,13 @@ func coordinates(p map[string]any) domains.Coordinates {
 }
 
 func number(p map[string]any, key string) (float64, bool) {
-	v, ok := p[key].(float64)
-	return v, ok
+	switch v := p[key].(type) {
+	case float64:
+		return v, true
+	case int64:
+		return float64(v), true
+	}
+	return 0, false
 }
 
 func float32Ptr(p map[string]any, key string) *float32 {

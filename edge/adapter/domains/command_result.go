@@ -8,6 +8,7 @@ const (
 	ResultTypeSuccess        ResultType = iota // Command executed successfully.
 	ResultTypeError                            // Command failed with an asset or system error.
 	ResultTypeNotImplemented                   // Command is not supported by this adapter.
+	ResultTypeRejected                         // Command was refused before it started; see ErrorCode.
 )
 
 func (r ResultType) String() string {
@@ -18,6 +19,8 @@ func (r ResultType) String() string {
 		return "ERROR"
 	case ResultTypeNotImplemented:
 		return "NOT_IMPLEMENTED"
+	case ResultTypeRejected:
+		return "REJECTED"
 	default:
 		return "UNKNOWN"
 	}
@@ -34,6 +37,26 @@ type CommandResult struct {
 	// later (a flight id). Set it, and the command is reported ACCEPTED: the platform waits for
 	// the CommandExecutionEvent carrying this id. Use Accepted to build such a result.
 	ExternalExecutionID string
+	// Output is the command's result, shaped by its output schema. Values must be JSON-shaped.
+	Output map[string]any
+	// ErrorCode is a stable, machine-readable code for a failed or rejected command, e.g.
+	// "command.invalid_params" or one of the codes the capability declares in Errors.
+	ErrorCode string
+}
+
+// Rejected is a command refused before it started, e.g. params that do not match its schema.
+func Rejected(code, message, sn string) *CommandResult {
+	return &CommandResult{Success: false, Message: message, SN: sn, ResultType: ResultTypeRejected, ErrorCode: code}
+}
+
+// IsRejected reports whether the command was refused before it started.
+func (r *CommandResult) IsRejected() bool {
+	return r != nil && r.ResultType == ResultTypeRejected
+}
+
+// SuccessWithOutput is a finished command that returns a result.
+func SuccessWithOutput(message, sn string, output map[string]any) *CommandResult {
+	return &CommandResult{Success: true, Message: message, SN: sn, ResultType: ResultTypeSuccess, Output: output}
 }
 
 // Accepted is a success that only started the command: its outcome follows as a
