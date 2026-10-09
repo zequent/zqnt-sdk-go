@@ -1,0 +1,8 @@
+version: "2"
+linters:
+  exclusions:
+    rules:
+      # The SDK is the v2 compatibility layer: it has to call the typed EdgeAdapter methods it
+      # deprecates for adapters.
+      - linters: [staticcheck]
+        text: "SA1019: .*adapter\\.(EdgeAdapter|UnimplementedEdgeAdapter)"

@@ -301,3 +301,11 @@ func TestV3TelemetryFieldsArePublishedWithTheCapabilities(t *testing.T) {
 		t.Fatalf("telemetry fields = %v", fields)
 	}
 }
+
+func TestBuiltInCommandIDsAreExactlyTheRoutedOnes(t *testing.T) {
+	for _, id := range BuiltInCommandIDs() {
+		if _, ok := builtIn(&v3Adapter{}, "SN-1", "", id, nil); !ok {
+			t.Errorf("%s is listed but not routed", id)
+		}
+	}
+}

@@ -355,6 +355,39 @@ func commandResultWith(commandID, commandExecutionID string, r *domains.CommandR
 	return out
 }
 
+// BuiltInCommandIDs are the catalog ids the SDK routes onto typed EdgeAdapter methods.
+func BuiltInCommandIDs() []string {
+	return []string{
+		"flight.takeoff",
+		"navigation.go_to",
+		"flight.return_to_home",
+		"flight.manual.enter",
+		"flight.manual.exit",
+		"gimbal.look_at",
+		"gimbal.tracking",
+		"camera.take_photo",
+		"camera.capture_photo",
+		"camera.change_lens",
+		"camera.change_zoom",
+		"stream.start",
+		"stream.stop",
+		"stream.split_screen",
+		"dock.open_cover",
+		"dock.close_cover",
+		"dock.start_charging",
+		"dock.stop_charging",
+		"asset.reboot",
+		"asset.boot_sub_asset",
+		"asset.remote_debug",
+		"asset.change_ac_mode",
+		"mission.prepare",
+		"mission.start",
+		"mission.stop",
+		"mission.pause",
+		"mission.resume",
+	}
+}
+
 // builtIn routes a built-in command id onto the typed EdgeAdapter method that implements it.
 // Params follow the catalog's JSON Schemas (zqnt-protos v3/COMMAND_CATALOG.md), the same as the
 // Java SDK's BuiltInCommandDispatch and the Python SDK's typed dispatch. The second return value

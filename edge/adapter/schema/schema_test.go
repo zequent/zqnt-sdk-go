@@ -72,3 +72,30 @@ func TestCompileRefusesABrokenSchema(t *testing.T) {
 		t.Fatal("a schema whose type is a number must not compile")
 	}
 }
+
+func TestExampleSatisfiesTheSchema(t *testing.T) {
+	doc := map[string]any{
+		"type":     "object",
+		"required": []any{"latitude", "longitude", "mode", "name", "count", "tags"},
+		"properties": map[string]any{
+			"latitude":  map[string]any{"type": "number", "minimum": -90, "maximum": 90},
+			"longitude": map[string]any{"type": "number", "exclusiveMinimum": 5},
+			"mode":      map[string]any{"type": "string", "enum": []any{"AUTO", "MANUAL"}},
+			"name":      map[string]any{"type": "string", "minLength": 2},
+			"count":     map[string]any{"type": "integer", "default": 3},
+			"tags":      map[string]any{"type": "array", "minItems": 1, "items": map[string]any{"type": "string"}},
+			"optional":  map[string]any{"type": "boolean"},
+		},
+	}
+	s, err := Compile(doc)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ex := Example(doc)
+	if _, err := s.Prepare(ex); err != nil {
+		t.Fatalf("example %v does not validate: %v", ex, err)
+	}
+	if _, ok := ex["optional"]; ok {
+		t.Error("optional properties are left out")
+	}
+}

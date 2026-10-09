@@ -141,13 +141,6 @@ func (st *ingestStream[Req, Resp]) backoff() {
 	st.retryAt = st.now().Add(delay)
 }
 
-// reset forgets a pending backoff, e.g. after switching back from a fallback.
-func (st *ingestStream[Req, Resp]) reset() {
-	st.mu.Lock()
-	st.attempt, st.retryAt = 0, time.Time{}
-	st.mu.Unlock()
-}
-
 // close half-closes the stream so the server answers with its counts, then releases it.
 func (st *ingestStream[Req, Resp]) close() {
 	st.mu.Lock()

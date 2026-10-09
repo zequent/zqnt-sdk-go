@@ -8,13 +8,14 @@ import (
 	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter/domains"
 )
 
-// EdgeAdapter is the interface SDK consumers implement to control their hardware.
+// EdgeAdapter is what the SDK serves to the platform.
 //
-// Embed [UnimplementedEdgeAdapter] in your concrete struct to get default
-// NOT_IMPLEMENTED responses for every method, then override only the commands
-// your asset supports. This pattern mirrors the generated gRPC server pattern.
+// New adapters embed [Base] and register each command once (Registry.RegisterCommand); Base
+// implements every method here from the registrations. The typed command methods are the v2
+// compatibility layer: an adapter written against them keeps working, and v3 ExecuteCommand
+// routes built-in ids onto them.
 //
-// Example:
+// v2-style example:
 //
 //	type MyDroneAdapter struct {
 //	    adapter.UnimplementedEdgeAdapter
@@ -28,34 +29,56 @@ import (
 //	    return domains.SuccessWithTID("takeOff accepted", req.TID, req.SN), nil
 //	}
 type EdgeAdapter interface {
+	// Deprecated: register "flight.takeoff" on Base instead; kept as the v2 compatibility layer.
 	TakeOff(ctx context.Context, req *domains.TakeOffRequest) (*domains.CommandResult, error)
+	// Deprecated: register "flight.return_to_home" on Base instead; kept as the v2 compatibility layer.
 	ReturnToHome(ctx context.Context, req *domains.ReturnToHomeRequest) (*domains.CommandResult, error)
+	// Deprecated: register "navigation.go_to" on Base instead; kept as the v2 compatibility layer.
 	GoTo(ctx context.Context, req *domains.GoToRequest) (*domains.CommandResult, error)
 
+	// Deprecated: register "flight.manual.enter" on Base instead; kept as the v2 compatibility layer.
 	EnterManualControl(ctx context.Context, sn string) (*domains.CommandResult, error)
+	// Deprecated: register "flight.manual.exit" on Base instead; kept as the v2 compatibility layer.
 	ExitManualControl(ctx context.Context, sn string) (*domains.CommandResult, error)
 	ManualControlInput(ctx context.Context, input *domains.ManualControlInput) (*domains.CommandResult, error)
 
+	// Deprecated: register "dock.open_cover" on Base instead; kept as the v2 compatibility layer.
 	OpenCover(ctx context.Context, sn string) (*domains.CommandResult, error)
+	// Deprecated: register "dock.close_cover" on Base instead; kept as the v2 compatibility layer.
 	CloseCover(ctx context.Context, sn string, force *bool) (*domains.CommandResult, error)
+	// Deprecated: register "dock.start_charging" on Base instead; kept as the v2 compatibility layer.
 	StartCharging(ctx context.Context, sn string) (*domains.CommandResult, error)
+	// Deprecated: register "dock.stop_charging" on Base instead; kept as the v2 compatibility layer.
 	StopCharging(ctx context.Context, sn string) (*domains.CommandResult, error)
 
+	// Deprecated: register "asset.reboot" on Base instead; kept as the v2 compatibility layer.
 	RebootAsset(ctx context.Context, sn string) (*domains.CommandResult, error)
+	// Deprecated: register "asset.boot_sub_asset" on Base instead; kept as the v2 compatibility layer.
 	BootUpSubAsset(ctx context.Context, sn string) (*domains.CommandResult, error)
+	// Deprecated: register "asset.boot_sub_asset" on Base instead; kept as the v2 compatibility layer.
 	BootDownSubAsset(ctx context.Context, sn string) (*domains.CommandResult, error)
 
+	// Deprecated: register "gimbal.look_at" on Base instead; kept as the v2 compatibility layer.
 	LookAt(ctx context.Context, req *domains.LookAtRequest) (*domains.CommandResult, error)
+	// Deprecated: register "camera.take_photo" on Base instead; kept as the v2 compatibility layer.
 	TakePhoto(ctx context.Context, req *domains.TakePhotoRequest) (*domains.CommandResult, error)
+	// Deprecated: register "camera.change_lens" on Base instead; kept as the v2 compatibility layer.
 	ChangeLens(ctx context.Context, req *domains.ChangeLensRequest) (*domains.CommandResult, error)
+	// Deprecated: register "camera.change_zoom" on Base instead; kept as the v2 compatibility layer.
 	ChangeZoom(ctx context.Context, req *domains.ChangeZoomRequest) (*domains.CommandResult, error)
+	// Deprecated: register "gimbal.tracking" on Base instead; kept as the v2 compatibility layer.
 	EnableGimbalTracking(ctx context.Context, sn string, enabled bool) (*domains.CommandResult, error)
 
+	// Deprecated: register "stream.start" on Base instead; kept as the v2 compatibility layer.
 	StartLiveStream(ctx context.Context, req *domains.LiveStreamStartRequest) (*domains.CommandResult, error)
+	// Deprecated: register "stream.stop" on Base instead; kept as the v2 compatibility layer.
 	StopLiveStream(ctx context.Context, req *domains.LiveStreamStopRequest) (*domains.CommandResult, error)
 
+	// Deprecated: register "asset.remote_debug" on Base instead; kept as the v2 compatibility layer.
 	EnterRemoteDebugMode(ctx context.Context, sn string) (*domains.CommandResult, error)
+	// Deprecated: register "asset.remote_debug" on Base instead; kept as the v2 compatibility layer.
 	CloseRemoteDebugMode(ctx context.Context, sn string) (*domains.CommandResult, error)
+	// Deprecated: register "asset.change_ac_mode" on Base instead; kept as the v2 compatibility layer.
 	ChangeACMode(ctx context.Context, sn, mode string) (*domains.CommandResult, error)
 
 	GetCapabilities(ctx context.Context, sn string) (*domains.CurrentCapabilities, error)
@@ -74,8 +97,12 @@ type EdgeAdapter interface {
 	// StopTask matters most: on the 2.0.0 contract it is the physical-cancellation path for any
 	// running command -- mission-autonomy's EdgeExecutionNodeDispatcher#cancel calls it with the
 	// external execution id the adapter reported when it accepted the command.
+	//
+	// Deprecated: register "mission.start" on Base instead; kept as the v2 compatibility layer.
 	StartTask(ctx context.Context, sn, taskID, tid string) (*domains.CommandResult, error)
+	// Deprecated: register "mission.stop" on Base instead; kept as the v2 compatibility layer.
 	StopTask(ctx context.Context, sn, taskID, tid string) (*domains.CommandResult, error)
+	// Deprecated: register "mission.prepare" on Base instead; kept as the v2 compatibility layer.
 	PrepareTask(ctx context.Context, sn, taskID, tid string) (*domains.CommandResult, error)
 
 	// PauseTask and ResumeTask, LiveStreamSplitScreen and SendCustomCommand below all exist on the
@@ -84,14 +111,20 @@ type EdgeAdapter interface {
 	// exist on edge-java-sdk v1.3.0's EdgeAdapterService (pauseTask/resumeTask/liveStreamSplitScreen/
 	// sendCustomCommand), so closing this gap is part of matching v1.3.0's command surface, not a
 	// separate concern.
+	//
+	// Deprecated: register "mission.pause" on Base instead; kept as the v2 compatibility layer.
 	PauseTask(ctx context.Context, sn, taskID, tid string) (*domains.CommandResult, error)
+	// Deprecated: register "mission.resume" on Base instead; kept as the v2 compatibility layer.
 	ResumeTask(ctx context.Context, sn, taskID, tid string) (*domains.CommandResult, error)
+	// Deprecated: register "stream.split_screen" on Base instead; kept as the v2 compatibility layer.
 	LiveStreamSplitScreen(ctx context.Context, sn string, enabled bool) (*domains.CommandResult, error)
 	SendCustomCommand(ctx context.Context, req *domains.CustomCommandRequest) (*domains.CommandResult, error)
 }
 
 // UnimplementedEdgeAdapter provides NOT_IMPLEMENTED default implementations for all
 // EdgeAdapter methods. Embed this in your concrete type and override as needed.
+//
+// Deprecated: embed Base and register commands instead.
 type UnimplementedEdgeAdapter struct{}
 
 func (UnimplementedEdgeAdapter) TakeOff(_ context.Context, req *domains.TakeOffRequest) (*domains.CommandResult, error) {

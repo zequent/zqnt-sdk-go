@@ -12,7 +12,9 @@ go env -w GONOPROXY="github.com/Zequent/*,github.com/zequent/*"
 go get github.com/Zequent/zqnt-edge-sdk-go/v2@v2.0.0  # proto stubs come from github.com/zequent/zqnt-utils-golang/v2@v2.0.0
 ```
 
-**2. Implement your adapter:**
+**2. Implement your adapter:** embed `adapter.Base` and register each command once — id, input
+and output JSON Schema, handler. The advertised capabilities, v3 `ExecuteCommand` and the v2 typed
+RPCs all come from that registration.
 
 ```go
 package main
@@ -26,28 +28,32 @@ import (
     "github.com/Zequent/zqnt-edge-sdk-go/v2/adapter/domains"
 )
 
-// Embed UnimplementedEdgeAdapter — only override the commands your hardware supports.
-// All other commands automatically return NOT_IMPLEMENTED.
-type MyDroneAdapter struct {
-    adapter.UnimplementedEdgeAdapter
+type MyDrone struct {
+    adapter.Base
 }
 
-func (a *MyDroneAdapter) TakeOff(ctx context.Context, req *domains.TakeOffRequest) (*domains.CommandResult, error) {
-    // send takeoff command to your hardware here
-    return domains.SuccessWithTID("ok", req.TID, req.SN), nil
+func (d *MyDrone) takeOff(ctx context.Context, req *domains.CustomCommandRequest) (*domains.CommandResult, error) {
+    altitude := req.Params["altitude"].(float64) // validated against the input schema
+    // send takeoff to your hardware; report completion under req.CommandExecutionID
+    return domains.Success("climbing", req.SN), nil
 }
 
 func main() {
-    client, _ := edgesdk.NewEdgeClient(
-        "your-backend:50051", // Zequent backend address
-        "YOUR-DEVICE-SN",     // device serial number
-        &MyDroneAdapter{},
-    )
+    d := &MyDrone{}
+    d.MustRegisterCommand("flight.takeoff",
+        map[string]any{"type": "object", "required": []any{"altitude"},
+            "properties": map[string]any{"altitude": map[string]any{"type": "number"}}},
+        nil, d.takeOff,
+        adapter.WithCompletion(domains.CompletionAsynchronous, "flight.takeoff.completed"))
 
+    client, _ := edgesdk.NewEdgeClient("your-backend:50051", "YOUR-DEVICE-SN", d)
     lis, _ := net.Listen("tcp", ":9090")
     client.StartServing(context.Background(), lis)
 }
 ```
+
+Adapters written against the typed methods (`adapter.UnimplementedEdgeAdapter` + `TakeOff`, …)
+keep working; those methods are deprecated in favour of the registry.
 
 **3. Run it:**
 
@@ -58,6 +64,35 @@ BACKEND_ADDR=your-backend:50051 DEVICE_SN=YOUR-SN go run main.go
 See [`example/main.go`](example/main.go) for a complete working example with graceful shutdown and logging.
 
 ---
+
+## v3: talking to the platform
+
+| What | v3 (tried first) | Fallback on `UNIMPLEMENTED` (older core) |
+|---|---|---|
+| Commands from the platform | `zqnt.edge.v3.EdgeAdapterService.ExecuteCommand` | v2 typed RPCs, served alongside |
+| Command events (`LiveData().PublishCommandExecutionEvent`) | `EdgeGatewayService.PublishCommandEvent` under the platform's `command_execution_id`, `occurred_at` always set | v2 notification stream |
+| Capabilities (on start, on every registry change, `client.RefreshCapabilities()`) | `EdgeGatewayService.ReportCapabilities`, incl. declared telemetry fields | v2 `ReportAssetRuntime` |
+| `LiveData().PublishTelemetrySample` | `TelemetryIngestService.PublishTelemetry` | v2 `ProduceTelemetry` with the shared fields; `Details` are dropped |
+| `LiveData().PublishDetections` | `TelemetryIngestService.PublishDetections` | v2 `ProduceDetection` |
+| `LiveData().PublishAlert` | `TelemetryIngestService.PublishAlerts` | none: dropped |
+
+After `UNIMPLEMENTED` the SDK stays on v2 for 10 minutes, then tries v3 again. The v3 streams are
+long-lived and reconnect with backoff; an item sent while a stream waits for its next attempt gets
+`livedata.ErrReconnecting`, and the first item sent to a v2-only platform can be lost before the
+SDK switches. remote-control serves `EdgeGatewayService`: point the SDK at it with
+`WithRemoteControlAddr` unless the main endpoint multiplexes it. The v2 telemetry API
+(`ProduceTelemetryData`, `ProduceTelemetry`) is unchanged.
+
+- **Params** are validated against the command's input schema before the handler runs; whole
+  numbers under an `integer` property arrive as `int64`, every other number as `float64`. A mismatch
+  is `REJECTED` with error code `command.invalid_params` and a message naming each field.
+- **Telemetry fields:** `DeclareTelemetryField` on the registry declares the keys of
+  `TelemetrySample.Details`; they are published with the capabilities.
+- **Conformance kit:** `conformance.Run(t, adapter, conformance.Options{Events: recorder})` checks
+  that every advertised id executes, every executable id is advertised, schemas parse and an
+  `ACCEPTED` command is completed by an event with `occurred_at`. It executes commands — run it
+  against fakes or a simulator. Publish events through `adapter.CommandEventPublisher` so the kit's
+  `Recorder` can stand in for the client.
 
 ## v2.0.0: the 2.0.0 wire contract
 
