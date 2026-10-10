@@ -92,3 +92,54 @@ func TestCapabilitiesAreReportedOnStartAndOnEveryRegistryChange(t *testing.T) {
 		return len(set.GetCapabilities()) == 2
 	})
 }
+
+func (g *gatewayServer) reportedSNs() map[string]bool {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	sns := map[string]bool{}
+	for _, set := range g.reports {
+		sns[set.GetAssetSn()] = true
+	}
+	return sns
+}
+
+func TestTrackedAssetsAreReportedToo(t *testing.T) {
+	platformLis, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	gw := &gatewayServer{}
+	srv := grpc.NewServer()
+	edgev3.RegisterEdgeGatewayServiceServer(srv, gw)
+	go func() { _ = srv.Serve(platformLis) }()
+	defer srv.Stop()
+
+	fleet := &struct{ adapter.Base }{}
+	fleet.MustRegisterCommand("flight.takeoff", nil, nil, noop)
+	client, err := NewEdgeClient(platformLis.Addr().String(), "FLEET", fleet, WithoutPlatformAuth(),
+		WithLogger(slog.New(slog.NewTextHandler(io.Discard, nil))))
+	if err != nil {
+		t.Fatal(err)
+	}
+	adapterLis, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	go func() { _ = client.StartServing(ctx, adapterLis) }()
+	defer func() { _ = client.Shutdown(context.Background()) }()
+
+	client.TrackCapabilities("SIM-1")
+	deadline := time.Now().Add(5 * time.Second)
+	for !gw.reportedSNs()["SIM-1"] {
+		if time.Now().After(deadline) {
+			t.Fatal("timed out waiting for the tracked asset's report")
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+	client.UntrackCapabilities("SIM-1")
+	if got := client.reportedSNs(); len(got) != 1 || got[0] != "FLEET" {
+		t.Fatalf("reported after untrack: %v", got)
+	}
+}

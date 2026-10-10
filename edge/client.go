@@ -56,6 +56,7 @@ type EdgeClient struct {
 
 	adapter      adapter.EdgeAdapter
 	capabilities *gateway.CapabilityReporter
+	tracked      sync.Map
 	refresh      chan struct{}
 	stopOnce     sync.Once
 	stop         chan struct{}
@@ -198,8 +199,31 @@ func (c *EdgeClient) RefreshCapabilities() {
 	}
 }
 
-// reportCapabilities sends the capability snapshot on start and after every refresh, retrying a
-// failed report with backoff until it gets through or a newer one replaces it.
+// TrackCapabilities adds an asset this adapter serves besides its own SN, e.g. one device of a
+// fleet: its capabilities are reported now and on every refresh until UntrackCapabilities.
+func (c *EdgeClient) TrackCapabilities(sn string) {
+	c.tracked.Store(sn, struct{}{})
+	c.RefreshCapabilities()
+}
+
+// UntrackCapabilities stops reporting an asset added with TrackCapabilities.
+func (c *EdgeClient) UntrackCapabilities(sn string) {
+	c.tracked.Delete(sn)
+}
+
+func (c *EdgeClient) reportedSNs() []string {
+	sns := []string{c.cfg.sn}
+	c.tracked.Range(func(key, _ any) bool {
+		if sn := key.(string); sn != c.cfg.sn {
+			sns = append(sns, sn)
+		}
+		return true
+	})
+	return sns
+}
+
+// reportCapabilities sends the capability snapshots on start and after every refresh, retrying a
+// failed round with backoff until it gets through or a newer one replaces it.
 func (c *EdgeClient) reportCapabilities(ctx context.Context) {
 	attempt := 0
 	var retryAfter <-chan time.Time
@@ -214,22 +238,37 @@ func (c *EdgeClient) reportCapabilities(ctx context.Context) {
 		case <-retryAfter:
 		}
 		retryAfter = nil
-		caps, err := c.adapter.GetCapabilities(ctx, c.cfg.sn)
-		if err == nil {
-			if caps.SN == "" {
-				caps.SN = c.cfg.sn
+		var failed error
+		for _, sn := range c.reportedSNs() {
+			if err := c.reportCapabilitiesOf(ctx, sn); err != nil {
+				failed = err
+				c.cfg.logger.Warn("capability report failed", "sn", sn, "error", err)
 			}
-			var revision string
-			if revision, err = c.capabilities.Report(ctx, caps); err == nil {
-				c.cfg.logger.Info("capabilities reported", "sn", caps.SN, "commands", len(caps.Capabilities), "revision", revision)
-				continue
-			}
+		}
+		if failed == nil {
+			continue
 		}
 		attempt++
 		delay := retry.ComputeDelay(attempt)
-		c.cfg.logger.Warn("capability report failed; retrying", "sn", c.cfg.sn, "in", delay, "error", err)
+		c.cfg.logger.Warn("capability report round failed; retrying", "in", delay, "error", failed)
 		retryAfter = time.After(delay)
 	}
+}
+
+func (c *EdgeClient) reportCapabilitiesOf(ctx context.Context, sn string) error {
+	caps, err := c.adapter.GetCapabilities(ctx, sn)
+	if err != nil {
+		return err
+	}
+	if caps.SN == "" {
+		caps.SN = sn
+	}
+	revision, err := c.capabilities.Report(ctx, caps)
+	if err != nil {
+		return err
+	}
+	c.cfg.logger.Info("capabilities reported", "sn", caps.SN, "commands", len(caps.Capabilities), "revision", revision)
+	return nil
 }
 
 // SN returns the configured serial number.
