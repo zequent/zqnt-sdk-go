@@ -9,9 +9,9 @@ import (
 	"fmt"
 	"time"
 
-	base "github.com/Zequent/zqnt-client-sdk-go/v2/gen/common/base/proto"
-	devicecontrol "github.com/Zequent/zqnt-client-sdk-go/v2/gen/devicecontrol/contracts/proto"
-	remotecontrolpb "github.com/Zequent/zqnt-client-sdk-go/v2/gen/remotecontrol/proto"
+	base "github.com/zequent/zqnt-utils-golang/v2/gen/common/base/proto"
+	devicecontrol "github.com/zequent/zqnt-utils-golang/v2/gen/devicecontrol/contracts/proto"
+	remotecontrolpb "github.com/zequent/zqnt-utils-golang/v2/gen/remotecontrol/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
