@@ -3,36 +3,108 @@
 Go SDK for customer applications consuming the Zequent platform — the Go counterpart to
 `client-java-sdk` / `client-python-sdk`.
 
-## This branch: the 2.0 (v2) wire contract
+```
+go get github.com/zequent/zqnt-client-sdk-go/v3
+```
 
-`refactoring/refactoring-client-go-sdk-v2` generates `gen/` from zqnt-protos' v2 line (branch
-`refactoring/refactoring-ecosystem-v2`), carried as this repo's own `proto/` submodule and pinned by
-commit — the same commit zqnt-utils-golang generates from. The 1.3.x line (Mission/Task) lives on
-`main` / `feature/v1.3.0-proto`; see zqnt-protos' README "Versioning" section.
+## Commanding assets (3.x): `control`
 
-**Included:**
-- `gen/` — generated protobuf/gRPC Go code for every `.proto` in `proto/`, regenerated via
-  `scripts/gen_protos.sh` (refuses to run unless the submodule is at the pinned commit).
-- `connector/` — asset lookup, the Skill Registry (`ObserveSkillContract`, `ListSkillContracts`,
-  `SetSkillContractStatus`, `SetSkillContractPermissions`), scheduler CRUD (`GetScheduler`/
-  `ListSchedulers`/`CreateScheduler(s)`/`UpdateScheduler`/`DeleteScheduler(s)`), operational policies
-  (`GetActivePoliciesByType`, `GetAllActivePolicies`) and technical config (`GetTechnicalConfigs`).
-- `missionautonomy/` — Application CRUD + `ListApplications`, the SkillExecution lifecycle
-  (`CreateSimpleExecution`/`ExecuteSimple` for a single command, `CreateApplicationExecution`/
-  `ExecuteApplication` for a named Skill out of a deployed Application, `GetSkillExecution`,
-  `ListSkillExecutions`, `Start`/`Pause`/`Resume`/`CancelSkillExecution`, `SignalSkillExecution`) and
-  `ResolveExecutionConfig`. There is no Mission/Task surface: the 2.0 contract has no such RPCs.
-- `remotecontrol/` — `RemoteControlService`'s command gateway. `GoToWithOptions(ctx, sn, coordinate,
-  GoToOptions{NoFlyZoneOverride: true})` flies through a no-fly zone that would refuse the fly-to
-  (honoured for an organization admin or a system admin only); `GoTo` is that with no options.
-- `livedata/` — telemetry/detection/notification streaming, returning the raw gRPC server-streaming
-  client.
+On a 3.x platform every action on an asset is a **capability** with a dotted command id
+(`flight.takeoff`, `navigation.go_to`, `dock.open_cover`, `vendor.<vendor>.<name>`) and JSON Schemas
+for its parameters and result. There is one way to run any of them — no per-command method — so a
+command a new adapter adds works without a new SDK release.
 
-**Deliberately not included:**
-- **Auto-reconnecting streams.** `StreamTelemetry`/`StreamDetections`/`StreamNotifications` return
-  the raw `grpc.ServerStreamingClient` — redialing on a broken stream is the caller's job.
-- A shared proto module: `gen/` is vendored directly into this repo rather than pulled from
-  zqnt-utils-golang.
+```go
+cfg, err := config.FromEnv()
+conn, err := cfg.Dial(cfg.RemoteControl)
+assets := control.New(conn)
+
+set, err := assets.ListCapabilities(ctx, "DRONE-1") // ids, schemas, risk, completion mode
+
+result, err := assets.ExecuteCommand(ctx, "DOCK-1", "dock.open_cover", nil)
+
+result, err = assets.ExecuteAndWait(ctx, "DRONE-1", "navigation.go_to",
+	control.Params{"latitude": 52.52, "longitude": 13.405, "altitude": 60},
+	control.WithReason("site inspection"))
+```
+
+- `ListCapabilities(ctx, sn, ...)` — what the asset can do right now. When its adapter is not
+  reachable the platform answers with the last snapshot, marked `SNAPSHOT_STATE_STALE`.
+- `ExecuteCommand(ctx, sn, commandID, params, ...)` — params are a `control.Params`
+  (`map[string]any`, sent as a `google.protobuf.Struct`). A command that finishes with the reply
+  returns `SUCCEEDED` and its result; one that takes time (takeoff, go-to) returns `ACCEPTED` or
+  `RUNNING` with a `command_execution_id`, and its outcome follows as events.
+- `ExecuteAndWait(...)` — `ExecuteCommand` plus waiting for that run's final event (ctx bounds it).
+- `WatchCommand(ctx, commandExecutionID)` / `WatchAsset(ctx, sn)` — command events from now on; a
+  single run's stream ends with `io.EOF` after its final event.
+- `CancelCommand(ctx, commandExecutionID, reason)`.
+- Options: `WithTarget` (a payload, sub-asset or component), `WithTimeout`, `WithReason` (required
+  for CRITICAL commands), `WithNoFlyZoneOverride` (organization or system admin only),
+  `WithIdempotencyKey`, `WithRequestID`.
+
+Errors: a command the platform refused (`REJECTED`: unknown id, parameters, precondition,
+permission) or that did not succeed (`FAILED`, `CANCELLED`, `TIMED_OUT`) is a `*control.CommandError`
+with `State()`, `Category()`, `Retryable()` and the full `Result`. A call that never got that far
+keeps its gRPC status — `status.Code(err)` is `Unauthenticated`, `PermissionDenied`,
+`InvalidArgument`, `Unavailable`, ...
+
+`control` is a client of `zqnt.control.v3.RemoteControlService`, served by remote-control on the
+same host and port as the 2.x `RemoteControlService` (`REMOTE_CONTROL_SERVICE_*`), with the same
+client credential. The message types are `zqnt-utils-golang`'s
+(`github.com/zequent/zqnt-utils-golang/v2/gen/zqnt/...`), the same Go types the edge SDK, the
+simulator and the Integration Hub use.
+
+`examples/command` lists an asset's capabilities and runs one:
+`go run ./examples/command DRONE-1 flight.takeoff '{"altitude": 40}'`.
+
+## Packages
+
+- `control/` — the 3.x command API above.
+- `connector/` — asset lookup, the Skill Registry, scheduler CRUD, operational policies and
+  technical config (2.x contract, still served).
+- `missionautonomy/` — Applications and the SkillExecution lifecycle (2.x contract, still served).
+- `livedata/` — telemetry/detection/notification streaming, returning the raw gRPC
+  server-streaming client; redialing a broken stream is the caller's job.
+- `remotecontrol/` — **deprecated**: the typed 2.x commands (`TakeOff`, `GoTo`, `OpenCover`, ...)
+  for platforms still on 2.x. Use `control` on 3.x.
+- `auth/`, `config/` — the client credential and where the platform is, shared by every package.
+
+Generated types come from
+[zqnt-utils-golang](https://github.com/zequent/zqnt-utils-golang): `gen/<service>/proto` for the
+2.x contracts, `gen/zqnt/<domain>/v3` for 3.x. This repository has no generated code of its own.
+
+## Migrating from 2.x
+
+1. Module path: `github.com/Zequent/zqnt-client-sdk-go/v2` → `github.com/zequent/zqnt-client-sdk-go/v3`
+   (note the lower-case owner, as for every other Zequent Go module).
+2. Generated types: `github.com/Zequent/zqnt-client-sdk-go/v2/gen/...` →
+   `github.com/zequent/zqnt-utils-golang/v2/gen/...` — same package paths below `gen/`, same types.
+   One `sed` does both:
+   ```
+   grep -rl zqnt-client-sdk-go/v2 --include='*.go' . | xargs sed -i \
+     -e 's#github.com/Zequent/zqnt-client-sdk-go/v2/gen/#github.com/zequent/zqnt-utils-golang/v2/gen/#g' \
+     -e 's#github.com/Zequent/zqnt-client-sdk-go/v2/#github.com/zequent/zqnt-client-sdk-go/v3/#g'
+   go get github.com/zequent/zqnt-client-sdk-go/v3 && go mod tidy
+   ```
+3. Typed commands → `control.ExecuteCommand` with a command id. `ListCapabilities` tells you the
+   ids and parameter schemas an asset really offers; the common ones:
+
+   | 2.x (`remotecontrol`) | 3.x (`control`) |
+   |---|---|
+   | `TakeOff(ctx, sn, coordinate)` | `ExecuteCommand(ctx, sn, "flight.takeoff", control.Params{"altitude": 40})` |
+   | `GoTo(ctx, sn, coordinate)` | `ExecuteCommand(ctx, sn, "navigation.go_to", control.Params{"latitude": .., "longitude": .., "altitude": ..})` |
+   | `GoToWithOptions(..., GoToOptions{NoFlyZoneOverride: true})` | `ExecuteCommand(..., control.WithNoFlyZoneOverride())` |
+   | `ReturnToHome(ctx, sn, altitude)` | `ExecuteCommand(ctx, sn, "flight.return_to_home", ...)` |
+   | `OpenCover` / `CloseCover` | `"dock.open_cover"` / `"dock.close_cover"` |
+   | `SendCustomCommand(ctx, sn, id, params, target)` | `ExecuteCommand(ctx, sn, id, params, control.WithTarget(...))` |
+   | `GetCapabilities(ctx, sn)` | `ListCapabilities(ctx, sn)` |
+   | `has_errors` / `error` on the response | `*control.CommandError` (`REJECTED`/`FAILED`/...) |
+
+   `go_to`'s `altitude` is metres above the takeoff point (default 40 m), as in 2.x. A command that
+   takes time no longer blocks on the typed RPC: wait with `ExecuteAndWait` or `WatchCommand`.
+   Ids not in this table: `ListCapabilities` on the asset, or `v3/COMMAND_CATALOG.md` in zqnt-protos.
+4. A 2.x platform does not serve `zqnt.control.v3`: keep using `remotecontrol` there (it still
+   works from `/v3`, marked deprecated) until the platform runs 3.x.
 
 ## Authentication
 
@@ -47,7 +119,7 @@ The clients here wrap a connection you dial, so the credential is a set of dial 
 opts := append(auth.DialOptions(""), // "" reads ZQNT_CLIENT_TOKEN; or pass the token itself
 	grpc.WithTransportCredentials(insecure.NewCredentials()))
 conn, err := grpc.NewClient("core.example.com:8010", opts...)
-assets := connector.New(conn)
+assets := connector.New(conn) // or control.New(conn) when dialing remote-control
 ```
 
 It is sent as `authorization: Bearer <token>` on every call, unary and streaming. A refusal keeps its
@@ -89,15 +161,5 @@ given). An `authorization` header already on the call wins and the connection's 
 
 ## Requirements
 
-Go 1.24+. `go build ./...` / `go vet ./...` / `go test ./...` all pass as of this commit.
-
-## Regenerating `gen/`
-
-```
-./scripts/gen_protos.sh
-```
-
-Generates from the `proto/` submodule (`git submodule update --init proto` in a fresh clone),
-after verifying it is at the commit pinned in the script. To move to a newer contract, check the
-submodule out at the new commit, update `EXPECTED_PROTO_COMMIT` in the script, regenerate, and commit
-the submodule pointer together with `gen/`.
+Go 1.26+. `go build ./...`, `go vet ./...` and `go test ./...` pass (with a parent `go.work`, run
+them with `GOWORK=off`).
