@@ -2,6 +2,9 @@
 // for manual flight control, dock operations, and asset/payload runtime discovery. It shares its
 // command contracts with EdgeAdapterService (device-control-contracts.proto), so the same request
 // and response shapes flow end to end from a customer app through to the edge adapter.
+//
+// Deprecated: the typed 2.x commands, for platforms on 2.x only. On 3.x use package control:
+// ListCapabilities and ExecuteCommand with a command id (flight.takeoff, navigation.go_to, ...).
 package remotecontrol
 
 import (
