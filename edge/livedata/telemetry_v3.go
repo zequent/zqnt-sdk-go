@@ -3,7 +3,6 @@ package livedata
 import (
 	"context"
 	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter/domains"
@@ -15,6 +14,7 @@ import (
 	commonv3 "github.com/zequent/zqnt-utils-golang/v2/gen/zqnt/common/v3"
 	edgev3 "github.com/zequent/zqnt-utils-golang/v2/gen/zqnt/edge/v3"
 	telemetryv3 "github.com/zequent/zqnt-utils-golang/v2/gen/zqnt/telemetry/v3"
+	"github.com/zequent/zqnt-utils-golang/v2/telemetry"
 
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -94,8 +94,9 @@ func sendV3[Req, Resp any](s *ServiceImpl, st *ingestStream[Req, Resp], req *Req
 }
 
 // PublishTelemetrySample sends one v3 sample: the shared fields plus Details under the keys the
-// adapter declares as telemetry fields. Without v3 on the platform the shared fields go over v2
-// ProduceTelemetry and Details are dropped.
+// adapter declares as telemetry fields. Without v3 on the platform it goes over v2 ProduceTelemetry,
+// mapped like zqnt-utils' telemetry package: catalog keys land in their v2 fields, other keys are
+// dropped.
 func (s *ServiceImpl) PublishTelemetrySample(ctx context.Context, sample *domains.TelemetrySample) error {
 	if sample == nil {
 		return nil
@@ -106,17 +107,17 @@ func (s *ServiceImpl) PublishTelemetrySample(ctx context.Context, sample *domain
 	if s.shuttingDown.Load() {
 		return nil
 	}
+	req, err := telemetrySampleV3(sample)
+	if err != nil {
+		return err
+	}
 	if s.useV3() {
-		req, err := telemetrySampleV3(sample)
-		if err != nil {
-			return err
-		}
 		fallback, err := sendV3(s, s.v3.telemetry, &telemetryv3.PublishTelemetryRequest{Sample: req})
 		if !fallback {
 			return err
 		}
 	}
-	return s.ProduceTelemetry(ctx, sample.SN, telemetrySampleV2(sample))
+	return s.ProduceTelemetry(ctx, sample.SN, telemetry.ToRequest(req))
 }
 
 // PublishDetections sends what the asset's detector saw in one frame. Without v3 on the platform
@@ -199,43 +200,6 @@ func geoPointV3(p *domains.GeoPoint) *commonv3.GeoPoint {
 		return nil
 	}
 	return &commonv3.GeoPoint{Latitude: p.Lat, Longitude: p.Lon, Altitude: p.Alt}
-}
-
-// telemetrySampleV2 maps the shared fields onto v2 Telemetry; Details have no v2 home.
-func telemetrySampleV2(in *domains.TelemetrySample) *livedatapb.ProduceTelemetryRequest {
-	t := &livedatapb.Telemetry{
-		Sn:               in.SN,
-		Timestamp:        timestampOrNow(in.ObservedAt),
-		RelativeAltitude: f64to32(in.RelativeAltitude),
-		Heading:          f64to32(in.HeadingDegrees),
-	}
-	if p := in.Position; p != nil {
-		t.Latitude, t.Longitude = &p.Lat, &p.Lon
-		t.AbsoluteAltitude = f64to32(p.Alt)
-	}
-	if in.HorizontalSpeed != nil || in.VerticalSpeed != nil || in.BatteryPercent != nil {
-		sub := &livedatapb.SubAssetTelemetryDetails{
-			HorizontalSpeed: f64to32(in.HorizontalSpeed),
-			VerticalSpeed:   f64to32(in.VerticalSpeed),
-		}
-		if in.BatteryPercent != nil {
-			pct := strconv.FormatFloat(*in.BatteryPercent, 'f', -1, 64)
-			sub.BatteryInformation = &livedatapb.SubAssetTelemetryDetails_SubAssetBatteryInformation{Percentage: &pct}
-		}
-		t.Source = &livedatapb.Telemetry_SubAsset{SubAsset: sub}
-	}
-	return &livedatapb.ProduceTelemetryRequest{
-		Base:      &commonpb.RequestBase{Tid: protohelpers.GenerateTID(), Sn: in.SN, Timestamp: protohelpers.Now()},
-		Telemetry: &livedatapb.ProduceTelemetryRequest_Data{Data: t},
-	}
-}
-
-func f64to32(v *float64) *float32 {
-	if v == nil {
-		return nil
-	}
-	f := float32(*v)
-	return &f
 }
 
 func detectionBatchV3(in *domains.DetectionBatch) *telemetryv3.DetectionBatch {

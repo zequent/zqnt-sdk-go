@@ -17,6 +17,7 @@ import (
 	capabilityv3 "github.com/zequent/zqnt-utils-golang/v2/gen/zqnt/capability/v3"
 	edgev3 "github.com/zequent/zqnt-utils-golang/v2/gen/zqnt/edge/v3"
 	telemetryv3 "github.com/zequent/zqnt-utils-golang/v2/gen/zqnt/telemetry/v3"
+	"github.com/zequent/zqnt-utils-golang/v2/telemetry"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -279,7 +280,7 @@ func TestTelemetrySampleGoesOverTheV3Stream(t *testing.T) {
 	})
 }
 
-func TestTelemetrySampleFallsBackToV2SharedFields(t *testing.T) {
+func TestTelemetrySampleFallsBackToV2WithItsCatalogDetails(t *testing.T) {
 	p := &platform{}
 	s := start(t, p, false)
 	eventually(t, "a v2 telemetry sample", func() bool {
@@ -291,7 +292,36 @@ func TestTelemetrySampleFallsBackToV2SharedFields(t *testing.T) {
 	p.locked(func() {
 		got := p.v2Telemetry[0]
 		if got.GetSn() != "SN-1" || got.GetLatitude() != 52.5 || got.GetAbsoluteAltitude() != 120 || got.GetHeading() != 90 ||
-			got.GetSubAsset().GetHorizontalSpeed() != 4.5 || got.GetSubAsset().GetBatteryInformation().GetPercentage() != "81" {
+			got.GetSubAsset().GetHorizontalSpeed() != 4.5 || got.GetSubAsset().GetBatteryInformation().GetPercentage() != "81" ||
+			got.GetSubAsset().GetGear() != 1 {
+			t.Fatalf("v2 telemetry = %v", got)
+		}
+	})
+}
+
+func TestAStandingAssetFallsBackToV2AssetTelemetry(t *testing.T) {
+	p := &platform{}
+	s := start(t, p, false)
+	standing := &domains.TelemetrySample{
+		SN:             "SN-2",
+		BatteryPercent: ptr(64.0),
+		Details: map[string]any{
+			telemetry.DockMode:                       "WORKING",
+			telemetry.DockManualControlActiveSession: true,
+			telemetry.WindSpeed:                      2.5,
+		},
+	}
+	eventually(t, "a v2 telemetry sample", func() bool {
+		_ = s.PublishTelemetrySample(context.Background(), standing)
+		var n int
+		p.locked(func() { n = len(p.v2Telemetry) })
+		return n > 0
+	})
+	p.locked(func() {
+		got := p.v2Telemetry[0]
+		asset := got.GetAsset()
+		if asset == nil || asset.GetMode().String() != "ASSET_MODE_WORKING" || !asset.GetHasActiveManualControlSession() ||
+			asset.GetSubAssetPercentage() != 64 || got.GetWindSpeed() != 2.5 {
 			t.Fatalf("v2 telemetry = %v", got)
 		}
 	})

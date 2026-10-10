@@ -72,7 +72,7 @@ See [`example/main.go`](example/main.go) for a complete working example with gra
 | Commands from the platform | `zqnt.edge.v3.EdgeAdapterService.ExecuteCommand` | v2 typed RPCs, served alongside |
 | Command events (`LiveData().PublishCommandExecutionEvent`) | `EdgeGatewayService.PublishCommandEvent` under the platform's `command_execution_id`, `occurred_at` always set | v2 notification stream |
 | Capabilities (on start, on every registry change, `client.RefreshCapabilities()`) | `EdgeGatewayService.ReportCapabilities`, incl. declared telemetry fields | v2 `ReportAssetRuntime` |
-| `LiveData().PublishTelemetrySample` | `TelemetryIngestService.PublishTelemetry` | v2 `ProduceTelemetry` with the shared fields; `Details` are dropped |
+| `LiveData().PublishTelemetrySample` | `TelemetryIngestService.PublishTelemetry` | v2 `ProduceTelemetry`; catalog keys in `Details` land in their v2 fields, other keys are dropped |
 | `LiveData().PublishDetections` | `TelemetryIngestService.PublishDetections` | v2 `ProduceDetection` |
 | `LiveData().PublishAlert` | `TelemetryIngestService.PublishAlerts` | none: dropped |
 
@@ -87,7 +87,9 @@ SDK switches. remote-control serves `EdgeGatewayService`: point the SDK at it wi
   numbers under an `integer` property arrive as `int64`, every other number as `float64`. A mismatch
   is `REJECTED` with error code `command.invalid_params` and a message naming each field.
 - **Telemetry fields:** `DeclareTelemetryField` on the registry declares the keys of
-  `TelemetrySample.Details`; they are published with the capabilities.
+  `TelemetrySample.Details`; they are published with the capabilities. Keys of the platform's
+  catalog (`github.com/zequent/zqnt-utils-golang/v2/telemetry`, e.g. `dock.mode`, `wind.speed`)
+  are described by `domains.StandardTelemetryField` and also reach a v2 platform.
 - **Conformance kit:** `conformance.Run(t, adapter, conformance.Options{Events: recorder})` checks
   that every advertised id executes, every executable id is advertised, schemas parse and an
   `ACCEPTED` command is completed by an event with `occurred_at`. It executes commands — run it
