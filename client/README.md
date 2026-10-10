@@ -57,9 +57,57 @@ simulator and the Integration Hub use.
 `examples/command` lists an asset's capabilities and runs one:
 `go run ./examples/command DRONE-1 flight.takeoff '{"altitude": 40}'`.
 
+### Manual control
+
+Stick input goes over one stream per asset. Put the asset in manual control first, then send
+inputs (roll, pitch, yaw, throttle from -1 to 1) at your control rate:
+
+```go
+if _, err := assets.ExecuteAndWait(ctx, "DRONE-1", "flight.manual.enter", nil); err != nil { ... }
+stick, err := assets.StreamManualControl(ctx, "DRONE-1")
+err = stick.Send(&edgev3.ManualControlInput{Pitch: 0.2, Throttle: 0.5})
+err = stick.Send(&edgev3.ManualControlInput{Throttle: 0.5, GimbalPitch: proto.Float32(-30)})
+accepted, err := stick.Close()
+```
+
+The first input names the asset; one stream controls one asset. `Close` ends the session and
+returns the number of inputs the platform passed on to the asset (an error in its answer is a
+`*control.CommandError`); cancelling `ctx` aborts the stream. When the platform refuses the session
+(no adapter reachable, an asset of another organization) or the adapter drops it, `Send` and `Close`
+return that error with its gRPC status; `Send` after `Close` is `control.ErrManualControlClosed`.
+`edgev3` is `github.com/zequent/zqnt-utils-golang/v2/gen/zqnt/edge/v3`.
+
+## Telemetry (3.x): `telemetry`
+
+```go
+conn, err := cfg.Dial(cfg.LiveData)
+watch, err := telemetry.New(conn).WatchTelemetry(ctx, []string{"DOCK-1"}, telemetry.WithMinInterval(time.Second))
+defer watch.Close()
+for {
+	item, err := watch.Recv()
+	if err != nil { ... } // io.EOF, telemetry.ErrSilent or the gRPC error
+	if sample := item.GetSample(); sample != nil {
+		fmt.Println(sample.GetAsset().GetSn(), sample.GetPosition(), sample.GetBatteryPercent(), sample.GetDetails().AsMap())
+	} else {
+		fmt.Println(item.GetSourceStatus().GetAsset().GetSn(), item.GetSourceStatus().GetState())
+	}
+}
+```
+
+`WatchTelemetry` is a client of `zqnt.telemetry.v3.TelemetryService` on live-data
+(`LIVE_DATA_SERVICE_*`). A `TelemetrySample` has the shared fields (position, relative altitude,
+heading, speeds, battery) and the device-specific `details` under the keys of the capabilities'
+`telemetry_fields`. No asset watches every asset of the caller's organization; a dock's serial
+includes its drone. `WithMinInterval` keeps at most one sample per asset per interval. A
+`SourceStatus` comes first for every watched asset, then on each change to online, stale or no
+data; heartbeats are skipped. When neither a sample nor a heartbeat arrives within
+`DefaultHeartbeatTimeout` (35 s, `WithHeartbeatTimeout`), `Recv` returns `telemetry.ErrSilent`. A
+watch does not reconnect: watch again.
+
 ## Packages
 
-- `control/` — the 3.x command API above.
+- `control/` — the 3.x command API and manual control above.
+- `telemetry/` — 3.x telemetry samples and source status.
 - `connector/` — asset lookup, the Skill Registry, scheduler CRUD, operational policies and
   technical config (2.x contract, still served).
 - `missionautonomy/` — Applications and the SkillExecution lifecycle (2.x contract, still served).
@@ -99,6 +147,9 @@ Generated types come from
    | `SendCustomCommand(ctx, sn, id, params, target)` | `ExecuteCommand(ctx, sn, id, params, control.WithTarget(...))` |
    | `GetCapabilities(ctx, sn)` | `ListCapabilities(ctx, sn)` |
    | `has_errors` / `error` on the response | `*control.CommandError` (`REJECTED`/`FAILED`/...) |
+   | `EnterManualControl` / `ExitManualControl` | `"flight.manual.enter"` / `"flight.manual.exit"` |
+   | `OpenManualControlInputStream(ctx)` + `Send` / `CloseAndRecv` | `StreamManualControl(ctx, sn)` + `Send(*edgev3.ManualControlInput)` / `Close()` |
+   | `livedata.StreamTelemetry(ctx, sn, frequencyMs, durationSeconds)` | `telemetry.WatchTelemetry(ctx, sns, telemetry.WithMinInterval(...))` |
 
    `go_to`'s `altitude` is metres above the takeoff point (default 40 m), as in 2.x. A command that
    takes time no longer blocks on the typed RPC: wait with `ExecuteAndWait` or `WatchCommand`.

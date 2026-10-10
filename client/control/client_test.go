@@ -27,13 +27,14 @@ import (
 type fakeRemoteControl struct {
 	controlv3.UnimplementedRemoteControlServiceServer
 
-	mu          sync.Mutex
-	capRequest  *controlv3.GetCapabilitiesRequest
-	execRequest *controlv3.ExecuteCommandRequest
-	cancelReq   *controlv3.CancelCommandRequest
-	watchReq    *controlv3.WatchCommandEventsRequest
-	authHeader  string
-	events      chan *capabilityv3.CommandEvent
+	mu           sync.Mutex
+	capRequest   *controlv3.GetCapabilitiesRequest
+	execRequest  *controlv3.ExecuteCommandRequest
+	cancelReq    *controlv3.CancelCommandRequest
+	watchReq     *controlv3.WatchCommandEventsRequest
+	authHeader   string
+	events       chan *capabilityv3.CommandEvent
+	manualInputs []*controlv3.StreamManualControlRequest
 }
 
 func newFake() *fakeRemoteControl {
