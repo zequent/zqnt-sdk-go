@@ -107,29 +107,6 @@ func (s *ServiceImpl) UpdateAsset(ctx context.Context, id string, asset *domains
 	return s.mapper.AssetFromProto(resp.GetAsset()), nil
 }
 
-// Deprecated: see ConnectorService.RegisterAsset.
-func (s *ServiceImpl) RegisterAsset(ctx context.Context, asset *domains.AssetDTO) (*domains.AssetDTO, error) {
-	sn := ""
-	if asset.SN != nil {
-		sn = *asset.SN
-	}
-	req := &connectorpb.ConnectorRegisterAssetRequest{
-		Base:  newBase(sn),
-		Asset: s.mapper.AssetToProto(asset),
-	}
-	resp, err := retry.Do(ctx, func(c context.Context) (*connectorpb.ConnectorResponse, error) {
-		return s.stub.RegisterAsset(c, req)
-	})
-	if err != nil {
-		return nil, err
-	}
-	if resp.GetHasErrors() {
-		s.log.Error("RegisterAsset error", "error", resp.GetError())
-		return nil, nil
-	}
-	return s.mapper.AssetFromProto(resp.GetAsset()), nil
-}
-
 func (s *ServiceImpl) RedeemAssetClaim(ctx context.Context, code string, asset *domains.AssetDTO) (*domains.AssetDTO, error) {
 	if code == "" || asset == nil || asset.SN == nil || *asset.SN == "" {
 		return nil, errors.New("RedeemAssetClaim: a code and the asset's sn are required")
