@@ -309,3 +309,45 @@ func TestBuiltInCommandIDsAreExactlyTheRoutedOnes(t *testing.T) {
 		}
 	}
 }
+
+func TestV3CommandSafetyComesFromTheCatalogUnlessDeclared(t *testing.T) {
+	ok := func(_ context.Context, req *domains.CustomCommandRequest) (*domains.CommandResult, error) {
+		return domains.Success("ok", req.SN), nil
+	}
+	b := &adapter.Base{}
+	b.MustRegisterCommand("flight.takeoff", nil, nil, ok)
+	b.MustRegisterCommand("flight.land", nil, nil, ok)
+	b.MustRegisterCommand("asset.property.night_lights_state.set", nil, nil, ok)
+	b.MustRegisterCommand("dock.open_cover", nil, nil, ok, adapter.WithSafety(domains.CommandSafety{
+		Risk: domains.CommandRiskMove, Preconditions: []string{"no aircraft above the dock"}}))
+	b.MustRegisterCommand("vendor.acme.spray", nil, nil, ok, adapter.WithRisk(domains.CommandRiskCritical))
+	b.MustRegisterCommand("vendor.acme.status", nil, nil, ok)
+	b.MustRegisterCommand("vendor.betaflight.arm", nil, nil, ok)
+
+	set := CapabilitySetV3(b.Capabilities("SN-1"), slog.New(slog.NewTextHandler(io.Discard, nil)))
+	got := map[string]*capabilityv3.CommandSafety{}
+	for _, c := range set.GetCapabilities() {
+		got[c.GetCommandId()] = c.GetSafety()
+	}
+	if s := got["flight.takeoff"]; s.GetRisk() != capabilityv3.CommandRisk_COMMAND_RISK_MOVE || !s.GetReversible() ||
+		s.GetUndoCommandId() != "flight.return_to_home" {
+		t.Fatalf("flight.takeoff safety = %v", s)
+	}
+	for id, want := range map[string]capabilityv3.CommandRisk{
+		"flight.land":                           capabilityv3.CommandRisk_COMMAND_RISK_CRITICAL,
+		"asset.property.night_lights_state.set": capabilityv3.CommandRisk_COMMAND_RISK_ADJUST,
+		"dock.open_cover":                       capabilityv3.CommandRisk_COMMAND_RISK_MOVE,
+		"vendor.acme.spray":                     capabilityv3.CommandRisk_COMMAND_RISK_CRITICAL,
+		"vendor.betaflight.arm":                 capabilityv3.CommandRisk_COMMAND_RISK_CRITICAL,
+	} {
+		if got[id].GetRisk() != want {
+			t.Errorf("%s risk = %v, want %v", id, got[id].GetRisk(), want)
+		}
+	}
+	if p := got["dock.open_cover"].GetPreconditions(); len(p) != 1 || p[0] != "no aircraft above the dock" {
+		t.Errorf("dock.open_cover preconditions = %v", p)
+	}
+	if got["vendor.acme.status"] != nil {
+		t.Errorf("an id outside the catalog declares no safety, got %v", got["vendor.acme.status"])
+	}
+}

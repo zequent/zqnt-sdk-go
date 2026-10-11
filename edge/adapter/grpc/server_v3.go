@@ -142,7 +142,26 @@ func capabilityV3(c domains.Capability, log *slog.Logger) *capabilityv3.Capabili
 	}
 	out.Completion = capabilityv3.CompletionMode(c.Completion)
 	out.CompletionEvent = c.CompletionEvent
+	out.Safety = safetyV3(c)
 	return out
+}
+
+func safetyV3(c domains.Capability) *capabilityv3.CommandSafety {
+	s := c.Safety
+	if s == nil {
+		catalog, ok := domains.CatalogSafety(c.Command)
+		if !ok {
+			return nil
+		}
+		s = &catalog
+	}
+	return &capabilityv3.CommandSafety{
+		Risk:          capabilityv3.CommandRisk(s.Risk),
+		Reversible:    s.Reversible,
+		UndoCommandId: s.UndoCommandID,
+		Preconditions: s.Preconditions,
+		Effects:       s.Effects,
+	}
 }
 
 func schemaStruct(log *slog.Logger, command, field string, m map[string]any) *structpb.Struct {

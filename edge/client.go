@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/zequent/zqnt-edge-sdk-go/v3/adapter"
+	"github.com/zequent/zqnt-edge-sdk-go/v3/adapter/domains"
 	adaptergrpc "github.com/zequent/zqnt-edge-sdk-go/v3/adapter/grpc"
 	"github.com/zequent/zqnt-edge-sdk-go/v3/auth"
 	"github.com/zequent/zqnt-edge-sdk-go/v3/connector"
@@ -279,6 +280,13 @@ func (c *EdgeClient) LiveData() *livedata.ServiceImpl { return c.liveData }
 
 // Connector returns the connector CRUD service.
 func (c *EdgeClient) Connector() *connector.ServiceImpl { return c.connectorSvc }
+
+// EnsureAsset binds to the asset with asset.SN, or pairs it with the configured claim code
+// ([WithClaimCode], ZQNT_CLAIM_CODE) when the platform does not know it. It returns (nil, nil)
+// when the asset is unknown and there is no usable code.
+func (c *EdgeClient) EnsureAsset(ctx context.Context, asset *domains.AssetDTO) (*domains.AssetDTO, error) {
+	return c.connectorSvc.EnsureAsset(ctx, asset, c.cfg.claimCode)
+}
 
 // MissionAutonomy returns the mission-autonomy service.
 func (c *EdgeClient) MissionAutonomy() *missionautonomy.ServiceImpl { return c.missionSvc }
