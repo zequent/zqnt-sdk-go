@@ -9,7 +9,7 @@ Go SDK for connecting edge devices (drones, robots) to the Zequent platform via 
 ```bash
 go env -w GONOSUMDB="github.com/Zequent/*,github.com/zequent/*"
 go env -w GONOPROXY="github.com/Zequent/*,github.com/zequent/*"
-go get github.com/Zequent/zqnt-edge-sdk-go/v2@v2.0.0  # proto stubs come from github.com/zequent/zqnt-utils-golang/v2@v2.0.0
+go get github.com/Zequent/zqnt-edge-sdk-go/v2@v2.0.0  # proto stubs come from github.com/zequent/zqnt-api-go
 ```
 
 **2. Implement your adapter:** embed `adapter.Base` and register each command once — id, input
@@ -88,7 +88,7 @@ SDK switches. remote-control serves `EdgeGatewayService`: point the SDK at it wi
   is `REJECTED` with error code `command.invalid_params` and a message naming each field.
 - **Telemetry fields:** `DeclareTelemetryField` on the registry declares the keys of
   `TelemetrySample.Details`; they are published with the capabilities. Keys of the platform's
-  catalog (`github.com/zequent/zqnt-utils-golang/v2/telemetry`, e.g. `dock.mode`, `wind.speed`)
+  catalog (`github.com/zequent/zqnt-api-go/telemetry`, e.g. `dock.mode`, `wind.speed`)
   are described by `domains.StandardTelemetryField` and also reach a v2 platform.
 - **Conformance kit:** `conformance.Run(t, adapter, conformance.Options{Events: recorder})` checks
   that every advertised id executes, every executable id is advertised, schemas parse and an
@@ -107,10 +107,10 @@ the running platform, not compatible with it.
 Per Go's semantic import versioning the module path carries the major version from here on:
 `github.com/Zequent/zqnt-edge-sdk-go/v2`.
 
-**Proto source**: no local generation in this repo (no `buf.gen.yaml`, no `gen/`). Stubs come from
-[`github.com/zequent/zqnt-utils-golang/v2`](../../../utils/zqnt-utils-golang) `v2.0.0` — a
-published, versioned dependency, mirroring how `edge-java-sdk` depends on `zqnt-utils-java` and
-`edge-python-sdk` on the `zqnt-utils` pip package, rather than generating proto code inline.
+**Proto source**: no local generation in this repo (no `buf.gen.yaml`, no `gen/`). Stubs and the
+telemetry mapping come from the public module
+[`github.com/zequent/zqnt-api-go`](https://github.com/Zequent/zqnt-api-go), the platform’s
+customer contracts; the SDK depends on nothing else of the platform.
 
 **What actually moved, and what didn't.** `edge.proto`, `common.proto`, `live-data.proto`,
 `live-data-types.proto`, `remote-control.proto` and `simulator-control.proto` are byte-identical
@@ -186,7 +186,7 @@ way any other adapter built on this SDK would.
 
 ### Local development
 
-`go.mod` points at a published version of `zqnt-utils-golang/v2`, so a clone and CI resolve it
+`go.mod` points at a published version of `zqnt-api-go`, so a clone and CI resolve it
 without any local setup. While the v2 line is still in review that's the PR preview build
 (`pr-<n>-<sha>`, resolved as a pseudo-version); it becomes `v2.0.0` when that release is cut.
 

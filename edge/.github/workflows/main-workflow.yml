@@ -16,7 +16,7 @@ jobs:
     steps:
       # No submodules in this repo anymore (removed in the Sept 2 migration) and self-checkout
       # doesn't need GH_PAT -- the default GITHUB_TOKEN handles that. GH_PAT is only genuinely
-      # needed below, to fetch the private zqnt-utils-golang module during go build.
+      # needed below, to fetch zqnt-api-go during go build while it is still private.
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           persist-credentials: false

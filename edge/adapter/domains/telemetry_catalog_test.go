@@ -4,7 +4,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/zequent/zqnt-utils-golang/v2/telemetry"
+	"github.com/zequent/zqnt-api-go/telemetry"
 )
 
 func TestStandardTelemetryFieldComesFromTheCatalog(t *testing.T) {

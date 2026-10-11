@@ -13,9 +13,9 @@ import (
 	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter"
 	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter/domains"
 	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter/schema"
-	capabilityv3 "github.com/zequent/zqnt-utils-golang/v2/gen/zqnt/capability/v3"
-	commonv3 "github.com/zequent/zqnt-utils-golang/v2/gen/zqnt/common/v3"
-	edgev3 "github.com/zequent/zqnt-utils-golang/v2/gen/zqnt/edge/v3"
+	capabilityv3 "github.com/zequent/zqnt-api-go/gen/zqnt/capability/v3"
+	commonv3 "github.com/zequent/zqnt-api-go/gen/zqnt/common/v3"
+	edgev3 "github.com/zequent/zqnt-api-go/gen/zqnt/edge/v3"
 
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/structpb"

@@ -13,11 +13,11 @@ import (
 	"github.com/Zequent/zqnt-edge-sdk-go/v2/internal/protohelpers"
 	"github.com/Zequent/zqnt-edge-sdk-go/v2/internal/retry"
 	"github.com/Zequent/zqnt-edge-sdk-go/v2/internal/v3compat"
-	commonpb "github.com/zequent/zqnt-utils-golang/v2/gen/common/base/proto"
-	devicecontrolpb "github.com/zequent/zqnt-utils-golang/v2/gen/devicecontrol/contracts/proto"
-	remotecontrolpb "github.com/zequent/zqnt-utils-golang/v2/gen/remotecontrol/proto"
-	capabilityv3 "github.com/zequent/zqnt-utils-golang/v2/gen/zqnt/capability/v3"
-	edgev3 "github.com/zequent/zqnt-utils-golang/v2/gen/zqnt/edge/v3"
+	commonpb "github.com/zequent/zqnt-api-go/gen/common/base/proto"
+	devicecontrolpb "github.com/zequent/zqnt-api-go/gen/devicecontrol/contracts/proto"
+	remotecontrolpb "github.com/zequent/zqnt-api-go/gen/remotecontrol/proto"
+	capabilityv3 "github.com/zequent/zqnt-api-go/gen/zqnt/capability/v3"
+	edgev3 "github.com/zequent/zqnt-api-go/gen/zqnt/edge/v3"
 
 	"google.golang.org/protobuf/proto"
 )

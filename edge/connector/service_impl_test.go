@@ -6,8 +6,8 @@ import (
 	"log/slog"
 	"testing"
 
-	commonpb "github.com/zequent/zqnt-utils-golang/v2/gen/common/proto"
-	connectorpb "github.com/zequent/zqnt-utils-golang/v2/gen/connector/proto"
+	commonpb "github.com/zequent/zqnt-api-go/gen/common/proto"
+	connectorpb "github.com/zequent/zqnt-api-go/gen/connector/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/proto"
 )
