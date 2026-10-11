@@ -19,12 +19,12 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	connectorpb "github.com/zequent/zqnt-api-go/gen/connector/proto"
-	livedatapb "github.com/zequent/zqnt-api-go/gen/livedata/proto"
-	missionautonomypb "github.com/zequent/zqnt-api-go/gen/missionautonomy/proto"
-	remotecontrolpb "github.com/zequent/zqnt-api-go/gen/remotecontrol/proto"
-	edgev3 "github.com/zequent/zqnt-api-go/gen/zqnt/edge/v3"
-	telemetryv3 "github.com/zequent/zqnt-api-go/gen/zqnt/telemetry/v3"
+	connectorpb "github.com/zequent/zqnt-api-go/v3/gen/connector/proto"
+	livedatapb "github.com/zequent/zqnt-api-go/v3/gen/livedata/proto"
+	missionautonomypb "github.com/zequent/zqnt-api-go/v3/gen/missionautonomy/proto"
+	remotecontrolpb "github.com/zequent/zqnt-api-go/v3/gen/remotecontrol/proto"
+	edgev3 "github.com/zequent/zqnt-api-go/v3/gen/zqnt/edge/v3"
+	telemetryv3 "github.com/zequent/zqnt-api-go/v3/gen/zqnt/telemetry/v3"
 )
 
 // EdgeClient is the main entry point of the edge-go-sdk.

@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter/domains"
-	devicecontrolpb "github.com/zequent/zqnt-api-go/gen/devicecontrol/contracts/proto"
+	devicecontrolpb "github.com/zequent/zqnt-api-go/v3/gen/devicecontrol/contracts/proto"
 )
 
 // TestCapabilityTargetTypeToProto guards the exact bug that made GetCapabilities' Target

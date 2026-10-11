@@ -11,7 +11,7 @@ help:
 	@echo "The v1.3.0-compat simulator built on this SDK lives in its own repo:"
 	@echo "  github.com/Zequent/zqnt-simulator"
 
-# No local proto generation: the stubs come from github.com/zequent/zqnt-api-go.
+# No local proto generation: the stubs come from github.com/zequent/zqnt-api-go/v3.
 
 # ── build ─────────────────────────────────────────────────────────────────────
 build:

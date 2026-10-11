@@ -2,8 +2,8 @@ package livedata
 
 import (
 	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter/domains"
-	commonpb "github.com/zequent/zqnt-api-go/gen/common/proto"
-	livedatapb "github.com/zequent/zqnt-api-go/gen/livedata/proto"
+	commonpb "github.com/zequent/zqnt-api-go/v3/gen/common/proto"
+	livedatapb "github.com/zequent/zqnt-api-go/v3/gen/livedata/proto"
 
 	"github.com/Zequent/zqnt-edge-sdk-go/v2/internal/protohelpers"
 

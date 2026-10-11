@@ -11,8 +11,8 @@ import (
 
 	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter"
 	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter/domains"
-	capabilityv3 "github.com/zequent/zqnt-api-go/gen/zqnt/capability/v3"
-	edgev3 "github.com/zequent/zqnt-api-go/gen/zqnt/edge/v3"
+	capabilityv3 "github.com/zequent/zqnt-api-go/v3/gen/zqnt/capability/v3"
+	edgev3 "github.com/zequent/zqnt-api-go/v3/gen/zqnt/edge/v3"
 
 	"google.golang.org/grpc"
 )
