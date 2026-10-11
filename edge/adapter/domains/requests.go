@@ -114,6 +114,14 @@ type DetectionResult struct {
 	BoundingBox BoundingBox
 	// Position is where the object is, when the detector can tell.
 	Position *GeoPoint
+	// RangeMeters, BearingDegrees (clockwise from true north) and ElevationDegrees locate the
+	// object relative to the sensor that saw it, as a radar reports it.
+	RangeMeters      *float64
+	BearingDegrees   *float64
+	ElevationDegrees *float64
+	// Speed (m/s) and HeadingDegrees (clockwise from true north) of the object when the sensor tracks it.
+	Speed          *float64
+	HeadingDegrees *float64
 }
 
 // BoundingBox holds the pixel coordinates of a detected object.

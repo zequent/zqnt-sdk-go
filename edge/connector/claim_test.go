@@ -3,6 +3,7 @@ package connector
 import (
 	"context"
 	"net"
+	"reflect"
 	"sync"
 	"testing"
 
@@ -128,5 +129,11 @@ func TestDescribeAssetClaimNamesTheOrganizationWithoutSpendingTheCode(t *testing
 	}
 	if name, err := svc.DescribeAssetClaim(context.Background(), "WRONG"); err != nil || name != "" {
 		t.Fatalf("unknown code: name=%q err=%v, want (\"\", nil)", name, err)
+	}
+}
+
+func TestAnAdapterCannotNameAnAssetIntoExistence(t *testing.T) {
+	if _, found := reflect.TypeOf((*ConnectorService)(nil)).Elem().MethodByName("RegisterAsset"); found {
+		t.Fatal("assets are paired by claim code (EnsureAsset/RedeemAssetClaim), never registered by an adapter")
 	}
 }
