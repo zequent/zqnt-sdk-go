@@ -1,6 +1,6 @@
 // Package control commands assets on a Zequent 3.x platform: list what an asset can do, run any of
 // it by command id with parameters, cancel a run and watch its events. It is the client of
-// zqnt.control.v3.RemoteControlService, served by remote-control next to the 2.x service.
+// zqnt.control.v3.RemoteControlService, served by remote-control.
 //
 // Every action is a capability with a dotted command id (flight.takeoff, navigation.go_to,
 // dock.open_cover, vendor.<vendor>.<name>); ListCapabilities returns the ids an asset offers with
