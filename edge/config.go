@@ -4,6 +4,7 @@ package edgesdk
 
 import (
 	"log/slog"
+	"os"
 	"time"
 
 	"github.com/zequent/zqnt-edge-sdk-go/v3/auth"
@@ -36,6 +37,10 @@ type config struct {
 	// ReportAssetRuntime.
 	remoteControlAddr string
 
+	// claimCode is a one-time pairing code minted in the console, traded for an asset the platform
+	// does not know yet (EdgeClient.EnsureAsset). Empty once the assets exist.
+	claimCode string
+
 	// auth: the edge credential for calls into the platform, and how the platform's commands are
 	// verified. Defaults from the environment (see package auth).
 	auth auth.Config
@@ -49,5 +54,6 @@ func defaultConfig(endpoint, sn string) *config {
 		maxRetries: 3,
 		logger:     slog.Default(),
 		auth:       auth.FromEnv(),
+		claimCode:  os.Getenv("ZQNT_CLAIM_CODE"),
 	}
 }

@@ -47,6 +47,12 @@ func WithEdgeToken(token string) Option {
 	return func(c *config) { c.auth.EdgeToken = token }
 }
 
+// WithClaimCode sets the one-time pairing code EnsureAsset redeems for an asset the platform does
+// not know yet (default: ZQNT_CLAIM_CODE). The claim decides the asset's organization.
+func WithClaimCode(code string) Option {
+	return func(c *config) { c.claimCode = code }
+}
+
 // WithPlatformPublicKey sets the platform's service public key the adapter's server verifies
 // every command with (default: ZQNT_PLATFORM_PUBLIC_KEY / SERVICE_AUTH_PUBLIC_KEY).
 func WithPlatformPublicKey(key string) Option {

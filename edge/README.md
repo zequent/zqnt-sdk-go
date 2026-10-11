@@ -86,6 +86,16 @@ SDK switches. remote-control serves `EdgeGatewayService`: point the SDK at it wi
 - **Params** are validated against the command's input schema before the handler runs; whole
   numbers under an `integer` property arrive as `int64`, every other number as `float64`. A mismatch
   is `REJECTED` with error code `command.invalid_params` and a message naming each field.
+- **Risk:** every capability carries a `CommandSafety`. A standard id gets the rating of the
+  platform's command catalog (`domains.CatalogSafety`, e.g. `flight.takeoff` MOVE, `flight.land`
+  CRITICAL); `adapter.WithSafety(...)` / `adapter.WithRisk(domains.CommandRiskCritical)` overrides
+  it. A `vendor.*` command that moves or affects the asset must declare its own: an id outside the
+  catalog declares none, and the platform then falls back to the 2.x prefix rule.
+- **Pairing:** `client.EnsureAsset(ctx, asset)` binds to the asset with that serial or, when the
+  platform does not know it, redeems the one-time claim code (`WithClaimCode`, default
+  `ZQNT_CLAIM_CODE`) minted in the console; the claim decides the organization.
+  `Connector().DescribeAssetClaim` names that organization without spending the code.
+  `RegisterAsset` is deprecated.
 - **Telemetry fields:** `DeclareTelemetryField` on the registry declares the keys of
   `TelemetrySample.Details`; they are published with the capabilities. Keys of the platform's
   catalog (`github.com/zequent/zqnt-api-go/v3/telemetry`, e.g. `dock.mode`, `wind.speed`)

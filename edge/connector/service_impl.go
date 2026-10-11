@@ -107,6 +107,7 @@ func (s *ServiceImpl) UpdateAsset(ctx context.Context, id string, asset *domains
 	return s.mapper.AssetFromProto(resp.GetAsset()), nil
 }
 
+// Deprecated: see ConnectorService.RegisterAsset.
 func (s *ServiceImpl) RegisterAsset(ctx context.Context, asset *domains.AssetDTO) (*domains.AssetDTO, error) {
 	sn := ""
 	if asset.SN != nil {
@@ -127,6 +128,59 @@ func (s *ServiceImpl) RegisterAsset(ctx context.Context, asset *domains.AssetDTO
 		return nil, nil
 	}
 	return s.mapper.AssetFromProto(resp.GetAsset()), nil
+}
+
+func (s *ServiceImpl) RedeemAssetClaim(ctx context.Context, code string, asset *domains.AssetDTO) (*domains.AssetDTO, error) {
+	if code == "" || asset == nil || asset.SN == nil || *asset.SN == "" {
+		return nil, errors.New("RedeemAssetClaim: a code and the asset's sn are required")
+	}
+	req := &connectorpb.RedeemAssetClaimRequest{Base: newBase(*asset.SN), Code: code, Asset: s.mapper.AssetToProto(asset)}
+	// Not retried: a redemption that landed but lost its response would be refused as spent.
+	resp, err := s.stub.RedeemAssetClaim(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	if resp.GetHasErrors() || resp.GetAsset() == nil {
+		s.log.Error("claim code refused: it may be unknown, expired, revoked, used up or not valid for this kind of "+
+			"device; the platform does not say which. Create a new code in the console and try again.", "sn", *asset.SN)
+		return nil, nil
+	}
+	s.log.Info("claim redeemed, asset created", "sn", *asset.SN)
+	return s.mapper.AssetFromProto(resp.GetAsset()), nil
+}
+
+func (s *ServiceImpl) DescribeAssetClaim(ctx context.Context, code string) (string, error) {
+	if code == "" {
+		return "", errors.New("DescribeAssetClaim: a code is required")
+	}
+	req := &connectorpb.DescribeAssetClaimRequest{Base: newBase(""), Code: code}
+	resp, err := retry.Do(ctx, func(c context.Context) (*connectorpb.AssetClaimDescriptionResponse, error) {
+		return s.stub.DescribeAssetClaim(c, req)
+	})
+	if err != nil {
+		return "", err
+	}
+	if resp.GetHasErrors() || resp.OrganizationName == nil {
+		s.log.Warn("claim code could not be resolved to an organization: it may be unknown, expired, revoked or used up")
+		return "", nil
+	}
+	return resp.GetOrganizationName(), nil
+}
+
+func (s *ServiceImpl) EnsureAsset(ctx context.Context, asset *domains.AssetDTO, claimCode string) (*domains.AssetDTO, error) {
+	if asset == nil || asset.SN == nil || *asset.SN == "" {
+		return nil, errors.New("EnsureAsset: the asset's sn is required")
+	}
+	existing, err := s.GetAssetBySN(ctx, *asset.SN)
+	if err != nil || existing != nil {
+		return existing, err
+	}
+	if claimCode == "" {
+		s.log.Warn("no asset registered for this sn and no claim code to pair one with: create the asset in the "+
+			"console, or pair the device with a code (ZQNT_CLAIM_CODE)", "sn", *asset.SN)
+		return nil, nil
+	}
+	return s.RedeemAssetClaim(ctx, claimCode, asset)
 }
 
 // DeRegisterAsset deletes the asset with this sn. Connector deletes by the request's own sn, so it

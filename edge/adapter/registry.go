@@ -28,6 +28,16 @@ func WithCompletion(mode domains.CompletionMode, completionEvent string) Command
 	return func(c *domains.Capability) { c.Completion, c.CompletionEvent = mode, completionEvent }
 }
 
+// WithSafety declares the command's risk; it overrides the catalog rating of a standard id.
+func WithSafety(s domains.CommandSafety) CommandOption {
+	return func(c *domains.Capability) { c.Safety = &s }
+}
+
+// WithRisk declares only the command's risk level; see WithSafety.
+func WithRisk(r domains.CommandRisk) CommandOption {
+	return WithSafety(domains.CommandSafety{Risk: r})
+}
+
 // WithTarget names the part of the asset that runs the command. Commands default to the asset.
 func WithTarget(t domains.CapabilityTargetType, ref string) CommandOption {
 	return func(c *domains.Capability) {

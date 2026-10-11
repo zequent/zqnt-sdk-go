@@ -75,6 +75,9 @@ type Capability struct {
 	// CompletionEvent names, for CompletionAsynchronous, the event in Events that reports the
 	// outcome, e.g. "flight.takeoff.completed".
 	CompletionEvent string
+	// Safety is the command's risk. Left nil, a standard command id is advertised with its
+	// CatalogSafety; any other id declares none and the platform falls back to the 2.x prefix rule.
+	Safety *CommandSafety
 }
 
 // CompletionMode is when a command is finished, as far as the platform can tell. The values
