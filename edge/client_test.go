@@ -9,10 +9,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zequent/zqnt-edge-sdk-go/v3/adapter"
-	"github.com/zequent/zqnt-edge-sdk-go/v3/adapter/domains"
 	capabilityv3 "github.com/zequent/zqnt-api-go/v3/gen/zqnt/capability/v3"
 	edgev3 "github.com/zequent/zqnt-api-go/v3/gen/zqnt/edge/v3"
+	"github.com/zequent/zqnt-edge-sdk-go/v3/adapter"
+	"github.com/zequent/zqnt-edge-sdk-go/v3/adapter/domains"
 
 	"google.golang.org/grpc"
 )

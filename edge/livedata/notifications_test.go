@@ -9,9 +9,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zequent/zqnt-edge-sdk-go/v3/adapter/domains"
 	eventspb "github.com/zequent/zqnt-api-go/v3/gen/events/proto"
 	livedatapb "github.com/zequent/zqnt-api-go/v3/gen/livedata/proto"
+	"github.com/zequent/zqnt-edge-sdk-go/v3/adapter/domains"
 
 	"google.golang.org/grpc"
 )

@@ -3,8 +3,8 @@ package connector
 import (
 	"time"
 
-	"github.com/zequent/zqnt-edge-sdk-go/v3/adapter/domains"
 	assetpb "github.com/zequent/zqnt-api-go/v3/gen/common/asset/proto"
+	"github.com/zequent/zqnt-edge-sdk-go/v3/adapter/domains"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 )

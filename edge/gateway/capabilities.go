@@ -8,16 +8,16 @@ import (
 	"errors"
 	"log/slog"
 
-	"github.com/zequent/zqnt-edge-sdk-go/v3/adapter/domains"
-	adaptergrpc "github.com/zequent/zqnt-edge-sdk-go/v3/adapter/grpc"
-	"github.com/zequent/zqnt-edge-sdk-go/v3/internal/protohelpers"
-	"github.com/zequent/zqnt-edge-sdk-go/v3/internal/retry"
-	"github.com/zequent/zqnt-edge-sdk-go/v3/internal/v3compat"
 	commonpb "github.com/zequent/zqnt-api-go/v3/gen/common/base/proto"
 	devicecontrolpb "github.com/zequent/zqnt-api-go/v3/gen/devicecontrol/contracts/proto"
 	remotecontrolpb "github.com/zequent/zqnt-api-go/v3/gen/remotecontrol/proto"
 	capabilityv3 "github.com/zequent/zqnt-api-go/v3/gen/zqnt/capability/v3"
 	edgev3 "github.com/zequent/zqnt-api-go/v3/gen/zqnt/edge/v3"
+	"github.com/zequent/zqnt-edge-sdk-go/v3/adapter/domains"
+	adaptergrpc "github.com/zequent/zqnt-edge-sdk-go/v3/adapter/grpc"
+	"github.com/zequent/zqnt-edge-sdk-go/v3/internal/protohelpers"
+	"github.com/zequent/zqnt-edge-sdk-go/v3/internal/retry"
+	"github.com/zequent/zqnt-edge-sdk-go/v3/internal/v3compat"
 
 	"google.golang.org/protobuf/proto"
 )

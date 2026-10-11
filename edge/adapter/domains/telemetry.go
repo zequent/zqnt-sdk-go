@@ -24,33 +24,33 @@ type TelemetryRequestData struct {
 
 // AssetTelemetryData mirrors the AssetTelemetry proto message.
 type AssetTelemetryData struct {
-	ID                         string
-	Timestamp                  time.Time
-	Latitude                   *float32
-	Longitude                  *float32
-	AbsoluteAltitude           *float32
-	RelativeAltitude           *float32
-	EnvironmentTemp            *float32
-	InsideTemp                 *float32
-	Humidity                   *float32
-	Mode                       *string
-	Rainfall                   *string
-	SubAssetInformation        *AssetSubAssetInformation
-	SubAssetAtHome             *bool
-	SubAssetCharging           *bool
-	SubAssetPercentage         *float32
-	Heading                    *float32
-	DebugModeOpen              *bool
-	HasActiveManualControl     *bool
-	CoverState                 *string
-	WorkingVoltage             *int32
-	WorkingCurrent             *int32
-	SupplyVoltage              *int32
-	WindSpeed                  *float32
-	PositionValid              *bool
-	NetworkInformation         *AssetNetworkInformation
-	AirConditioner             *AssetAirConditioner
-	ManualControlState         *string
+	ID                     string
+	Timestamp              time.Time
+	Latitude               *float32
+	Longitude              *float32
+	AbsoluteAltitude       *float32
+	RelativeAltitude       *float32
+	EnvironmentTemp        *float32
+	InsideTemp             *float32
+	Humidity               *float32
+	Mode                   *string
+	Rainfall               *string
+	SubAssetInformation    *AssetSubAssetInformation
+	SubAssetAtHome         *bool
+	SubAssetCharging       *bool
+	SubAssetPercentage     *float32
+	Heading                *float32
+	DebugModeOpen          *bool
+	HasActiveManualControl *bool
+	CoverState             *string
+	WorkingVoltage         *int32
+	WorkingCurrent         *int32
+	SupplyVoltage          *int32
+	WindSpeed              *float32
+	PositionValid          *bool
+	NetworkInformation     *AssetNetworkInformation
+	AirConditioner         *AssetAirConditioner
+	ManualControlState     *string
 }
 
 // AssetSubAssetInformation holds paired sub-asset info within asset telemetry.
@@ -117,11 +117,11 @@ type PayloadTelemetryData struct {
 
 // CameraData holds camera gimbal and lens information.
 type CameraData struct {
-	CurrentLens  *string
-	GimbalPitch  *float32
-	GimbalYaw    *float32
-	GimbalRoll   *float32
-	ZoomFactor   *float32
+	CurrentLens *string
+	GimbalPitch *float32
+	GimbalYaw   *float32
+	GimbalRoll  *float32
+	ZoomFactor  *float32
 }
 
 // RangeFinderData holds rangefinder target information.

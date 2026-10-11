@@ -10,7 +10,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zequent/zqnt-edge-sdk-go/v3/adapter/domains"
 	detectionpb "github.com/zequent/zqnt-api-go/v3/gen/common/detection/proto"
 	eventspb "github.com/zequent/zqnt-api-go/v3/gen/events/proto"
 	livedatapb "github.com/zequent/zqnt-api-go/v3/gen/livedata/proto"
@@ -18,6 +17,7 @@ import (
 	edgev3 "github.com/zequent/zqnt-api-go/v3/gen/zqnt/edge/v3"
 	telemetryv3 "github.com/zequent/zqnt-api-go/v3/gen/zqnt/telemetry/v3"
 	"github.com/zequent/zqnt-api-go/v3/telemetry"
+	"github.com/zequent/zqnt-edge-sdk-go/v3/adapter/domains"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
