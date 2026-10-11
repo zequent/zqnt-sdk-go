@@ -3,9 +3,9 @@
 package adaptergrpc
 
 import (
-	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter/domains"
-	detectionpb "github.com/zequent/zqnt-utils-golang/v2/gen/common/detection/proto"
-	devicecontrolpb "github.com/zequent/zqnt-utils-golang/v2/gen/devicecontrol/contracts/proto"
+	detectionpb "github.com/zequent/zqnt-api-go/v3/gen/common/detection/proto"
+	devicecontrolpb "github.com/zequent/zqnt-api-go/v3/gen/devicecontrol/contracts/proto"
+	"github.com/zequent/zqnt-edge-sdk-go/v3/adapter/domains"
 )
 
 // Mapper converts between proto request/response messages and domain structs.

@@ -13,9 +13,9 @@ import (
 	"syscall"
 	"time"
 
-	edgesdk "github.com/Zequent/zqnt-edge-sdk-go/v2"
-	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter"
-	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter/domains"
+	edgesdk "github.com/zequent/zqnt-edge-sdk-go/v3"
+	"github.com/zequent/zqnt-edge-sdk-go/v3/adapter"
+	"github.com/zequent/zqnt-edge-sdk-go/v3/adapter/domains"
 )
 
 var altitudeInput = map[string]any{

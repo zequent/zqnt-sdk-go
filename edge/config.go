@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/Zequent/zqnt-edge-sdk-go/v2/auth"
+	"github.com/zequent/zqnt-edge-sdk-go/v3/auth"
 )
 
 // config holds the resolved configuration for an EdgeClient.

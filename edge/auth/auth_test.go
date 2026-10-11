@@ -20,8 +20,8 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/grpc/test/bufconn"
 
-	commonpb "github.com/zequent/zqnt-utils-golang/v2/gen/common/proto"
-	edgepb "github.com/zequent/zqnt-utils-golang/v2/gen/edge/sdk/proto"
+	commonpb "github.com/zequent/zqnt-api-go/v3/gen/common/proto"
+	edgepb "github.com/zequent/zqnt-api-go/v3/gen/edge/sdk/proto"
 )
 
 func newKey(t *testing.T) (ed25519.PrivateKey, string) {

@@ -5,7 +5,7 @@ package adapter
 import (
 	"context"
 
-	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter/domains"
+	"github.com/zequent/zqnt-edge-sdk-go/v3/adapter/domains"
 )
 
 // EdgeAdapter is what the SDK serves to the platform.

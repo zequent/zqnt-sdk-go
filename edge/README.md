@@ -9,7 +9,7 @@ Go SDK for connecting edge devices (drones, robots) to the Zequent platform via 
 ```bash
 go env -w GONOSUMDB="github.com/Zequent/*,github.com/zequent/*"
 go env -w GONOPROXY="github.com/Zequent/*,github.com/zequent/*"
-go get github.com/Zequent/zqnt-edge-sdk-go/v2@v2.0.0  # proto stubs come from github.com/zequent/zqnt-utils-golang/v2@v2.0.0
+go get github.com/zequent/zqnt-edge-sdk-go/v3@v3.0.0  # proto stubs come from github.com/zequent/zqnt-api-go/v3
 ```
 
 **2. Implement your adapter:** embed `adapter.Base` and register each command once — id, input
@@ -23,9 +23,9 @@ import (
     "context"
     "net"
 
-    edgesdk "github.com/Zequent/zqnt-edge-sdk-go/v2"
-    "github.com/Zequent/zqnt-edge-sdk-go/v2/adapter"
-    "github.com/Zequent/zqnt-edge-sdk-go/v2/adapter/domains"
+    edgesdk "github.com/zequent/zqnt-edge-sdk-go/v3"
+    "github.com/zequent/zqnt-edge-sdk-go/v3/adapter"
+    "github.com/zequent/zqnt-edge-sdk-go/v3/adapter/domains"
 )
 
 type MyDrone struct {
@@ -88,13 +88,25 @@ SDK switches. remote-control serves `EdgeGatewayService`: point the SDK at it wi
   is `REJECTED` with error code `command.invalid_params` and a message naming each field.
 - **Telemetry fields:** `DeclareTelemetryField` on the registry declares the keys of
   `TelemetrySample.Details`; they are published with the capabilities. Keys of the platform's
-  catalog (`github.com/zequent/zqnt-utils-golang/v2/telemetry`, e.g. `dock.mode`, `wind.speed`)
+  catalog (`github.com/zequent/zqnt-api-go/v3/telemetry`, e.g. `dock.mode`, `wind.speed`)
   are described by `domains.StandardTelemetryField` and also reach a v2 platform.
 - **Conformance kit:** `conformance.Run(t, adapter, conformance.Options{Events: recorder})` checks
   that every advertised id executes, every executable id is advertised, schemas parse and an
   `ACCEPTED` command is completed by an event with `occurred_at`. It executes commands — run it
   against fakes or a simulator. Publish events through `adapter.CommandEventPublisher` so the kit's
   `Recorder` can stand in for the client.
+
+## Migrating from 2.x
+
+Module path: `github.com/Zequent/zqnt-edge-sdk-go/v2` → `github.com/zequent/zqnt-edge-sdk-go/v3`
+(lower-case owner, as for every other Zequent Go module). Generated types come from
+`github.com/zequent/zqnt-api-go/v3/gen/...` (same package paths below `gen/`):
+
+```bash
+grep -rl zqnt-edge-sdk-go/v2 --include='*.go' . | xargs sed -i \
+  's#github.com/Zequent/zqnt-edge-sdk-go/v2#github.com/zequent/zqnt-edge-sdk-go/v3#g'
+go get github.com/zequent/zqnt-edge-sdk-go/v3 && go mod tidy
+```
 
 ## v2.0.0: the 2.0.0 wire contract
 
@@ -104,13 +116,10 @@ plus `simulator-control.proto`), the exact commit `utils/zqnt-utils` (Java) and 
 contract for customers still integrated against `edge-java-sdk` v1.3.0; that line is now behind
 the running platform, not compatible with it.
 
-Per Go's semantic import versioning the module path carries the major version from here on:
-`github.com/Zequent/zqnt-edge-sdk-go/v2`.
-
-**Proto source**: no local generation in this repo (no `buf.gen.yaml`, no `gen/`). Stubs come from
-[`github.com/zequent/zqnt-utils-golang/v2`](../../../utils/zqnt-utils-golang) `v2.0.0` — a
-published, versioned dependency, mirroring how `edge-java-sdk` depends on `zqnt-utils-java` and
-`edge-python-sdk` on the `zqnt-utils` pip package, rather than generating proto code inline.
+**Proto source**: no local generation in this repo (no `buf.gen.yaml`, no `gen/`). Stubs and the
+telemetry mapping come from the public module
+[`github.com/zequent/zqnt-api-go/v3`](https://github.com/Zequent/zqnt-api-go), the platform’s
+customer contracts; the SDK depends on nothing else of the platform.
 
 **What actually moved, and what didn't.** `edge.proto`, `common.proto`, `live-data.proto`,
 `live-data-types.proto`, `remote-control.proto` and `simulator-control.proto` are byte-identical
@@ -181,14 +190,14 @@ connector/live-data/remote-control/mission-autonomy stack.
 
 **The simulator built on this SDK lives in its own repo**,
 [`github.com/Zequent/zqnt-simulator`](https://github.com/Zequent/zqnt-simulator) — a standalone
-service depending on `github.com/Zequent/zqnt-edge-sdk-go/v2` as a real tagged dependency, the same
+service depending on `github.com/zequent/zqnt-edge-sdk-go/v3` as a real tagged dependency, the same
 way any other adapter built on this SDK would.
 
 ### Local development
 
-`go.mod` points at a published version of `zqnt-utils-golang/v2`, so a clone and CI resolve it
-without any local setup. While the v2 line is still in review that's the PR preview build
-(`pr-<n>-<sha>`, resolved as a pseudo-version); it becomes `v2.0.0` when that release is cut.
+`go.mod` points at a published version of `zqnt-api-go`, so a clone and CI resolve it
+without any local setup. While the v3 line is still in review that's the PR preview build
+(`pr-<n>-<sha>`, resolved as a pseudo-version); it becomes `v3.0.0` when that release is cut.
 
 To build against the sibling monorepo checkout instead, use a **Go workspace** — never a committed
 `replace`, which would break every consumer outside a full `zqnt-platform` tree:

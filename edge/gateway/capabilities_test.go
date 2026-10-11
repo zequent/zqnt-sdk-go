@@ -9,11 +9,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter/domains"
-	devicecontrolpb "github.com/zequent/zqnt-utils-golang/v2/gen/devicecontrol/contracts/proto"
-	remotecontrolpb "github.com/zequent/zqnt-utils-golang/v2/gen/remotecontrol/proto"
-	capabilityv3 "github.com/zequent/zqnt-utils-golang/v2/gen/zqnt/capability/v3"
-	edgev3 "github.com/zequent/zqnt-utils-golang/v2/gen/zqnt/edge/v3"
+	devicecontrolpb "github.com/zequent/zqnt-api-go/v3/gen/devicecontrol/contracts/proto"
+	remotecontrolpb "github.com/zequent/zqnt-api-go/v3/gen/remotecontrol/proto"
+	capabilityv3 "github.com/zequent/zqnt-api-go/v3/gen/zqnt/capability/v3"
+	edgev3 "github.com/zequent/zqnt-api-go/v3/gen/zqnt/edge/v3"
+	"github.com/zequent/zqnt-edge-sdk-go/v3/adapter/domains"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"

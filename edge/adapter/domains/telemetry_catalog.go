@@ -1,6 +1,6 @@
 package domains
 
-import "github.com/zequent/zqnt-utils-golang/v2/telemetry"
+import "github.com/zequent/zqnt-api-go/v3/telemetry"
 
 // StandardTelemetryField describes a key of the platform's telemetry catalog (the keys every
 // language maps to and from v2 telemetry), or reports false for a key outside it. Declaring
