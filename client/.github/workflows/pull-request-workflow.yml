@@ -1,0 +1,73 @@
+name: Pull Request Workflow
+
+on:
+  pull_request:
+    branches: ["main", "feature/v3-agentic"]
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-build:
+    name: Test & Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
+        with:
+          go-version: "1.26"
+          cache: true
+
+      - name: Build
+        run: go build ./...
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Test
+        run: go test ./... -timeout 5m
+
+  # Tags and pre-releases every PR build so it's individually go get-able for review/testing --
+  # deliberately NOT a "v*"-shaped tag: release-workflow.yml triggers on tags: ["v*"], and this
+  # must never accidentally fire that (a real production release is only ever an intentional
+  # `git tag vX.Y.Z && git push` by a maintainer). `go get .../zqnt-client-sdk-go@pr-<n>-<sha>`
+  # still resolves fine -- Go accepts any git ref as a version query, converting non-semver tags to
+  # a pseudo-version automatically.
+  pr-preview:
+    name: Tag PR preview build
+    needs: test-and-build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Compute preview tag
+        id: tag
+        run: |
+          SHORT_SHA=$(git rev-parse --short=7 HEAD)
+          echo "tag=pr-${{ github.event.pull_request.number }}-${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+
+      # The checkout keeps no credentials; the push authenticates in this step only.
+      - name: Create and push preview tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git tag "${{ steps.tag.outputs.tag }}"
+          git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "${{ steps.tag.outputs.tag }}"
+
+      - name: Create GitHub pre-release
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2.6.2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: "PR #${{ github.event.pull_request.number }} preview (${{ steps.tag.outputs.tag }})"
+          prerelease: true
+          generate_release_notes: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
