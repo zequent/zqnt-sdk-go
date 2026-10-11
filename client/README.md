@@ -48,9 +48,8 @@ with `State()`, `Category()`, `Retryable()` and the full `Result`. A call that n
 keeps its gRPC status — `status.Code(err)` is `Unauthenticated`, `PermissionDenied`,
 `InvalidArgument`, `Unavailable`, ...
 
-`control` is a client of `zqnt.control.v3.RemoteControlService`, served by remote-control on the
-same host and port as the 2.x `RemoteControlService` (`REMOTE_CONTROL_SERVICE_*`), with the same
-client credential. The message types are those of the public
+`control` is a client of `zqnt.control.v3.RemoteControlService`, served by remote-control
+(`REMOTE_CONTROL_SERVICE_*`). The message types are those of the public
 `zqnt-api-go` module (`github.com/zequent/zqnt-api-go/v3/gen/zqnt/...`), the same Go types the edge
 SDK, the simulator and the Integration Hub use.
 
@@ -77,7 +76,7 @@ returns the number of inputs the platform passed on to the asset (an error in it
 return that error with its gRPC status; `Send` after `Close` is `control.ErrManualControlClosed`.
 `edgev3` is `github.com/zequent/zqnt-api-go/v3/gen/zqnt/edge/v3`.
 
-## Telemetry (3.x): `telemetry`
+## Telemetry, detections and alerts (3.x): `telemetry`
 
 ```go
 conn, err := cfg.Dial(cfg.LiveData)
@@ -100,21 +99,28 @@ heading, speeds, battery) and the device-specific `details` under the keys of th
 `telemetry_fields`. No asset watches every asset of the caller's organization; a dock's serial
 includes its drone. `WithMinInterval` keeps at most one sample per asset per interval. A
 `SourceStatus` comes first for every watched asset, then on each change to online, stale or no
-data; heartbeats are skipped. When neither a sample nor a heartbeat arrives within
+data; heartbeats are skipped. When neither an item nor a heartbeat arrives within
 `DefaultHeartbeatTimeout` (35 s, `WithHeartbeatTimeout`), `Recv` returns `telemetry.ErrSilent`. A
 watch does not reconnect: watch again.
+
+Detections and alerts are watched the same way, with the same heartbeat timeout:
+
+```go
+detections, err := telemetry.New(conn).WatchDetections(ctx, []string{"DRONE-1"})
+batch, err := detections.Recv() // batch.GetBatch(): asset, observed_at, stream_url, detections
+
+alerts, err := telemetry.New(conn).WatchAlerts(ctx, nil,
+	telemetry.WithMinSeverity(telemetryv3.AlertSeverity_ALERT_SEVERITY_WARNING))
+alert, err := alerts.Recv() // alert.GetAlert(): asset, severity, a stable code such as "dock.rain", message, details
+```
 
 ## Packages
 
 - `control/` — the 3.x command API and manual control above.
-- `telemetry/` — 3.x telemetry samples and source status.
+- `telemetry/` — 3.x telemetry samples and source status, detections and alerts.
 - `connector/` — asset lookup, the Skill Registry, scheduler CRUD, operational policies and
   technical config (2.x contract, still served).
 - `missionautonomy/` — Applications and the SkillExecution lifecycle (2.x contract, still served).
-- `livedata/` — telemetry/detection/notification streaming, returning the raw gRPC
-  server-streaming client; redialing a broken stream is the caller's job.
-- `remotecontrol/` — **deprecated**: the typed 2.x commands (`TakeOff`, `GoTo`, `OpenCover`, ...)
-  for platforms still on 2.x. Use `control` on 3.x.
 - `auth/`, `config/` — the client credential and where the platform is, shared by every package.
 
 Generated types come from
@@ -123,39 +129,8 @@ Generated types come from
 
 ## Migrating from 2.x
 
-1. Module path: `github.com/Zequent/zqnt-client-sdk-go/v2` → `github.com/zequent/zqnt-client-sdk-go/v3`
-   (note the lower-case owner, as for every other Zequent Go module).
-2. Generated types: `github.com/Zequent/zqnt-client-sdk-go/v2/gen/...` →
-   `github.com/zequent/zqnt-api-go/v3/gen/...` — same package paths below `gen/`, same types.
-   One `sed` does both:
-   ```
-   grep -rl zqnt-client-sdk-go/v2 --include='*.go' . | xargs sed -i \
-     -e 's#github.com/Zequent/zqnt-client-sdk-go/v2/gen/#github.com/zequent/zqnt-api-go/v3/gen/#g' \
-     -e 's#github.com/Zequent/zqnt-client-sdk-go/v2/#github.com/zequent/zqnt-client-sdk-go/v3/#g'
-   go get github.com/zequent/zqnt-client-sdk-go/v3 && go mod tidy
-   ```
-3. Typed commands → `control.ExecuteCommand` with a command id. `ListCapabilities` tells you the
-   ids and parameter schemas an asset really offers; the common ones:
-
-   | 2.x (`remotecontrol`) | 3.x (`control`) |
-   |---|---|
-   | `TakeOff(ctx, sn, coordinate)` | `ExecuteCommand(ctx, sn, "flight.takeoff", control.Params{"altitude": 40})` |
-   | `GoTo(ctx, sn, coordinate)` | `ExecuteCommand(ctx, sn, "navigation.go_to", control.Params{"latitude": .., "longitude": .., "altitude": ..})` |
-   | `GoToWithOptions(..., GoToOptions{NoFlyZoneOverride: true})` | `ExecuteCommand(..., control.WithNoFlyZoneOverride())` |
-   | `ReturnToHome(ctx, sn, altitude)` | `ExecuteCommand(ctx, sn, "flight.return_to_home", ...)` |
-   | `OpenCover` / `CloseCover` | `"dock.open_cover"` / `"dock.close_cover"` |
-   | `SendCustomCommand(ctx, sn, id, params, target)` | `ExecuteCommand(ctx, sn, id, params, control.WithTarget(...))` |
-   | `GetCapabilities(ctx, sn)` | `ListCapabilities(ctx, sn)` |
-   | `has_errors` / `error` on the response | `*control.CommandError` (`REJECTED`/`FAILED`/...) |
-   | `EnterManualControl` / `ExitManualControl` | `"flight.manual.enter"` / `"flight.manual.exit"` |
-   | `OpenManualControlInputStream(ctx)` + `Send` / `CloseAndRecv` | `StreamManualControl(ctx, sn)` + `Send(*edgev3.ManualControlInput)` / `Close()` |
-   | `livedata.StreamTelemetry(ctx, sn, frequencyMs, durationSeconds)` | `telemetry.WatchTelemetry(ctx, sns, telemetry.WithMinInterval(...))` |
-
-   `go_to`'s `altitude` is metres above the takeoff point (default 40 m), as in 2.x. A command that
-   takes time no longer blocks on the typed RPC: wait with `ExecuteAndWait` or `WatchCommand`.
-   Ids not in this table: `ListCapabilities` on the asset, or `v3/COMMAND_CATALOG.md` in zqnt-protos.
-4. A 2.x platform does not serve `zqnt.control.v3`: keep using `remotecontrol` there (it still
-   works from `/v3`, marked deprecated) until the platform runs 3.x.
+3.0 offers only the command API: the 2.x packages `remotecontrol` (typed commands) and `livedata`
+are gone. [MIGRATION.md](MIGRATION.md) maps every 2.x call to its command id or `telemetry` watch.
 
 ## Authentication
 
