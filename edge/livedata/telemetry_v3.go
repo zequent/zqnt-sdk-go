@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter/domains"
-	"github.com/Zequent/zqnt-edge-sdk-go/v2/internal/protohelpers"
-	"github.com/Zequent/zqnt-edge-sdk-go/v2/internal/v3compat"
+	"github.com/zequent/zqnt-edge-sdk-go/v3/adapter/domains"
+	"github.com/zequent/zqnt-edge-sdk-go/v3/internal/protohelpers"
+	"github.com/zequent/zqnt-edge-sdk-go/v3/internal/v3compat"
 	commonpb "github.com/zequent/zqnt-api-go/v3/gen/common/base/proto"
 	detectionpb "github.com/zequent/zqnt-api-go/v3/gen/common/detection/proto"
 	livedatapb "github.com/zequent/zqnt-api-go/v3/gen/livedata/proto"

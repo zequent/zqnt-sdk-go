@@ -3,7 +3,7 @@
 package adaptergrpc
 
 import (
-	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter/domains"
+	"github.com/zequent/zqnt-edge-sdk-go/v3/adapter/domains"
 	detectionpb "github.com/zequent/zqnt-api-go/v3/gen/common/detection/proto"
 	devicecontrolpb "github.com/zequent/zqnt-api-go/v3/gen/devicecontrol/contracts/proto"
 )

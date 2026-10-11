@@ -10,9 +10,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter"
-	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter/domains"
-	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter/schema"
+	"github.com/zequent/zqnt-edge-sdk-go/v3/adapter"
+	"github.com/zequent/zqnt-edge-sdk-go/v3/adapter/domains"
+	"github.com/zequent/zqnt-edge-sdk-go/v3/adapter/schema"
 	capabilityv3 "github.com/zequent/zqnt-api-go/v3/gen/zqnt/capability/v3"
 	commonv3 "github.com/zequent/zqnt-api-go/v3/gen/zqnt/common/v3"
 	edgev3 "github.com/zequent/zqnt-api-go/v3/gen/zqnt/edge/v3"

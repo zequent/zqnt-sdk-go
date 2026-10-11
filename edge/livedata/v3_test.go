@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Zequent/zqnt-edge-sdk-go/v2/adapter/domains"
+	"github.com/zequent/zqnt-edge-sdk-go/v3/adapter/domains"
 	detectionpb "github.com/zequent/zqnt-api-go/v3/gen/common/detection/proto"
 	eventspb "github.com/zequent/zqnt-api-go/v3/gen/events/proto"
 	livedatapb "github.com/zequent/zqnt-api-go/v3/gen/livedata/proto"
