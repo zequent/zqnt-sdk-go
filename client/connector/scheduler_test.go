@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
-	connectorpb "github.com/zequent/zqnt-api-go/gen/connector/proto"
-	schedulerpb "github.com/zequent/zqnt-api-go/gen/missionautonomy/contracts/proto"
-	schedulerdto "github.com/zequent/zqnt-api-go/gen/missionautonomy/dto/proto"
+	connectorpb "github.com/zequent/zqnt-api-go/v3/gen/connector/proto"
+	schedulerpb "github.com/zequent/zqnt-api-go/v3/gen/missionautonomy/contracts/proto"
+	schedulerdto "github.com/zequent/zqnt-api-go/v3/gen/missionautonomy/dto/proto"
 )
 
 type fakeSchedulerService struct {

@@ -5,9 +5,9 @@ import (
 	"net"
 	"testing"
 
-	execdto "github.com/zequent/zqnt-api-go/gen/execution/contracts/proto"
-	execution "github.com/zequent/zqnt-api-go/gen/execution/dto/proto"
-	missionautonomypb "github.com/zequent/zqnt-api-go/gen/missionautonomy/proto"
+	execdto "github.com/zequent/zqnt-api-go/v3/gen/execution/contracts/proto"
+	execution "github.com/zequent/zqnt-api-go/v3/gen/execution/dto/proto"
+	missionautonomypb "github.com/zequent/zqnt-api-go/v3/gen/missionautonomy/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/proto"

@@ -10,9 +10,9 @@ import (
 	"testing"
 	"time"
 
-	capabilityv3 "github.com/zequent/zqnt-api-go/gen/zqnt/capability/v3"
-	commonv3 "github.com/zequent/zqnt-api-go/gen/zqnt/common/v3"
-	controlv3 "github.com/zequent/zqnt-api-go/gen/zqnt/control/v3"
+	capabilityv3 "github.com/zequent/zqnt-api-go/v3/gen/zqnt/capability/v3"
+	commonv3 "github.com/zequent/zqnt-api-go/v3/gen/zqnt/common/v3"
+	controlv3 "github.com/zequent/zqnt-api-go/v3/gen/zqnt/control/v3"
 	"github.com/zequent/zqnt-client-sdk-go/v3/auth"
 	"github.com/zequent/zqnt-client-sdk-go/v3/control"
 	"google.golang.org/grpc"

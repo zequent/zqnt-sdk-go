@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	schedulerpb "github.com/zequent/zqnt-api-go/gen/missionautonomy/contracts/proto"
-	schedulerdto "github.com/zequent/zqnt-api-go/gen/missionautonomy/dto/proto"
+	schedulerpb "github.com/zequent/zqnt-api-go/v3/gen/missionautonomy/contracts/proto"
+	schedulerdto "github.com/zequent/zqnt-api-go/v3/gen/missionautonomy/dto/proto"
 )
 
 // GetScheduler fetches a scheduler by ID.
