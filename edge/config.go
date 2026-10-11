@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/zequent/zqnt-edge-sdk-go/v3/auth"
+	"github.com/zequent/zqnt-sdk-go/v3/edge/auth"
 )
 
 // config holds the resolved configuration for an EdgeClient.

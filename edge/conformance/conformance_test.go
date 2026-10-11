@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zequent/zqnt-edge-sdk-go/v3/adapter"
-	"github.com/zequent/zqnt-edge-sdk-go/v3/adapter/domains"
+	"github.com/zequent/zqnt-sdk-go/v3/edge/adapter"
+	"github.com/zequent/zqnt-sdk-go/v3/edge/adapter/domains"
 )
 
 type goodDrone struct {

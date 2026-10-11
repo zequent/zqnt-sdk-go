@@ -1,14 +1,14 @@
-module github.com/zequent/zqnt-edge-sdk-go/v3
+module github.com/zequent/zqnt-sdk-go/v3
 
-go 1.26.0
+go 1.26.2
 
 require (
 	github.com/google/uuid v1.6.0
 	github.com/redis/go-redis/v9 v9.22.0
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2
-	github.com/zequent/zqnt-api-go/v3 v3.0.0-20261011145926-38ad3f555a87
+	github.com/zequent/zqnt-api/go/v3 v3.0.0-20261011201038-390b5e2f0fa6
 	google.golang.org/grpc v1.83.2
-	google.golang.org/protobuf v1.36.11
+	google.golang.org/protobuf v1.36.12
 )
 
 require (

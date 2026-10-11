@@ -13,8 +13,8 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/zequent/zqnt-client-sdk-go/v3/config"
-	"github.com/zequent/zqnt-client-sdk-go/v3/control"
+	"github.com/zequent/zqnt-sdk-go/v3/client/config"
+	"github.com/zequent/zqnt-sdk-go/v3/client/control"
 )
 
 func main() {
@@ -31,7 +31,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 	assets := control.New(conn)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)

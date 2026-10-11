@@ -5,9 +5,9 @@ import (
 	"net"
 	"testing"
 
-	execdto "github.com/zequent/zqnt-api-go/v3/gen/execution/contracts/proto"
-	execution "github.com/zequent/zqnt-api-go/v3/gen/execution/dto/proto"
-	missionautonomypb "github.com/zequent/zqnt-api-go/v3/gen/missionautonomy/proto"
+	execdto "github.com/zequent/zqnt-api/go/v3/gen/execution/contracts/proto"
+	execution "github.com/zequent/zqnt-api/go/v3/gen/execution/dto/proto"
+	missionautonomypb "github.com/zequent/zqnt-api/go/v3/gen/missionautonomy/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/proto"
@@ -17,7 +17,6 @@ type fakeService struct {
 	missionautonomypb.UnimplementedMissionAutonomyServiceServer
 	lastExecuteRequest   *execdto.ExecuteSkillRequest
 	lastLifecycleRequest *execdto.SkillExecutionLifecycleRequest
-	execution            *execution.SkillExecutionProtoDTO
 }
 
 func (s *fakeService) ExecuteSkill(ctx context.Context, req *execdto.ExecuteSkillRequest) (*execdto.SkillExecutionResponse, error) {

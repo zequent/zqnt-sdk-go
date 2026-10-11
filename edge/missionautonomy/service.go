@@ -12,7 +12,7 @@ package missionautonomy
 import (
 	"context"
 
-	"github.com/zequent/zqnt-edge-sdk-go/v3/adapter/domains"
+	"github.com/zequent/zqnt-sdk-go/v3/edge/adapter/domains"
 )
 
 // MissionAutonomyService is the client-side interface for the MissionAutonomy backend.

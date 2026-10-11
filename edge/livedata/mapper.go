@@ -1,11 +1,11 @@
 package livedata
 
 import (
-	commonpb "github.com/zequent/zqnt-api-go/v3/gen/common/proto"
-	livedatapb "github.com/zequent/zqnt-api-go/v3/gen/livedata/proto"
-	"github.com/zequent/zqnt-edge-sdk-go/v3/adapter/domains"
+	commonpb "github.com/zequent/zqnt-api/go/v3/gen/common/proto"
+	livedatapb "github.com/zequent/zqnt-api/go/v3/gen/livedata/proto"
+	"github.com/zequent/zqnt-sdk-go/v3/edge/adapter/domains"
 
-	"github.com/zequent/zqnt-edge-sdk-go/v3/internal/protohelpers"
+	"github.com/zequent/zqnt-sdk-go/v3/edge/internal/protohelpers"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 )

@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zequent/zqnt-edge-sdk-go/v3/conformance"
+	"github.com/zequent/zqnt-sdk-go/v3/edge/conformance"
 )
 
 func TestExampleConforms(t *testing.T) {

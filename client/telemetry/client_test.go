@@ -9,9 +9,9 @@ import (
 	"testing"
 	"time"
 
-	commonv3 "github.com/zequent/zqnt-api-go/v3/gen/zqnt/common/v3"
-	telemetryv3 "github.com/zequent/zqnt-api-go/v3/gen/zqnt/telemetry/v3"
-	"github.com/zequent/zqnt-client-sdk-go/v3/telemetry"
+	commonv3 "github.com/zequent/zqnt-api/go/v3/gen/zqnt/common/v3"
+	telemetryv3 "github.com/zequent/zqnt-api/go/v3/gen/zqnt/telemetry/v3"
+	"github.com/zequent/zqnt-sdk-go/v3/client/telemetry"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"

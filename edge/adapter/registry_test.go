@@ -5,8 +5,8 @@ import (
 	"math"
 	"testing"
 
-	"github.com/zequent/zqnt-edge-sdk-go/v3/adapter/domains"
-	"github.com/zequent/zqnt-edge-sdk-go/v3/adapter/schema"
+	"github.com/zequent/zqnt-sdk-go/v3/edge/adapter/domains"
+	"github.com/zequent/zqnt-sdk-go/v3/edge/adapter/schema"
 )
 
 var takeoffSchema = map[string]any{

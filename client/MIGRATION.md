@@ -16,15 +16,15 @@ result, err := assets.ExecuteCommand(ctx, "DRONE-1", "navigation.go_to",
 
 ## Module and generated types
 
-1. Module path: `github.com/Zequent/zqnt-client-sdk-go/v2` → `github.com/zequent/zqnt-client-sdk-go/v3`
+1. Module path: `github.com/Zequent/zqnt-client-sdk-go/v2` → `github.com/zequent/zqnt-sdk-go/v3/client`
    (lower-case owner, as for every other Zequent Go module).
 2. Generated types: `github.com/Zequent/zqnt-client-sdk-go/v2/gen/...` →
-   `github.com/zequent/zqnt-api-go/v3/gen/...`. One `sed` does both:
+   `github.com/zequent/zqnt-api/go/v3/gen/...`. One `sed` does both:
    ```
    grep -rl zqnt-client-sdk-go/v2 --include='*.go' . | xargs sed -i \
-     -e 's#github.com/Zequent/zqnt-client-sdk-go/v2/gen/#github.com/zequent/zqnt-api-go/v3/gen/#g' \
-     -e 's#github.com/Zequent/zqnt-client-sdk-go/v2/#github.com/zequent/zqnt-client-sdk-go/v3/#g'
-   go get github.com/zequent/zqnt-client-sdk-go/v3 && go mod tidy
+     -e 's#github.com/Zequent/zqnt-client-sdk-go/v2/gen/#github.com/zequent/zqnt-api/go/v3/gen/#g' \
+     -e 's#github.com/Zequent/zqnt-client-sdk-go/v2/#github.com/zequent/zqnt-sdk-go/v3/client/#g'
+   go get github.com/zequent/zqnt-sdk-go/v3/client && go mod tidy
    ```
 
 ## Typed call → command id + params

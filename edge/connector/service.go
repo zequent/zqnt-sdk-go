@@ -11,7 +11,7 @@ package connector
 import (
 	"context"
 
-	"github.com/zequent/zqnt-edge-sdk-go/v3/adapter/domains"
+	"github.com/zequent/zqnt-sdk-go/v3/edge/adapter/domains"
 )
 
 // ConnectorService is the client-side interface for the Connector backend service.

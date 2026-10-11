@@ -29,7 +29,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/zequent/zqnt-client-sdk-go/v3/auth"
+	"github.com/zequent/zqnt-sdk-go/v3/client/auth"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"

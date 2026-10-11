@@ -22,3 +22,7 @@ go.work.sum
 *.zqnt
 kubeconfig*
 *.pem
+# Go build artifacts
+/bin/
+
+

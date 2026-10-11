@@ -4,7 +4,7 @@ import (
 	"context"
 	"math"
 
-	"github.com/zequent/zqnt-edge-sdk-go/v3/adapter/domains"
+	"github.com/zequent/zqnt-sdk-go/v3/edge/adapter/domains"
 )
 
 // Base is the starting point of an adapter: embed it, register each command once on its
