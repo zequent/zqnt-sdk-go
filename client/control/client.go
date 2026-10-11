@@ -22,9 +22,9 @@ import (
 	"io"
 	"time"
 
-	capabilityv3 "github.com/zequent/zqnt-utils-golang/v2/gen/zqnt/capability/v3"
-	commonv3 "github.com/zequent/zqnt-utils-golang/v2/gen/zqnt/common/v3"
-	controlv3 "github.com/zequent/zqnt-utils-golang/v2/gen/zqnt/control/v3"
+	capabilityv3 "github.com/zequent/zqnt-api-go/v3/gen/zqnt/capability/v3"
+	commonv3 "github.com/zequent/zqnt-api-go/v3/gen/zqnt/common/v3"
+	controlv3 "github.com/zequent/zqnt-api-go/v3/gen/zqnt/control/v3"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/structpb"
