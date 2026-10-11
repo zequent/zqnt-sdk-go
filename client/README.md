@@ -214,3 +214,7 @@ given). An `authorization` header already on the call wins and the connection's 
 
 Go 1.26+. `go build ./...`, `go vet ./...` and `go test ./...` pass (with a parent `go.work`, run
 them with `GOWORK=off`).
+
+## License
+
+Licensed under the [Apache License, Version 2.0](LICENSE); see [NOTICE](NOTICE).
