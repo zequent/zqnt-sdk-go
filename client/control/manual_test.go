@@ -84,15 +84,13 @@ func TestARefusedManualControlSessionKeepsItsStatusCode(t *testing.T) {
 	if err != nil {
 		t.Fatalf("StreamManualControl: %v", err)
 	}
-	_ = stick.Send(&edgev3.ManualControlInput{Throttle: 0.5})
 	var sendErr error
-	for range 100 {
-		if sendErr = stick.Send(&edgev3.ManualControlInput{Throttle: 0.5}); sendErr != nil {
-			break
-		}
+	for sendErr == nil {
+		sendErr = stick.Send(&edgev3.ManualControlInput{Throttle: 0.5})
 	}
+	laterSendErr := stick.Send(&edgev3.ManualControlInput{Throttle: 0.5})
 	_, closeErr := stick.Close()
-	for _, err := range []error{sendErr, closeErr} {
+	for _, err := range []error{sendErr, laterSendErr, closeErr} {
 		if status.Code(err) != codes.PermissionDenied {
 			t.Fatalf("err = %v", err)
 		}
