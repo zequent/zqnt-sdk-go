@@ -1,0 +1,321 @@
+package livedata
+
+import (
+	"context"
+	"log/slog"
+	"math/rand"
+	"sync"
+	"sync/atomic"
+	"time"
+
+	livedatapb "github.com/zequent/zqnt-api-go/v3/gen/livedata/proto"
+	edgev3 "github.com/zequent/zqnt-api-go/v3/gen/zqnt/edge/v3"
+	telemetryv3 "github.com/zequent/zqnt-api-go/v3/gen/zqnt/telemetry/v3"
+	"github.com/zequent/zqnt-edge-sdk-go/v3/adapter/domains"
+	"github.com/zequent/zqnt-edge-sdk-go/v3/internal/v3compat"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+)
+
+const (
+	initialReconnectDelay = 2 * time.Second
+	maxReconnectDelay     = 60 * time.Second
+	maxReconnectAttempts  = 100
+)
+
+// streamEntry holds a single active client-streaming connection.
+type streamEntry struct {
+	stream livedatapb.LiveDataService_ProduceTelemetryClient
+	cancel context.CancelFunc
+}
+
+// notificationStream holds the process-wide notification stream (see notifications.go for why
+// notifications share one stream where telemetry keys them per device).
+type notificationStream struct {
+	stream livedatapb.LiveDataService_ProduceNotificationClient
+	cancel context.CancelFunc
+}
+
+// ServiceImpl is the gRPC-backed implementation of LiveDataService.
+// It maintains one persistent bidirectional stream per device SN and
+// reconnects automatically on transient failures.
+type ServiceImpl struct {
+	stub         livedatapb.LiveDataServiceClient
+	mapper       *Mapper
+	log          *slog.Logger
+	mu           sync.RWMutex
+	streams      map[string]*streamEntry
+	attempts     map[string]int
+	shuttingDown atomic.Bool
+
+	notifyMu       sync.RWMutex
+	notifyStream   *notificationStream
+	notifyAttempts int
+
+	gateway   edgev3.EdgeGatewayServiceClient
+	gatewayV3 v3compat.Switch
+
+	ingest   telemetryv3.TelemetryIngestServiceClient
+	ingestV3 v3compat.Switch
+	v3       *v3Streams
+	v2       *v2Streams
+}
+
+// Option configures a ServiceImpl.
+type Option func(*ServiceImpl)
+
+// WithGateway sends command events over the v3 EdgeGatewayService, falling back to the v2
+// notification stream while the platform does not serve it.
+func WithGateway(c edgev3.EdgeGatewayServiceClient) Option {
+	return func(s *ServiceImpl) { s.gateway = c }
+}
+
+// WithTelemetryIngest sends v3 telemetry, detections and alerts over TelemetryIngestService,
+// falling back to v2 while the platform does not serve it.
+func WithTelemetryIngest(c telemetryv3.TelemetryIngestServiceClient) Option {
+	return func(s *ServiceImpl) { s.ingest = c }
+}
+
+// NewServiceImpl creates a new LiveDataService implementation.
+func NewServiceImpl(stub livedatapb.LiveDataServiceClient, log *slog.Logger, opts ...Option) *ServiceImpl {
+	s := &ServiceImpl{
+		stub:     stub,
+		mapper:   &Mapper{},
+		log:      log,
+		streams:  make(map[string]*streamEntry),
+		attempts: make(map[string]int),
+	}
+	for _, o := range opts {
+		o(s)
+	}
+	s.v3 = newV3Streams(s)
+	s.v2 = newV2Streams(s)
+	return s
+}
+
+func (s *ServiceImpl) ProduceTelemetryData(ctx context.Context, data *domains.TelemetryRequestData) error {
+	if data == nil {
+		return nil
+	}
+	req := s.mapper.Map(data)
+	return s.ProduceTelemetry(ctx, data.SN, req)
+}
+
+func (s *ServiceImpl) ProduceTelemetry(ctx context.Context, deviceSN string, req *livedatapb.ProduceTelemetryRequest) error {
+	if s.shuttingDown.Load() {
+		s.log.Warn("cannot produce telemetry: service is shutting down", "sn", deviceSN)
+		return nil
+	}
+
+	entry, err := s.getOrCreateStream(ctx, deviceSN)
+	if err != nil || entry == nil {
+		return err
+	}
+
+	if sendErr := entry.stream.Send(req); sendErr != nil {
+		s.log.Error("error sending telemetry", "sn", deviceSN, "error", sendErr)
+		s.removeStream(deviceSN)
+		go s.handleStreamFailure(deviceSN, entry.stream)
+		return sendErr
+	}
+	return nil
+}
+
+func (s *ServiceImpl) CloseStream(_ context.Context, deviceSN string) error {
+	s.mu.Lock()
+	entry, ok := s.streams[deviceSN]
+	if ok {
+		delete(s.streams, deviceSN)
+		delete(s.attempts, deviceSN)
+	}
+	s.mu.Unlock()
+
+	if entry != nil {
+		entry.cancel()
+		if _, err := entry.stream.CloseAndRecv(); err != nil {
+			s.log.Warn("error closing stream", "sn", deviceSN, "error", err)
+		}
+		s.log.Info("closed telemetry stream", "sn", deviceSN)
+	}
+	return nil
+}
+
+func (s *ServiceImpl) CloseAllStreams(_ context.Context) error {
+	s.mu.Lock()
+	entries := make(map[string]*streamEntry, len(s.streams))
+	for k, v := range s.streams {
+		entries[k] = v
+	}
+	s.streams = make(map[string]*streamEntry)
+	s.attempts = make(map[string]int)
+	s.mu.Unlock()
+
+	s.log.Info("closing all telemetry streams", "count", len(entries))
+	for sn, entry := range entries {
+		entry.cancel()
+		if _, err := entry.stream.CloseAndRecv(); err != nil {
+			s.log.Warn("error closing stream", "sn", sn, "error", err)
+		}
+	}
+	s.log.Info("all telemetry streams closed")
+	return nil
+}
+
+// Shutdown sets the shutting-down flag and closes all streams, telemetry and notification alike.
+func (s *ServiceImpl) Shutdown(ctx context.Context) error {
+	s.log.Info("LiveDataService shutdown initiated")
+	s.shuttingDown.Store(true)
+	// Close notifications first, and keep going if it fails: a half-closed notification stream
+	// must not leave telemetry streams open behind it.
+	if err := s.CloseNotificationStream(ctx); err != nil {
+		s.log.Warn("error closing notification stream during shutdown", "error", err)
+	}
+	s.v3.close()
+	s.v2.close()
+	return s.CloseAllStreams(ctx)
+}
+
+// ---- internal helpers -------------------------------------------------------
+
+func (s *ServiceImpl) getOrCreateStream(ctx context.Context, deviceSN string) (*streamEntry, error) {
+	s.mu.RLock()
+	entry, ok := s.streams[deviceSN]
+	s.mu.RUnlock()
+	if ok {
+		return entry, nil
+	}
+
+	if s.shuttingDown.Load() {
+		return nil, nil
+	}
+
+	return s.createStream(ctx, deviceSN)
+}
+
+func (s *ServiceImpl) createStream(ctx context.Context, deviceSN string) (*streamEntry, error) {
+	s.log.Info("creating gRPC telemetry stream", "sn", deviceSN)
+
+	streamCtx, cancel := context.WithCancel(context.Background())
+	stream, err := s.stub.ProduceTelemetry(streamCtx)
+	if err != nil {
+		cancel()
+		s.log.Error("failed to create telemetry stream", "sn", deviceSN, "error", err)
+		s.scheduleReconnect(deviceSN, 1)
+		return nil, err
+	}
+
+	entry := &streamEntry{stream: stream, cancel: cancel}
+
+	s.mu.Lock()
+	s.streams[deviceSN] = entry
+	s.attempts[deviceSN] = 0
+	s.mu.Unlock()
+
+	return entry, nil
+}
+
+// handleStreamFailure runs after a Send on this device's stream has already failed (see
+// ProduceTelemetry) -- it retrieves the RPC's real terminal error via CloseAndRecv and, if the
+// failure looks transient, schedules a reconnect.
+//
+// This must never run before a Send failure: for a client-streaming RPC, CloseAndRecv is how the
+// client signals "I'm done sending" -- calling it eagerly (as this code used to, from a
+// background goroutine started the moment the stream opened) half-closes the stream's send side
+// immediately, racing the caller's very first Send. That raced every telemetry tick into
+// recreating the stream from scratch instead of reusing the persistent one this cache exists for
+// -- found live-verifying the v1.3.0-compat simulator's telemetry publishing, which never
+// actually got a sample through before this fix.
+func (s *ServiceImpl) handleStreamFailure(deviceSN string, stream livedatapb.LiveDataService_ProduceTelemetryClient) {
+	_, err := stream.CloseAndRecv()
+	if err == nil {
+		s.log.Info("telemetry stream completed normally", "sn", deviceSN)
+		return
+	}
+
+	s.log.Error("telemetry stream error", "sn", deviceSN, "error", err)
+
+	if s.shuttingDown.Load() || !s.shouldReconnect(err) {
+		return
+	}
+
+	s.mu.Lock()
+	s.attempts[deviceSN]++
+	attempt := s.attempts[deviceSN]
+	s.mu.Unlock()
+
+	if attempt <= maxReconnectAttempts {
+		s.scheduleReconnect(deviceSN, attempt)
+	} else {
+		s.log.Warn("max reconnect attempts reached for device; manual recovery required", "sn", deviceSN, "attempts", attempt)
+	}
+}
+
+func (s *ServiceImpl) removeStream(deviceSN string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	delete(s.streams, deviceSN)
+}
+
+func (s *ServiceImpl) scheduleReconnect(deviceSN string, attempt int) {
+	if s.shuttingDown.Load() {
+		return
+	}
+	delay := s.computeDelay(attempt)
+	s.log.Info("scheduling reconnect for device", "sn", deviceSN, "delay", delay, "attempt", attempt)
+
+	time.AfterFunc(delay, func() {
+		if s.shuttingDown.Load() {
+			return
+		}
+		s.mu.RLock()
+		_, exists := s.streams[deviceSN]
+		s.mu.RUnlock()
+		if exists {
+			return
+		}
+
+		if _, err := s.createStream(context.Background(), deviceSN); err != nil {
+			s.log.Error("reconnect failed", "sn", deviceSN, "error", err)
+		}
+	})
+}
+
+func (s *ServiceImpl) shouldReconnect(err error) bool {
+	if err == nil {
+		return false
+	}
+	st, ok := status.FromError(err)
+	if !ok {
+		return true
+	}
+	switch st.Code() {
+	case codes.Unavailable,
+		codes.DeadlineExceeded,
+		codes.ResourceExhausted,
+		codes.Internal,
+		codes.Unknown:
+		return true
+	case codes.Unauthenticated,
+		codes.PermissionDenied,
+		codes.FailedPrecondition,
+		codes.Unimplemented,
+		codes.DataLoss:
+		return false
+	default:
+		return true
+	}
+}
+
+func (s *ServiceImpl) computeDelay(attempt int) time.Duration {
+	shift := attempt - 1
+	if shift > 6 {
+		shift = 6
+	}
+	base := initialReconnectDelay * time.Duration(1<<shift)
+	if base > maxReconnectDelay {
+		base = maxReconnectDelay
+	}
+	jitter := time.Duration(rand.Int63n(int64(base)/4 + 1))
+	return base + jitter
+}

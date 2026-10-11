@@ -1,0 +1,413 @@
+{
+  "version": "3.0.0",
+  "commands": [
+    {
+      "command_id": "camera.take_photo",
+      "risk": "OBSERVE",
+      "undo_command_id": "",
+      "description": "Takes a photo."
+    },
+    {
+      "command_id": "camera.capture_photo",
+      "risk": "OBSERVE",
+      "undo_command_id": "",
+      "description": "Takes a photo (alias kept from 2.x; prefer camera.take_photo)."
+    },
+    {
+      "command_id": "camera.start_recording",
+      "risk": "OBSERVE",
+      "undo_command_id": "camera.stop_recording",
+      "description": "Starts recording video."
+    },
+    {
+      "command_id": "camera.stop_recording",
+      "risk": "OBSERVE",
+      "undo_command_id": "",
+      "description": "Stops recording video."
+    },
+    {
+      "command_id": "stream.start",
+      "risk": "OBSERVE",
+      "undo_command_id": "stream.stop",
+      "description": "Starts the live video stream."
+    },
+    {
+      "command_id": "stream.stop",
+      "risk": "OBSERVE",
+      "undo_command_id": "",
+      "description": "Stops the live video stream."
+    },
+    {
+      "command_id": "stream.split_screen",
+      "risk": "OBSERVE",
+      "undo_command_id": "",
+      "description": "Switches the live view between one and two cameras."
+    },
+    {
+      "command_id": "detection.start",
+      "risk": "OBSERVE",
+      "undo_command_id": "detection.stop",
+      "description": "Starts object detection on the live video."
+    },
+    {
+      "command_id": "detection.stop",
+      "risk": "OBSERVE",
+      "undo_command_id": "",
+      "description": "Stops object detection."
+    },
+    {
+      "command_id": "detection.status",
+      "risk": "OBSERVE",
+      "undo_command_id": "",
+      "description": "Reports whether detection is running."
+    },
+    {
+      "command_id": "detection.wait",
+      "risk": "OBSERVE",
+      "undo_command_id": "",
+      "description": "Waits for a detection."
+    },
+    {
+      "command_id": "detection.count",
+      "risk": "OBSERVE",
+      "undo_command_id": "",
+      "description": "Counts detected objects."
+    },
+    {
+      "command_id": "detection.control",
+      "risk": "OBSERVE",
+      "undo_command_id": "",
+      "description": "Starts or stops object detection (2.x form)."
+    },
+    {
+      "command_id": "gimbal.look_at",
+      "risk": "ADJUST",
+      "undo_command_id": "gimbal.reset",
+      "description": "Points the camera at a location."
+    },
+    {
+      "command_id": "gimbal.rotate",
+      "risk": "ADJUST",
+      "undo_command_id": "gimbal.reset",
+      "description": "Turns the camera."
+    },
+    {
+      "command_id": "gimbal.reset",
+      "risk": "ADJUST",
+      "undo_command_id": "",
+      "description": "Recentres the camera or points it straight down."
+    },
+    {
+      "command_id": "gimbal.tracking",
+      "risk": "ADJUST",
+      "undo_command_id": "",
+      "description": "Makes the camera follow a target."
+    },
+    {
+      "command_id": "camera.change_lens",
+      "risk": "ADJUST",
+      "undo_command_id": "",
+      "description": "Switches the camera lens."
+    },
+    {
+      "command_id": "camera.change_zoom",
+      "risk": "ADJUST",
+      "undo_command_id": "",
+      "description": "Changes the zoom."
+    },
+    {
+      "command_id": "camera.thermal_palette",
+      "risk": "ADJUST",
+      "undo_command_id": "",
+      "description": "Changes the thermal colour palette."
+    },
+    {
+      "command_id": "speaker.audio.play",
+      "risk": "ADJUST",
+      "undo_command_id": "speaker.audio.stop",
+      "description": "Plays audio through the loudspeaker."
+    },
+    {
+      "command_id": "speaker.audio.stop",
+      "risk": "ADJUST",
+      "undo_command_id": "",
+      "description": "Stops loudspeaker playback."
+    },
+    {
+      "command_id": "speaker.volume.set",
+      "risk": "ADJUST",
+      "undo_command_id": "",
+      "description": "Changes the loudspeaker volume."
+    },
+    {
+      "command_id": "searchlight.mode.set",
+      "risk": "ADJUST",
+      "undo_command_id": "",
+      "description": "Changes the searchlight mode."
+    },
+    {
+      "command_id": "searchlight.brightness.set",
+      "risk": "ADJUST",
+      "undo_command_id": "",
+      "description": "Changes the searchlight brightness."
+    },
+    {
+      "command_id": "widget.set",
+      "risk": "ADJUST",
+      "undo_command_id": "",
+      "description": "Changes a payload setting."
+    },
+    {
+      "command_id": "parachute.led.set",
+      "risk": "ADJUST",
+      "undo_command_id": "",
+      "description": "Switches the parachute light."
+    },
+    {
+      "command_id": "dock.light",
+      "risk": "ADJUST",
+      "undo_command_id": "",
+      "description": "Switches the landing-pad light."
+    },
+    {
+      "command_id": "dock.open_cover",
+      "risk": "ADJUST",
+      "undo_command_id": "dock.close_cover",
+      "description": "Opens the dock cover (no flight task running)."
+    },
+    {
+      "command_id": "dock.close_cover",
+      "risk": "ADJUST",
+      "undo_command_id": "dock.open_cover",
+      "description": "Closes the dock cover (no flight task running)."
+    },
+    {
+      "command_id": "dock.putter",
+      "risk": "ADJUST",
+      "undo_command_id": "",
+      "description": "Moves the centring putters on the landing pad."
+    },
+    {
+      "command_id": "dock.start_charging",
+      "risk": "ADJUST",
+      "undo_command_id": "dock.stop_charging",
+      "description": "Starts charging the docked aircraft."
+    },
+    {
+      "command_id": "dock.stop_charging",
+      "risk": "ADJUST",
+      "undo_command_id": "dock.start_charging",
+      "description": "Stops charging the docked aircraft."
+    },
+    {
+      "command_id": "asset.change_ac_mode",
+      "risk": "ADJUST",
+      "undo_command_id": "",
+      "description": "Changes the dock's air conditioning mode."
+    },
+    {
+      "command_id": "asset.alarm",
+      "risk": "ADJUST",
+      "undo_command_id": "",
+      "description": "Switches the dock's audible and visual alarm."
+    },
+    {
+      "command_id": "asset.remote_debug",
+      "risk": "ADJUST",
+      "undo_command_id": "",
+      "description": "Switches the dock's remote debug mode (no flight task running)."
+    },
+    {
+      "command_id": "asset.property.<name>.set",
+      "risk": "ADJUST",
+      "undo_command_id": "",
+      "description": "Changes one device setting (family, rated by prefix)."
+    },
+    {
+      "command_id": "battery.maintenance",
+      "risk": "ADJUST",
+      "undo_command_id": "",
+      "description": "Switches the dock's battery maintenance."
+    },
+    {
+      "command_id": "battery.store_mode",
+      "risk": "ADJUST",
+      "undo_command_id": "",
+      "description": "Changes how the dock stores the battery."
+    },
+    {
+      "command_id": "radar.look_at",
+      "risk": "ADJUST",
+      "undo_command_id": "",
+      "description": "Turns the radar towards a location."
+    },
+    {
+      "command_id": "radar.point",
+      "risk": "ADJUST",
+      "undo_command_id": "",
+      "description": "Turns the radar."
+    },
+    {
+      "command_id": "radar.set_mode",
+      "risk": "ADJUST",
+      "undo_command_id": "",
+      "description": "Switches the radar between search and track."
+    },
+    {
+      "command_id": "jammer.look_at",
+      "risk": "ADJUST",
+      "undo_command_id": "",
+      "description": "Turns the jammer towards a location."
+    },
+    {
+      "command_id": "jammer.set_bands",
+      "risk": "ADJUST",
+      "undo_command_id": "",
+      "description": "Changes the bands the jammer can deny."
+    },
+    {
+      "command_id": "mission.pause",
+      "risk": "ADJUST",
+      "undo_command_id": "mission.resume",
+      "description": "Pauses the running route (airborne)."
+    },
+    {
+      "command_id": "mission.prepare",
+      "risk": "ADJUST",
+      "undo_command_id": "",
+      "description": "Uploads a route to the dock."
+    },
+    {
+      "command_id": "flight.manual.enter",
+      "risk": "ADJUST",
+      "undo_command_id": "flight.manual.exit",
+      "description": "Starts manual control (stick input via StreamManualControl)."
+    },
+    {
+      "command_id": "flight.manual.exit",
+      "risk": "ADJUST",
+      "undo_command_id": "",
+      "description": "Ends manual control."
+    },
+    {
+      "command_id": "flight.takeoff",
+      "risk": "MOVE",
+      "undo_command_id": "flight.return_to_home",
+      "description": "Takes off and climbs to the given height above the takeoff point (default 40 m)."
+    },
+    {
+      "command_id": "navigation.go_to",
+      "risk": "MOVE",
+      "undo_command_id": "flight.return_to_home",
+      "description": "Flies to a position; altitude is relative to the takeoff point (default 40 m)."
+    },
+    {
+      "command_id": "navigation.update_target",
+      "risk": "MOVE",
+      "undo_command_id": "",
+      "description": "Changes the target of a running go-to."
+    },
+    {
+      "command_id": "flight.return_to_home",
+      "risk": "MOVE",
+      "undo_command_id": "",
+      "description": "Returns to the dock/home point."
+    },
+    {
+      "command_id": "flight.manual.input",
+      "risk": "MOVE",
+      "undo_command_id": "",
+      "description": "One manual-control input (stream form: StreamManualControl)."
+    },
+    {
+      "command_id": "flight.emergency_stop",
+      "risk": "MOVE",
+      "undo_command_id": "",
+      "description": "Stops and hovers immediately."
+    },
+    {
+      "command_id": "mission.waypoint.execute",
+      "risk": "MOVE",
+      "undo_command_id": "mission.stop",
+      "description": "Flies a waypoint route from the dock."
+    },
+    {
+      "command_id": "mission.start",
+      "risk": "MOVE",
+      "undo_command_id": "mission.stop",
+      "description": "Starts the prepared route."
+    },
+    {
+      "command_id": "mission.resume",
+      "risk": "MOVE",
+      "undo_command_id": "mission.pause",
+      "description": "Resumes a paused route."
+    },
+    {
+      "command_id": "mission.stop",
+      "risk": "MOVE",
+      "undo_command_id": "",
+      "description": "Stops the route."
+    },
+    {
+      "command_id": "flight.land",
+      "risk": "CRITICAL",
+      "undo_command_id": "flight.emergency_stop",
+      "description": "Lands where it is; must be recovered by hand."
+    },
+    {
+      "command_id": "asset.reboot",
+      "risk": "CRITICAL",
+      "undo_command_id": "",
+      "description": "Restarts the device; offline until booted."
+    },
+    {
+      "command_id": "asset.boot_sub_asset",
+      "risk": "CRITICAL",
+      "undo_command_id": "",
+      "description": "Powers the aircraft on or off (docked)."
+    },
+    {
+      "command_id": "link.mode",
+      "risk": "CRITICAL",
+      "undo_command_id": "",
+      "description": "Changes how the dock talks to the aircraft; a wrong mode can cut the link."
+    },
+    {
+      "command_id": "jammer.enabled",
+      "risk": "CRITICAL",
+      "undo_command_id": "",
+      "description": "Starts or stops radio jamming; denies every receiver in the beam."
+    },
+    {
+      "command_id": "vendor.rns.send_raw",
+      "risk": "",
+      "undo_command_id": "",
+      "description": "Reticulum: sends a raw envelope."
+    },
+    {
+      "command_id": "vendor.sapient.mode_change",
+      "risk": "",
+      "undo_command_id": "",
+      "description": "SAPIENT: changes the sensor mode."
+    },
+    {
+      "command_id": "vendor.sapient.request",
+      "risk": "",
+      "undo_command_id": "",
+      "description": "SAPIENT: sends a task request."
+    },
+    {
+      "command_id": "vendor.betaflight.arm",
+      "risk": "",
+      "undo_command_id": "",
+      "description": "Betaflight: arms the motors."
+    },
+    {
+      "command_id": "vendor.betaflight.disarm",
+      "risk": "",
+      "undo_command_id": "",
+      "description": "Betaflight: disarms the motors."
+    }
+  ]
+}

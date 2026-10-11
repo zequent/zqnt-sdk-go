@@ -1,0 +1,256 @@
+// Package adapter defines the EdgeAdapter interface that SDK consumers implement
+// to expose hardware control operations over gRPC.
+package adapter
+
+import (
+	"context"
+
+	"github.com/zequent/zqnt-edge-sdk-go/v3/adapter/domains"
+)
+
+// EdgeAdapter is what the SDK serves to the platform.
+//
+// New adapters embed [Base] and register each command once (Registry.RegisterCommand); Base
+// implements every method here from the registrations. The typed command methods are the v2
+// compatibility layer: an adapter written against them keeps working, and v3 ExecuteCommand
+// routes built-in ids onto them.
+//
+// v2-style example:
+//
+//	type MyDroneAdapter struct {
+//	    adapter.UnimplementedEdgeAdapter
+//	    drone *hardware.Drone
+//	}
+//
+//	func (a *MyDroneAdapter) TakeOff(ctx context.Context, req *domains.TakeOffRequest) (*domains.CommandResult, error) {
+//	    if err := a.drone.TakeOff(req.Coordinates.Alt); err != nil {
+//	        return domains.Error(err.Error(), req.SN), nil
+//	    }
+//	    return domains.SuccessWithTID("takeOff accepted", req.TID, req.SN), nil
+//	}
+type EdgeAdapter interface {
+	// Deprecated: register "flight.takeoff" on Base instead; kept as the v2 compatibility layer.
+	TakeOff(ctx context.Context, req *domains.TakeOffRequest) (*domains.CommandResult, error)
+	// Deprecated: register "flight.return_to_home" on Base instead; kept as the v2 compatibility layer.
+	ReturnToHome(ctx context.Context, req *domains.ReturnToHomeRequest) (*domains.CommandResult, error)
+	// Deprecated: register "navigation.go_to" on Base instead; kept as the v2 compatibility layer.
+	GoTo(ctx context.Context, req *domains.GoToRequest) (*domains.CommandResult, error)
+
+	// Deprecated: register "flight.manual.enter" on Base instead; kept as the v2 compatibility layer.
+	EnterManualControl(ctx context.Context, sn string) (*domains.CommandResult, error)
+	// Deprecated: register "flight.manual.exit" on Base instead; kept as the v2 compatibility layer.
+	ExitManualControl(ctx context.Context, sn string) (*domains.CommandResult, error)
+	ManualControlInput(ctx context.Context, input *domains.ManualControlInput) (*domains.CommandResult, error)
+
+	// Deprecated: register "dock.open_cover" on Base instead; kept as the v2 compatibility layer.
+	OpenCover(ctx context.Context, sn string) (*domains.CommandResult, error)
+	// Deprecated: register "dock.close_cover" on Base instead; kept as the v2 compatibility layer.
+	CloseCover(ctx context.Context, sn string, force *bool) (*domains.CommandResult, error)
+	// Deprecated: register "dock.start_charging" on Base instead; kept as the v2 compatibility layer.
+	StartCharging(ctx context.Context, sn string) (*domains.CommandResult, error)
+	// Deprecated: register "dock.stop_charging" on Base instead; kept as the v2 compatibility layer.
+	StopCharging(ctx context.Context, sn string) (*domains.CommandResult, error)
+
+	// Deprecated: register "asset.reboot" on Base instead; kept as the v2 compatibility layer.
+	RebootAsset(ctx context.Context, sn string) (*domains.CommandResult, error)
+	// Deprecated: register "asset.boot_sub_asset" on Base instead; kept as the v2 compatibility layer.
+	BootUpSubAsset(ctx context.Context, sn string) (*domains.CommandResult, error)
+	// Deprecated: register "asset.boot_sub_asset" on Base instead; kept as the v2 compatibility layer.
+	BootDownSubAsset(ctx context.Context, sn string) (*domains.CommandResult, error)
+
+	// Deprecated: register "gimbal.look_at" on Base instead; kept as the v2 compatibility layer.
+	LookAt(ctx context.Context, req *domains.LookAtRequest) (*domains.CommandResult, error)
+	// Deprecated: register "camera.take_photo" on Base instead; kept as the v2 compatibility layer.
+	TakePhoto(ctx context.Context, req *domains.TakePhotoRequest) (*domains.CommandResult, error)
+	// Deprecated: register "camera.change_lens" on Base instead; kept as the v2 compatibility layer.
+	ChangeLens(ctx context.Context, req *domains.ChangeLensRequest) (*domains.CommandResult, error)
+	// Deprecated: register "camera.change_zoom" on Base instead; kept as the v2 compatibility layer.
+	ChangeZoom(ctx context.Context, req *domains.ChangeZoomRequest) (*domains.CommandResult, error)
+	// Deprecated: register "gimbal.tracking" on Base instead; kept as the v2 compatibility layer.
+	EnableGimbalTracking(ctx context.Context, sn string, enabled bool) (*domains.CommandResult, error)
+
+	// Deprecated: register "stream.start" on Base instead; kept as the v2 compatibility layer.
+	StartLiveStream(ctx context.Context, req *domains.LiveStreamStartRequest) (*domains.CommandResult, error)
+	// Deprecated: register "stream.stop" on Base instead; kept as the v2 compatibility layer.
+	StopLiveStream(ctx context.Context, req *domains.LiveStreamStopRequest) (*domains.CommandResult, error)
+
+	// Deprecated: register "asset.remote_debug" on Base instead; kept as the v2 compatibility layer.
+	EnterRemoteDebugMode(ctx context.Context, sn string) (*domains.CommandResult, error)
+	// Deprecated: register "asset.remote_debug" on Base instead; kept as the v2 compatibility layer.
+	CloseRemoteDebugMode(ctx context.Context, sn string) (*domains.CommandResult, error)
+	// Deprecated: register "asset.change_ac_mode" on Base instead; kept as the v2 compatibility layer.
+	ChangeACMode(ctx context.Context, sn, mode string) (*domains.CommandResult, error)
+
+	GetCapabilities(ctx context.Context, sn string) (*domains.CurrentCapabilities, error)
+
+	// GetDetections is a server-streaming operation.
+	// The adapter calls send for each detection frame until ctx is cancelled or
+	// the stream ends. Returning a non-nil error terminates the stream.
+	GetDetections(ctx context.Context, req *domains.GetDetectionsRequest, send func(*domains.DetectionResult) error) error
+
+	// The task-lifecycle commands all take the asset's sn as well as the task id. An adapter
+	// process serves a whole vendor's fleet behind one endpoint (routing is per-vendor, not
+	// per-device -- see the discovery package), so without the sn a multi-device adapter cannot
+	// tell which of its devices a StopTask is even for. The wire has always carried it on
+	// TaskCommandRequest.base.sn; it just wasn't passed through before.
+	//
+	// StopTask matters most: on the 2.0.0 contract it is the physical-cancellation path for any
+	// running command -- mission-autonomy's EdgeExecutionNodeDispatcher#cancel calls it with the
+	// external execution id the adapter reported when it accepted the command.
+	//
+	// Deprecated: register "mission.start" on Base instead; kept as the v2 compatibility layer.
+	StartTask(ctx context.Context, sn, taskID, tid string) (*domains.CommandResult, error)
+	// Deprecated: register "mission.stop" on Base instead; kept as the v2 compatibility layer.
+	StopTask(ctx context.Context, sn, taskID, tid string) (*domains.CommandResult, error)
+	// Deprecated: register "mission.prepare" on Base instead; kept as the v2 compatibility layer.
+	PrepareTask(ctx context.Context, sn, taskID, tid string) (*domains.CommandResult, error)
+
+	// PauseTask and ResumeTask, LiveStreamSplitScreen and SendCustomCommand below all exist on the
+	// current wire schema (edge.proto) but had no EdgeAdapter interface method before this branch --
+	// see adapter/grpc/server.go's former "intentionally left unimplemented" list. All four also
+	// exist on edge-java-sdk v1.3.0's EdgeAdapterService (pauseTask/resumeTask/liveStreamSplitScreen/
+	// sendCustomCommand), so closing this gap is part of matching v1.3.0's command surface, not a
+	// separate concern.
+	//
+	// Deprecated: register "mission.pause" on Base instead; kept as the v2 compatibility layer.
+	PauseTask(ctx context.Context, sn, taskID, tid string) (*domains.CommandResult, error)
+	// Deprecated: register "mission.resume" on Base instead; kept as the v2 compatibility layer.
+	ResumeTask(ctx context.Context, sn, taskID, tid string) (*domains.CommandResult, error)
+	// Deprecated: register "stream.split_screen" on Base instead; kept as the v2 compatibility layer.
+	LiveStreamSplitScreen(ctx context.Context, sn string, enabled bool) (*domains.CommandResult, error)
+	SendCustomCommand(ctx context.Context, req *domains.CustomCommandRequest) (*domains.CommandResult, error)
+}
+
+// UnimplementedEdgeAdapter provides NOT_IMPLEMENTED default implementations for all
+// EdgeAdapter methods. Embed this in your concrete type and override as needed.
+//
+// Deprecated: embed Base and register commands instead.
+type UnimplementedEdgeAdapter struct{}
+
+func (UnimplementedEdgeAdapter) TakeOff(_ context.Context, req *domains.TakeOffRequest) (*domains.CommandResult, error) {
+	return domains.NotImplemented("takeOff is not implemented for this asset", req.SN), nil
+}
+
+func (UnimplementedEdgeAdapter) ReturnToHome(_ context.Context, req *domains.ReturnToHomeRequest) (*domains.CommandResult, error) {
+	return domains.NotImplemented("returnToHome is not implemented for this asset", req.SN), nil
+}
+
+func (UnimplementedEdgeAdapter) GoTo(_ context.Context, req *domains.GoToRequest) (*domains.CommandResult, error) {
+	return domains.NotImplemented("goTo is not implemented for this asset", req.SN), nil
+}
+
+func (UnimplementedEdgeAdapter) EnterManualControl(_ context.Context, sn string) (*domains.CommandResult, error) {
+	return domains.NotImplemented("enterManualControl is not implemented for this asset", sn), nil
+}
+
+func (UnimplementedEdgeAdapter) ExitManualControl(_ context.Context, sn string) (*domains.CommandResult, error) {
+	return domains.NotImplemented("exitManualControl is not implemented for this asset", sn), nil
+}
+
+func (UnimplementedEdgeAdapter) ManualControlInput(_ context.Context, input *domains.ManualControlInput) (*domains.CommandResult, error) {
+	return domains.NotImplemented("manualControlInput is not implemented for this asset", input.SN), nil
+}
+
+func (UnimplementedEdgeAdapter) OpenCover(_ context.Context, sn string) (*domains.CommandResult, error) {
+	return domains.NotImplemented("openCover is not implemented for this asset", sn), nil
+}
+
+func (UnimplementedEdgeAdapter) CloseCover(_ context.Context, sn string, _ *bool) (*domains.CommandResult, error) {
+	return domains.NotImplemented("closeCover is not implemented for this asset", sn), nil
+}
+
+func (UnimplementedEdgeAdapter) StartCharging(_ context.Context, sn string) (*domains.CommandResult, error) {
+	return domains.NotImplemented("startCharging is not implemented for this asset", sn), nil
+}
+
+func (UnimplementedEdgeAdapter) StopCharging(_ context.Context, sn string) (*domains.CommandResult, error) {
+	return domains.NotImplemented("stopCharging is not implemented for this asset", sn), nil
+}
+
+func (UnimplementedEdgeAdapter) RebootAsset(_ context.Context, sn string) (*domains.CommandResult, error) {
+	return domains.NotImplemented("rebootAsset is not implemented for this asset", sn), nil
+}
+
+func (UnimplementedEdgeAdapter) BootUpSubAsset(_ context.Context, sn string) (*domains.CommandResult, error) {
+	return domains.NotImplemented("bootUpSubAsset is not implemented for this asset", sn), nil
+}
+
+func (UnimplementedEdgeAdapter) BootDownSubAsset(_ context.Context, sn string) (*domains.CommandResult, error) {
+	return domains.NotImplemented("bootDownSubAsset is not implemented for this asset", sn), nil
+}
+
+func (UnimplementedEdgeAdapter) LookAt(_ context.Context, req *domains.LookAtRequest) (*domains.CommandResult, error) {
+	return domains.NotImplemented("lookAt is not implemented for this asset", req.SN), nil
+}
+
+func (UnimplementedEdgeAdapter) TakePhoto(_ context.Context, req *domains.TakePhotoRequest) (*domains.CommandResult, error) {
+	return domains.NotImplemented("takePhoto is not implemented for this asset", req.SN), nil
+}
+
+func (UnimplementedEdgeAdapter) ChangeLens(_ context.Context, req *domains.ChangeLensRequest) (*domains.CommandResult, error) {
+	return domains.NotImplemented("changeLens is not implemented for this asset", req.SN), nil
+}
+
+func (UnimplementedEdgeAdapter) ChangeZoom(_ context.Context, req *domains.ChangeZoomRequest) (*domains.CommandResult, error) {
+	return domains.NotImplemented("changeZoom is not implemented for this asset", req.SN), nil
+}
+
+func (UnimplementedEdgeAdapter) EnableGimbalTracking(_ context.Context, sn string, _ bool) (*domains.CommandResult, error) {
+	return domains.NotImplemented("enableGimbalTracking is not implemented for this asset", sn), nil
+}
+
+func (UnimplementedEdgeAdapter) StartLiveStream(_ context.Context, req *domains.LiveStreamStartRequest) (*domains.CommandResult, error) {
+	return domains.NotImplemented("startLiveStream is not implemented for this asset", req.SN), nil
+}
+
+func (UnimplementedEdgeAdapter) StopLiveStream(_ context.Context, req *domains.LiveStreamStopRequest) (*domains.CommandResult, error) {
+	return domains.NotImplemented("stopLiveStream is not implemented for this asset", req.SN), nil
+}
+
+func (UnimplementedEdgeAdapter) EnterRemoteDebugMode(_ context.Context, sn string) (*domains.CommandResult, error) {
+	return domains.NotImplemented("enterRemoteDebugMode is not implemented for this asset", sn), nil
+}
+
+func (UnimplementedEdgeAdapter) CloseRemoteDebugMode(_ context.Context, sn string) (*domains.CommandResult, error) {
+	return domains.NotImplemented("closeRemoteDebugMode is not implemented for this asset", sn), nil
+}
+
+func (UnimplementedEdgeAdapter) ChangeACMode(_ context.Context, sn, _ string) (*domains.CommandResult, error) {
+	return domains.NotImplemented("changeAcMode is not implemented for this asset", sn), nil
+}
+
+func (UnimplementedEdgeAdapter) GetCapabilities(_ context.Context, sn string) (*domains.CurrentCapabilities, error) {
+	return domains.EmptyCapabilities(sn), nil
+}
+
+func (UnimplementedEdgeAdapter) GetDetections(_ context.Context, _ *domains.GetDetectionsRequest, _ func(*domains.DetectionResult) error) error {
+	return nil
+}
+
+func (UnimplementedEdgeAdapter) StartTask(_ context.Context, sn, _, _ string) (*domains.CommandResult, error) {
+	return domains.NotImplemented("startTask is not implemented for this asset", sn), nil
+}
+
+func (UnimplementedEdgeAdapter) StopTask(_ context.Context, sn, _, _ string) (*domains.CommandResult, error) {
+	return domains.NotImplemented("stopTask is not implemented for this asset", sn), nil
+}
+
+func (UnimplementedEdgeAdapter) PrepareTask(_ context.Context, sn, _, _ string) (*domains.CommandResult, error) {
+	return domains.NotImplemented("prepareTask is not implemented for this asset", sn), nil
+}
+
+func (UnimplementedEdgeAdapter) PauseTask(_ context.Context, sn, _, _ string) (*domains.CommandResult, error) {
+	return domains.NotImplemented("pauseTask is not implemented for this asset", sn), nil
+}
+
+func (UnimplementedEdgeAdapter) ResumeTask(_ context.Context, sn, _, _ string) (*domains.CommandResult, error) {
+	return domains.NotImplemented("resumeTask is not implemented for this asset", sn), nil
+}
+
+func (UnimplementedEdgeAdapter) LiveStreamSplitScreen(_ context.Context, sn string, _ bool) (*domains.CommandResult, error) {
+	return domains.NotImplemented("liveStreamSplitScreen is not implemented for this asset", sn), nil
+}
+
+func (UnimplementedEdgeAdapter) SendCustomCommand(_ context.Context, req *domains.CustomCommandRequest) (*domains.CommandResult, error) {
+	return domains.NotImplemented("sendCustomCommand is not implemented for this asset", req.SN), nil
+}
