@@ -101,3 +101,7 @@ Generates from the `proto/` submodule (`git submodule update --init proto` in a 
 after verifying it is at the commit pinned in the script. To move to a newer contract, check the
 submodule out at the new commit, update `EXPECTED_PROTO_COMMIT` in the script, regenerate, and commit
 the submodule pointer together with `gen/`.
+
+## License
+
+Licensed under the [Apache License, Version 2.0](LICENSE); see [NOTICE](NOTICE).
