@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"reflect"
+	"slices"
 	"sync"
 	"time"
 
@@ -73,6 +75,7 @@ type Registry struct {
 	commands        map[string]*registeredCommand
 	order           []string
 	telemetryFields []domains.TelemetryField
+	payloads        map[string][]domains.Payload
 	listeners       []func()
 }
 
@@ -168,7 +171,48 @@ func (r *Registry) DeclareTelemetryField(f domains.TelemetryField) {
 	r.changed()
 }
 
-// OnChange calls f after every change of the registered commands or telemetry fields.
+// SetPayloads sets the devices mounted on sn, as a full snapshot: a payload left out is detached.
+// Capability listeners are notified when the snapshot differs from the previous one.
+func (r *Registry) SetPayloads(sn string, payloads []domains.Payload) error {
+	if sn == "" {
+		return errors.New("set payloads: sn is required")
+	}
+	refs := map[string]bool{}
+	for _, p := range payloads {
+		if p.Ref == "" {
+			return fmt.Errorf("set payloads of %s: a payload has no ref", sn)
+		}
+		if refs[p.Ref] {
+			return fmt.Errorf("set payloads of %s: two payloads share the ref %s", sn, p.Ref)
+		}
+		refs[p.Ref] = true
+	}
+	r.mu.Lock()
+	if reflect.DeepEqual(r.payloads[sn], payloads) || (len(r.payloads[sn]) == 0 && len(payloads) == 0) {
+		r.mu.Unlock()
+		return nil
+	}
+	if r.payloads == nil {
+		r.payloads = map[string][]domains.Payload{}
+	}
+	if len(payloads) == 0 {
+		delete(r.payloads, sn)
+	} else {
+		r.payloads[sn] = slices.Clone(payloads)
+	}
+	r.mu.Unlock()
+	r.changed()
+	return nil
+}
+
+// Payloads returns what SetPayloads last set for sn.
+func (r *Registry) Payloads(sn string) []domains.Payload {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	return slices.Clone(r.payloads[sn])
+}
+
+// OnChange calls f after every change of the registered commands, telemetry fields or payloads.
 func (r *Registry) OnChange(f func()) {
 	r.mu.Lock()
 	r.listeners = append(r.listeners, f)
@@ -202,6 +246,7 @@ func (r *Registry) Capabilities(sn string) *domains.CurrentCapabilities {
 		Capabilities:    make([]domains.Capability, 0, len(r.order)),
 		Timestamp:       time.Now(),
 		TelemetryFields: append([]domains.TelemetryField(nil), r.telemetryFields...),
+		Payloads:        slices.Clone(r.payloads[sn]),
 	}
 	for _, id := range r.order {
 		out.Capabilities = append(out.Capabilities, r.commands[id].capability)

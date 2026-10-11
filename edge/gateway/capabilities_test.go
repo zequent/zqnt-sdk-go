@@ -118,3 +118,24 @@ func TestCapabilitiesFallBackToReportAssetRuntime(t *testing.T) {
 		t.Fatal("v3 must be skipped after UNIMPLEMENTED")
 	}
 }
+
+func TestPayloadsAreReportedAndChangeTheRevision(t *testing.T) {
+	rc := &remoteControl{}
+	r := reporter(t, rc, true)
+	without, _ := r.Report(context.Background(), caps())
+	slot := int32(1)
+	mounted := caps()
+	mounted.Payloads = []domains.Payload{{Ref: "speaker-1", Kind: "speaker", Vendor: "DJI", SlotIndex: &slot,
+		ExternalID: "42-0-1", MountedOn: "drone-1", Metadata: map[string]string{"volume": "max"}}}
+	with, _ := r.Report(context.Background(), mounted)
+
+	p := rc.v3Sets[1].GetPayloads()[0]
+	if without == with || p.GetRef() != "speaker-1" || p.GetSlotIndex() != 1 || p.SlotIndex == nil ||
+		p.GetExternalId() != "42-0-1" || p.GetMountedOn().GetType() != capabilityv3.TargetType_TARGET_TYPE_SUB_ASSET ||
+		p.GetMountedOn().GetRef() != "drone-1" || p.GetMetadata()["volume"] != "max" {
+		t.Fatalf("revisions %q %q, payload %v", without, with, p)
+	}
+	if rc.v3Sets[0].GetPayloads() != nil {
+		t.Fatalf("payloads without any mounted: %v", rc.v3Sets[0].GetPayloads())
+	}
+}

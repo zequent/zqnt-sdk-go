@@ -134,3 +134,28 @@ func TestBrokenSchemaIsRefusedAtRegistration(t *testing.T) {
 		t.Fatalf("err = %v, registered = %v", err, d.Has("x.y"))
 	}
 }
+
+func TestPayloadsAreKeptPerAssetAndAnnouncedOnChange(t *testing.T) {
+	d := newDrone(t)
+	calls := 0
+	d.OnChange(func() { calls++ })
+	slot := int32(0)
+	camera := domains.Payload{Ref: "camera-0", Kind: "camera", SlotIndex: &slot}
+
+	if err := d.SetPayloads("SN-1", []domains.Payload{camera}); err != nil {
+		t.Fatal(err)
+	}
+	_ = d.SetPayloads("SN-1", []domains.Payload{camera})
+	caps, _ := d.GetCapabilities(context.Background(), "SN-1")
+	other, _ := d.GetCapabilities(context.Background(), "SN-2")
+	if len(caps.Payloads) != 1 || caps.Payloads[0].Ref != "camera-0" || len(other.Payloads) != 0 {
+		t.Fatalf("payloads %+v, other %+v", caps.Payloads, other.Payloads)
+	}
+	_ = d.SetPayloads("SN-1", nil)
+	if calls != 2 || len(d.Payloads("SN-1")) != 0 {
+		t.Fatalf("listener called %d times, payloads %+v", calls, d.Payloads("SN-1"))
+	}
+	if d.SetPayloads("SN-1", []domains.Payload{camera, camera}) == nil || d.SetPayloads("SN-1", []domains.Payload{{Kind: "camera"}}) == nil {
+		t.Fatal("duplicate or missing refs were accepted")
+	}
+}

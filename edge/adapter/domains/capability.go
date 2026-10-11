@@ -141,6 +141,29 @@ type CurrentCapabilities struct {
 	Timestamp    time.Time
 	// TelemetryFields are the device-specific values this asset sends in TelemetrySample.Details.
 	TelemetryFields []TelemetryField
+	// Payloads are the devices mounted on the asset, a full snapshot: one left out of the next
+	// report is detached.
+	Payloads []Payload
+}
+
+// Payload is a device mounted on the asset: camera, gimbal, speaker, spotlight, sprayer, sensor.
+type Payload struct {
+	// Ref is stable within the asset; a command acting on this payload has TargetType
+	// CapabilityTargetPayload and TargetRef Ref.
+	Ref string
+	// Kind is "camera", "speaker", "spotlight", "sprayer", "sensor", ...
+	Kind         string
+	Vendor       string
+	Model        string
+	SerialNumber string
+	// SlotIndex is the mount position, e.g. DJI gimbal 0..2; nil when the asset has no slots.
+	SlotIndex       *int32
+	FirmwareVersion string
+	// ExternalID is the vendor's id, e.g. DJI "type-subtype-gimbalindex".
+	ExternalID string
+	// MountedOn is the ref of the sub-asset carrying the payload; empty means the asset itself.
+	MountedOn string
+	Metadata  map[string]string
 }
 
 // TelemetryValueType is the type of one declared telemetry detail.

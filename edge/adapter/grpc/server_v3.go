@@ -80,7 +80,7 @@ func (s *ServerV3) GetCapabilities(ctx context.Context, req *edgev3.GetCapabilit
 }
 
 // CapabilitySetV3 maps the adapter's capabilities onto the v3 CapabilitySet, including the
-// telemetry fields it declares. A schema that cannot be put on the wire is logged and dropped.
+// telemetry fields it declares and the payloads mounted on the asset. A schema that cannot be put on the wire is logged and dropped.
 func CapabilitySetV3(caps *domains.CurrentCapabilities, log *slog.Logger) *capabilityv3.CapabilitySet {
 	set := &capabilityv3.CapabilitySet{
 		AssetSn:       caps.SN,
@@ -100,7 +100,28 @@ func CapabilitySetV3(caps *domains.CurrentCapabilities, log *slog.Logger) *capab
 			AllowedValues: f.AllowedValues,
 		})
 	}
+	for _, p := range caps.Payloads {
+		set.Payloads = append(set.Payloads, payloadV3(p))
+	}
 	return set
+}
+
+func payloadV3(p domains.Payload) *capabilityv3.Payload {
+	out := &capabilityv3.Payload{
+		Ref:             p.Ref,
+		Kind:            p.Kind,
+		Vendor:          p.Vendor,
+		Model:           p.Model,
+		SerialNumber:    p.SerialNumber,
+		SlotIndex:       p.SlotIndex,
+		FirmwareVersion: p.FirmwareVersion,
+		ExternalId:      p.ExternalID,
+		Metadata:        p.Metadata,
+	}
+	if p.MountedOn != "" {
+		out.MountedOn = &capabilityv3.Target{Type: capabilityv3.TargetType_TARGET_TYPE_SUB_ASSET, Ref: p.MountedOn}
+	}
+	return out
 }
 
 func capabilityV3(c domains.Capability, log *slog.Logger) *capabilityv3.Capability {

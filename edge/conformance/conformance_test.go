@@ -97,3 +97,20 @@ func TestAcceptedCommandsNeedARecorder(t *testing.T) {
 		t.Fatalf("completion problems = %v", r.Completion)
 	}
 }
+
+func TestACommandTargetingAnUnreportedPayloadIsFound(t *testing.T) {
+	events := &Recorder{}
+	d := newGoodDrone(events)
+	d.MustRegisterCommand("vendor.acme.announce", nil, nil, func(_ context.Context, req *domains.CustomCommandRequest) (*domains.CommandResult, error) {
+		return domains.Success("said", req.SN), nil
+	}, adapter.WithTarget(domains.CapabilityTargetPayload, "speaker-1"))
+
+	r := Check(d, Options{Events: events})
+	if len(r.Payloads) != 1 || r.Payloads[0] != "vendor.acme.announce targets payload 'speaker-1', which is not reported" {
+		t.Fatalf("payload problems %v", r.Payloads)
+	}
+	if err := d.SetPayloads("CONFORMANCE-1", []domains.Payload{{Ref: "speaker-1", Kind: "speaker"}}); err != nil {
+		t.Fatal(err)
+	}
+	Run(t, d, Options{Events: events})
+}
