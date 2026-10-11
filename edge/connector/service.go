@@ -22,10 +22,6 @@ type ConnectorService interface {
 	GetAssetByID(ctx context.Context, id string) (*domains.AssetDTO, error)
 	GetSubAssetBySN(ctx context.Context, sn string) (*domains.SubAssetDTO, error)
 	UpdateAsset(ctx context.Context, id string, asset *domains.AssetDTO) (*domains.AssetDTO, error)
-	// Deprecated: an adapter does not create assets. RegisterAsset is insert-only and creates an
-	// asset with no organization, which no tenant sees and nobody can move afterwards. Use
-	// EnsureAsset: bind to what exists, or pair an unknown serial with a claim code.
-	RegisterAsset(ctx context.Context, asset *domains.AssetDTO) (*domains.AssetDTO, error)
 	DeRegisterAsset(ctx context.Context, id string) (bool, error)
 
 	// RedeemAssetClaim trades a one-time claim code for the asset and returns it. The code is the

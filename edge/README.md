@@ -94,8 +94,8 @@ SDK switches. remote-control serves `EdgeGatewayService`: point the SDK at it wi
 - **Pairing:** `client.EnsureAsset(ctx, asset)` binds to the asset with that serial or, when the
   platform does not know it, redeems the one-time claim code (`WithClaimCode`, default
   `ZQNT_CLAIM_CODE`) minted in the console; the claim decides the organization.
-  `Connector().DescribeAssetClaim` names that organization without spending the code.
-  `RegisterAsset` is deprecated.
+  `Connector().DescribeAssetClaim` names that organization without spending the code. An adapter
+  cannot create an asset any other way: `Connector().RegisterAsset` was removed in 3.0.
 - **Telemetry fields:** `DeclareTelemetryField` on the registry declares the keys of
   `TelemetrySample.Details`; they are published with the capabilities. Keys of the platform's
   catalog (`github.com/zequent/zqnt-api-go/v3/telemetry`, e.g. `dock.mode`, `wind.speed`)

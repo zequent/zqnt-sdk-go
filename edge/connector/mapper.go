@@ -217,12 +217,6 @@ func enumString[T stringer](e *T) string {
 
 // parseEnum resolves a domain enum-name string (e.g. "ASSET_VENDOR_ZQNT") back to its proto enum
 // pointer via protoc-gen-go's generated *_value name->number map, the inverse of enumString.
-//
-// AssetToProto/SubAssetToProto never set Type/Vendor/Connection before this: RegisterAsset and
-// UpdateAsset silently sent every asset with those three fields unset, which the backend reads as
-// the enum zero value (AssetTypeEnum_UNKNOWN / AssetVendor_DJI / AssetConnection's own zero) rather
-// than an error -- a real asset registered through this SDK would misreport as DJI regardless of
-// its actual vendor. Found while wiring the simulator's own RegisterAsset call.
 func parseEnum[T ~int32](values map[string]int32, s string) *T {
 	if s == "" {
 		return nil
