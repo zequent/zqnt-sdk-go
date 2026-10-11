@@ -232,3 +232,7 @@ Both directions are authenticated (package `auth`):
 
 **`fatal: could not read Username`**
 - Make sure you have access to the repository and are authenticated with GitHub
+
+## License
+
+Licensed under the [Apache License, Version 2.0](LICENSE); see [NOTICE](NOTICE).
