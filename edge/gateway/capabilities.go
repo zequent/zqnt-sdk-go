@@ -82,6 +82,7 @@ func revision(set *capabilityv3.CapabilitySet) string {
 		AssetType:       set.GetAssetType(),
 		Capabilities:    set.GetCapabilities(),
 		TelemetryFields: set.GetTelemetryFields(),
+		Payloads:        set.GetPayloads(),
 	}
 	raw, err := proto.MarshalOptions{Deterministic: true}.Marshal(content)
 	if err != nil {

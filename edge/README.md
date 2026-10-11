@@ -100,6 +100,10 @@ SDK switches. remote-control serves `EdgeGatewayService`: point the SDK at it wi
   `TelemetrySample.Details`; they are published with the capabilities. Keys of the platform's
   catalog (`github.com/zequent/zqnt-api-go/v3/telemetry`, e.g. `dock.mode`, `wind.speed`)
   are described by `domains.StandardTelemetryField` and also reach a v2 platform.
+- **Payloads:** `SetPayloads(sn, payloads)` on the registry sets the devices mounted on an asset
+  (camera, speaker, spotlight, ...), published with the capabilities as a full snapshot: a payload
+  left out is detached. A command acting on one is registered with
+  `WithTarget(domains.CapabilityTargetPayload, payload.Ref)`.
 - **Conformance kit:** `conformance.Run(t, adapter, conformance.Options{Events: recorder})` checks
   that every advertised id executes, every executable id is advertised, schemas parse and an
   `ACCEPTED` command is completed by an event with `occurred_at`. It executes commands — run it

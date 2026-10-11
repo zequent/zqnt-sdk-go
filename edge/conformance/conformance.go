@@ -7,7 +7,7 @@
 //	}
 //
 // It checks that every advertised command is executable, every executable command is advertised,
-// every schema parses, and that an ACCEPTED command is completed by an event under its
+// every schema parses, every command targeting a payload names a reported one, and that an ACCEPTED command is completed by an event under its
 // command_execution_id that carries occurred_at.
 package conformance
 
@@ -79,6 +79,7 @@ type Report struct {
 	Advertised []string
 	Executable []string
 	Completion []string
+	Payloads   []string
 }
 
 // Run checks the adapter and reports every problem as a failure of the matching subtest.
@@ -90,6 +91,7 @@ func Run(t *testing.T, a adapter.EdgeAdapter, opts Options) {
 		"advertised ids are executable":       r.Advertised,
 		"executable ids are advertised":       r.Executable,
 		"completion events carry occurred_at": r.Completion,
+		"payload targets are reported":        r.Payloads,
 	} {
 		t.Run(name, func(t *testing.T) {
 			for _, p := range problems {
@@ -114,6 +116,7 @@ func Check(a adapter.EdgeAdapter, opts Options) Report {
 		r.Advertised = append(r.Advertised, fmt.Sprintf("GetCapabilities: %v", err))
 		return r
 	}
+	r.Payloads = payloadProblems(caps)
 	server := adaptergrpc.NewServerV3(a, slog.New(slog.NewTextHandler(io.Discard, nil)))
 	advertised := map[string]bool{}
 	for _, c := range caps.Capabilities {
@@ -190,6 +193,33 @@ func Check(a adapter.EdgeAdapter, opts Options) Report {
 		}
 	}
 	return r
+}
+
+func payloadProblems(caps *domains.CurrentCapabilities) []string {
+	var out []string
+	refs := map[string]bool{}
+	for _, p := range caps.Payloads {
+		switch {
+		case p.Ref == "":
+			out = append(out, "a payload has no ref")
+		case refs[p.Ref]:
+			out = append(out, fmt.Sprintf("payload %s is reported twice", p.Ref))
+		}
+		refs[p.Ref] = true
+	}
+	for _, c := range caps.Capabilities {
+		if c.TargetType != domains.CapabilityTargetPayload {
+			continue
+		}
+		ref := ""
+		if c.TargetRef != nil {
+			ref = *c.TargetRef
+		}
+		if !refs[ref] {
+			out = append(out, fmt.Sprintf("%s targets payload '%s', which is not reported", c.Command, ref))
+		}
+	}
+	return out
 }
 
 func schemaProblems(command, what string, doc map[string]any) []string {
