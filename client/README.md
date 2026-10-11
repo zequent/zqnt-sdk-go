@@ -50,9 +50,9 @@ keeps its gRPC status — `status.Code(err)` is `Unauthenticated`, `PermissionDe
 
 `control` is a client of `zqnt.control.v3.RemoteControlService`, served by remote-control on the
 same host and port as the 2.x `RemoteControlService` (`REMOTE_CONTROL_SERVICE_*`), with the same
-client credential. The message types are `zqnt-utils-golang`'s
-(`github.com/zequent/zqnt-utils-golang/v2/gen/zqnt/...`), the same Go types the edge SDK, the
-simulator and the Integration Hub use.
+client credential. The message types are those of the public
+`zqnt-api-go` module (`github.com/zequent/zqnt-api-go/gen/zqnt/...`), the same Go types the edge
+SDK, the simulator and the Integration Hub use.
 
 `examples/command` lists an asset's capabilities and runs one:
 `go run ./examples/command DRONE-1 flight.takeoff '{"altitude": 40}'`.
@@ -75,7 +75,7 @@ returns the number of inputs the platform passed on to the asset (an error in it
 `*control.CommandError`); cancelling `ctx` aborts the stream. When the platform refuses the session
 (no adapter reachable, an asset of another organization) or the adapter drops it, `Send` and `Close`
 return that error with its gRPC status; `Send` after `Close` is `control.ErrManualControlClosed`.
-`edgev3` is `github.com/zequent/zqnt-utils-golang/v2/gen/zqnt/edge/v3`.
+`edgev3` is `github.com/zequent/zqnt-api-go/gen/zqnt/edge/v3`.
 
 ## Telemetry (3.x): `telemetry`
 
@@ -118,7 +118,7 @@ watch does not reconnect: watch again.
 - `auth/`, `config/` — the client credential and where the platform is, shared by every package.
 
 Generated types come from
-[zqnt-utils-golang](https://github.com/zequent/zqnt-utils-golang): `gen/<service>/proto` for the
+[zqnt-api-go](https://github.com/zequent/zqnt-api-go): `gen/<service>/proto` for the
 2.x contracts, `gen/zqnt/<domain>/v3` for 3.x. This repository has no generated code of its own.
 
 ## Migrating from 2.x
@@ -126,11 +126,11 @@ Generated types come from
 1. Module path: `github.com/Zequent/zqnt-client-sdk-go/v2` → `github.com/zequent/zqnt-client-sdk-go/v3`
    (note the lower-case owner, as for every other Zequent Go module).
 2. Generated types: `github.com/Zequent/zqnt-client-sdk-go/v2/gen/...` →
-   `github.com/zequent/zqnt-utils-golang/v2/gen/...` — same package paths below `gen/`, same types.
+   `github.com/zequent/zqnt-api-go/gen/...` — same package paths below `gen/`, same types.
    One `sed` does both:
    ```
    grep -rl zqnt-client-sdk-go/v2 --include='*.go' . | xargs sed -i \
-     -e 's#github.com/Zequent/zqnt-client-sdk-go/v2/gen/#github.com/zequent/zqnt-utils-golang/v2/gen/#g' \
+     -e 's#github.com/Zequent/zqnt-client-sdk-go/v2/gen/#github.com/zequent/zqnt-api-go/gen/#g' \
      -e 's#github.com/Zequent/zqnt-client-sdk-go/v2/#github.com/zequent/zqnt-client-sdk-go/v3/#g'
    go get github.com/zequent/zqnt-client-sdk-go/v3 && go mod tidy
    ```

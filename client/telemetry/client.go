@@ -23,8 +23,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	commonv3 "github.com/zequent/zqnt-utils-golang/v2/gen/zqnt/common/v3"
-	telemetryv3 "github.com/zequent/zqnt-utils-golang/v2/gen/zqnt/telemetry/v3"
+	commonv3 "github.com/zequent/zqnt-api-go/gen/zqnt/common/v3"
+	telemetryv3 "github.com/zequent/zqnt-api-go/gen/zqnt/telemetry/v3"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/durationpb"
 )

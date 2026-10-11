@@ -7,10 +7,10 @@ import (
 	"sync"
 	"testing"
 
+	base "github.com/zequent/zqnt-api-go/gen/common/base/proto"
+	connectorpb "github.com/zequent/zqnt-api-go/gen/connector/proto"
 	"github.com/zequent/zqnt-client-sdk-go/v3/auth"
 	"github.com/zequent/zqnt-client-sdk-go/v3/connector"
-	base "github.com/zequent/zqnt-utils-golang/v2/gen/common/base/proto"
-	connectorpb "github.com/zequent/zqnt-utils-golang/v2/gen/connector/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"

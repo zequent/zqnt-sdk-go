@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	connectorpb "github.com/zequent/zqnt-utils-golang/v2/gen/connector/proto"
+	connectorpb "github.com/zequent/zqnt-api-go/gen/connector/proto"
 )
 
 // GetActivePoliciesByType fetches every active operational policy of a given type.
