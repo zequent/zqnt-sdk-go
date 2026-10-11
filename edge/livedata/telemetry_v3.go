@@ -3,6 +3,7 @@ package livedata
 import (
 	"context"
 	"fmt"
+	"math"
 	"time"
 
 	commonpb "github.com/zequent/zqnt-api-go/v3/gen/common/base/proto"
@@ -215,7 +216,12 @@ func detectionBatchV3(in *domains.DetectionBatch) *telemetryv3.DetectionBatch {
 			Confidence: d.Confidence,
 			BoundingBox: &edgev3.BoundingBox{X: d.BoundingBox.X, Y: d.BoundingBox.Y,
 				Width: d.BoundingBox.Width, Height: d.BoundingBox.Height},
-			Position: geoPointV3(d.Position),
+			Position:         geoPointV3(d.Position),
+			RangeMeters:      d.RangeMeters,
+			BearingDegrees:   d.BearingDegrees,
+			ElevationDegrees: d.ElevationDegrees,
+			Speed:            d.Speed,
+			HeadingDegrees:   d.HeadingDegrees,
 		})
 	}
 	return out
@@ -235,7 +241,29 @@ func detectionBatchV2(in *domains.DetectionBatch) *detectionpb.DetectionBatch {
 			Confidence: &d.Confidence,
 			BoundingBox: &detectionpb.BoundingBox{X: d.BoundingBox.X, Y: d.BoundingBox.Y,
 				Width: d.BoundingBox.Width, Height: d.BoundingBox.Height},
+			Position: detectionPositionV2(d),
 		})
+	}
+	return out
+}
+
+func detectionPositionV2(d domains.DetectionResult) *detectionpb.DetectionPosition {
+	located := d.Position != nil
+	if !located && d.RangeMeters == nil && d.BearingDegrees == nil && d.ElevationDegrees == nil &&
+		d.Speed == nil && d.HeadingDegrees == nil {
+		return nil
+	}
+	out := &detectionpb.DetectionPosition{
+		Latitude:     math.NaN(),
+		Longitude:    math.NaN(),
+		RangeM:       d.RangeMeters,
+		BearingDeg:   d.BearingDegrees,
+		ElevationDeg: d.ElevationDegrees,
+		SpeedMps:     d.Speed,
+		HeadingDeg:   d.HeadingDegrees,
+	}
+	if located {
+		out.Latitude, out.Longitude, out.Altitude = d.Position.Lat, d.Position.Lon, d.Position.Alt
 	}
 	return out
 }
