@@ -49,6 +49,12 @@ func (s *Server) RegisterWith(gs *grpc.Server) {
 
 // ---- helpers ----------------------------------------------------------------
 
+// withExecution passes the platform's id of this run, which a 2.x call carries as
+// RequestBase.external_id, on to the adapter (adapter.CommandExecutionID).
+func withExecution(ctx context.Context, base *commonpb.RequestBase) context.Context {
+	return adapter.WithCommandExecutionID(ctx, base.GetExternalId())
+}
+
 func (s *Server) toCommandResponse(base *commonpb.RequestBase, result *domains.CommandResult) *devicecontrolpb.CommandResponse {
 	resp := &devicecontrolpb.CommandResponse{
 		Meta: &commonpb.ResponseMeta{Tid: base.GetTid(), Sn: base.GetSn(), Timestamp: protohelpers.Now()},
@@ -144,6 +150,7 @@ func (s *Server) toErrorResponse(base *commonpb.RequestBase, err error) *devicec
 
 func (s *Server) TakeOff(ctx context.Context, req *devicecontrolpb.CoordinateCommandRequest) (*devicecontrolpb.CommandResponse, error) {
 	s.log.Info("TakeOff", "sn", req.Base.GetSn())
+	ctx = withExecution(ctx, req.Base)
 	result, err := s.adapter.TakeOff(ctx, s.mapper.MapTakeOffRequest(req))
 	if err != nil {
 		return s.toErrorResponse(req.Base, err), nil
@@ -153,6 +160,7 @@ func (s *Server) TakeOff(ctx context.Context, req *devicecontrolpb.CoordinateCom
 
 func (s *Server) ReturnToHome(ctx context.Context, req *devicecontrolpb.ReturnToHomeCommandRequest) (*devicecontrolpb.CommandResponse, error) {
 	s.log.Info("ReturnToHome", "sn", req.Base.GetSn())
+	ctx = withExecution(ctx, req.Base)
 	result, err := s.adapter.ReturnToHome(ctx, s.mapper.MapReturnToHomeRequest(req))
 	if err != nil {
 		return s.toErrorResponse(req.Base, err), nil
@@ -162,6 +170,7 @@ func (s *Server) ReturnToHome(ctx context.Context, req *devicecontrolpb.ReturnTo
 
 func (s *Server) GoTo(ctx context.Context, req *devicecontrolpb.CoordinateCommandRequest) (*devicecontrolpb.CommandResponse, error) {
 	s.log.Info("GoTo", "sn", req.Base.GetSn())
+	ctx = withExecution(ctx, req.Base)
 	result, err := s.adapter.GoTo(ctx, s.mapper.MapGoToRequest(req))
 	if err != nil {
 		return s.toErrorResponse(req.Base, err), nil
@@ -171,6 +180,7 @@ func (s *Server) GoTo(ctx context.Context, req *devicecontrolpb.CoordinateComman
 
 func (s *Server) EnterManualControl(ctx context.Context, req *devicecontrolpb.ManualControlCommandRequest) (*devicecontrolpb.CommandResponse, error) {
 	s.log.Info("EnterManualControl", "sn", req.Base.GetSn())
+	ctx = withExecution(ctx, req.Base)
 	result, err := s.adapter.EnterManualControl(ctx, req.Base.GetSn())
 	if err != nil {
 		return s.toErrorResponse(req.Base, err), nil
@@ -180,6 +190,7 @@ func (s *Server) EnterManualControl(ctx context.Context, req *devicecontrolpb.Ma
 
 func (s *Server) ExitManualControl(ctx context.Context, req *devicecontrolpb.ManualControlCommandRequest) (*devicecontrolpb.CommandResponse, error) {
 	s.log.Info("ExitManualControl", "sn", req.Base.GetSn())
+	ctx = withExecution(ctx, req.Base)
 	result, err := s.adapter.ExitManualControl(ctx, req.Base.GetSn())
 	if err != nil {
 		return s.toErrorResponse(req.Base, err), nil
@@ -218,6 +229,7 @@ func (s *Server) ManualControlInput(stream grpc.ClientStreamingServer[devicecont
 
 func (s *Server) LookAt(ctx context.Context, req *devicecontrolpb.LookAtCommandRequest) (*devicecontrolpb.CommandResponse, error) {
 	s.log.Info("LookAt", "sn", req.Base.GetSn())
+	ctx = withExecution(ctx, req.Base)
 	result, err := s.adapter.LookAt(ctx, s.mapper.MapLookAtRequest(req))
 	if err != nil {
 		return s.toErrorResponse(req.Base, err), nil
@@ -227,6 +239,7 @@ func (s *Server) LookAt(ctx context.Context, req *devicecontrolpb.LookAtCommandR
 
 func (s *Server) CapturePhoto(ctx context.Context, req *devicecontrolpb.EmptyCommandRequest) (*devicecontrolpb.CommandResponse, error) {
 	s.log.Info("CapturePhoto", "sn", req.Base.GetSn())
+	ctx = withExecution(ctx, req.Base)
 	result, err := s.adapter.TakePhoto(ctx, s.mapper.MapTakePhotoRequest(req))
 	if err != nil {
 		return s.toErrorResponse(req.Base, err), nil
@@ -236,6 +249,7 @@ func (s *Server) CapturePhoto(ctx context.Context, req *devicecontrolpb.EmptyCom
 
 func (s *Server) EnableGimbalTracking(ctx context.Context, req *devicecontrolpb.ToggleCommandRequest) (*devicecontrolpb.CommandResponse, error) {
 	s.log.Info("EnableGimbalTracking", "sn", req.Base.GetSn())
+	ctx = withExecution(ctx, req.Base)
 	result, err := s.adapter.EnableGimbalTracking(ctx, req.Base.GetSn(), req.Enabled)
 	if err != nil {
 		return s.toErrorResponse(req.Base, err), nil
@@ -273,6 +287,7 @@ func (s *Server) GetDetections(req *detectionpb.DetectionStreamRequest, stream g
 
 func (s *Server) OpenCover(ctx context.Context, req *devicecontrolpb.EmptyCommandRequest) (*devicecontrolpb.CommandResponse, error) {
 	s.log.Info("OpenCover", "sn", req.Base.GetSn())
+	ctx = withExecution(ctx, req.Base)
 	result, err := s.adapter.OpenCover(ctx, req.Base.GetSn())
 	if err != nil {
 		return s.toErrorResponse(req.Base, err), nil
@@ -282,6 +297,7 @@ func (s *Server) OpenCover(ctx context.Context, req *devicecontrolpb.EmptyComman
 
 func (s *Server) CloseCover(ctx context.Context, req *devicecontrolpb.CloseCoverCommandRequest) (*devicecontrolpb.CommandResponse, error) {
 	s.log.Info("CloseCover", "sn", req.Base.GetSn())
+	ctx = withExecution(ctx, req.Base)
 	var force *bool
 	if req.Force != nil {
 		v := req.GetForce()
@@ -296,6 +312,7 @@ func (s *Server) CloseCover(ctx context.Context, req *devicecontrolpb.CloseCover
 
 func (s *Server) StartCharging(ctx context.Context, req *devicecontrolpb.EmptyCommandRequest) (*devicecontrolpb.CommandResponse, error) {
 	s.log.Info("StartCharging", "sn", req.Base.GetSn())
+	ctx = withExecution(ctx, req.Base)
 	result, err := s.adapter.StartCharging(ctx, req.Base.GetSn())
 	if err != nil {
 		return s.toErrorResponse(req.Base, err), nil
@@ -305,6 +322,7 @@ func (s *Server) StartCharging(ctx context.Context, req *devicecontrolpb.EmptyCo
 
 func (s *Server) StopCharging(ctx context.Context, req *devicecontrolpb.EmptyCommandRequest) (*devicecontrolpb.CommandResponse, error) {
 	s.log.Info("StopCharging", "sn", req.Base.GetSn())
+	ctx = withExecution(ctx, req.Base)
 	result, err := s.adapter.StopCharging(ctx, req.Base.GetSn())
 	if err != nil {
 		return s.toErrorResponse(req.Base, err), nil
@@ -314,6 +332,7 @@ func (s *Server) StopCharging(ctx context.Context, req *devicecontrolpb.EmptyCom
 
 func (s *Server) RebootAsset(ctx context.Context, req *devicecontrolpb.EmptyCommandRequest) (*devicecontrolpb.CommandResponse, error) {
 	s.log.Info("RebootAsset", "sn", req.Base.GetSn())
+	ctx = withExecution(ctx, req.Base)
 	result, err := s.adapter.RebootAsset(ctx, req.Base.GetSn())
 	if err != nil {
 		return s.toErrorResponse(req.Base, err), nil
@@ -325,6 +344,7 @@ func (s *Server) RebootAsset(ctx context.Context, req *devicecontrolpb.EmptyComm
 // BootDownSubAsset RPC pair with one Enabled-toggle RPC, same pattern as SetRemoteDebugMode below.
 func (s *Server) BootSubAsset(ctx context.Context, req *devicecontrolpb.ToggleCommandRequest) (*devicecontrolpb.CommandResponse, error) {
 	s.log.Info("BootSubAsset", "sn", req.Base.GetSn(), "enabled", req.Enabled)
+	ctx = withExecution(ctx, req.Base)
 	var result *domains.CommandResult
 	var err error
 	if req.Enabled {
@@ -340,6 +360,7 @@ func (s *Server) BootSubAsset(ctx context.Context, req *devicecontrolpb.ToggleCo
 
 func (s *Server) SetRemoteDebugMode(ctx context.Context, req *devicecontrolpb.ToggleCommandRequest) (*devicecontrolpb.CommandResponse, error) {
 	s.log.Info("SetRemoteDebugMode", "sn", req.Base.GetSn(), "enabled", req.Enabled)
+	ctx = withExecution(ctx, req.Base)
 	var result *domains.CommandResult
 	var err error
 	if req.Enabled {
@@ -355,6 +376,7 @@ func (s *Server) SetRemoteDebugMode(ctx context.Context, req *devicecontrolpb.To
 
 func (s *Server) ChangeAcMode(ctx context.Context, req *devicecontrolpb.ChangeAcModeCommandRequest) (*devicecontrolpb.CommandResponse, error) {
 	s.log.Info("ChangeAcMode", "sn", req.Base.GetSn())
+	ctx = withExecution(ctx, req.Base)
 	result, err := s.adapter.ChangeACMode(ctx, req.Base.GetSn(), req.Mode.String())
 	if err != nil {
 		return s.toErrorResponse(req.Base, err), nil
@@ -364,6 +386,7 @@ func (s *Server) ChangeAcMode(ctx context.Context, req *devicecontrolpb.ChangeAc
 
 func (s *Server) StartLiveStream(ctx context.Context, req *devicecontrolpb.LiveStreamStartCommandRequest) (*devicecontrolpb.CommandResponse, error) {
 	s.log.Info("StartLiveStream", "sn", req.Base.GetSn())
+	ctx = withExecution(ctx, req.Base)
 	result, err := s.adapter.StartLiveStream(ctx, s.mapper.MapStartLiveStreamRequest(req))
 	if err != nil {
 		return s.toErrorResponse(req.Base, err), nil
@@ -373,6 +396,7 @@ func (s *Server) StartLiveStream(ctx context.Context, req *devicecontrolpb.LiveS
 
 func (s *Server) StopLiveStream(ctx context.Context, req *devicecontrolpb.LiveStreamStopCommandRequest) (*devicecontrolpb.CommandResponse, error) {
 	s.log.Info("StopLiveStream", "sn", req.Base.GetSn())
+	ctx = withExecution(ctx, req.Base)
 	result, err := s.adapter.StopLiveStream(ctx, s.mapper.MapStopLiveStreamRequest(req))
 	if err != nil {
 		return s.toErrorResponse(req.Base, err), nil
@@ -382,6 +406,7 @@ func (s *Server) StopLiveStream(ctx context.Context, req *devicecontrolpb.LiveSt
 
 func (s *Server) ChangeLens(ctx context.Context, req *devicecontrolpb.ChangeCameraLensCommandRequest) (*devicecontrolpb.CommandResponse, error) {
 	s.log.Info("ChangeLens", "sn", req.Base.GetSn())
+	ctx = withExecution(ctx, req.Base)
 	result, err := s.adapter.ChangeLens(ctx, s.mapper.MapChangeLensRequest(req))
 	if err != nil {
 		return s.toErrorResponse(req.Base, err), nil
@@ -391,6 +416,7 @@ func (s *Server) ChangeLens(ctx context.Context, req *devicecontrolpb.ChangeCame
 
 func (s *Server) ChangeZoom(ctx context.Context, req *devicecontrolpb.ChangeCameraZoomCommandRequest) (*devicecontrolpb.CommandResponse, error) {
 	s.log.Info("ChangeZoom", "sn", req.Base.GetSn())
+	ctx = withExecution(ctx, req.Base)
 	result, err := s.adapter.ChangeZoom(ctx, s.mapper.MapChangeZoomRequest(req))
 	if err != nil {
 		return s.toErrorResponse(req.Base, err), nil
@@ -545,6 +571,7 @@ func capabilityTargetTypeToProto(t domains.CapabilityTargetType) devicecontrolpb
 
 func (s *Server) PrepareTask(ctx context.Context, req *devicecontrolpb.TaskCommandRequest) (*devicecontrolpb.CommandResponse, error) {
 	s.log.Info("PrepareTask", "sn", req.Base.GetSn(), "taskId", req.TaskId)
+	ctx = withExecution(ctx, req.Base)
 	result, err := s.adapter.PrepareTask(ctx, req.Base.GetSn(), req.TaskId, req.Base.GetTid())
 	if err != nil {
 		return s.toErrorResponse(req.Base, err), nil
@@ -554,6 +581,7 @@ func (s *Server) PrepareTask(ctx context.Context, req *devicecontrolpb.TaskComma
 
 func (s *Server) StartTask(ctx context.Context, req *devicecontrolpb.TaskCommandRequest) (*devicecontrolpb.CommandResponse, error) {
 	s.log.Info("StartTask", "sn", req.Base.GetSn(), "taskId", req.TaskId)
+	ctx = withExecution(ctx, req.Base)
 	result, err := s.adapter.StartTask(ctx, req.Base.GetSn(), req.TaskId, req.Base.GetTid())
 	if err != nil {
 		return s.toErrorResponse(req.Base, err), nil
@@ -563,6 +591,7 @@ func (s *Server) StartTask(ctx context.Context, req *devicecontrolpb.TaskCommand
 
 func (s *Server) StopTask(ctx context.Context, req *devicecontrolpb.TaskCommandRequest) (*devicecontrolpb.CommandResponse, error) {
 	s.log.Warn("StopTask", "sn", req.Base.GetSn(), "taskId", req.TaskId)
+	ctx = withExecution(ctx, req.Base)
 	result, err := s.adapter.StopTask(ctx, req.Base.GetSn(), req.TaskId, req.Base.GetTid())
 	if err != nil {
 		return s.toErrorResponse(req.Base, err), nil
@@ -572,6 +601,7 @@ func (s *Server) StopTask(ctx context.Context, req *devicecontrolpb.TaskCommandR
 
 func (s *Server) PauseTask(ctx context.Context, req *devicecontrolpb.TaskCommandRequest) (*devicecontrolpb.CommandResponse, error) {
 	s.log.Info("PauseTask", "sn", req.Base.GetSn(), "taskId", req.TaskId)
+	ctx = withExecution(ctx, req.Base)
 	result, err := s.adapter.PauseTask(ctx, req.Base.GetSn(), req.TaskId, req.Base.GetTid())
 	if err != nil {
 		return s.toErrorResponse(req.Base, err), nil
@@ -581,6 +611,7 @@ func (s *Server) PauseTask(ctx context.Context, req *devicecontrolpb.TaskCommand
 
 func (s *Server) ResumeTask(ctx context.Context, req *devicecontrolpb.TaskCommandRequest) (*devicecontrolpb.CommandResponse, error) {
 	s.log.Info("ResumeTask", "sn", req.Base.GetSn(), "taskId", req.TaskId)
+	ctx = withExecution(ctx, req.Base)
 	result, err := s.adapter.ResumeTask(ctx, req.Base.GetSn(), req.TaskId, req.Base.GetTid())
 	if err != nil {
 		return s.toErrorResponse(req.Base, err), nil
@@ -590,6 +621,7 @@ func (s *Server) ResumeTask(ctx context.Context, req *devicecontrolpb.TaskComman
 
 func (s *Server) LiveStreamSplitScreen(ctx context.Context, req *devicecontrolpb.ToggleCommandRequest) (*devicecontrolpb.CommandResponse, error) {
 	s.log.Info("LiveStreamSplitScreen", "sn", req.Base.GetSn(), "enabled", req.Enabled)
+	ctx = withExecution(ctx, req.Base)
 	result, err := s.adapter.LiveStreamSplitScreen(ctx, req.Base.GetSn(), req.Enabled)
 	if err != nil {
 		return s.toErrorResponse(req.Base, err), nil
@@ -599,7 +631,7 @@ func (s *Server) LiveStreamSplitScreen(ctx context.Context, req *devicecontrolpb
 
 func (s *Server) SendCustomCommand(ctx context.Context, req *devicecontrolpb.CustomCommandRequest) (*devicecontrolpb.CustomCommandResponse, error) {
 	s.log.Info("SendCustomCommand", "sn", req.Base.GetSn(), "commandId", req.CommandId)
-	result, err := s.adapter.SendCustomCommand(ctx, s.mapper.MapCustomCommandRequest(req))
+	result, err := s.customCommand(withExecution(ctx, req.Base), s.mapper.MapCustomCommandRequest(req))
 	if err != nil {
 		s.log.Error("error processing command", "sn", req.Base.GetSn(), "tid", req.Base.GetTid(), "error", err)
 		hasErr := true
@@ -617,4 +649,21 @@ func (s *Server) SendCustomCommand(ctx context.Context, req *devicecontrolpb.Cus
 		}, nil
 	}
 	return s.toCustomCommandResponse(req.Base, req.CommandId, result), nil
+}
+
+// customCommand runs a command the adapter registered, its text params converted to the published
+// schema first; any other id goes to the adapter's LegacyCustomCommand. An adapter without a
+// registry handles every id in its own SendCustomCommand.
+func (s *Server) customCommand(ctx context.Context, req *domains.CustomCommandRequest) (*domains.CommandResult, error) {
+	ra, ok := s.adapter.(adapter.RegistryAdapter)
+	if !ok {
+		return s.adapter.SendCustomCommand(ctx, req)
+	}
+	if ra.CommandRegistry().Has(req.CommandID) {
+		return ra.CommandRegistry().ExecuteV2(ctx, req)
+	}
+	if legacy, ok := s.adapter.(adapter.LegacyCommandAdapter); ok {
+		return legacy.LegacyCustomCommand(ctx, req)
+	}
+	return domains.NotImplemented(req.CommandID+" is not supported by this adapter", req.SN), nil
 }

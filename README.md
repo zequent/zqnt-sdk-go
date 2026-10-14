@@ -275,7 +275,7 @@ Override any of these methods in your adapter:
 | `GetCapabilities` | Report device capabilities |
 | `PauseTask` / `ResumeTask` | Pause/resume a running task |
 | `LiveStreamSplitScreen` | Toggle livestream split-screen view |
-| `SendCustomCommand` | Vendor/adapter-specific escape hatch for commands with no dedicated RPC |
+| `SendCustomCommand` | 2.x only: runs a registered command; an unregistered id goes to `LegacyCustomCommand` (refused unless the adapter overrides it). v3 `ExecuteCommand` runs registered commands only |
 
 ---
 
