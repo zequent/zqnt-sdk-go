@@ -105,7 +105,11 @@ SDK switches. remote-control serves `EdgeGatewayService`: point the SDK at it wi
 
 - **Params** are validated against the command's input schema before the handler runs; whole
   numbers under an `integer` property arrive as `int64`, every other number as `float64`. A mismatch
-  is `REJECTED` with error code `command.invalid_params` and a message naming each field.
+  is `REJECTED` with error code `command.invalid_params` and a message naming each field. v3 params
+  are validated as sent; on v2 the SDK first converts text the schema does not accept as text
+  (`"13.405"` for a number, `"true"` for a boolean, `"pitch_down"` for the enum value `PITCH_DOWN`),
+  exact conversions only (`schema.ConvertText`). Enum aliases (a DJI name such as `SDR_ONLY` or
+  `IRONBOW1` for a standard value) are not converted: a 2.x platform must send the standard value.
 - **Risk:** every capability carries a `CommandSafety`. A standard id gets the rating of the
   platform's command catalog (`domains.CatalogSafety`, e.g. `flight.takeoff` MOVE, `flight.land`
   CRITICAL); `adapter.WithSafety(...)` / `adapter.WithRisk(domains.CommandRiskCritical)` overrides
