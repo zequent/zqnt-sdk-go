@@ -6,6 +6,7 @@ import (
 	"io"
 	"log/slog"
 	"math"
+	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -28,11 +29,11 @@ const NotSupportedCode = "command.not_supported"
 // ServerV3 implements the v3 edge contract (zqnt.edge.v3.EdgeAdapterService) next to the v2
 // Server, on the same EdgeAdapter.
 //
-// v3 has no per-command RPCs: every command is an ExecuteCommand with a dotted id. A built-in id
-// (flight.takeoff, dock.open_cover, ...) runs the typed EdgeAdapter method that implements it --
-// the method every adapter written for v2 already has -- and anything else goes to
-// SendCustomCommand. An existing adapter therefore answers v3 without a change; it only has to
-// register this server too (RegisterWith).
+// v3 has no per-command RPCs: every command is an ExecuteCommand with a dotted id, and only a
+// command the adapter published runs: a registered one (RegistryAdapter), or for an adapter
+// without a registry a built-in id (flight.takeoff, dock.open_cover, ...) it advertises as
+// available, which runs the typed EdgeAdapter method that implements it. Any other id is refused
+// with NotSupportedCode; free-form commands reach an adapter through 2.x SendCustomCommand only.
 type ServerV3 struct {
 	edgev3.UnimplementedEdgeAdapterServiceServer
 	adapter adapter.EdgeAdapter
@@ -49,6 +50,7 @@ const contractCacheTTL = 30 * time.Second
 type commandContract struct {
 	input      *schema.Schema
 	completion domains.CompletionMode
+	available  bool
 }
 
 type cachedContracts struct {
@@ -230,21 +232,22 @@ func (s *ServerV3) ExecuteCommand(ctx context.Context, req *edgev3.ExecuteComman
 }
 
 // dispatch runs a registered command through the adapter's registry, which validates its params.
-// Anything else is validated against the schema the adapter advertises and goes to the typed
-// method of a built-in id or to SendCustomCommand.
+// An adapter without a registry runs an advertised built-in id on its typed method, validated
+// against the schema it advertises. Anything else is not supported.
 func (s *ServerV3) dispatch(ctx context.Context, run *domains.CustomCommandRequest) (*domains.CommandResult, error) {
-	if ra, ok := s.adapter.(adapter.RegistryAdapter); ok && ra.CommandRegistry().Has(run.CommandID) {
+	if ra, ok := s.adapter.(adapter.RegistryAdapter); ok {
 		return ra.CommandRegistry().Execute(ctx, run)
 	}
-	params, err := s.contract(ctx, run.SN, run.CommandID).input.Prepare(run.Params)
+	contract := s.contract(ctx, run.SN, run.CommandID)
+	if !contract.available || !slices.Contains(BuiltInCommandIDs(), run.CommandID) {
+		return domains.NotImplemented(run.CommandID+" is not supported by this adapter", run.SN), nil
+	}
+	params, err := contract.input.Prepare(run.Params)
 	if err != nil {
 		return domains.Rejected(schema.InvalidParamsCode, run.CommandID+": "+err.Error(), run.SN), nil
 	}
-	run.Params = params
-	if call, ok := builtIn(s.adapter, run.SN, run.TID, run.CommandID, params); ok {
-		return call(ctx)
-	}
-	return s.adapter.SendCustomCommand(ctx, run)
+	call, _ := builtIn(s.adapter, run.SN, run.TID, run.CommandID, params)
+	return call(ctx)
 }
 
 // contract is the command's advertised input schema and completion mode. It never fails the
@@ -265,7 +268,7 @@ func (s *ServerV3) contract(ctx context.Context, sn, commandID string) commandCo
 			if err != nil {
 				s.log.Warn("input schema does not compile; params of this command are not validated", "command", c.Command, "error", err)
 			}
-			cached.commands[c.Command] = commandContract{input: input, completion: c.Completion}
+			cached.commands[c.Command] = commandContract{input: input, completion: c.Completion, available: c.Available}
 		}
 		s.contractMu.Lock()
 		s.contracts[sn] = cached
@@ -431,7 +434,7 @@ func BuiltInCommandIDs() []string {
 // builtIn routes a built-in command id onto the typed EdgeAdapter method that implements it.
 // Params follow the catalog's JSON Schemas (zqnt-protos v3/COMMAND_CATALOG.md), the same as the
 // Java SDK's BuiltInCommandDispatch and the Python SDK's typed dispatch. The second return value
-// is false for an id that is not a built-in, which then goes to SendCustomCommand.
+// is false for an id that is not a built-in.
 func builtIn(a adapter.EdgeAdapter, sn, tid, id string, p map[string]any) (func(context.Context) (*domains.CommandResult, error), bool) {
 	switch id {
 	case "flight.takeoff":

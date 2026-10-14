@@ -2,6 +2,7 @@ package conformance
 
 import (
 	"context"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -42,7 +43,7 @@ func TestAConformingAdapterPasses(t *testing.T) {
 	Run(t, newGoodDrone(events), Options{Events: events})
 }
 
-// legacyDrone breaks every rule once.
+// legacyDrone advertises what only its free-form SendCustomCommand runs, and a broken schema.
 type legacyDrone struct {
 	adapter.UnimplementedEdgeAdapter
 }
@@ -55,28 +56,45 @@ func (legacyDrone) GetCapabilities(_ context.Context, sn string) (*domains.Curre
 	}}, nil
 }
 
-func (legacyDrone) TakeOff(_ context.Context, req *domains.TakeOffRequest) (*domains.CommandResult, error) {
-	return domains.Success("up", req.SN), nil
+func (legacyDrone) SendCustomCommand(_ context.Context, req *domains.CustomCommandRequest) (*domains.CommandResult, error) {
+	return domains.Success("ok", req.SN), nil
 }
 
-func (legacyDrone) SendCustomCommand(_ context.Context, req *domains.CustomCommandRequest) (*domains.CommandResult, error) {
-	if strings.HasPrefix(req.CommandID, "vendor.acme.") {
+// sloppyDrone hides a registered command and never completes the one it accepts.
+type sloppyDrone struct {
+	adapter.Base
+}
+
+func newSloppyDrone() *sloppyDrone {
+	d := &sloppyDrone{}
+	ok := func(_ context.Context, req *domains.CustomCommandRequest) (*domains.CommandResult, error) {
 		return domains.Success("ok", req.SN), nil
 	}
-	return domains.NotImplemented("no", req.SN), nil
+	d.MustRegisterCommand("flight.takeoff", nil, nil, ok)
+	d.MustRegisterCommand("vendor.acme.mission", nil, nil, ok, adapter.WithCompletion(domains.CompletionAsynchronous, ""))
+	return d
+}
+
+func (d *sloppyDrone) GetCapabilities(_ context.Context, sn string) (*domains.CurrentCapabilities, error) {
+	caps := d.Capabilities(sn)
+	caps.Capabilities = slices.DeleteFunc(caps.Capabilities, func(c domains.Capability) bool { return c.Command == "flight.takeoff" })
+	return caps, nil
 }
 
 func TestEveryRuleIsChecked(t *testing.T) {
-	r := Check(legacyDrone{}, Options{Events: &Recorder{}, CompletionTimeout: 50 * time.Millisecond})
+	opts := Options{Events: &Recorder{}, CompletionTimeout: 50 * time.Millisecond}
+	legacy, sloppy := Check(legacyDrone{}, opts), Check(newSloppyDrone(), opts)
 	expect := map[string][]string{
-		"schemas":    r.Schemas,
-		"advertised": r.Advertised,
-		"executable": r.Executable,
-		"completion": r.Completion,
+		"schemas":    legacy.Schemas,
+		"advertised": legacy.Advertised,
+		"free-form":  legacy.Advertised,
+		"executable": sloppy.Executable,
+		"completion": sloppy.Completion,
 	}
 	want := map[string]string{
 		"schemas":    "vendor.acme.spray: input schema does not parse",
 		"advertised": "dock.open_cover is advertised but not executable",
+		"free-form":  "vendor.acme.mission is advertised but not executable",
 		"executable": "flight.takeoff is executable",
 		"completion": "vendor.acme.mission was ACCEPTED",
 	}
