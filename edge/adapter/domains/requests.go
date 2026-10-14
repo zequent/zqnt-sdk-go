@@ -94,8 +94,8 @@ type CustomCommandRequest struct {
 	CommandID string
 	TargetRef *string
 	Params    map[string]any
-	// CommandExecutionID is the platform's id of this run (v3). Report the command's progress and
-	// completion under it; empty on the v2 path, where TID carries it.
+	// CommandExecutionID is the platform's id of this run: v3 command_execution_id, on a 2.x call
+	// RequestBase.external_id. Report the command's progress and completion under it.
 	CommandExecutionID string
 }
 
