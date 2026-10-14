@@ -32,16 +32,46 @@ type RegistryAdapter interface {
 	CommandRegistry() *Registry
 }
 
+// LegacyCommandAdapter takes the 2.x SendCustomCommand ids a RegistryAdapter has not registered.
+// v3 ExecuteCommand never reaches it: v3 runs registered commands only.
+type LegacyCommandAdapter interface {
+	LegacyCustomCommand(ctx context.Context, req *domains.CustomCommandRequest) (*domains.CommandResult, error)
+}
+
+type commandExecutionKey struct{}
+
+// WithCommandExecutionID returns ctx carrying the platform's id of the command run it serves.
+func WithCommandExecutionID(ctx context.Context, id string) context.Context {
+	if id == "" {
+		return ctx
+	}
+	return context.WithValue(ctx, commandExecutionKey{}, id)
+}
+
+// CommandExecutionID is the platform's id of the command run ctx serves, or "".
+func CommandExecutionID(ctx context.Context) string {
+	id, _ := ctx.Value(commandExecutionKey{}).(string)
+	return id
+}
+
 func (b *Base) run(ctx context.Context, sn, tid, id string, params map[string]any) (*domains.CommandResult, error) {
-	return b.Execute(ctx, &domains.CustomCommandRequest{SN: sn, TID: tid, CommandID: id, Params: params})
+	return b.ExecuteV2(ctx, &domains.CustomCommandRequest{SN: sn, TID: tid, CommandID: id, Params: params,
+		CommandExecutionID: CommandExecutionID(ctx)})
 }
 
 func (b *Base) GetCapabilities(_ context.Context, sn string) (*domains.CurrentCapabilities, error) {
 	return b.Capabilities(sn), nil
 }
 
+// SendCustomCommand runs a registered command for a 2.x caller (Registry.ExecuteV2).
 func (b *Base) SendCustomCommand(ctx context.Context, req *domains.CustomCommandRequest) (*domains.CommandResult, error) {
-	return b.Execute(ctx, req)
+	return b.ExecuteV2(ctx, req)
+}
+
+// LegacyCustomCommand refuses a 2.x SendCustomCommand whose id is not registered. Override it to
+// keep accepting free-form commands from 2.x callers.
+func (b *Base) LegacyCustomCommand(_ context.Context, req *domains.CustomCommandRequest) (*domains.CommandResult, error) {
+	return domains.NotImplemented(req.CommandID+" is not supported by this adapter", req.SN), nil
 }
 
 func (b *Base) TakeOff(ctx context.Context, req *domains.TakeOffRequest) (*domains.CommandResult, error) {
@@ -206,4 +236,7 @@ func coordinateParams(c domains.Coordinates) map[string]any {
 	return p
 }
 
-var _ EdgeAdapter = (*Base)(nil)
+var (
+	_ EdgeAdapter          = (*Base)(nil)
+	_ LegacyCommandAdapter = (*Base)(nil)
+)

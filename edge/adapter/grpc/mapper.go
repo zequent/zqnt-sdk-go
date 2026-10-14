@@ -190,9 +190,10 @@ func (m *Mapper) MapCustomCommandRequest(r *devicecontrolpb.CustomCommandRequest
 		return nil
 	}
 	req := &domains.CustomCommandRequest{
-		SN:        r.Base.GetSn(),
-		TID:       r.Base.GetTid(),
-		CommandID: r.CommandId,
+		SN:                 r.Base.GetSn(),
+		TID:                r.Base.GetTid(),
+		CommandID:          r.CommandId,
+		CommandExecutionID: r.Base.GetExternalId(),
 	}
 	if r.Target != nil && r.Target.TargetRef != nil {
 		v := r.Target.GetTargetRef()
