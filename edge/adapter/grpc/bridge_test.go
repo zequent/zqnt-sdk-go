@@ -86,6 +86,17 @@ func TestV3RefusesAnUnregisteredIDEvenWhenTheAdapterTakesFreeFormCommands(t *tes
 	}
 }
 
+func TestV2CapabilitiesAreACurrentSnapshot(t *testing.T) {
+	resp, err := v2Server(newSprayer()).GetCapabilities(context.Background(),
+		&devicecontrolpb.AssetCapabilitiesRequest{Sn: "SN-1"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := resp.GetCapabilities().GetSnapshotState(); got != devicecontrolpb.CapabilitySnapshotState_CAPABILITY_SNAPSHOT_STATE_CURRENT {
+		t.Fatalf("snapshot state = %v", got)
+	}
+}
+
 func TestV2HandsAnUnregisteredIDToLegacyCustomCommand(t *testing.T) {
 	a := newSprayer()
 	resp := sendCustom(t, a, "Start Test", nil)
