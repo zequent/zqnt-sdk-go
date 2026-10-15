@@ -439,10 +439,11 @@ func (s *Server) GetCapabilities(ctx context.Context, req *devicecontrolpb.Asset
 
 	return &devicecontrolpb.AssetCapabilitiesResponse{
 		Capabilities: &devicecontrolpb.AssetCapabilities{
-			AssetSn:      caps.SN,
-			AssetType:    caps.AssetType,
-			Capabilities: CapabilitiesV2(caps, s.log),
-			Timestamp:    protohelpers.Now(),
+			AssetSn:       caps.SN,
+			AssetType:     caps.AssetType,
+			Capabilities:  CapabilitiesV2(caps, s.log),
+			Timestamp:     protohelpers.Now(),
+			SnapshotState: devicecontrolpb.CapabilitySnapshotState_CAPABILITY_SNAPSHOT_STATE_CURRENT,
 		},
 	}, nil
 }
