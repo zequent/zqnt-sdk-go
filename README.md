@@ -435,10 +435,28 @@ alerts, err := telemetry.New(conn).WatchAlerts(ctx, nil,
 alert, err := alerts.Recv() // alert.GetAlert(): asset, severity, a stable code such as "dock.rain", message, details
 ```
 
+### Live video streams (3.x): `stream`
+
+```go
+conn, err := cfg.Dial(cfg.LiveData)
+streams, err := stream.New(conn).ListLiveStreams(ctx)
+for _, s := range streams {
+	fmt.Println(s.GetAsset().GetSn(), s.GetPath(), s.GetSince().AsTime(), s.GetViewers())
+}
+```
+
+`ListLiveStreams` returns every stream of the caller's organization that is live right now: the
+asset publishing it (for a docked aircraft, the aircraft), the media server's path, since when it
+is received and how many sessions read it. It is a client of `zqnt.stream.v3.LiveStreamService` on
+live-data (`LIVE_DATA_SERVICE_*`). The error keeps its gRPC status: `PermissionDenied` when the
+organization's license does not include live streams, `Unavailable` when the platform has no
+current answer from the media server.
+
 ### Packages
 
 - `control/` — the 3.x command API and manual control above.
 - `telemetry/` — 3.x telemetry samples and source status, detections and alerts.
+- `stream/` — 3.x list of the live video streams.
 - `connector/` — asset lookup, the Skill Registry, scheduler CRUD, operational policies and
   technical config (2.x contract, still served).
 - `missionautonomy/` — Applications and the SkillExecution lifecycle (2.x contract, still served).
