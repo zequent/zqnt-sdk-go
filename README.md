@@ -5,7 +5,7 @@ One Go module, `github.com/zequent/zqnt-sdk-go/v3`, with two SDKs released toget
 | Packages | Import | For |
 |---|---|---|
 | [`edge/...`](edge) | `github.com/zequent/zqnt-sdk-go/v3/edge` (package `edgesdk`), `.../edge/adapter`, ... | adapters that connect devices to the platform |
-| [`client/...`](client) | `github.com/zequent/zqnt-sdk-go/v3/client/control`, `.../client/telemetry`, ... | applications that use the platform |
+| [`client/...`](client) | `github.com/zequent/zqnt-sdk-go/v3/client/control`, `.../client/telemetry`, `.../client/streams`, ... | applications that use the platform |
 
 Both build on the public API module `github.com/zequent/zqnt-api/go/v3` ([zqnt-api](https://github.com/zequent/zqnt-api)).
 One module rather than two: edge and client share one dependency set and one version, a consumer
@@ -435,10 +435,28 @@ alerts, err := telemetry.New(conn).WatchAlerts(ctx, nil,
 alert, err := alerts.Recv() // alert.GetAlert(): asset, severity, a stable code such as "dock.rain", message, details
 ```
 
+### Live video streams (3.x): `streams`
+
+```go
+conn, err := cfg.Dial(cfg.LiveData)
+live, err := streams.New(conn).ListLiveStreams(ctx)
+for _, stream := range live {
+	fmt.Println(stream.GetAsset().GetSn(), stream.GetPath(), stream.GetSince().AsTime(), stream.GetViewers())
+}
+```
+
+`ListLiveStreams` is a client of `zqnt.stream.v3.LiveStreamService` on live-data
+(`LIVE_DATA_SERVICE_*`), called with the client credential. It returns every live video stream of
+the caller's organization right now, as the media server sees it, whatever started it: the
+publishing asset (for a docked aircraft the aircraft itself), the media server path, `since` (when
+the media server started receiving it) and the number of viewers. When the platform has no current
+answer from the media server the error carries `codes.Unavailable` (`status.Code(err)`); ask again.
+
 ### Packages
 
 - `control/` — the 3.x command API and manual control above.
 - `telemetry/` — 3.x telemetry samples and source status, detections and alerts.
+- `streams/` — 3.x live video streams of the organization.
 - `connector/` — asset lookup, the Skill Registry, scheduler CRUD, operational policies and
   technical config (2.x contract, still served).
 - `missionautonomy/` — Applications and the SkillExecution lifecycle (2.x contract, still served).
