@@ -301,9 +301,16 @@ Both directions are authenticated (package `auth`):
 - `ZQNT_EDGE_TOKEN` / `WithEdgeToken` -- the adapter's edge credential, sent on every call into the
   platform. Issue one in the console (Edge Credentials, `POST /api/admin-console/edge-credentials`)
   or with `core/scripts/mint-edge-credential.py`. The platform refuses calls without it.
+- `ZQNT_PLATFORM_KEYS_URL` / `WithPlatformKeysURL` -- where the platform publishes the keys it
+  signs commands with, as a JWK set: `http://<admin-console>:8005/api/admin-console/auth/service-keys`.
+  The adapter loads it at startup (retrying until the platform answers), refreshes it every five
+  minutes and when a command names a key it does not know yet (at most every 30 seconds), so the
+  platform can rotate its keys without touching the adapter. A command signed with a key that is not
+  in the set is refused.
 - `ZQNT_PLATFORM_PUBLIC_KEY` (alias `SERVICE_AUTH_PUBLIC_KEY`) / `WithPlatformPublicKey` -- the
-  platform's service public key. The adapter's server refuses every command not signed with it;
-  without the key it refuses everything.
+  platform's static service public key, for commands that name no key (a platform that keeps its
+  keys in the environment). Without it such commands are checked against the set's key without kid.
+- With neither of the two the adapter refuses every command.
 - `ZQNT_EDGE_AUTH_DISABLED=true` / `WithoutPlatformAuth()` -- accept unauthenticated commands. Local
   SITL/simulators only.
 
