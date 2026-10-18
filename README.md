@@ -459,11 +459,43 @@ live-data (`LIVE_DATA_SERVICE_*`). The error keeps its gRPC status: `PermissionD
 organization's license does not include live streams, `Unavailable` when the platform has no
 current answer from the media server.
 
+### Simulating an Application (3.x): `simulation`
+
+```go
+conn, err := cfg.Dial(cfg.MissionAutonomy)
+battery := 18.0
+trace, err := simulation.New(conn).Simulate(ctx, &simulationv3.StartSimulationRequest{
+	ApplicationId: applicationID,
+	Nodes: []*simulationv3.NodeScenario{{
+		CommandId: "flight.takeoff",
+		Outcome:   simulationv3.NodeOutcome_NODE_OUTCOME_FAILURE,
+		ErrorCode: "flight.not_airborne",
+	}},
+	Fleet: []*simulationv3.VirtualAsset{{Sn: "DRONE-1", BatteryPercent: &battery}},
+}, time.Second, 2*time.Minute)
+for _, step := range trace.GetSteps() {
+	fmt.Println(step.GetNodeId(), step.GetStatus(), step.GetSimulatedBy())
+}
+```
+
+`simulation` runs an Application on a virtual fleet through
+`zqnt.application_simulation.v3.SimulationService` on mission-autonomy (`MISSION_AUTONOMY_SERVICE_*`):
+the platform's engine runs the graph, every command is answered from its contract and the
+request's `NodeScenario`s (success, failure, timeout, delay, fixed output, approval answer), and
+nothing reaches a real asset. `StartSimulation` returns the execution id and status (a request
+without `context.idempotency_key` gets a new one), `SimulationTrace` the path the run took so far,
+`CancelSimulation` stops it. `WaitForSimulation(ctx, executionID, interval, timeout)` polls the trace
+until `SUCCEEDED`, `FAILED`, `CANCELLED` or `TIMED_OUT` (`simulation.Final`) and returns it; when
+`timeout` elapses first it returns `simulation.ErrWaitTimedOut` and the run keeps going. `Simulate`
+does both. Errors keep their gRPC status: `InvalidArgument` for an unusable scenario or fleet,
+`NotFound` for an Application or run of another organization.
+
 ### Packages
 
 - `control/` — the 3.x command API and manual control above.
 - `telemetry/` — 3.x telemetry samples and source status, detections and alerts.
 - `stream/` — 3.x list of the live video streams.
+- `simulation/` — 3.x simulated runs of an Application on a virtual fleet and their traces.
 - `connector/` — asset lookup, the Skill Registry, scheduler CRUD, operational policies and
   technical config (2.x contract, still served).
 - `missionautonomy/` — Applications and the SkillExecution lifecycle (2.x contract, still served).
