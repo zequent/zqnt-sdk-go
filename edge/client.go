@@ -49,6 +49,7 @@ type EdgeClient struct {
 	cfg           *config
 	adapterServer *adaptergrpc.Server
 	grpcServer    *grpc.Server
+	guard         *auth.Guard
 	liveData      *livedata.ServiceImpl
 	connectorSvc  *connector.ServiceImpl
 	missionSvc    *missionautonomy.ServiceImpl
@@ -72,7 +73,8 @@ type EdgeClient struct {
 //
 // The backend connection is plaintext; every call carries the adapter's edge credential
 // (ZQNT_EDGE_TOKEN / [WithEdgeToken]), and the adapter's own server only accepts commands signed
-// by the platform (ZQNT_PLATFORM_PUBLIC_KEY / [WithPlatformPublicKey]). See package auth.
+// by the platform (ZQNT_PLATFORM_KEYS_URL / [WithPlatformKeysURL], ZQNT_PLATFORM_PUBLIC_KEY /
+// [WithPlatformPublicKey]). See package auth.
 func NewEdgeClient(endpoint, sn string, edgeAdapter adapter.EdgeAdapter, opts ...Option) (*EdgeClient, error) {
 	cfg := defaultConfig(endpoint, sn)
 	for _, o := range opts {
@@ -93,12 +95,6 @@ func NewEdgeClient(endpoint, sn string, edgeAdapter adapter.EdgeAdapter, opts ..
 	} else {
 		log.Warn("no ZQNT_EDGE_TOKEN: calls to the platform carry no credential and will be refused " +
 			"(issue one in the console under Edge Credentials)")
-	}
-
-	// Only the platform may command the device: every inbound call must carry its service token.
-	guard, err := auth.NewGuard(cfg.auth, log)
-	if err != nil {
-		return nil, fmt.Errorf("edge-go-sdk: %w", err)
 	}
 
 	conn, err := grpc.NewClient(endpoint, dialOpts...)
@@ -159,6 +155,16 @@ func NewEdgeClient(endpoint, sn string, edgeAdapter adapter.EdgeAdapter, opts ..
 	connSvc := connector.NewServiceImpl(connectorpb.NewConnectorServiceClient(connectorConn), log)
 	maSvc := missionautonomy.NewServiceImpl(missionautonomypb.NewMissionAutonomyServiceClient(missionConn), log)
 
+	// Only the platform may command the device: every inbound call must carry its service token.
+	guard, err := auth.NewGuard(cfg.auth, log)
+	if err != nil {
+		_ = conn.Close()
+		for _, c := range extraConns {
+			_ = c.Close()
+		}
+		return nil, fmt.Errorf("edge-go-sdk: %w", err)
+	}
+
 	// Build the inbound gRPC server for EdgeAdapterService.
 	grpcSrv := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(guard.UnaryServerInterceptor()),
@@ -173,6 +179,7 @@ func NewEdgeClient(endpoint, sn string, edgeAdapter adapter.EdgeAdapter, opts ..
 		cfg:           cfg,
 		adapterServer: adapterSrv,
 		grpcServer:    grpcSrv,
+		guard:         guard,
 		liveData:      ldSvc,
 		connectorSvc:  connSvc,
 		missionSvc:    maSvc,
@@ -318,6 +325,7 @@ func (c *EdgeClient) Shutdown(ctx context.Context) error {
 	c.stopOnce.Do(func() { close(c.stop) })
 
 	c.grpcServer.GracefulStop()
+	c.guard.Close()
 
 	if err := c.liveData.Shutdown(ctx); err != nil {
 		c.cfg.logger.Error("error shutting down live-data service", "error", err)

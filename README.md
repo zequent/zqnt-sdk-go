@@ -105,7 +105,11 @@ SDK switches. remote-control serves `EdgeGatewayService`: point the SDK at it wi
 
 - **Params** are validated against the command's input schema before the handler runs; whole
   numbers under an `integer` property arrive as `int64`, every other number as `float64`. A mismatch
-  is `REJECTED` with error code `command.invalid_params` and a message naming each field.
+  is `REJECTED` with error code `command.invalid_params` and a message naming each field. v3 params
+  are validated as sent; on v2 the SDK first converts text the schema does not accept as text
+  (`"13.405"` for a number, `"true"` for a boolean, `"pitch_down"` for the enum value `PITCH_DOWN`),
+  exact conversions only (`schema.ConvertText`). Enum aliases (a DJI name such as `SDR_ONLY` or
+  `IRONBOW1` for a standard value) are not converted: a 2.x platform must send the standard value.
 - **Risk:** every capability carries a `CommandSafety`. A standard id gets the rating of the
   platform's command catalog (`domains.CatalogSafety`, e.g. `flight.takeoff` MOVE, `flight.land`
   CRITICAL); `adapter.WithSafety(...)` / `adapter.WithRisk(domains.CommandRiskCritical)` overrides
@@ -275,7 +279,7 @@ Override any of these methods in your adapter:
 | `GetCapabilities` | Report device capabilities |
 | `PauseTask` / `ResumeTask` | Pause/resume a running task |
 | `LiveStreamSplitScreen` | Toggle livestream split-screen view |
-| `SendCustomCommand` | Vendor/adapter-specific escape hatch for commands with no dedicated RPC |
+| `SendCustomCommand` | 2.x only: runs a registered command; an unregistered id goes to `LegacyCustomCommand` (refused unless the adapter overrides it). v3 `ExecuteCommand` runs registered commands only |
 
 ---
 
@@ -297,9 +301,16 @@ Both directions are authenticated (package `auth`):
 - `ZQNT_EDGE_TOKEN` / `WithEdgeToken` -- the adapter's edge credential, sent on every call into the
   platform. Issue one in the console (Edge Credentials, `POST /api/admin-console/edge-credentials`)
   or with `core/scripts/mint-edge-credential.py`. The platform refuses calls without it.
+- `ZQNT_PLATFORM_KEYS_URL` / `WithPlatformKeysURL` -- where the platform publishes the keys it
+  signs commands with, as a JWK set: `http://<admin-console>:8005/api/admin-console/auth/service-keys`.
+  The adapter loads it at startup (retrying until the platform answers), refreshes it every five
+  minutes and when a command names a key it does not know yet (at most every 30 seconds), so the
+  platform can rotate its keys without touching the adapter. A command signed with a key that is not
+  in the set is refused.
 - `ZQNT_PLATFORM_PUBLIC_KEY` (alias `SERVICE_AUTH_PUBLIC_KEY`) / `WithPlatformPublicKey` -- the
-  platform's service public key. The adapter's server refuses every command not signed with it;
-  without the key it refuses everything.
+  platform's static service public key, for commands that name no key (a platform that keeps its
+  keys in the environment). Without it such commands are checked against the set's key without kid.
+- With neither of the two the adapter refuses every command.
 - `ZQNT_EDGE_AUTH_DISABLED=true` / `WithoutPlatformAuth()` -- accept unauthenticated commands. Local
   SITL/simulators only.
 
@@ -431,10 +442,60 @@ alerts, err := telemetry.New(conn).WatchAlerts(ctx, nil,
 alert, err := alerts.Recv() // alert.GetAlert(): asset, severity, a stable code such as "dock.rain", message, details
 ```
 
+### Live video streams (3.x): `stream`
+
+```go
+conn, err := cfg.Dial(cfg.LiveData)
+streams, err := stream.New(conn).ListLiveStreams(ctx)
+for _, s := range streams {
+	fmt.Println(s.GetAsset().GetSn(), s.GetPath(), s.GetSince().AsTime(), s.GetViewers())
+}
+```
+
+`ListLiveStreams` returns every stream of the caller's organization that is live right now: the
+asset publishing it (for a docked aircraft, the aircraft), the media server's path, since when it
+is received and how many sessions read it. It is a client of `zqnt.stream.v3.LiveStreamService` on
+live-data (`LIVE_DATA_SERVICE_*`). The error keeps its gRPC status: `PermissionDenied` when the
+organization's license does not include live streams, `Unavailable` when the platform has no
+current answer from the media server.
+
+### Simulating an Application (3.x): `simulation`
+
+```go
+conn, err := cfg.Dial(cfg.MissionAutonomy)
+battery := 18.0
+trace, err := simulation.New(conn).Simulate(ctx, &simulationv3.StartSimulationRequest{
+	ApplicationId: applicationID,
+	Nodes: []*simulationv3.NodeScenario{{
+		CommandId: "flight.takeoff",
+		Outcome:   simulationv3.NodeOutcome_NODE_OUTCOME_FAILURE,
+		ErrorCode: "flight.not_airborne",
+	}},
+	Fleet: []*simulationv3.VirtualAsset{{Sn: "DRONE-1", BatteryPercent: &battery}},
+}, time.Second, 2*time.Minute)
+for _, step := range trace.GetSteps() {
+	fmt.Println(step.GetNodeId(), step.GetStatus(), step.GetSimulatedBy())
+}
+```
+
+`simulation` runs an Application on a virtual fleet through
+`zqnt.application_simulation.v3.SimulationService` on mission-autonomy (`MISSION_AUTONOMY_SERVICE_*`):
+the platform's engine runs the graph, every command is answered from its contract and the
+request's `NodeScenario`s (success, failure, timeout, delay, fixed output, approval answer), and
+nothing reaches a real asset. `StartSimulation` returns the execution id and status (a request
+without `context.idempotency_key` gets a new one), `SimulationTrace` the path the run took so far,
+`CancelSimulation` stops it. `WaitForSimulation(ctx, executionID, interval, timeout)` polls the trace
+until `SUCCEEDED`, `FAILED`, `CANCELLED` or `TIMED_OUT` (`simulation.Final`) and returns it; when
+`timeout` elapses first it returns `simulation.ErrWaitTimedOut` and the run keeps going. `Simulate`
+does both. Errors keep their gRPC status: `InvalidArgument` for an unusable scenario or fleet,
+`NotFound` for an Application or run of another organization.
+
 ### Packages
 
 - `control/` — the 3.x command API and manual control above.
 - `telemetry/` — 3.x telemetry samples and source status, detections and alerts.
+- `stream/` — 3.x list of the live video streams.
+- `simulation/` — 3.x simulated runs of an Application on a virtual fleet and their traces.
 - `connector/` — asset lookup, the Skill Registry, scheduler CRUD, operational policies and
   technical config (2.x contract, still served).
 - `missionautonomy/` — Applications and the SkillExecution lifecycle (2.x contract, still served).
