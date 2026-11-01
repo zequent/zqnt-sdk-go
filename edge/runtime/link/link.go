@@ -36,6 +36,13 @@ type Driver interface {
 	Neighbors() []Neighbor
 }
 
+// Handshaker is implemented by drivers that open connections of their own, such as an IP
+// session: the frame the handshake function returns goes out first on every new connection,
+// before any frame handed to Send.
+type Handshaker interface {
+	SetHandshake(handshake func() ([]byte, error))
+}
+
 // SendMeta says where and how a frame goes.
 type SendMeta struct {
 	// To is the destination in the driver's address form; empty broadcasts where the link can.
