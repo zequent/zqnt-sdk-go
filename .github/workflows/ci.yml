@@ -9,7 +9,7 @@ on:
       - '**/docker-compose*.yml'
       - '.github/dependabot.yml'
   push:
-    branches: [main, feature/v3-agentic]
+    branches: ["main", "feature/r*-sprint*"]
 
 # Pushes get a group of their own, so none of them is ever cancelled or dropped.
 concurrency:
