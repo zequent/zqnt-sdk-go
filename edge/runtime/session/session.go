@@ -43,8 +43,11 @@ type Handler func(ctx context.Context, frame *edgelinkv3.DownlinkFrame) error
 
 // Config configures a session.
 type Config struct {
-	NodeID         string
-	AssetSNs       []string
+	NodeID   string
+	AssetSNs []string
+	// Assets, when set, is read for every Hello and replaces AssetSNs, so assets that attach while
+	// the node runs are announced on the next session.
+	Assets         func() []string
 	RuntimeVersion string
 	// LinkKind is reported in Hello, e.g. "ip-session".
 	LinkKind string
@@ -286,7 +289,7 @@ func (s *Session) hello() ([]byte, error) {
 		MonotonicMs:    uint64(time.Since(s.start).Milliseconds()),
 		Wallclock:      timestamppb.New(s.cfg.Clock.Local()),
 		Encodings:      s.cfg.Encodings,
-		AssetSns:       s.cfg.AssetSNs,
+		AssetSns:       s.assets(),
 		LinkKind:       s.cfg.LinkKind,
 		RuntimeVersion: s.cfg.RuntimeVersion,
 		DownlinkAcked:  s.cfg.Store.DownlinkAck(),
@@ -302,6 +305,13 @@ func (s *Session) hello() ([]byte, error) {
 		}
 	}
 	return proto.Marshal(&edgelinkv3.UplinkFrame{Frame: &edgelinkv3.UplinkFrame_Hello{Hello: h}})
+}
+
+func (s *Session) assets() []string {
+	if s.cfg.Assets != nil {
+		return s.cfg.Assets()
+	}
+	return s.cfg.AssetSNs
 }
 
 func (s *Session) sendHello(ctx context.Context) {
