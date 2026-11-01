@@ -258,13 +258,28 @@ func (r *Registry) Capabilities(sn string) *domains.CurrentCapabilities {
 // unregistered id is not implemented; params that do not match are rejected with
 // schema.InvalidParamsCode before the handler runs.
 func (r *Registry) Execute(ctx context.Context, req *domains.CustomCommandRequest) (*domains.CommandResult, error) {
+	return r.execute(ctx, req, false)
+}
+
+// ExecuteV2 is Execute for a 2.x caller, which sends numbers, booleans and enum values as text:
+// the params are converted to the types the input schema declares (schema.ConvertText) before
+// they are validated.
+func (r *Registry) ExecuteV2(ctx context.Context, req *domains.CustomCommandRequest) (*domains.CommandResult, error) {
+	return r.execute(ctx, req, true)
+}
+
+func (r *Registry) execute(ctx context.Context, req *domains.CustomCommandRequest, convertText bool) (*domains.CommandResult, error) {
 	r.mu.RLock()
 	cmd, ok := r.commands[req.CommandID]
 	r.mu.RUnlock()
 	if !ok {
 		return domains.NotImplemented(req.CommandID+" is not supported by this adapter", req.SN), nil
 	}
-	params, err := cmd.input.Prepare(req.Params)
+	params := req.Params
+	if convertText {
+		params = cmd.input.ConvertText(params)
+	}
+	params, err := cmd.input.Prepare(params)
 	if err != nil {
 		return domains.Rejected(schema.InvalidParamsCode, req.CommandID+": "+err.Error(), req.SN), nil
 	}

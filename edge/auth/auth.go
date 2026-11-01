@@ -7,26 +7,25 @@
 //     connection to connector / live-data / mission-autonomy attaches it ([BearerCredentials]).
 //
 //   - Platform -> adapter: the platform signs a short-lived service token (audience zqnt-edge) for
-//     every command. The adapter's server verifies it with the platform's service public key
-//     (ZQNT_PLATFORM_PUBLIC_KEY, alias SERVICE_AUTH_PUBLIC_KEY) and refuses everything else
-//     ([UnaryServerInterceptor], [StreamServerInterceptor]).
+//     every command. The adapter's server verifies it with the platform's published signing keys
+//     (ZQNT_PLATFORM_KEYS_URL, core's JWK set; the token's kid names the key, see [KeySet]) and/or
+//     the static service public key (ZQNT_PLATFORM_PUBLIC_KEY, alias SERVICE_AUTH_PUBLIC_KEY, for
+//     tokens without kid), and refuses everything else ([UnaryServerInterceptor],
+//     [StreamServerInterceptor]).
 //
 // ZQNT_EDGE_AUTH_DISABLED=true turns the inbound check off -- local SITL/simulators only. Without a
-// public key and without that switch every command is refused (fail closed).
+// key set URL, without a public key and without that switch every command is refused (fail closed).
 //
-// Token contract (must match core's ServiceTokens.java): compact JWS, alg EdDSA (Ed25519),
-// iss "zqnt-service", aud "zqnt-edge", scope contains "platform", exp in the future.
+// Token contract (must match core's ServiceTokens.java): compact JWS, alg EdDSA (Ed25519), optional
+// kid "<key>:v<n>", iss "zqnt-service", aud "zqnt-edge", scope contains "platform", exp in the future.
 package auth
 
 import (
 	"context"
 	"crypto/ed25519"
-	"crypto/x509"
 	"encoding/base64"
 	"encoding/json"
-	"encoding/pem"
 	"errors"
-	"fmt"
 	"log/slog"
 	"os"
 	"strings"
@@ -52,6 +51,9 @@ type Config struct {
 	// PlatformPublicKey verifies the platform's commands (ZQNT_PLATFORM_PUBLIC_KEY or
 	// SERVICE_AUTH_PUBLIC_KEY): base64 DER (SubjectPublicKeyInfo) or PEM.
 	PlatformPublicKey string
+	// PlatformKeysURL is where the platform publishes its signing keys as a JWK set
+	// (ZQNT_PLATFORM_KEYS_URL, e.g. http://admin-console:8005/api/admin-console/auth/service-keys).
+	PlatformKeysURL string
 	// Disabled skips the inbound check (ZQNT_EDGE_AUTH_DISABLED=true). Local SITL only.
 	Disabled bool
 }
@@ -62,41 +64,43 @@ func FromEnv() Config {
 	if key == "" {
 		key = os.Getenv("SERVICE_AUTH_PUBLIC_KEY")
 	}
+	cfg := Config{
+		EdgeToken:         os.Getenv("ZQNT_EDGE_TOKEN"),
+		PlatformPublicKey: key,
+		PlatformKeysURL:   strings.TrimSpace(os.Getenv("ZQNT_PLATFORM_KEYS_URL")),
+	}
 	switch strings.ToLower(strings.TrimSpace(os.Getenv("ZQNT_EDGE_AUTH_DISABLED"))) {
 	case "1", "true", "yes", "on":
-		return Config{EdgeToken: os.Getenv("ZQNT_EDGE_TOKEN"), PlatformPublicKey: key, Disabled: true}
+		cfg.Disabled = true
 	}
-	return Config{EdgeToken: os.Getenv("ZQNT_EDGE_TOKEN"), PlatformPublicKey: key}
+	return cfg
 }
 
 // Verifier checks the service token the platform puts on every call into the adapter.
 type Verifier struct {
-	key ed25519.PublicKey
-	now func() time.Time
+	keys Keys
+	now  func() time.Time
 }
 
-// NewVerifier parses the platform's Ed25519 public key.
+// NewVerifier verifies tokens without kid with the platform's Ed25519 public key.
 func NewVerifier(publicKey string) (*Verifier, error) {
-	value := strings.TrimSpace(publicKey)
-	var der []byte
-	if block, _ := pem.Decode([]byte(value)); block != nil {
-		der = block.Bytes
-	} else {
-		decoded, err := base64.StdEncoding.DecodeString(value)
-		if err != nil {
-			return nil, fmt.Errorf("platform public key is not base64: %w", err)
-		}
-		der = decoded
-	}
-	parsed, err := x509.ParsePKIXPublicKey(der)
+	key, err := ParsePublicKey(publicKey)
 	if err != nil {
-		return nil, fmt.Errorf("platform public key: %w", err)
+		return nil, err
 	}
-	key, ok := parsed.(ed25519.PublicKey)
-	if !ok {
-		return nil, errors.New("platform public key is not an Ed25519 key")
-	}
-	return &Verifier{key: key, now: time.Now}, nil
+	return NewKeysVerifier(StaticKey{key: key}), nil
+}
+
+// NewKeysVerifier verifies tokens with the keys keys resolves, typically a [KeySet].
+func NewKeysVerifier(keys Keys) *Verifier {
+	return &Verifier{keys: keys, now: time.Now}
+}
+
+// Claims is what a verified platform token asserts.
+type Claims struct {
+	Subject        string
+	OrganizationID string
+	Scope          []string
 }
 
 type claims struct {
@@ -104,75 +108,83 @@ type claims struct {
 	Sub   string   `json:"sub"`
 	Aud   string   `json:"aud"`
 	Scope []string `json:"scope"`
+	OrgID string   `json:"org_id"`
 	Exp   *int64   `json:"exp"`
 	Iat   *int64   `json:"iat"`
 }
 
-// Verify returns the token's subject, or why the token is refused.
-func (v *Verifier) Verify(token string) (string, error) {
+// Verify returns what the token asserts, or why it is refused.
+func (v *Verifier) Verify(token string) (Claims, error) {
 	parts := strings.Split(token, ".")
 	if len(parts) != 3 {
-		return "", errors.New("token must be a compact JWS")
+		return Claims{}, errors.New("token must be a compact JWS")
 	}
 	decode := base64.RawURLEncoding.DecodeString
 	headerJSON, err := decode(parts[0])
 	if err != nil {
-		return "", errors.New("token is not well-formed")
+		return Claims{}, errors.New("token is not well-formed")
 	}
 	payloadJSON, err := decode(parts[1])
 	if err != nil {
-		return "", errors.New("token is not well-formed")
+		return Claims{}, errors.New("token is not well-formed")
 	}
 	signature, err := decode(parts[2])
 	if err != nil {
-		return "", errors.New("token is not well-formed")
+		return Claims{}, errors.New("token is not well-formed")
 	}
 	var header struct {
 		Alg string `json:"alg"`
+		Kid string `json:"kid"`
 	}
 	if json.Unmarshal(headerJSON, &header) != nil || header.Alg != "EdDSA" {
-		return "", errors.New("only EdDSA tokens are accepted")
+		return Claims{}, errors.New("only EdDSA tokens are accepted")
 	}
-	if !ed25519.Verify(v.key, []byte(parts[0]+"."+parts[1]), signature) {
-		return "", errors.New("token signature is invalid")
+	key, err := v.keys.Key(header.Kid)
+	if err != nil {
+		return Claims{}, err
+	}
+	if !ed25519.Verify(key, []byte(parts[0]+"."+parts[1]), signature) {
+		return Claims{}, errors.New("token signature is invalid")
 	}
 	var c claims
 	if json.Unmarshal(payloadJSON, &c) != nil {
-		return "", errors.New("token is not well-formed")
+		return Claims{}, errors.New("token is not well-formed")
 	}
 	if c.Iss != Issuer {
-		return "", errors.New("unexpected token issuer")
+		return Claims{}, errors.New("unexpected token issuer")
 	}
 	if c.Aud != AudienceEdge {
-		return "", errors.New("token is not meant for an edge adapter")
+		return Claims{}, errors.New("token is not meant for an edge adapter")
 	}
 	platform := false
 	for _, s := range c.Scope {
 		platform = platform || s == ScopePlatform
 	}
 	if !platform {
-		return "", errors.New("token is not a platform service token")
+		return Claims{}, errors.New("token is not a platform service token")
 	}
 	now := v.now()
 	if c.Exp == nil || time.Unix(*c.Exp, 0).Add(clockSkew).Before(now) {
-		return "", errors.New("token is expired")
+		return Claims{}, errors.New("token is expired")
 	}
 	if c.Iat != nil && time.Unix(*c.Iat, 0).Add(-clockSkew).After(now) {
-		return "", errors.New("token is issued in the future")
+		return Claims{}, errors.New("token is issued in the future")
 	}
-	return c.Sub, nil
+	return Claims{Subject: c.Sub, OrganizationID: c.OrgID, Scope: c.Scope}, nil
 }
 
 // Guard decides whether an inbound call may proceed.
 type Guard struct {
 	disabled      bool
 	verifier      *Verifier
+	keySet        *KeySet
 	misconfigured string
 	log           *slog.Logger
 }
 
-// NewGuard builds the inbound check from cfg. A missing key is not an error: the guard then
-// refuses every call and says why, so a misconfigured adapter fails closed and visibly.
+// NewGuard builds the inbound check from cfg. Missing keys are not an error: the guard then
+// refuses every call and says why, so a misconfigured adapter fails closed and visibly. With a key
+// set URL the guard loads the platform's keys in the background; [Guard.Close] stops that.
 func NewGuard(cfg Config, log *slog.Logger) (*Guard, error) {
 	if log == nil {
 		log = slog.Default()
@@ -182,18 +194,38 @@ func NewGuard(cfg Config, log *slog.Logger) (*Guard, error) {
 	case cfg.Disabled:
 		log.Warn("ZQNT_EDGE_AUTH_DISABLED is set: this adapter accepts commands from ANYONE who can reach " +
 			"its port. Local SITL/simulator use only.")
-	case cfg.PlatformPublicKey == "":
-		g.misconfigured = "ZQNT_PLATFORM_PUBLIC_KEY is not configured"
-		log.Error("ZQNT_PLATFORM_PUBLIC_KEY is not set: every platform command will be refused. Set it to the " +
-			"platform's SERVICE_AUTH_PUBLIC_KEY (or ZQNT_EDGE_AUTH_DISABLED=true for local SITL).")
-	default:
+	case cfg.PlatformKeysURL == "" && cfg.PlatformPublicKey == "":
+		g.misconfigured = "neither ZQNT_PLATFORM_KEYS_URL nor ZQNT_PLATFORM_PUBLIC_KEY is configured"
+		log.Error("ZQNT_PLATFORM_KEYS_URL and ZQNT_PLATFORM_PUBLIC_KEY are not set: every platform command will " +
+			"be refused. Set ZQNT_PLATFORM_KEYS_URL to the platform's /api/admin-console/auth/service-keys " +
+			"and/or ZQNT_PLATFORM_PUBLIC_KEY to its SERVICE_AUTH_PUBLIC_KEY (or ZQNT_EDGE_AUTH_DISABLED=true for local SITL).")
+	case cfg.PlatformKeysURL == "":
 		v, err := NewVerifier(cfg.PlatformPublicKey)
 		if err != nil {
 			return nil, err
 		}
 		g.verifier = v
+	default:
+		var static ed25519.PublicKey
+		if cfg.PlatformPublicKey != "" {
+			key, err := ParsePublicKey(cfg.PlatformPublicKey)
+			if err != nil {
+				return nil, err
+			}
+			static = key
+		}
+		g.keySet = NewKeySet(cfg.PlatformKeysURL, static, log)
+		g.keySet.Start()
+		g.verifier = NewKeysVerifier(g.keySet)
 	}
 	return g, nil
+}
+
+// Close stops the background refresh of the platform's keys.
+func (g *Guard) Close() {
+	if g.keySet != nil {
+		g.keySet.Close()
+	}
 }
 
 // Check returns nil when the call may proceed, else a gRPC status error.

@@ -78,9 +78,9 @@ func TestVerifierAcceptsThePlatformsToken(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	sub, err := v.Verify(sign(t, key, tokenOpts{}))
-	if err != nil || sub != "svc:remote-control-service" {
-		t.Fatalf("got %q, %v", sub, err)
+	claims, err := v.Verify(sign(t, key, tokenOpts{}))
+	if err != nil || claims.Subject != "svc:remote-control-service" {
+		t.Fatalf("got %+v, %v", claims, err)
 	}
 }
 

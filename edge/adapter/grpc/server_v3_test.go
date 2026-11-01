@@ -18,13 +18,22 @@ import (
 )
 
 // v3 has no per-command RPCs. An adapter written for v2 -- typed TakeOff, its own
-// SendCustomCommand for vendor ids -- must answer v3 ExecuteCommand unchanged, and an id it
-// cannot place is REJECTED, never an error status.
+// SendCustomCommand for vendor ids -- answers v3 ExecuteCommand for the built-in ids it advertises.
+// Its SendCustomCommand is a free-form handler v3 never reaches, and an id it cannot place is
+// REJECTED, never an error status.
 type v3Adapter struct {
 	adapter.UnimplementedEdgeAdapter
 	takeoffs []*domains.TakeOffRequest
 	custom   []*domains.CustomCommandRequest
 	stopped  []string
+}
+
+func (a *v3Adapter) GetCapabilities(_ context.Context, sn string) (*domains.CurrentCapabilities, error) {
+	return &domains.CurrentCapabilities{SN: sn, Capabilities: []domains.Capability{
+		{Command: "flight.takeoff", Available: true},
+		{Command: "mission.stop", Available: true},
+		{Command: "vendor.acme.spray", Available: true},
+	}}, nil
 }
 
 func (a *v3Adapter) TakeOff(_ context.Context, req *domains.TakeOffRequest) (*domains.CommandResult, error) {
@@ -86,14 +95,22 @@ func TestV3BuiltInIDRunsTheTypedMethod(t *testing.T) {
 	}
 }
 
-func TestV3VendorIDGoesToSendCustomCommand(t *testing.T) {
+func TestV3NeverHandsACommandToSendCustomCommand(t *testing.T) {
 	a := &v3Adapter{}
 	r := execute(t, a, "vendor.acme.spray", map[string]any{"seconds": 3})
-	if r.GetState() != capabilityv3.CommandState_COMMAND_STATE_SUCCEEDED || len(a.custom) != 1 {
-		t.Fatalf("state = %v, custom = %d", r.GetState(), len(a.custom))
+	if r.GetState() != capabilityv3.CommandState_COMMAND_STATE_REJECTED || r.GetError().GetCode() != NotSupportedCode {
+		t.Fatalf("result = %v", r)
 	}
-	if a.custom[0].Params["seconds"] != 3.0 {
-		t.Errorf("params = %v", a.custom[0].Params)
+	if len(a.custom) != 0 {
+		t.Fatalf("SendCustomCommand ran %d times", len(a.custom))
+	}
+}
+
+func TestV3RefusesABuiltInIDTheAdapterDoesNotAdvertise(t *testing.T) {
+	a := &v3Adapter{}
+	r := execute(t, a, "flight.return_to_home", nil)
+	if r.GetState() != capabilityv3.CommandState_COMMAND_STATE_REJECTED || r.GetError().GetCode() != NotSupportedCode {
+		t.Fatalf("result = %v", r)
 	}
 }
 
@@ -108,7 +125,11 @@ func TestV3UnknownIDIsRejectedNotAnError(t *testing.T) {
 }
 
 func TestV3AdapterFailureIsFailed(t *testing.T) {
-	r := execute(t, &v3Adapter{}, "vendor.acme.broken", nil)
+	b := &adapter.Base{}
+	b.MustRegisterCommand("vendor.acme.broken", nil, nil, func(_ context.Context, req *domains.CustomCommandRequest) (*domains.CommandResult, error) {
+		return domains.Error("nozzle blocked", req.SN), nil
+	})
+	r := executeOn(t, b, "vendor.acme.broken", nil)
 	if r.GetState() != capabilityv3.CommandState_COMMAND_STATE_FAILED || r.GetError().GetMessage() != "nozzle blocked" {
 		t.Fatalf("result = %+v", r)
 	}
@@ -136,7 +157,7 @@ func (a *declaringAdapter) GetCapabilities(_ context.Context, sn string) (*domai
 		{Command: "flight.takeoff", Available: true, Completion: domains.CompletionAsynchronous,
 			CompletionEvent: "flight.takeoff.completed",
 			Events:          []domains.CapabilityEvent{{Name: "flight.takeoff.completed", Description: "airborne"}}},
-		{Command: "vendor.acme.spray", Available: true, Completion: domains.CompletionOnReply},
+		{Command: "mission.stop", Available: true, Completion: domains.CompletionOnReply},
 	}}, nil
 }
 
@@ -168,23 +189,18 @@ func TestV3DeclaredAsynchronousCommandWaitsEvenOnAPlainSuccess(t *testing.T) {
 }
 
 func TestV3DeclaredOnReplyCommandIsDoneOnItsReply(t *testing.T) {
-	r := executeOn(t, &declaringAdapter{}, "vendor.acme.spray", map[string]any{})
+	r := executeOn(t, &declaringAdapter{}, "mission.stop", map[string]any{"taskId": "task-1"})
 	if r.GetState() != capabilityv3.CommandState_COMMAND_STATE_SUCCEEDED {
 		t.Fatalf("state = %v, want SUCCEEDED", r.GetState())
 	}
 }
 
-// acceptingAdapter answers with its own execution id, the way a mission is started.
-type acceptingAdapter struct {
-	v3Adapter
-}
-
-func (a *acceptingAdapter) SendCustomCommand(_ context.Context, req *domains.CustomCommandRequest) (*domains.CommandResult, error) {
-	return domains.Accepted("flying", "sim-mission-7", req.SN), nil
-}
-
 func TestV3AnAdapterAcceptedResultCarriesItsOwnExecutionID(t *testing.T) {
-	r := executeOn(t, &acceptingAdapter{}, "mission.waypoint.execute", map[string]any{})
+	b := &adapter.Base{}
+	b.MustRegisterCommand("mission.waypoint.execute", nil, nil, func(_ context.Context, req *domains.CustomCommandRequest) (*domains.CommandResult, error) {
+		return domains.Accepted("flying", "sim-mission-7", req.SN), nil
+	})
+	r := executeOn(t, b, "mission.waypoint.execute", map[string]any{})
 	if r.GetState() != capabilityv3.CommandState_COMMAND_STATE_ACCEPTED {
 		t.Fatalf("state = %v, want ACCEPTED", r.GetState())
 	}

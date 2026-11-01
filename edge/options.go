@@ -54,9 +54,16 @@ func WithClaimCode(code string) Option {
 }
 
 // WithPlatformPublicKey sets the platform's service public key the adapter's server verifies
-// every command with (default: ZQNT_PLATFORM_PUBLIC_KEY / SERVICE_AUTH_PUBLIC_KEY).
+// commands without kid with (default: ZQNT_PLATFORM_PUBLIC_KEY / SERVICE_AUTH_PUBLIC_KEY).
 func WithPlatformPublicKey(key string) Option {
 	return func(c *config) { c.auth.PlatformPublicKey = key }
+}
+
+// WithPlatformKeysURL sets where the platform publishes the keys its commands are signed with, as
+// a JWK set (default: ZQNT_PLATFORM_KEYS_URL), e.g.
+// http://admin-console:8005/api/admin-console/auth/service-keys. Lets the platform rotate keys.
+func WithPlatformKeysURL(url string) Option {
+	return func(c *config) { c.auth.PlatformKeysURL = url }
 }
 
 // WithoutPlatformAuth accepts commands from anyone who can reach the adapter's port. Local
