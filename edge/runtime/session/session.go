@@ -3,17 +3,24 @@
 // envelopes lane by lane, drops them when the platform acknowledges them, resends the rest after
 // a reconnect or a retransmit timeout, and hands the platform's downlink to a handler at most
 // once, acknowledging it after the handler returns.
+//
+// After an outage, fresh telemetry goes before the backlog, and the backlog uses at most a share
+// of the link (BacklogShare). The session reports its link and the queues in a LinkReport and
+// raises edge.queue_overflow when the ALARM lane had to drop alarms.
 package session
 
 import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
 	"sync"
 	"time"
 
 	edgelinkv3 "github.com/zequent/zqnt-api/go/v3/gen/zqnt/edgelink/v3"
+	telemetryv3 "github.com/zequent/zqnt-api/go/v3/gen/zqnt/telemetry/v3"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zequent/zqnt-sdk-go/v3/edge/runtime/link"
@@ -56,7 +63,20 @@ type Config struct {
 	RetransmitTimeout time.Duration
 	// PingInterval applies until the platform's LinkPolicy sets one (15 s).
 	PingInterval time.Duration
+	// FreshWindow is how old a telemetry sample may be and still go before the backlog (2 min).
+	FreshWindow time.Duration
+	// BacklogShare is the share of the link the telemetry backlog may use (0.3): of the send
+	// window, and of the driver's bandwidth estimate when it has one.
+	BacklogShare float64
+	// ReportInterval is how often a LinkReport goes out besides on every link state change
+	// (1 min); negative turns LinkReports off.
+	ReportInterval time.Duration
+	// OverflowAlertInterval is the shortest gap between two edge.queue_overflow alerts (1 min).
+	OverflowAlertInterval time.Duration
 }
+
+// CodeQueueOverflow is the alert code the session raises when the ALARM lane dropped alarms.
+const CodeQueueOverflow = "edge.queue_overflow"
 
 // Session is safe for concurrent use; Run drives it.
 type Session struct {
@@ -69,6 +89,13 @@ type Session struct {
 	rtt       time.Duration
 	nonce     uint32
 	ping      *time.Ticker
+	linkState link.StateChange
+	policyRev string
+
+	tokens     float64
+	tokensAt   time.Time
+	alarmDrops uint64
+	overflowAt time.Time
 }
 
 // New checks cfg and fills in defaults.
@@ -95,6 +122,18 @@ func New(cfg Config) (*Session, error) {
 	}
 	if cfg.PingInterval <= 0 {
 		cfg.PingInterval = 15 * time.Second
+	}
+	if cfg.FreshWindow <= 0 {
+		cfg.FreshWindow = 2 * time.Minute
+	}
+	if cfg.BacklogShare <= 0 || cfg.BacklogShare > 1 {
+		cfg.BacklogShare = 0.3
+	}
+	if cfg.ReportInterval == 0 {
+		cfg.ReportInterval = time.Minute
+	}
+	if cfg.OverflowAlertInterval <= 0 {
+		cfg.OverflowAlertInterval = time.Minute
 	}
 	return &Session{cfg: cfg, start: time.Now()}, nil
 }
@@ -175,6 +214,16 @@ func (s *Session) Run(ctx context.Context) error {
 	s.mu.Unlock()
 	defer ping.Stop()
 
+	var report <-chan time.Time
+	if s.cfg.ReportInterval > 0 {
+		t := time.NewTicker(s.cfg.ReportInterval)
+		defer t.Stop()
+		report = t.C
+	}
+	overflow := time.NewTimer(time.Hour)
+	overflow.Stop()
+	defer overflow.Stop()
+
 	rx, states := d.Receive(), d.State()
 	for {
 		select {
@@ -190,6 +239,9 @@ func (s *Session) Run(ctx context.Context) error {
 				states = nil
 				continue
 			}
+			s.mu.Lock()
+			s.linkState = st
+			s.mu.Unlock()
 			switch st.State {
 			case link.StateDown:
 				s.lost()
@@ -197,6 +249,19 @@ func (s *Session) Run(ctx context.Context) error {
 				if !handshaking {
 					s.sendHello(ctx)
 				}
+			}
+			if report != nil {
+				s.publishLinkReport(ctx)
+			}
+		case <-report:
+			s.publishLinkReport(ctx)
+		case <-s.cfg.Store.Drops():
+			if wait := s.checkOverflow(ctx); wait > 0 {
+				overflow.Reset(wait)
+			}
+		case <-overflow.C:
+			if wait := s.checkOverflow(ctx); wait > 0 {
+				overflow.Reset(wait)
 			}
 		case <-s.cfg.Store.Ready():
 		case <-retry.C:
@@ -311,13 +376,13 @@ func (s *Session) welcome(w *edgelinkv3.Welcome) {
 }
 
 func (s *Session) applyPolicy(p *edgelinkv3.LinkPolicy) {
-	every := p.GetPingInterval().AsDuration()
-	if every <= 0 {
+	if p == nil {
 		return
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if s.ping != nil {
+	s.policyRev = p.GetRevision()
+	if every := p.GetPingInterval().AsDuration(); every > 0 && s.ping != nil {
 		s.ping.Reset(every)
 	}
 }
@@ -356,14 +421,17 @@ func (s *Session) pump(ctx context.Context) {
 		if room <= 0 {
 			return
 		}
-		items, err := st.Take(min(room, 64))
+		items, err := st.TakeWith(s.takeOptions(min(room, 64)))
 		if err != nil || len(items) == 0 {
 			return
 		}
-		epoch := st.Epoch()
 		heldFrom, _ := st.HeldFrom()
+		if items[0].Epoch != st.Epoch() {
+			return
+		}
+		s.spendBacklog(items)
 		for i, it := range items {
-			frame, err := s.envelopeFrame(epoch, min(heldFrom, it.Seq), it)
+			frame, err := s.envelopeFrame(it.Epoch, min(heldFrom, it.Seq), it)
 			if err == nil && s.cfg.Driver.Send(ctx, frame, link.SendMeta{}).OK() {
 				continue
 			}
@@ -371,7 +439,7 @@ func (s *Session) pump(ctx context.Context) {
 			for _, rest := range items[i:] {
 				unsent = append(unsent, rest.Seq)
 			}
-			st.Unmark(unsent...)
+			st.Unmark(it.Epoch, unsent...)
 			return
 		}
 	}
@@ -386,4 +454,147 @@ func (s *Session) envelopeFrame(epoch, heldFrom uint32, it store.Item) ([]byte, 
 	env.Id = &edgelinkv3.MessageId{Epoch: epoch, Seq: it.Seq}
 	env.HeldFrom = heldFrom
 	return proto.Marshal(&edgelinkv3.UplinkFrame{Frame: &edgelinkv3.UplinkFrame_Envelope{Envelope: env}})
+}
+
+// takeOptions puts fresh telemetry before the backlog and caps the backlog at BacklogShare of the
+// send window and, when the driver estimates its bandwidth, of that bandwidth.
+func (s *Session) takeOptions(n int) store.TakeOptions {
+	o := store.TakeOptions{
+		Max:          n,
+		FreshAfter:   s.cfg.Clock.Now().Add(-s.cfg.FreshWindow),
+		BacklogItems: int(math.Ceil(s.cfg.BacklogShare*float64(s.cfg.Window))) - s.cfg.Store.InFlightBacklog(),
+	}
+	bps := s.cfg.Driver.Metrics().BandwidthEstimate
+	if bps <= 0 || o.BacklogItems <= 0 {
+		return o
+	}
+	rate := s.cfg.BacklogShare * float64(bps) / 8
+	now := time.Now()
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.tokensAt.IsZero() {
+		s.tokens = rate
+	} else {
+		s.tokens = min(s.tokens+rate*now.Sub(s.tokensAt).Seconds(), rate)
+	}
+	s.tokensAt = now
+	if s.tokens <= 0 {
+		o.BacklogItems = 0
+		return o
+	}
+	o.BacklogBytes = max(int64(s.tokens), 1)
+	return o
+}
+
+// spendBacklog takes the backlog's payload from the bandwidth budget; the budget may go into
+// debt by one item, which the following refill pays back.
+func (s *Session) spendBacklog(items []store.Item) {
+	var spent int
+	for _, it := range items {
+		if it.Backlog {
+			spent += len(it.Payload)
+		}
+	}
+	if spent == 0 {
+		return
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if !s.tokensAt.IsZero() {
+		s.tokens -= float64(spent)
+	}
+}
+
+// LinkReport is the session's link and the node's queues, as published in the STATUS lane.
+func (s *Session) LinkReport() (*edgelinkv3.LinkReport, error) {
+	backlog, err := s.cfg.Store.Backlog()
+	if err != nil {
+		return nil, err
+	}
+	d := s.cfg.Driver
+	m := d.Metrics()
+	s.mu.Lock()
+	st, rev, rtt := s.linkState, s.policyRev, s.rtt
+	s.mu.Unlock()
+	if m.RTT > 0 {
+		rtt = m.RTT
+	}
+	status := &edgelinkv3.LinkStatus{
+		LinkId:               d.ID(),
+		Driver:               s.cfg.LinkKind,
+		State:                edgelinkv3.LinkState(st.State),
+		StateReason:          st.Reason,
+		RttMs:                uint32(min(rtt.Milliseconds(), math.MaxUint32)),
+		Loss:                 float32(m.Loss),
+		BandwidthEstimateBps: uint64(max(m.BandwidthEstimate, 0)),
+		BytesUsed:            m.BytesSent + m.BytesReceived,
+		ProbeFailures:        uint32(max(m.ProbeFailures, 0)),
+	}
+	if !m.LastRx.IsZero() {
+		status.LastRx = timestamppb.New(m.LastRx)
+	}
+	report := &edgelinkv3.LinkReport{Links: []*edgelinkv3.LinkStatus{status}, PolicyRevision: rev}
+	for _, b := range backlog {
+		lb := &edgelinkv3.LaneBacklog{Lane: b.Lane, Items: uint64(b.Items), Bytes: uint64(max(b.Bytes, 0))}
+		if !b.Oldest.IsZero() {
+			lb.Oldest = timestamppb.New(b.Oldest)
+		}
+		report.Backlog = append(report.Backlog, lb)
+	}
+	return report, nil
+}
+
+func (s *Session) publishLinkReport(ctx context.Context) {
+	report, err := s.LinkReport()
+	if err != nil {
+		return
+	}
+	_, _ = s.Publish(ctx, &edgelinkv3.Envelope{Body: &edgelinkv3.Envelope_LinkReport{LinkReport: report}})
+}
+
+// checkOverflow raises edge.queue_overflow for alarms the ALARM lane dropped since the last
+// alert. It returns how long to wait when the last alert was too recent.
+func (s *Session) checkOverflow(ctx context.Context) time.Duration {
+	backlog, err := s.cfg.Store.Backlog()
+	if err != nil {
+		return 0
+	}
+	var alarm store.LaneBacklog
+	for _, b := range backlog {
+		if b.Lane == edgelinkv3.Lane_LANE_ALARM {
+			alarm = b
+		}
+	}
+	now := time.Now()
+	s.mu.Lock()
+	if alarm.Dropped <= s.alarmDrops {
+		s.mu.Unlock()
+		return 0
+	}
+	if since := now.Sub(s.overflowAt); !s.overflowAt.IsZero() && since < s.cfg.OverflowAlertInterval {
+		s.mu.Unlock()
+		return s.cfg.OverflowAlertInterval - since
+	}
+	dropped := alarm.Dropped - s.alarmDrops
+	s.alarmDrops, s.overflowAt = alarm.Dropped, now
+	s.mu.Unlock()
+
+	details, _ := structpb.NewStruct(map[string]any{
+		"node_id":       s.cfg.NodeID,
+		"lane":          edgelinkv3.Lane_LANE_ALARM.String(),
+		"dropped":       float64(dropped),
+		"dropped_total": float64(alarm.Dropped),
+		"quota_items":   float64(alarm.MaxItems),
+	})
+	_, _ = s.Publish(ctx, &edgelinkv3.Envelope{
+		Lane: edgelinkv3.Lane_LANE_ALARM,
+		Body: &edgelinkv3.Envelope_Alert{Alert: &telemetryv3.Alert{
+			OccurredAt: timestamppb.New(s.cfg.Clock.Now()),
+			Severity:   telemetryv3.AlertSeverity_ALERT_SEVERITY_CRITICAL,
+			Code:       CodeQueueOverflow,
+			Message:    fmt.Sprintf("Edge Node %s dropped %d alarms: its alarm queue was full", s.cfg.NodeID, dropped),
+			Details:    details,
+		}},
+	})
+	return 0
 }

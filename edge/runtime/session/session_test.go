@@ -31,6 +31,10 @@ type nodeOpts struct {
 	handler session.Handler
 	rto     time.Duration
 	epoch   uint32
+	lanes   map[store.Lane]store.LanePolicy
+	maxSeq  uint32
+	// configure adjusts the session config; LinkReports are off unless it turns them on.
+	configure func(*session.Config)
 }
 
 func startNode(t *testing.T, path string, p *platform, o nodeOpts) *node {
@@ -38,7 +42,12 @@ func startNode(t *testing.T, path string, p *platform, o nodeOpts) *node {
 	if o.epoch == 0 {
 		o.epoch = 7
 	}
-	st, err := store.Open(path, store.Options{FlushInterval: 10 * time.Millisecond, NewEpoch: func() uint32 { return o.epoch }})
+	st, err := store.Open(path, store.Options{
+		FlushInterval: 10 * time.Millisecond,
+		NewEpoch:      func() uint32 { return o.epoch },
+		Lanes:         o.lanes,
+		MaxSeq:        o.maxSeq,
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -58,7 +67,7 @@ links:
 	if err != nil {
 		t.Fatal(err)
 	}
-	sess, err := session.New(session.Config{
+	scfg := session.Config{
 		NodeID:            nodeID,
 		AssetSNs:          []string{"SIM-1"},
 		LinkKind:          "ip-session",
@@ -67,7 +76,12 @@ links:
 		Driver:            drivers[0],
 		Handler:           o.handler,
 		RetransmitTimeout: o.rto,
-	})
+		ReportInterval:    -1,
+	}
+	if o.configure != nil {
+		o.configure(&scfg)
+	}
+	sess, err := session.New(scfg)
 	if err != nil {
 		t.Fatal(err)
 	}
