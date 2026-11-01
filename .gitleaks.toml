@@ -1,0 +1,6 @@
+[extend]
+useDefault = true
+
+[allowlist]
+description = "throwaway Reticulum test identity, not a credential (zqnt-sdk-go#22)"
+paths = ['''^edge/runtime/link/rns/testdata/vectors_0\.9\.4\.json$''']
