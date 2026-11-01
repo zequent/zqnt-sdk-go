@@ -147,6 +147,12 @@ CREATE TABLE IF NOT EXISTS items (
 CREATE INDEX IF NOT EXISTS items_lane ON items (lane, seq);
 CREATE INDEX IF NOT EXISTS items_key ON items (lane, key) WHERE key <> '';
 CREATE TABLE IF NOT EXISTS downlink (seq INTEGER PRIMARY KEY);
+CREATE TABLE IF NOT EXISTS commands (
+	n INTEGER PRIMARY KEY AUTOINCREMENT,
+	id TEXT NOT NULL UNIQUE,
+	finished INTEGER NOT NULL,
+	payload BLOB NOT NULL
+);
 `
 
 // Open opens or creates the store at path.
