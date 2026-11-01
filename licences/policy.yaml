@@ -1,0 +1,103 @@
+# Zequent dependency licence policy.
+#
+# The same file lives in zqnt-sdk-go, zqnt-sdk-python and zqnt-sdk-java; change it through
+# zequent/zqnt-core#323 and copy it into all three. Human-readable version:
+# zqnt-docs docs/edge/licence-policy.md. Repo-specific reviewed cases go to exceptions.yaml.
+#
+# Each dependency licence is reduced to SPDX terms. "A OR B" passes when one alternative passes,
+# "A AND B" only when every part passes. Patterns use shell globs and match the whole term.
+
+version: 1
+status: engineering list, pending legal sign-off (zequent/zqnt-core#323)
+
+# Shipped freely; listed in THIRD_PARTY.md.
+allow:
+  - MIT
+  - MIT-0
+  - BSD-2-Clause
+  - BSD-3-Clause
+  - 0BSD
+  - Apache-2.0
+  - ISC
+  - Zlib
+  - Unlicense
+  - CC0-1.0
+  - PSF-2.0
+  - Python-2.0
+
+# Allowed, marked "review" in THIRD_PARTY.md: file-level copyleft. Ship the library unmodified;
+# changes to its own files must be published under its licence.
+review:
+  - MPL-2.0
+  - EPL-1.0
+  - EPL-2.0
+  - CDDL-1.0
+  - CDDL-1.1
+  - "LGPL-* WITH *linking-exception*"
+
+# Allowed only where the library stays a separately replaceable unit (Python packages, Java jars);
+# Go links statically, so these fail there.
+review_dynamic:
+  ecosystems: [python, java]
+  licences:
+    - LGPL-2.1-only
+    - LGPL-2.1-or-later
+
+# Always fail. Anything matching neither list fails as well (unknown / unlicensed).
+deny:
+  - "GPL-*"
+  - "AGPL-*"
+  - "LGPL-3.0*"
+  - "SSPL-*"
+  - "BUSL-*"
+  - "CC-BY-NC*"
+  - "Elastic-*"
+  - JSON
+  - Commons-Clause
+  - LicenseRef-Reticulum
+
+# Licence texts and names that fail regardless of what else they say (field-of-use and
+# source-available licences that are not SPDX ids). Case-insensitive regular expressions.
+deny_text:
+  - reticulum
+  - harm to human beings
+  - commons[ -]clause
+  - non[- ]?commercial
+  - business source
+  - server side public
+  - "\\bsspl\\b"
+  - "\\bbusl\\b"
+
+# Names that tools report instead of SPDX ids. Keys are compared case-insensitively with every
+# character that is not a letter or digit removed. "BSD License" is the Python classifier without
+# a clause count; it is read as BSD-3-Clause, the variant all such packages seen so far use.
+aliases:
+  Apache 2.0: Apache-2.0
+  Apache License 2.0: Apache-2.0
+  Apache License, Version 2.0: Apache-2.0
+  Apache Software License: Apache-2.0
+  The Apache License, Version 2.0: Apache-2.0
+  The Apache Software License, Version 2.0: Apache-2.0
+  MIT License: MIT
+  The MIT License: MIT
+  3-Clause BSD License: BSD-3-Clause
+  BSD License: BSD-3-Clause
+  BSD 3-Clause License: BSD-3-Clause
+  New BSD License: BSD-3-Clause
+  BSD 2-Clause License: BSD-2-Clause
+  Simplified BSD License: BSD-2-Clause
+  ISC License: ISC
+  Mozilla Public License 2.0 (MPL 2.0): MPL-2.0
+  Eclipse Public License - v 1.0: EPL-1.0
+  Eclipse Public License - v 2.0: EPL-2.0
+  Eclipse Public License v2.0: EPL-2.0
+  EPL 2.0: EPL-2.0
+  GPL2 w/ CPE: GPL-2.0-only WITH Classpath-exception-2.0
+  CDDL + GPLv2 with classpath exception: CDDL-1.1 OR GPL-2.0-only WITH Classpath-exception-2.0
+  The GNU General Public License, v2 with Universal FOSS Exception, v1.0: GPL-2.0-only WITH Universal-FOSS-exception-1.0
+  GNU General Public License v3 (GPLv3): GPL-3.0-only
+  GNU General Public License v2 (GPLv2): GPL-2.0-only
+  GNU Lesser General Public License v2 or later (LGPLv2+): LGPL-2.1-or-later
+  GNU Lesser General Public License v3 (LGPLv3): LGPL-3.0-only
+  GNU Affero General Public License v3: AGPL-3.0-only
+  Python Software Foundation License: PSF-2.0
