@@ -141,6 +141,51 @@ func TestAckCumulativeAndSelective(t *testing.T) {
 	}
 }
 
+func TestAckFromSelectiveBase(t *testing.T) {
+	s := open(t, tempDB(t), store.Options{FlushInterval: time.Hour})
+	seqs := appendN(t, s, telemetry, 10)
+	flush(t, s)
+	takeAll(t, s)
+
+	s.Ack(&edgelinkv3.Ack{Epoch: 7, CumulativeSeq: seqs[0], SelectiveBase: seqs[6], SelectiveBitmap: []byte{0b0000_0101}})
+	s.Release()
+	got := seqsOf(takeAll(t, s))
+	want := []uint32{seqs[1], seqs[2], seqs[3], seqs[4], seqs[5], seqs[6], seqs[8]}
+	if !slices.Equal(got, want) {
+		t.Fatalf("after ack = %v, want %v", got, want)
+	}
+}
+
+func TestHeldFrom(t *testing.T) {
+	lanes := store.DefaultLanes()
+	lanes[alarm] = store.LanePolicy{MaxItems: 2, Sync: true}
+	s := open(t, tempDB(t), store.Options{Lanes: lanes, FlushInterval: time.Hour})
+	if held, err := s.HeldFrom(); err != nil || held != 0 {
+		t.Fatalf("empty store held from %d, %v", held, err)
+	}
+	seqs := appendN(t, s, telemetry, 5)
+	flush(t, s)
+	if held, _ := s.HeldFrom(); held != seqs[0] {
+		t.Fatalf("held from %d, want %d", held, seqs[0])
+	}
+
+	s.Ack(&edgelinkv3.Ack{Epoch: 7, CumulativeSeq: seqs[0], SelectiveBitmap: []byte{0b0000_0001}})
+	if held, _ := s.HeldFrom(); held != seqs[2] {
+		t.Fatalf("held from %d after acks, want %d", held, seqs[2])
+	}
+	s.Ack(&edgelinkv3.Ack{Epoch: 7, CumulativeSeq: seqs[4]})
+	flush(t, s)
+
+	alarms := appendN(t, s, alarm, 4)
+	if held, _ := s.HeldFrom(); held != alarms[2] {
+		t.Fatalf("held from %d with the oldest alarms dropped, want %d", held, alarms[2])
+	}
+	s.Ack(&edgelinkv3.Ack{Epoch: 7, CumulativeSeq: alarms[3]})
+	if held, _ := s.HeldFrom(); held != 0 {
+		t.Fatalf("held from %d with everything acknowledged", held)
+	}
+}
+
 func TestSurvivesRestart(t *testing.T) {
 	path := tempDB(t)
 	s := open(t, path, store.Options{FlushInterval: time.Hour})

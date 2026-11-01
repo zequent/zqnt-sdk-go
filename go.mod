@@ -6,7 +6,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/redis/go-redis/v9 v9.23.0
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.3
-	github.com/zequent/zqnt-api/go/v3 v3.0.1-0.20261101162446-1de10b4f5232
+	github.com/zequent/zqnt-api/go/v3 v3.0.1-0.20261101200616-d25d3b616bfc
 	go.yaml.in/yaml/v3 v3.0.5
 	google.golang.org/grpc v1.84.0
 	google.golang.org/protobuf v1.36.12

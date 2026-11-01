@@ -17,7 +17,7 @@ import (
 type msgKey struct{ epoch, seq uint32 }
 
 // platform is an in-process EdgeLinkService that records envelopes, deduplicates them by id and
-// acknowledges them the way edge-link does.
+// acknowledges them the way edge-link does, settling everything below the node's low-water mark.
 type platform struct {
 	edgelinkv3.UnimplementedEdgeLinkServiceServer
 	addr string
@@ -28,6 +28,7 @@ type platform struct {
 	blackhole bool
 	offsetMs  int64
 	epoch     uint32
+	low       uint32
 	got       map[msgKey]*edgelinkv3.Envelope
 	order     []*edgelinkv3.Envelope
 	frames    int
@@ -75,7 +76,7 @@ func (p *platform) killStreams() {
 }
 
 func (p *platform) ack() *edgelinkv3.Ack {
-	a := &edgelinkv3.Ack{Epoch: p.epoch}
+	a := &edgelinkv3.Ack{Epoch: p.epoch, CumulativeSeq: p.low}
 	for {
 		if _, ok := p.got[msgKey{p.epoch, a.CumulativeSeq + 1}]; !ok {
 			break
@@ -185,7 +186,10 @@ func (p *platform) handle(f *edgelinkv3.UplinkFrame) *edgelinkv3.Ack {
 		env := fr.Envelope
 		k := msgKey{env.GetId().GetEpoch(), env.GetId().GetSeq()}
 		if k.epoch > p.epoch {
-			p.epoch = k.epoch
+			p.epoch, p.low = k.epoch, 0
+		}
+		if k.epoch == p.epoch && env.GetHeldFrom() > p.low+1 {
+			p.low = env.GetHeldFrom() - 1
 		}
 		if _, dup := p.got[k]; dup {
 			p.dupes++
