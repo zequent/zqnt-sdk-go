@@ -34,8 +34,8 @@ github.com/stretchr/testify v1.12.1 h1:EuwCh5fleGS7H32xRwO3wRGT7DxrDhLAT6FF8MpWD
 github.com/stretchr/testify v1.12.1/go.mod h1:MDEgiDPPsNp5cuIrHPPCyornHKgEVbtFUmoNlxoYthg=
 github.com/zeebo/xxh3 v1.1.0 h1:s7DLGDK45Dyfg7++yxI0khrfwq9661w9EN78eP/UZVs=
 github.com/zeebo/xxh3 v1.1.0/go.mod h1:IisAie1LELR4xhVinxWS5+zf1lA4p0MW4T+w+W07F5s=
-github.com/zequent/zqnt-api/go/v3 v3.0.1-0.20261101162446-1de10b4f5232 h1:jskpa/1JBpAIkCFGxJuTNI8qecpUn1DPn+XJgCmo4+M=
-github.com/zequent/zqnt-api/go/v3 v3.0.1-0.20261101162446-1de10b4f5232/go.mod h1:NLQzZDP9duPvSooAiPgMU9iVwrf/iaChMqTh/ZNKQdk=
+github.com/zequent/zqnt-api/go/v3 v3.0.1-0.20261101200616-d25d3b616bfc h1:BxCrrtI2RconsglFn0OKXYPlzFdPOGO126nagLH8lHg=
+github.com/zequent/zqnt-api/go/v3 v3.0.1-0.20261101200616-d25d3b616bfc/go.mod h1:NLQzZDP9duPvSooAiPgMU9iVwrf/iaChMqTh/ZNKQdk=
 go.uber.org/atomic v1.12.0 h1:BvcXdFKuviU4fTL/f+SxdQ5qJX/Jix8pAkgdUcb3XOE=
 go.uber.org/atomic v1.12.0/go.mod h1:I6c4cg+6HCxRjfjSsYtApoFILnpc0CGUdGkXVqbYVNk=
 go.yaml.in/yaml/v3 v3.0.5 h1:N6y/pJk8buWs9NY5ERU2HSMfm+IuD/OtfdAnq6kESPw=
