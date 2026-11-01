@@ -662,8 +662,47 @@ func (s *Store) Retry(timeout time.Duration) int {
 	return n
 }
 
+// HeldFrom is the lowest seq of the current epoch the store still holds unacknowledged, 0 when it
+// holds none. Every seq below it was acknowledged or dropped for good and is never sent again.
+func (s *Store) HeldFrom() (uint32, error) {
+	s.mu.Lock()
+	if s.closed {
+		s.mu.Unlock()
+		return 0, ErrClosed
+	}
+	through := s.ackedThrough
+	acked := len(s.acked)
+	s.mu.Unlock()
+
+	rows, err := s.db.QueryContext(context.Background(),
+		`SELECT seq FROM items WHERE seq > ? ORDER BY seq LIMIT ?`, through, acked+1)
+	if err != nil {
+		return 0, fmt.Errorf("store: held from: %w", err)
+	}
+	defer func() { _ = rows.Close() }()
+	var seqs []uint32
+	for rows.Next() {
+		var seq uint32
+		if err := rows.Scan(&seq); err != nil {
+			return 0, fmt.Errorf("store: held from: %w", err)
+		}
+		seqs = append(seqs, seq)
+	}
+	if err := rows.Err(); err != nil {
+		return 0, fmt.Errorf("store: held from: %w", err)
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for _, seq := range seqs {
+		if _, done := s.acked[seq]; !done && seq > s.ackedThrough {
+			return seq, nil
+		}
+	}
+	return 0, nil
+}
+
 // Ack drops what the platform acknowledged: everything up to the cumulative seq and every seq
-// the selective bitmap names. Acks for another epoch are ignored. Removal from disk happens
+// the selective bitmap names, counted from the selective base when the ack sets one. Acks for another epoch are ignored. Removal from disk happens
 // with the next batch commit; acknowledged items are never handed out again.
 func (s *Store) Ack(a *edgelinkv3.Ack) {
 	if a == nil {
@@ -689,6 +728,9 @@ func (s *Store) Ack(a *edgelinkv3.Ack) {
 		}
 	}
 	base := a.GetCumulativeSeq() + 1
+	if a.GetSelectiveBase() != 0 {
+		base = a.GetSelectiveBase() + 1
+	}
 	for i, b := range a.GetSelectiveBitmap() {
 		for bit := range 8 {
 			if b&(1<<bit) == 0 {

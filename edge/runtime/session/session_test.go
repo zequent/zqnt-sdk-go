@@ -295,6 +295,34 @@ func TestDrainsLaneByLane(t *testing.T) {
 	})
 }
 
+func TestReportsItsLowWaterMark(t *testing.T) {
+	p := startPlatform(t)
+	p.set(func(p *platform) { p.reject = true })
+	n := startNode(t, filepath.Join(t.TempDir(), "node.db"), p, nodeOpts{})
+	ids := publish(t, n, capabilities(), capabilities(), sample(1), sample(2))
+	if err := n.store.Flush(); err != nil {
+		t.Fatal(err)
+	}
+	p.set(func(p *platform) { p.reject = false })
+	waitFor(t, "3 envelopes", func() bool { return received(p) == 3 })
+	waitFor(t, "an empty backlog", func() bool { return backlogEmpty(t, n.store) })
+
+	last := ids[len(ids)-1].GetSeq()
+	p.read(func(p *platform) {
+		if _, sent := p.got[msgKey{ids[0].GetEpoch(), ids[0].GetSeq()}]; sent {
+			t.Error("the replaced capability set was sent")
+		}
+		for _, env := range p.order {
+			if held := env.GetHeldFrom(); held <= ids[0].GetSeq() || held > env.GetId().GetSeq() {
+				t.Errorf("envelope %v reports held_from %d", env.GetId(), held)
+			}
+		}
+		if cum := p.ack().GetCumulativeSeq(); cum != last {
+			t.Errorf("platform settled through %d, want %d despite the replaced seq", cum, last)
+		}
+	})
+}
+
 func TestClockOffsetAndUnsynced(t *testing.T) {
 	p := startPlatform(t)
 	p.set(func(p *platform) {

@@ -361,8 +361,9 @@ func (s *Session) pump(ctx context.Context) {
 			return
 		}
 		epoch := st.Epoch()
+		heldFrom, _ := st.HeldFrom()
 		for i, it := range items {
-			frame, err := s.envelopeFrame(epoch, it)
+			frame, err := s.envelopeFrame(epoch, min(heldFrom, it.Seq), it)
 			if err == nil && s.cfg.Driver.Send(ctx, frame, link.SendMeta{}).OK() {
 				continue
 			}
@@ -376,12 +377,13 @@ func (s *Session) pump(ctx context.Context) {
 	}
 }
 
-func (s *Session) envelopeFrame(epoch uint32, it store.Item) ([]byte, error) {
+func (s *Session) envelopeFrame(epoch, heldFrom uint32, it store.Item) ([]byte, error) {
 	env := &edgelinkv3.Envelope{}
 	if err := proto.Unmarshal(it.Payload, env); err != nil {
 		return nil, err
 	}
 	env.NodeId = s.cfg.NodeID
 	env.Id = &edgelinkv3.MessageId{Epoch: epoch, Seq: it.Seq}
+	env.HeldFrom = heldFrom
 	return proto.Marshal(&edgelinkv3.UplinkFrame{Frame: &edgelinkv3.UplinkFrame_Envelope{Envelope: env}})
 }
