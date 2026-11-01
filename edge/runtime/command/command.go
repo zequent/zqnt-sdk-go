@@ -40,7 +40,8 @@ const (
 type Progress func(fraction float32, message string)
 
 // Handler runs one command on the asset it names. ctx ends when the command's timeout passes or
-// the platform cancels it. A nil error succeeds with result; an *Error fails with its code.
+// the platform cancels it, and carries the delivery (see DeliveryFrom). A nil error succeeds with
+// result; an *Error fails with its code.
 type Handler interface {
 	Execute(ctx context.Context, cmd *capabilityv3.Command, progress Progress) (*structpb.Struct, error)
 }
@@ -58,6 +59,17 @@ type Error struct {
 	Code     string
 	Message  string
 	Category commonv3.ErrorCategory
+	// Rejected reports the command as REJECTED, refused before it started, instead of FAILED.
+	Rejected bool
+}
+
+type deliveryKey struct{}
+
+// DeliveryFrom is the delivery of the command a Handler runs, with its command execution id and
+// request context; nil outside a Handler.
+func DeliveryFrom(ctx context.Context) *edgelinkv3.CommandDelivery {
+	d, _ := ctx.Value(deliveryKey{}).(*edgelinkv3.CommandDelivery)
+	return d
 }
 
 func (e *Error) Error() string { return e.Code + ": " + e.Message }
@@ -174,7 +186,7 @@ func (r *Runner) execute(ctx context.Context, d *edgelinkv3.CommandDelivery, cmd
 		return errors.Join(err, r.cfg.Store.ForgetCommand(d.GetCommandExecutionId()))
 	}
 
-	runCtx, cancel := context.WithCancelCause(context.WithoutCancel(ctx))
+	runCtx, cancel := context.WithCancelCause(context.WithValue(context.WithoutCancel(ctx), deliveryKey{}, proto.Clone(d)))
 	if t := cmd.GetTimeout(); t != nil && t.AsDuration() > 0 {
 		var stop context.CancelFunc
 		runCtx, stop = context.WithTimeoutCause(runCtx, t.AsDuration(), context.DeadlineExceeded)
@@ -225,6 +237,9 @@ func (r *Runner) outcome(ctx context.Context, result *structpb.Struct, err error
 		ev := r.event(d, capabilityv3.CommandState_COMMAND_STATE_FAILED)
 		var coded *Error
 		if errors.As(err, &coded) {
+			if coded.Rejected {
+				ev.State = capabilityv3.CommandState_COMMAND_STATE_REJECTED
+			}
 			category := coded.Category
 			if category == commonv3.ErrorCategory_ERROR_CATEGORY_UNSPECIFIED {
 				category = commonv3.ErrorCategory_ERROR_CATEGORY_ASSET

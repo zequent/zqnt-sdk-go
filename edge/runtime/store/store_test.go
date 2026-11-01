@@ -315,7 +315,7 @@ func TestRetryAndUnmark(t *testing.T) {
 	if s.InFlight() != 2 {
 		t.Fatalf("in flight = %d", s.InFlight())
 	}
-	s.Unmark(seqs[1])
+	s.Unmark(s.Epoch(), seqs[1])
 	if got := seqsOf(takeAll(t, s)); !slices.Equal(got, seqs[1:]) {
 		t.Fatalf("after unmark = %v", got)
 	}

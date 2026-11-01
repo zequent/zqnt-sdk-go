@@ -35,7 +35,11 @@ func keyFor(env *edgelinkv3.Envelope) string {
 	case *edgelinkv3.Envelope_Capabilities:
 		return "capabilities/" + b.Capabilities.GetAssetSn()
 	case *edgelinkv3.Envelope_LinkReport:
-		return "link_report"
+		key := "link_report"
+		for _, l := range b.LinkReport.GetLinks() {
+			key += "/" + l.GetLinkId()
+		}
+		return key
 	case *edgelinkv3.Envelope_Topology:
 		return "topology"
 	}

@@ -4,7 +4,8 @@
 //
 // Appends are committed in batches to spare SD cards; lanes marked Sync commit at once. Only
 // committed items are handed out by Take, so a sequence number the platform has seen is never
-// reused, not even after a crash.
+// reused, not even after a crash. Before seq would wrap, the store rolls over to a new epoch and
+// numbers what it still holds from 1 again.
 package store
 
 import (
@@ -12,6 +13,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"math"
 	"sync"
 	"time"
 
@@ -62,15 +64,21 @@ type Options struct {
 	FlushInterval time.Duration
 	// FlushItems commits as soon as this many appends are waiting (50).
 	FlushItems int
-	// NewEpoch numbers a new store; it defaults to the wall clock in seconds.
+	// NewEpoch numbers a new store; it defaults to the wall clock in seconds. A rollover takes
+	// the larger of NewEpoch and the current epoch + 1.
 	NewEpoch func() uint32
-	Now      func() time.Time
+	// MaxSeq is the highest seq the store assigns before it rolls over to a new epoch
+	// (math.MaxUint32). From MaxSeq - MaxSeq/16 on, it rolls over as soon as nothing is in flight.
+	MaxSeq uint32
+	Now    func() time.Time
 }
 
 // Item is one queued envelope.
 type Item struct {
-	Seq  uint32
-	Lane Lane
+	// Epoch is set by Take: the epoch Seq belongs to.
+	Epoch uint32
+	Seq   uint32
+	Lane  Lane
 	// Key identifies what the item reports for LatestPerKey lanes, e.g. "capabilities/DOCK-1".
 	Key string
 	// Rank orders eviction in DropOldest lanes: lower ranks go first.
@@ -78,6 +86,23 @@ type Item struct {
 	DeviceTime    time.Time
 	ClockUnsynced bool
 	Payload       []byte
+	// Backlog is set by TakeWith for a TELEMETRY item older than TakeOptions.FreshAfter.
+	Backlog bool
+}
+
+// TakeOptions shape what TakeWith hands out.
+type TakeOptions struct {
+	// Max is the most items to hand out.
+	Max int
+	// FreshAfter splits the TELEMETRY lane. Samples from this time on are fresh and go first,
+	// oldest first; older samples are backlog and follow them newest first, within the backlog
+	// budget. The zero time hands TELEMETRY out oldest first without a split.
+	FreshAfter time.Time
+	// BacklogItems is the most backlog samples to hand out.
+	BacklogItems int
+	// BacklogBytes caps the payload of the backlog samples handed out; the first sample always
+	// fits. 0 = no byte cap.
+	BacklogBytes int64
 }
 
 // LaneBacklog is what one lane holds.
@@ -87,15 +112,39 @@ type LaneBacklog struct {
 	Bytes   int64
 	Oldest  time.Time
 	Dropped uint64
+	// MaxItems and MaxBytes are the lane's quota; 0 = unlimited.
+	MaxItems int
+	MaxBytes int64
+}
+
+// Fill is how full the lane is against its quota, 0..1; 0 for an unlimited lane.
+func (b LaneBacklog) Fill() float64 {
+	f := 0.0
+	if b.MaxItems > 0 {
+		f = float64(b.Items) / float64(b.MaxItems)
+	}
+	if b.MaxBytes > 0 {
+		f = max(f, float64(b.Bytes)/float64(b.MaxBytes))
+	}
+	return min(f, 1)
 }
 
 // ErrClosed is returned by calls on a closed store.
 var ErrClosed = errors.New("store: closed")
 
+// ErrSeqExhausted is returned by Append when the store holds MaxSeq items, so even a new epoch
+// has no seq left.
+var ErrSeqExhausted = errors.New("store: no seq left")
+
 type laneStat struct {
 	items   int
 	bytes   int64
 	dropped uint64
+}
+
+type inflight struct {
+	at      time.Time
+	backlog bool
 }
 
 type downlinkState struct {
@@ -121,13 +170,14 @@ type Store struct {
 	acked        map[uint32]struct{}
 	delThrough   uint32
 	delSeqs      []uint32
-	inflight     map[uint32]time.Time
+	inflight     map[uint32]inflight
 	lanes        map[Lane]*laneStat
 	downlink     downlinkState
 	lastErr      error
 
 	flushReq chan struct{}
 	ready    chan struct{}
+	drops    chan struct{}
 	stop     chan struct{}
 	done     chan struct{}
 }
@@ -173,6 +223,9 @@ func Open(path string, opts Options) (*Store, error) {
 		now := opts.Now
 		opts.NewEpoch = func() uint32 { return uint32(max(now().Unix(), 1)) }
 	}
+	if opts.MaxSeq == 0 {
+		opts.MaxSeq = math.MaxUint32
+	}
 	dsn := "file:" + path + "?_pragma=journal_mode(WAL)&_pragma=synchronous(FULL)&_pragma=busy_timeout(5000)&_txlock=immediate"
 	db, err := sql.Open("sqlite", dsn)
 	if err != nil {
@@ -183,11 +236,12 @@ func Open(path string, opts Options) (*Store, error) {
 		db:       db,
 		opts:     opts,
 		acked:    map[uint32]struct{}{},
-		inflight: map[uint32]time.Time{},
+		inflight: map[uint32]inflight{},
 		lanes:    map[Lane]*laneStat{},
 		downlink: downlinkState{above: map[uint32]struct{}{}},
 		flushReq: make(chan struct{}, 1),
 		ready:    make(chan struct{}, 1),
+		drops:    make(chan struct{}, 1),
 		stop:     make(chan struct{}),
 		done:     make(chan struct{}),
 	}
@@ -297,6 +351,10 @@ func (s *Store) Epoch() uint32 {
 // Ready signals after a commit added items or after items became sendable again.
 func (s *Store) Ready() <-chan struct{} { return s.ready }
 
+// Drops signals after a commit dropped items to keep a lane within its quota; Backlog has the
+// counts.
+func (s *Store) Drops() <-chan struct{} { return s.drops }
+
 // Err is the error of the last failed background commit, nil once a commit succeeds again.
 func (s *Store) Err() error {
 	s.mu.Lock()
@@ -317,6 +375,17 @@ func (s *Store) Append(ctx context.Context, it Item) (uint32, error) {
 	}
 	it.Payload = append([]byte(nil), it.Payload...)
 	s.mu.Lock()
+	if !s.closed && s.seqExhausted() {
+		s.mu.Unlock()
+		if err := s.rollover(true); err != nil {
+			return 0, err
+		}
+		s.mu.Lock()
+		if !s.closed && s.seqExhausted() {
+			s.mu.Unlock()
+			return 0, ErrSeqExhausted
+		}
+	}
 	if s.closed {
 		s.mu.Unlock()
 		return 0, ErrClosed
@@ -355,9 +424,11 @@ func (s *Store) requestFlush() {
 	}
 }
 
-func (s *Store) signalReady() {
+func (s *Store) signalReady() { signal(s.ready) }
+
+func signal(ch chan struct{}) {
 	select {
-	case s.ready <- struct{}{}:
+	case ch <- struct{}{}:
 	default:
 	}
 }
@@ -374,6 +445,9 @@ func (s *Store) run() {
 		case <-s.flushReq:
 		}
 		err := s.flush()
+		if err == nil {
+			err = s.rollover(false)
+		}
 		s.mu.Lock()
 		s.lastErr = err
 		s.mu.Unlock()
@@ -383,6 +457,11 @@ func (s *Store) run() {
 func (s *Store) flush() error {
 	s.writeMu.Lock()
 	defer s.writeMu.Unlock()
+	return s.flushLocked()
+}
+
+// flushLocked commits what is waiting; s.writeMu is held.
+func (s *Store) flushLocked() error {
 	s.mu.Lock()
 	items, waiters := s.pending, s.waiters
 	delThrough, delSeqs := s.delThrough, s.delSeqs
@@ -396,7 +475,7 @@ func (s *Store) flush() error {
 	var res commitResult
 	var err error
 	if len(items) > 0 || delThrough > 0 || len(delSeqs) > 0 {
-		res, err = s.commit(items, delThrough, delSeqs, stats)
+		res, err = s.commit(items, delThrough, delSeqs, stats, 0)
 	}
 
 	s.mu.Lock()
@@ -405,15 +484,7 @@ func (s *Store) flush() error {
 		s.delThrough = max(s.delThrough, delThrough)
 		s.delSeqs = append(delSeqs, s.delSeqs...)
 	} else {
-		for l, st := range res.stats {
-			ls := s.lanes[l]
-			if ls == nil {
-				ls = &laneStat{}
-				s.lanes[l] = ls
-			}
-			ls.items, ls.bytes = st.items, st.bytes
-			ls.dropped += res.dropped[l]
-		}
+		s.applyStats(res)
 		for _, seq := range res.removed {
 			delete(s.inflight, seq)
 			if seq <= s.ackedThrough {
@@ -428,11 +499,83 @@ func (s *Store) flush() error {
 	for _, w := range waiters {
 		w <- err
 	}
-	if err == nil && len(items) > 0 {
-		s.signalReady()
-	}
 	if err != nil {
 		return fmt.Errorf("store: commit: %w", err)
+	}
+	if len(items) > 0 {
+		s.signalReady()
+	}
+	if res.anyDropped() {
+		signal(s.drops)
+	}
+	return nil
+}
+
+// applyStats takes the lane counts of a successful commit; s.mu is held.
+func (s *Store) applyStats(res commitResult) {
+	for l, st := range res.stats {
+		ls := s.lanes[l]
+		if ls == nil {
+			ls = &laneStat{}
+			s.lanes[l] = ls
+		}
+		ls.items, ls.bytes = st.items, st.bytes
+		ls.dropped += res.dropped[l]
+	}
+}
+
+// seqExhausted reports whether the next seq would pass MaxSeq or wrap; s.mu is held.
+func (s *Store) seqExhausted() bool {
+	return s.nextSeq == 0 || s.nextSeq > s.opts.MaxSeq
+}
+
+// rollover moves the store to a new epoch and numbers the items it holds from 1 again, in their
+// order. Forced, it runs whenever seq is exhausted; otherwise only once seq passed the soft limit
+// and nothing is in flight, so no item the platform may hold unacknowledged changes its id.
+func (s *Store) rollover(force bool) error {
+	s.writeMu.Lock()
+	defer s.writeMu.Unlock()
+	s.mu.Lock()
+	soft := s.opts.MaxSeq - s.opts.MaxSeq/16
+	due := !s.closed && (s.seqExhausted() || (!force && s.nextSeq-1 >= soft && len(s.inflight) == 0))
+	s.mu.Unlock()
+	if !due {
+		return nil
+	}
+	if err := s.flushLocked(); err != nil {
+		return err
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	held := len(s.pending)
+	for _, st := range s.lanes {
+		held += st.items
+	}
+	if s.closed || held >= int(s.opts.MaxSeq) || (!force && !s.seqExhausted() && len(s.inflight) > 0) {
+		return nil
+	}
+	epoch := max(s.epoch+1, s.opts.NewEpoch())
+	stats := make(map[Lane]laneStat, len(s.lanes))
+	for l, st := range s.lanes {
+		stats[l] = *st
+	}
+	res, err := s.commit(s.pending, s.delThrough, s.delSeqs, stats, epoch)
+	if err != nil {
+		return fmt.Errorf("store: roll over to epoch %d: %w", epoch, err)
+	}
+	s.applyStats(res)
+	for _, w := range s.waiters {
+		w <- nil
+	}
+	s.pending, s.waiters, s.delThrough, s.delSeqs = nil, nil, 0, nil
+	s.epoch = epoch
+	s.nextSeq = res.held + 1
+	s.ackedThrough = 0
+	clear(s.acked)
+	clear(s.inflight)
+	s.signalReady()
+	if res.anyDropped() {
+		signal(s.drops)
 	}
 	return nil
 }
@@ -441,9 +584,22 @@ type commitResult struct {
 	stats   map[Lane]laneStat
 	dropped map[Lane]uint64
 	removed []uint32
+	// held is the number of items after a renumbering commit.
+	held uint32
 }
 
-func (s *Store) commit(items []Item, delThrough uint32, delSeqs []uint32, stats map[Lane]laneStat) (commitResult, error) {
+func (r commitResult) anyDropped() bool {
+	for _, n := range r.dropped {
+		if n > 0 {
+			return true
+		}
+	}
+	return false
+}
+
+// commit writes a batch in one transaction. A non-zero renumberEpoch also moves the store to that
+// epoch and numbers every item it holds from 1 in seq order.
+func (s *Store) commit(items []Item, delThrough uint32, delSeqs []uint32, stats map[Lane]laneStat, renumberEpoch uint32) (commitResult, error) {
 	ctx := context.Background()
 	res := commitResult{stats: stats, dropped: map[Lane]uint64{}}
 	tx, err := s.db.BeginTx(ctx, nil)
@@ -488,13 +644,51 @@ func (s *Store) commit(items []Item, delThrough uint32, delSeqs []uint32, stats 
 		}
 	}
 	if len(items) > 0 {
-		if _, err := tx.ExecContext(ctx,
-			`INSERT INTO meta (k, v) VALUES ('seq', ?) ON CONFLICT (k) DO UPDATE SET v = excluded.v`,
-			items[len(items)-1].Seq); err != nil {
+		if err := setMeta(ctx, tx, "seq", int64(items[len(items)-1].Seq)); err != nil {
+			return res, err
+		}
+	}
+	if renumberEpoch != 0 {
+		held, err := renumber(ctx, tx)
+		if err != nil {
+			return res, err
+		}
+		res.held = held
+		if err := setMeta(ctx, tx, "epoch", int64(renumberEpoch)); err != nil {
+			return res, err
+		}
+		if err := setMeta(ctx, tx, "seq", int64(held)); err != nil {
 			return res, err
 		}
 	}
 	return res, tx.Commit()
+}
+
+func setMeta(ctx context.Context, tx *sql.Tx, k string, v int64) error {
+	_, err := tx.ExecContext(ctx, `INSERT INTO meta (k, v) VALUES (?, ?) ON CONFLICT (k) DO UPDATE SET v = excluded.v`, k, v)
+	return err
+}
+
+// renumber numbers the items 1..n in seq order and returns n. Seqs pass through negative values
+// so no update collides with a seq not yet renumbered.
+func renumber(ctx context.Context, tx *sql.Tx) (uint32, error) {
+	for _, q := range []string{
+		`CREATE TEMP TABLE IF NOT EXISTS renumber (old INTEGER PRIMARY KEY, new INTEGER NOT NULL)`,
+		`DELETE FROM renumber`,
+		`INSERT INTO renumber (old, new) SELECT seq, ROW_NUMBER() OVER (ORDER BY seq) FROM items`,
+		`UPDATE items SET seq = -(SELECT new FROM renumber WHERE old = items.seq)`,
+		`UPDATE items SET seq = -seq`,
+	} {
+		if _, err := tx.ExecContext(ctx, q); err != nil {
+			return 0, err
+		}
+	}
+	var n int64
+	if err := tx.QueryRowContext(ctx, `SELECT COUNT(*) FROM renumber`).Scan(&n); err != nil {
+		return 0, err
+	}
+	_, err := tx.ExecContext(ctx, `DELETE FROM renumber`)
+	return uint32(n), err
 }
 
 type committer struct {
@@ -570,10 +764,21 @@ func (c *committer) enforce(lane Lane, pol LanePolicy) error {
 
 // Take hands out up to n committed items that are neither in flight nor acknowledged, ALARM
 // first and oldest first within a lane, and marks them in flight.
-func (s *Store) Take(n int) ([]Item, error) {
-	if n <= 0 {
+func (s *Store) Take(n int) ([]Item, error) { return s.TakeWith(TakeOptions{Max: n}) }
+
+const takeColumns = `SELECT seq, lane, key, rank, device_time, unsynced, payload FROM items`
+
+// TakeWith hands out committed items that are neither in flight nor acknowledged, lane by lane,
+// and marks them in flight. With FreshAfter set, fresh TELEMETRY goes before the backlog, which
+// stays within its budget; BULK follows either way.
+func (s *Store) TakeWith(o TakeOptions) ([]Item, error) {
+	if o.Max <= 0 {
 		return nil, nil
 	}
+	// No commit may run between the query and the marking below: one that deletes an item acked
+	// meanwhile would leave nothing to tell it from an unsent item.
+	s.writeMu.Lock()
+	defer s.writeMu.Unlock()
 	s.mu.Lock()
 	if s.closed {
 		s.mu.Unlock()
@@ -583,34 +788,46 @@ func (s *Store) Take(n int) ([]Item, error) {
 	through := s.ackedThrough
 	s.mu.Unlock()
 
-	rows, err := s.db.QueryContext(context.Background(),
-		`SELECT seq, lane, key, rank, device_time, unsynced, payload FROM items WHERE seq > ? ORDER BY lane, seq LIMIT ?`,
-		through, n+skip)
+	telemetry := edgelinkv3.Lane_LANE_TELEMETRY
+	var main, backlog []Item
+	var err error
+	if o.FreshAfter.IsZero() {
+		main, err = s.query(takeColumns+` WHERE seq > ? ORDER BY lane, seq LIMIT ?`, through, o.Max+skip)
+	} else {
+		cutoff := o.FreshAfter.UnixNano()
+		main, err = s.query(takeColumns+` WHERE seq > ? AND NOT (lane = ? AND device_time < ?) ORDER BY lane, seq LIMIT ?`,
+			through, telemetry, cutoff, o.Max+skip)
+		if err == nil && o.BacklogItems > 0 {
+			backlog, err = s.query(takeColumns+` WHERE seq > ? AND lane = ? AND device_time < ? ORDER BY seq DESC LIMIT ?`,
+				through, telemetry, cutoff, o.BacklogItems+skip)
+		}
+	}
 	if err != nil {
 		return nil, fmt.Errorf("store: take: %w", err)
 	}
-	var found []Item
-	for rows.Next() {
-		var it Item
-		var dt int64
-		if err := rows.Scan(&it.Seq, &it.Lane, &it.Key, &it.Rank, &dt, &it.ClockUnsynced, &it.Payload); err != nil {
-			_ = rows.Close()
-			return nil, fmt.Errorf("store: take: %w", err)
-		}
-		it.DeviceTime = time.Unix(0, dt)
-		found = append(found, it)
+	for i := range backlog {
+		backlog[i].Backlog = true
 	}
-	_ = rows.Close()
-	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("store: take: %w", err)
+	candidates := main
+	if len(backlog) > 0 {
+		cut := len(main)
+		for i, it := range main {
+			if it.Lane > telemetry {
+				cut = i
+				break
+			}
+		}
+		candidates = make([]Item, 0, len(main)+len(backlog))
+		candidates = append(append(append(candidates, main[:cut]...), backlog...), main[cut:]...)
 	}
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	now := s.opts.Now()
-	out := make([]Item, 0, min(n, len(found)))
-	for _, it := range found {
-		if len(out) == n {
+	out := make([]Item, 0, min(o.Max, len(candidates)))
+	backlogItems, backlogBytes := 0, int64(0)
+	for _, it := range candidates {
+		if len(out) == o.Max {
 			break
 		}
 		if _, busy := s.inflight[it.Seq]; busy {
@@ -619,10 +836,38 @@ func (s *Store) Take(n int) ([]Item, error) {
 		if _, done := s.acked[it.Seq]; done || it.Seq <= s.ackedThrough {
 			continue
 		}
-		s.inflight[it.Seq] = now
+		if it.Backlog {
+			size := int64(len(it.Payload))
+			if backlogItems >= o.BacklogItems || (o.BacklogBytes > 0 && backlogItems > 0 && backlogBytes+size > o.BacklogBytes) {
+				continue
+			}
+			backlogItems++
+			backlogBytes += size
+		}
+		it.Epoch = s.epoch
+		s.inflight[it.Seq] = inflight{at: now, backlog: it.Backlog}
 		out = append(out, it)
 	}
 	return out, nil
+}
+
+func (s *Store) query(q string, args ...any) ([]Item, error) {
+	rows, err := s.db.QueryContext(context.Background(), q, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = rows.Close() }()
+	var found []Item
+	for rows.Next() {
+		var it Item
+		var dt int64
+		if err := rows.Scan(&it.Seq, &it.Lane, &it.Key, &it.Rank, &dt, &it.ClockUnsynced, &it.Payload); err != nil {
+			return nil, err
+		}
+		it.DeviceTime = time.Unix(0, dt)
+		found = append(found, it)
+	}
+	return found, rows.Err()
 }
 
 // InFlight is the number of items handed out and not yet acknowledged or released.
@@ -632,11 +877,27 @@ func (s *Store) InFlight() int {
 	return len(s.inflight)
 }
 
-// Unmark returns items that were taken but not sent. Unlike Release it does not signal Ready, so
-// a sender whose link refused them waits for the next event instead of spinning.
-func (s *Store) Unmark(seqs ...uint32) {
+// InFlightBacklog is the number of TELEMETRY backlog items in flight.
+func (s *Store) InFlightBacklog() int {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	n := 0
+	for _, f := range s.inflight {
+		if f.backlog {
+			n++
+		}
+	}
+	return n
+}
+
+// Unmark returns items of epoch that were taken but not sent. Unlike Release it does not signal
+// Ready, so a sender whose link refused them waits for the next event instead of spinning.
+func (s *Store) Unmark(epoch uint32, seqs ...uint32) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if epoch != s.epoch {
+		return
+	}
 	for _, seq := range seqs {
 		delete(s.inflight, seq)
 	}
@@ -655,8 +916,8 @@ func (s *Store) Retry(timeout time.Duration) int {
 	s.mu.Lock()
 	cutoff := s.opts.Now().Add(-timeout)
 	n := 0
-	for seq, at := range s.inflight {
-		if at.Before(cutoff) {
+	for seq, f := range s.inflight {
+		if f.at.Before(cutoff) {
 			delete(s.inflight, seq)
 			n++
 		}
@@ -780,34 +1041,31 @@ func (s *Store) AdvanceEpoch(epoch uint32) error {
 	return nil
 }
 
-// Backlog reports every configured lane, in drain order.
+// Backlog reports every configured lane, in drain order. Oldest is the device time of the lane's
+// earliest queued item; it costs one index lookup per lane.
 func (s *Store) Backlog() ([]LaneBacklog, error) {
-	rows, err := s.db.QueryContext(context.Background(), `SELECT lane, MIN(device_time) FROM items GROUP BY lane`)
-	if err != nil {
-		return nil, fmt.Errorf("store: backlog: %w", err)
-	}
 	oldest := map[Lane]time.Time{}
-	for rows.Next() {
-		var lane Lane
+	for lane := range s.opts.Lanes {
 		var dt int64
-		if err := rows.Scan(&lane, &dt); err != nil {
-			_ = rows.Close()
+		err := s.db.QueryRowContext(context.Background(),
+			`SELECT device_time FROM items WHERE lane = ? ORDER BY seq LIMIT 1`, lane).Scan(&dt)
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+		case err != nil:
 			return nil, fmt.Errorf("store: backlog: %w", err)
+		default:
+			oldest[lane] = time.Unix(0, dt)
 		}
-		oldest[lane] = time.Unix(0, dt)
-	}
-	_ = rows.Close()
-	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("store: backlog: %w", err)
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	var out []LaneBacklog
 	for lane := edgelinkv3.Lane_LANE_ALARM; lane <= edgelinkv3.Lane_LANE_BULK; lane++ {
-		if _, ok := s.opts.Lanes[lane]; !ok {
+		pol, ok := s.opts.Lanes[lane]
+		if !ok {
 			continue
 		}
-		b := LaneBacklog{Lane: lane, Oldest: oldest[lane]}
+		b := LaneBacklog{Lane: lane, Oldest: oldest[lane], MaxItems: pol.MaxItems, MaxBytes: pol.MaxBytes}
 		if st := s.lanes[lane]; st != nil {
 			b.Items, b.Bytes, b.Dropped = st.items, st.bytes, st.dropped
 		}
