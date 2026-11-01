@@ -595,3 +595,16 @@ Moving from the 2.x typed calls to commands: [client/MIGRATION.md](client/MIGRAT
 ## License
 
 Licensed under the [Apache License, Version 2.0](LICENSE); see [NOTICE](NOTICE).
+
+### Dependency licences
+
+CI fails when a dependency's licence is not allowed by [licences/policy.yaml](licences/policy.yaml)
+(the same policy in every Zequent SDK; human-readable in the docs under `edge/licence-policy`).
+Every dependency, including test-only ones, is listed in [THIRD_PARTY.md](THIRD_PARTY.md).
+After changing `go.mod`, run `make licences` (needs `go install github.com/google/go-licenses/v2@v2.0.1`
+and `uv`) and commit `THIRD_PARTY.md`. A dependency the policy rejects but that was reviewed goes into
+[licences/exceptions.yaml](licences/exceptions.yaml) with reason, reviewer and date.
+
+Code generated from a `.proto` file carries the licence of that file: never generate code from
+GPL-licensed protos (for example the Meshtastic protobufs) into this module; such a protocol is
+spoken by a separate process.

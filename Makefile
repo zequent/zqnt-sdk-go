@@ -1,7 +1,7 @@
-.PHONY: help build vet test lint tidy check
+.PHONY: help build vet test lint tidy check licences
 
 help:
-	@echo "Targets: build vet test lint tidy check (build + vet + test, what CI runs besides lint)"
+	@echo "Targets: build vet test lint tidy check (build + vet + test, what CI runs besides lint) licences"
 
 build:
 	go build ./...
@@ -19,3 +19,6 @@ tidy:
 	go mod tidy
 
 check: build vet test
+
+licences:
+	scripts/licence-gate.sh
