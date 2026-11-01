@@ -325,6 +325,47 @@ Both directions are authenticated (package `auth`):
 - Make sure you have access to the repository and are authenticated with GitHub
 
 
+## Edge Node (`zqnt-edge-node`)
+
+`cmd/zqnt-edge-node` runs an Edge Node: Device Adapters attach on its local Unix socket with the
+v3 contracts they already speak (point the adapter's platform endpoint at
+`unix:///run/zqnt-edge-node/node.sock`), and the node carries their telemetry, alerts, capabilities
+and command events to the platform over its link. While the link is down everything waits in a
+durable SQLite outbox; commands the platform delivers run at most once on the adapter that
+registered the asset.
+
+```bash
+go install github.com/zequent/zqnt-sdk-go/v3/cmd/zqnt-edge-node@latest
+zqnt-edge-node --config node.yaml --check-config   # validate, print every problem, exit
+zqnt-edge-node --config node.yaml                  # run; SIGTERM shuts down cleanly
+zqnt-edge-node --version
+```
+
+Cross-compiled without cgo:
+`CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -ldflags "-X main.version=v3.x.y" ./cmd/zqnt-edge-node`
+(also `amd64`, and `GOARCH=arm GOARM=7`).
+
+The configuration (annotated example: [`examples/edge-node/node.yaml`](examples/edge-node/node.yaml)):
+
+| Key | Default | |
+|---|---|---|
+| `node_id` | required | the node's id on the platform |
+| `assets` | none | announced in every Hello; assets adapters register on the socket are added and announced from the next session |
+| `store.path` | `/var/lib/zqnt-edge-node/node.db` | durable outbox |
+| `quotas.<lane>.max_items` / `max_bytes` | lane defaults | lanes `alarm`, `command_reply`, `status`, `telemetry`, `bulk`; sizes like `20MiB` |
+| `local.socket` / `mode` / `group` | `/run/zqnt-edge-node/node.sock`, `"0600"` | only owner and group may have access |
+| `local.default_adapter_endpoint` | none | `unix:///path` of the adapter that gets commands when the adapter did not name its own socket |
+| `report_interval` | `1m` | LinkReport to the platform and the `node stats` log line |
+| `shutdown_timeout` | `10s` | how long a stopping node waits for running commands |
+| `log.level` / `log.format` | `info` / `text` | `json` for log shippers |
+| `links` | required | exactly one link for now (`ip-session`: `endpoint`, `token_file`, `ca_file`, `insecure`) |
+
+Shutdown stops accepting adapters, waits for running commands, closes the link and flushes the
+store; a command still running is reported as interrupted on the next start. The node logs
+connects, session losses and a periodic `node stats` line (link counters, lane backlog and drops).
+Not in this build yet: node identity and enrollment (the Hello goes out unsigned), several links
+with switching, and relaying.
+
 ## Client SDK
 
 
