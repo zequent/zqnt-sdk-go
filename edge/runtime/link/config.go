@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"go.yaml.in/yaml/v3"
 )
@@ -119,4 +120,30 @@ func (l LinkConfig) RequiredString(key string) (string, error) {
 		err = fmt.Errorf("%s is required", key)
 	}
 	return s, err
+}
+
+// Bool reads an optional boolean option.
+func (l LinkConfig) Bool(key string, fallback bool) (bool, error) {
+	v, ok := l.Options[key]
+	if !ok || v == nil {
+		return fallback, nil
+	}
+	b, ok := v.(bool)
+	if !ok {
+		return false, fmt.Errorf("%s: want a boolean, got %T", key, v)
+	}
+	return b, nil
+}
+
+// Duration reads an optional duration option written as a Go duration ("500ms", "10s").
+func (l LinkConfig) Duration(key string, fallback time.Duration) (time.Duration, error) {
+	s, err := l.String(key, "")
+	if err != nil || s == "" {
+		return fallback, err
+	}
+	d, err := time.ParseDuration(s)
+	if err != nil {
+		return 0, fmt.Errorf("%s: %w", key, err)
+	}
+	return d, nil
 }
