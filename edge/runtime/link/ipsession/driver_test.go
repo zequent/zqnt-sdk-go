@@ -153,7 +153,7 @@ func TestHandshakeFirstOnEveryConnection(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	d.SetHandshake(func() ([]byte, error) {
+	d.SetHandshake(func(link.Handshake) ([]byte, error) {
 		return frame(t, &edgelinkv3.UplinkFrame{Frame: &edgelinkv3.UplinkFrame_Hello{Hello: &edgelinkv3.Hello{NodeId: "n1"}}}), nil
 	})
 	if res := d.Send(context.Background(), ping(t, 1), link.SendMeta{}); res.Status != link.Down {

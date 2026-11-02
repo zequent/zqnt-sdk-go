@@ -13,6 +13,8 @@ import (
 	edgelinkv3 "github.com/zequent/zqnt-api/go/v3/gen/zqnt/edgelink/v3"
 	telemetryv3 "github.com/zequent/zqnt-api/go/v3/gen/zqnt/telemetry/v3"
 
+	"github.com/zequent/zqnt-sdk-go/v3/edge/runtime/identity"
+	"github.com/zequent/zqnt-sdk-go/v3/edge/runtime/identity/identitytest"
 	"github.com/zequent/zqnt-sdk-go/v3/edge/runtime/link"
 	_ "github.com/zequent/zqnt-sdk-go/v3/edge/runtime/link/ipsession"
 	"github.com/zequent/zqnt-sdk-go/v3/edge/runtime/session"
@@ -67,7 +69,19 @@ links:
 	if err != nil {
 		t.Fatal(err)
 	}
+	enrolled := identitytest.Enroll(t, p.auth, p.org)
+	id, err := identity.NewProvider(enrolled.Dir, enrolled.Store, enrolled.State)
+	if err != nil {
+		t.Fatal(err)
+	}
+	trust, err := enrolled.Dir.Trust(enrolled.State)
+	if err != nil {
+		t.Fatal(err)
+	}
+	p.set(func(p *platform) { p.nodeKey = enrolled.Key.Public })
 	scfg := session.Config{
+		Identity:          id,
+		Trust:             trust,
 		NodeID:            nodeID,
 		AssetSNs:          []string{"SIM-1"},
 		LinkKind:          "ip-session",

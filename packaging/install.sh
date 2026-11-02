@@ -30,12 +30,13 @@ if ! getent passwd "$USER_NAME" >/dev/null; then
 fi
 
 install -D -m 0755 zqnt-edge-node "$PREFIX/bin/zqnt-edge-node"
+install -d -m 0750 -o "$USER_NAME" -g "$USER_NAME" /var/lib/zqnt-edge-node
 install -d -m 0755 "$CONFIG_DIR"
 if [ -e "$CONFIG_DIR/node.yaml" ]; then
   echo "kept existing $CONFIG_DIR/node.yaml"
 else
   install -m 0640 -o root -g "$USER_NAME" node.yaml "$CONFIG_DIR/node.yaml"
-  echo "installed example $CONFIG_DIR/node.yaml: set node_id and the link before starting"
+  echo "installed example $CONFIG_DIR/node.yaml: set the identity key store and the link before starting"
 fi
 
 if [ "$PREFIX" = /usr/local ]; then
@@ -49,4 +50,6 @@ systemctl daemon-reload
 
 echo "next: edit $CONFIG_DIR/node.yaml, check it with"
 echo "  $PREFIX/bin/zqnt-edge-node --config $CONFIG_DIR/node.yaml --check-config"
+echo "enroll it once with a claim code from the console:"
+echo "  sudo -u $USER_NAME $PREFIX/bin/zqnt-edge-node enroll --config $CONFIG_DIR/node.yaml --claim-code ZQ-XXXXX-XXXXX"
 echo "then: systemctl enable --now zqnt-edge-node"

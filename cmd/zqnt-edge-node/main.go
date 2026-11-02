@@ -5,6 +5,11 @@
 //	zqnt-edge-node --config /etc/zqnt-edge-node/node.yaml
 //	zqnt-edge-node --config node.yaml --check-config
 //	zqnt-edge-node --version
+//	zqnt-edge-node enroll --config node.yaml --claim-code ZQ-ABCDE-FGHJK [--platform host:port]
+//	zqnt-edge-node enroll --config node.yaml --provisioning provisioning.json
+//	zqnt-edge-node identity --config node.yaml
+//	zqnt-edge-node rotate-key --config node.yaml
+//	zqnt-edge-node renew-credential --config node.yaml
 package main
 
 import (
@@ -33,12 +38,23 @@ func main() {
 }
 
 func run(args []string, stdout, stderr io.Writer) int {
+	if len(args) > 0 {
+		if cmd, ok := commands[args[0]]; ok {
+			return cmd(args[1:], stdout, stderr)
+		}
+	}
 	fl := flag.NewFlagSet("zqnt-edge-node", flag.ContinueOnError)
 	fl.SetOutput(stderr)
+	fl.Usage = func() { usage(fl) }
 	configPath := fl.String("config", defaultConfig, "node configuration file")
 	showVersion := fl.Bool("version", false, "print the version and exit")
-	checkOnly := fl.Bool("check-config", false, "validate the configuration and exit")
+	checkOnly := fl.Bool("check-config", false, "validate the configuration and the key store and exit")
 	if err := fl.Parse(args); err != nil {
+		return 2
+	}
+	if fl.NArg() > 0 {
+		_, _ = fmt.Fprintf(stderr, "unknown command %q\n", fl.Arg(0))
+		usage(fl)
 		return 2
 	}
 	if *showVersion {
@@ -51,8 +67,7 @@ func run(args []string, stdout, stderr io.Writer) int {
 		return 1
 	}
 	if *checkOnly {
-		_, _ = fmt.Fprintf(stdout, "%s: configuration is valid\n", *configPath)
-		return 0
+		return checkConfig(*configPath, cfg, stdout, stderr)
 	}
 
 	log := newLogger(cfg.Log, stderr)
@@ -67,6 +82,35 @@ func run(args []string, stdout, stderr io.Writer) int {
 		log.Error("edge node failed", "error", err)
 		return 1
 	}
+	return 0
+}
+
+func usage(fl *flag.FlagSet) {
+	_, _ = fmt.Fprintf(fl.Output(), `Usage:
+  zqnt-edge-node [--config FILE]                 run the node
+  zqnt-edge-node --config FILE --check-config    validate the configuration and exit
+  zqnt-edge-node enroll --config FILE --claim-code CODE [--platform HOST:PORT]
+  zqnt-edge-node enroll --config FILE --provisioning FILE | --provisioning-qr PAYLOAD
+  zqnt-edge-node identity --config FILE          show the node id, key and anchor fingerprints
+  zqnt-edge-node rotate-key --config FILE        replace the identity key
+  zqnt-edge-node renew-credential --config FILE  renew the node credential now
+
+Flags:
+`)
+	fl.PrintDefaults()
+}
+
+func checkConfig(path string, cfg node.Config, stdout, stderr io.Writer) int {
+	if err := cfg.Identity.Check(); err != nil {
+		_, _ = fmt.Fprintln(stderr, err)
+		return 1
+	}
+	status, err := enrollmentStatus(cfg)
+	if err != nil {
+		_, _ = fmt.Fprintln(stderr, err)
+		return 1
+	}
+	_, _ = fmt.Fprintf(stdout, "%s: configuration is valid; %s\n", path, status)
 	return 0
 }
 

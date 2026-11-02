@@ -8,6 +8,7 @@ Status `review` marks file-level copyleft (ship unmodified, publish changes to i
 |---|---|---|
 | `github.com/cespare/xxhash/v2` | MIT | allow |
 | `github.com/dustin/go-humanize` | MIT | allow |
+| `github.com/google/go-tpm` | Apache-2.0 | allow |
 | `github.com/google/uuid` | BSD-3-Clause | allow |
 | `github.com/mattn/go-isatty` | MIT | allow |
 | `github.com/ncruces/go-strftime` | MIT | allow |

@@ -5,6 +5,8 @@ import (
 	"testing"
 	"time"
 
+	edgelinkv3 "github.com/zequent/zqnt-api/go/v3/gen/zqnt/edgelink/v3"
+
 	"github.com/zequent/zqnt-sdk-go/v3/edge/runtime/link"
 	"github.com/zequent/zqnt-sdk-go/v3/edge/runtime/store"
 )
@@ -22,7 +24,7 @@ func TestTheBacklogBudgetFollowsTheBandwidthEstimate(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() { _ = st.Close() })
-	s, err := New(Config{NodeID: "n", Store: st, Driver: meteredDriver{bps: 8000}, Window: 10})
+	s, err := New(Config{NodeID: "n", Store: st, Driver: meteredDriver{bps: 8000}, Window: 10, Identity: stubIdentity{}, Trust: stubTrust{}})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -42,3 +44,17 @@ func TestTheBacklogBudgetFollowsTheBandwidthEstimate(t *testing.T) {
 		t.Fatalf("budget after 3 s = %d, want about 200", o.BacklogBytes)
 	}
 }
+
+type stubIdentity struct{}
+
+func (stubIdentity) Suite() uint32                    { return 0x0101 }
+func (stubIdentity) KeyID() []byte                    { return make([]byte, 16) }
+func (stubIdentity) Sign(_, _ []byte) ([]byte, error) { return make([]byte, 64), nil }
+
+type stubTrust struct{}
+
+func (stubTrust) OrganizationID() string { return "" }
+func (stubTrust) VerifyPlatformKey(*edgelinkv3.PlatformKey, time.Time, bool) error {
+	return nil
+}
+func (stubTrust) RaiseHighWater(time.Time) error { return nil }

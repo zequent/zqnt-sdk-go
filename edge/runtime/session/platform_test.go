@@ -12,6 +12,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
+
+	"github.com/zequent/zqnt-sdk-go/v3/edge/runtime/identity/identitytest"
 )
 
 type msgKey struct{ epoch, seq uint32 }
@@ -21,6 +23,8 @@ type msgKey struct{ epoch, seq uint32 }
 type platform struct {
 	edgelinkv3.UnimplementedEdgeLinkServiceServer
 	addr string
+	auth *identitytest.Authority
+	org  string
 
 	mu        sync.Mutex
 	reject    bool
@@ -36,6 +40,8 @@ type platform struct {
 	hellos    []*edgelinkv3.Hello
 	dlAcks    []*edgelinkv3.Ack
 	sessions  int
+	nodeKey   []byte
+	served    []string
 	kills     []context.CancelFunc
 	sendQ     chan *edgelinkv3.DownlinkFrame
 }
@@ -48,6 +54,8 @@ func startPlatform(t *testing.T) *platform {
 	}
 	p := &platform{
 		addr:  lis.Addr().String(),
+		auth:  identitytest.NewAuthority(t),
+		org:   "6f1c2a0e-3b5d-4c8e-9a7f-1d2e3f405162",
 		got:   map[msgKey]*edgelinkv3.Envelope{},
 		sendQ: make(chan *edgelinkv3.DownlinkFrame, 64),
 	}
@@ -111,6 +119,13 @@ func (p *platform) Connect(stream edgelinkv3.EdgeLinkService_ConnectServer) erro
 	if hello == nil {
 		return status.Error(codes.InvalidArgument, "first frame must be Hello")
 	}
+	p.mu.Lock()
+	nodeKey := p.nodeKey
+	p.mu.Unlock()
+	transcript, err := identitytest.VerifyHello(hello, p.org, nil, nodeKey)
+	if err != nil {
+		return status.Error(codes.Unauthenticated, "handshake refused")
+	}
 	ctx, cancel := context.WithCancel(stream.Context())
 	defer cancel()
 
@@ -125,8 +140,9 @@ func (p *platform) Connect(stream edgelinkv3.EdgeLinkService_ConnectServer) erro
 	p.hellos = append(p.hellos, proto.Clone(hello).(*edgelinkv3.Hello))
 	p.sessions++
 	p.kills = append(p.kills, cancel)
-	welcome := &edgelinkv3.Welcome{ClockOffsetMs: p.offsetMs, ResumeFrom: p.ack(), SessionId: fmt.Sprint("s", p.sessions)}
+	welcome := &edgelinkv3.Welcome{ClockOffsetMs: p.offsetMs, ResumeFrom: p.ack(), SessionId: fmt.Sprint("s", p.sessions), ServedAssetSns: p.served}
 	p.mu.Unlock()
+	p.auth.Welcome(transcript, hello, welcome).Zero()
 	if err := send(&edgelinkv3.DownlinkFrame{Frame: &edgelinkv3.DownlinkFrame_Welcome{Welcome: welcome}}); err != nil {
 		return err
 	}
