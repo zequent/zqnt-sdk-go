@@ -29,18 +29,27 @@ func TestFlags(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	noTPM := filepath.Join(t.TempDir(), "node.yaml")
+	if err := os.WriteFile(noTPM, []byte(strings.Replace(string(example), "  # tpm_device: /dev/tpmrm0",
+		"  tpm_device: "+filepath.Join(t.TempDir(), "tpmrm0"), 1)), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	devExample, err := os.ReadFile(filepath.Join("..", "..", "examples", "edge-node", "node-dev.yaml"))
+	if err != nil {
+		t.Fatal(err)
+	}
 	sealingKey := filepath.Join(t.TempDir(), "sealing.key")
 	if err := os.WriteFile(sealingKey, []byte(strings.Repeat("ab", 32)), 0o600); err != nil {
 		t.Fatal(err)
 	}
-	exampleCfg := filepath.Join(t.TempDir(), "node.yaml")
-	adjusted := strings.ReplaceAll(string(example), "/etc/zqnt-edge-node/sealing.key", sealingKey)
-	adjusted = strings.ReplaceAll(adjusted, "# dir: /var/lib/zqnt-edge-node/identity", "dir: "+filepath.Join(t.TempDir(), "identity"))
+	exampleCfg := filepath.Join(t.TempDir(), "node-dev.yaml")
+	adjusted := strings.ReplaceAll(string(devExample), "dir: ./identity", "dir: "+filepath.Join(t.TempDir(), "identity"))
+	adjusted = strings.ReplaceAll(adjusted, "# sealing_key_file: ./dev-sealing.key", "sealing_key_file: "+sealingKey)
 	if err := os.WriteFile(exampleCfg, []byte(adjusted), 0o600); err != nil {
 		t.Fatal(err)
 	}
 	missingKey := filepath.Join(t.TempDir(), "node.yaml")
-	if err := os.WriteFile(missingKey, example, 0o600); err != nil {
+	if err := os.WriteFile(missingKey, []byte(strings.ReplaceAll(adjusted, sealingKey, sealingKey+".missing")), 0o600); err != nil {
 		t.Fatal(err)
 	}
 	cases := []struct {
@@ -51,6 +60,7 @@ func TestFlags(t *testing.T) {
 		{[]string{"--version"}, 0, "zqnt-edge-node dev", ""},
 		{[]string{"--config", exampleCfg, "--check-config"}, 0, "configuration is valid; not enrolled yet", ""},
 		{[]string{"--config", missingKey, "--check-config"}, 1, "", "sealing key"},
+		{[]string{"--config", noTPM, "--check-config"}, 1, "", "identity.tpm_device"},
 		{[]string{"--config", bad, "--check-config"}, 1, "", "links: one link is required"},
 		{[]string{"--config", filepath.Join(t.TempDir(), "missing.yaml")}, 1, "", "no such file"},
 		{[]string{"--bogus"}, 2, "", "flag provided but not defined"},

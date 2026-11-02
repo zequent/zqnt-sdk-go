@@ -458,7 +458,7 @@ links: [{id: lan, driver: ip-session, endpoint: "127.0.0.1:1", insecure: true}]
 		"not enrolled":    {fmt.Sprintf("{key_store: software-dev, dev: true, dir: %q}", t.TempDir()), "not enrolled"},
 		"other class":     {fmt.Sprintf("{key_store: software-dev, dev: true, dir: %q, node_class: personal}", enrolled.Dir), "enrolled as a infrastructure node"},
 		"other suite":     {fmt.Sprintf("{key_store: software-dev, dev: true, dir: %q, suite: s1-aes-256-gcm}", enrolled.Dir), "enrolled with suite"},
-		"other key store": {fmt.Sprintf("{key_store: software-sealed, sealing_key_env: ZQNT_TEST_SEALING_KEY, dir: %q}", enrolled.Dir), "holds no identity key"},
+		"other key store": {fmt.Sprintf("{key_store: software-dev, dev: true, sealing_key_env: ZQNT_TEST_SEALING_KEY, dir: %q}", enrolled.Dir), "holds no identity key"},
 	} {
 		t.Run(name, func(t *testing.T) {
 			t.Setenv("ZQNT_TEST_SEALING_KEY", strings.Repeat("42", 32))

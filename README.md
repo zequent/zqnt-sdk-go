@@ -351,10 +351,10 @@ The configuration (annotated example: [`examples/edge-node/node.yaml`](examples/
 
 | Key | Default | |
 |---|---|---|
-| `identity.key_store` | required | `tpm`, `software-sealed` or `software-dev` (see [Node identity](#node-identity)) |
+| `identity.key_store` | required | `tpm`, `software-tpm-sealed` or `software-dev` (see [Node identity](#node-identity)) |
 | `identity.dir` | `/var/lib/zqnt-edge-node/identity` | enrollment (`node.json`), credential, time high-water mark, key files |
-| `identity.sealing_key_file` / `sealing_key_env` | | `software-sealed`: 32-byte sealing key (64 hex digits); the file must not be readable by others |
-| `identity.tpm_device` | `/dev/tpmrm0` | `tpm` |
+| `identity.sealing_key_file` / `sealing_key_env` | | `software-dev` only, optional: 32-byte key (64 hex digits) that encrypts the dev key at rest; the file must not be readable by others |
+| `identity.tpm_device` | `/dev/tpmrm0` | `tpm`, `software-tpm-sealed` |
 | `identity.node_class` | `infrastructure` | or `personal`; must match the claim |
 | `identity.suite` | `s1-chacha20-poly1305` | or `s1-aes-256-gcm` |
 | `identity.dev` | `false` | `software-dev` keys are refused unless `true` |
@@ -386,8 +386,13 @@ the platform time in a signed HelloRetry first.
 | `key_store` | Key protection | |
 |---|---|---|
 | `tpm` | `TPM` | generated in the TPM 2.0 (`/dev/tpmrm0`), never leaves it; the blob in `identity.dir` is useless without that TPM |
-| `software-sealed` | `SOFTWARE_SEALED` | P-256 key encrypted at rest (AES-256-GCM) with the sealing key; for boards without a TPM |
-| `software-dev` | `SOFTWARE_DEV` | plain key file, refused unless `identity.dev: true`; development, simulators, CI |
+| `software-tpm-sealed` | `SOFTWARE_SEALED` | software P-256 key sealed by the TPM 2.0 (bound to that TPM, not to PCRs), unsealed into memory at start over an encrypted session; for TPMs that cannot hold the key themselves |
+| `software-dev` | `SOFTWARE_DEV` | plain key file, or encrypted with a sealing key from `sealing_key_file`/`sealing_key_env` (still `SOFTWARE_DEV`: that key lives on the same device); refused unless `identity.dev: true`; development, simulators, CI |
+
+Production installations require at least `SOFTWARE_SEALED` (spec decision OD-5), so a node
+without a TPM can only join a development installation. The annotated example
+[`examples/edge-node/node.yaml`](examples/edge-node/node.yaml) uses `tpm`;
+[`examples/edge-node/node-dev.yaml`](examples/edge-node/node-dev.yaml) is a development node.
 
 The node never falls back to another key store. `--check-config` checks that the sealing key or
 TPM device is there and whether the node is enrolled.
@@ -406,9 +411,9 @@ zqnt-edge-node renew-credential --config /etc/zqnt-edge-node/node.yaml  # the ru
 After enrolling, compare the anchor fingerprint the command prints with the one the console shows.
 The running node renews its credential when a third of its lifetime remains. A node that receives a
 revocation naming itself erases its enrollment, credential and identity key and stops; it needs a
-re-enrollment claim (`enroll --reenroll`). The TPM key store is tested against the TPM 2.0
-reference simulator in its own module: `cd edge/runtime/identity/tpmsim && go test ./...` (cgo,
-libcrypto).
+re-enrollment claim (`enroll --reenroll`). Both TPM key stores are tested against the TPM 2.0
+reference simulator in a module of their own, not in CI: run `make test-tpm` locally (cgo, a C
+compiler and libcrypto headers) after changing them.
 
 ### Installing an Edge Node
 
@@ -455,7 +460,7 @@ Device Adapters reach the socket through the group: add the adapter's user to `z
 listens on a socket in a directory of its own (for example its own `RuntimeDirectory`) and is named
 in `local.default_adapter_endpoint`, since `/run/zqnt-edge-node` belongs to the node. A link over a
 serial (cellular) modem needs the device: in `systemctl edit zqnt-edge-node` set
-`SupplementaryGroups=dialout` and `PrivateDevices=no`. The `tpm` key store needs the TPM: set
+`SupplementaryGroups=dialout` and `PrivateDevices=no`. The `tpm` and `software-tpm-sealed` key stores need the TPM: set
 `SupplementaryGroups=tss`, `PrivateDevices=no` and `DeviceAllow=/dev/tpmrm0 rw` (and run `enroll`
 as `zqnt-edge` with the `tss` group).
 

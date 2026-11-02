@@ -46,17 +46,19 @@ func TestAMinimalConfigTakesTheDefaults(t *testing.T) {
 	}
 }
 
-func TestTheExampleConfigIsValid(t *testing.T) {
-	if _, err := node.LoadConfig(filepath.Join("..", "..", "..", "examples", "edge-node", "node.yaml")); err != nil {
-		t.Fatal(err)
+func TestTheExampleConfigsAreValid(t *testing.T) {
+	for _, name := range []string{"node.yaml", "node-dev.yaml"} {
+		if _, err := node.LoadConfig(filepath.Join("..", "..", "..", "examples", "edge-node", name)); err != nil {
+			t.Fatalf("%s: %v", name, err)
+		}
 	}
 }
 
 func TestAFullConfigIsRead(t *testing.T) {
 	cfg, err := node.ParseConfig([]byte(`
 identity:
-  key_store: software-sealed
-  sealing_key_file: /etc/zqnt-edge-node/sealing.key
+  key_store: software-tpm-sealed
+  tpm_device: /dev/tpm0
   dir: /data/identity
   node_class: personal
   suite: s1-aes-256-gcm
@@ -126,7 +128,7 @@ links:
     driver: ip-session
     endpoint: x:1
 `, []string{
-			"refused unless identity.dev is true", `node_class "soldier"`, `suite "s9"`, "tpm_device: only for key_store tpm",
+			"refused unless identity.dev is true", `node_class "soldier"`, `suite "s9"`, "tpm_device: only for key_store tpm and software-tpm-sealed",
 			`assets[1]: duplicate "A"`, "assets[2]: empty serial number",
 			`unknown lane "radio"`, "quotas.bulk: limits must not be negative",
 			"local.mode 0666", "local.group", "local.default_adapter_endpoint",
@@ -135,8 +137,8 @@ links:
 		"bad mode":     {minimal + "local: {mode: rw}\n", []string{`mode "rw" is not octal`}},
 		"bad size":     {minimal + "quotas: {bulk: {max_bytes: lots}}\n", []string{`"lots" is not a size`}},
 		"bad duration": {minimal + "report_interval: soon\n", []string{"soon"}},
-		"sealed without a key": {"identity: {key_store: software-sealed}\nlinks: [{id: lte, driver: ip-session, endpoint: \"a:1\"}]\n",
-			[]string{"software-sealed needs sealing_key_file or sealing_key_env"}},
+		"sealing key outside dev": {"identity: {key_store: tpm, sealing_key_env: K}\nlinks: [{id: lte, driver: ip-session, endpoint: \"a:1\"}]\n",
+			[]string{"sealing_key_file/sealing_key_env: only for key_store software-dev"}},
 		"unknown key store": {"identity: {key_store: yubikey}\nlinks: [{id: lte, driver: ip-session, endpoint: \"a:1\"}]\n",
 			[]string{`key_store "yubikey"`}},
 		"two links": {`

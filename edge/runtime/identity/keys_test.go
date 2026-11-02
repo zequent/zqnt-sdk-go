@@ -27,7 +27,7 @@ func stores(t *testing.T) map[string]KeyStore {
 	if err != nil {
 		t.Fatal(err)
 	}
-	sealed, err := NewSealedKeyStore(filepath.Join(t.TempDir(), "sealed"), sealingKey())
+	sealed, err := NewFileSealedKeyStore(filepath.Join(t.TempDir(), "sealed"), sealingKey())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -94,7 +94,7 @@ func blobPath(s KeyStore, name string) string {
 	switch s := s.(type) {
 	case *DevKeyStore:
 		return s.path(name)
-	case *SealedKeyStore:
+	case *FileSealedKeyStore:
 		return s.path(name)
 	}
 	return ""
@@ -102,7 +102,7 @@ func blobPath(s KeyStore, name string) string {
 
 func TestSealedKeyIsEncryptedAtRest(t *testing.T) {
 	dir := t.TempDir()
-	s, err := NewSealedKeyStore(dir, sealingKey())
+	s, err := NewFileSealedKeyStore(dir, sealingKey())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -121,7 +121,7 @@ func TestSealedKeyIsEncryptedAtRest(t *testing.T) {
 	if bytes.Contains(data, scalar) || strings.Contains(string(data), hex.EncodeToString(scalar)) {
 		t.Fatal("the sealed file holds the private scalar in plain form")
 	}
-	other, err := NewSealedKeyStore(dir, bytes.Repeat([]byte{1}, SealingKeySize))
+	other, err := NewFileSealedKeyStore(dir, bytes.Repeat([]byte{1}, SealingKeySize))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -195,7 +195,7 @@ func TestVectorIdentityKeyInEveryStore(t *testing.T) {
 	if err := dev.create(KeyActive, pem.EncodeToMemory(&pem.Block{Type: "PRIVATE KEY", Bytes: der})); err != nil {
 		t.Fatal(err)
 	}
-	sealed, err := NewSealedKeyStore(t.TempDir(), sealingKey())
+	sealed, err := NewFileSealedKeyStore(t.TempDir(), sealingKey())
 	if err != nil {
 		t.Fatal(err)
 	}

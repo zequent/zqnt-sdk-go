@@ -4,14 +4,14 @@
 #   zqnt-edge-node enroll --config node.yaml --claim-code ZQ-XXXXX-XXXXX
 # stores it in identity.dir together with the pinned platform anchors and the node credential.
 identity:
-  # Where the identity key lives: tpm (generated in the TPM 2.0, never leaves it),
-  # software-sealed (encrypted at rest with a sealing key) or software-dev (plain file; refused
-  # unless dev: true; development and simulators only).
-  key_store: software-sealed
-  # 32 bytes as 64 hex digits; others must have no access (root:zqnt-edge 0640).
-  # Create it with: head -c 32 /dev/urandom | od -An -tx1 | tr -d ' \n'
-  sealing_key_file: /etc/zqnt-edge-node/sealing.key
-  # sealing_key_env: ZQNT_EDGE_SEALING_KEY
+  # Where the identity key lives:
+  #   tpm                  generated in the TPM 2.0 and never leaves it (KEY_PROTECTION_TPM)
+  #   software-tpm-sealed  software key sealed by the TPM 2.0, for TPMs that cannot hold the key
+  #                        themselves (SOFTWARE_SEALED, the production minimum)
+  #   software-dev         plain or file-sealed key (SOFTWARE_DEV): refused unless dev: true, and
+  #                        refused by production platforms; see node-dev.yaml
+  # The service needs the TPM: see the tpm lines in the systemd unit.
+  key_store: tpm
   # tpm_device: /dev/tpmrm0
   # dir: /var/lib/zqnt-edge-node/identity
   # infrastructure, or personal for a device carried by a person; must match the claim.

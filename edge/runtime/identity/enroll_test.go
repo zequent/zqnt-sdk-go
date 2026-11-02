@@ -23,7 +23,7 @@ type fixture struct {
 	tls    identitytest.TLS
 	server *identitytest.EnrollmentServer
 	dir    identity.Dir
-	store  *identity.SealedKeyStore
+	store  *identity.FileSealedKeyStore
 }
 
 func newFixture(t *testing.T) *fixture {
@@ -31,7 +31,7 @@ func newFixture(t *testing.T) *fixture {
 	auth := identitytest.NewAuthority(t)
 	creds := identitytest.NewTLS(t)
 	dir := identity.Dir(filepath.Join(t.TempDir(), "identity"))
-	store, err := identity.NewSealedKeyStore(string(dir), bytes.Repeat([]byte{7}, identity.SealingKeySize))
+	store, err := identity.NewFileSealedKeyStore(string(dir), bytes.Repeat([]byte{7}, identity.SealingKeySize))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -72,7 +72,7 @@ func TestEnrollStoresTheIdentity(t *testing.T) {
 	if len(n.Binding) != 32 {
 		t.Fatalf("platform saw channel binding %x", n.Binding)
 	}
-	if n.Protection != edgelinkv3.KeyProtection_KEY_PROTECTION_SOFTWARE_SEALED || len(n.Assets) != 2 {
+	if n.Protection != edgelinkv3.KeyProtection_KEY_PROTECTION_SOFTWARE_DEV || len(n.Assets) != 2 {
 		t.Fatalf("enrolled %+v", n)
 	}
 	loaded, err := f.dir.LoadState()
@@ -81,7 +81,7 @@ func TestEnrollStoresTheIdentity(t *testing.T) {
 	}
 	if loaded.NodeID != n.NodeID || state.NodeID != n.NodeID || !bytes.Equal(loaded.IdentityKeyID, n.KeyID) ||
 		loaded.InstallationID != f.auth.InstallationID || loaded.OrganizationID != f.server.OrganizationID ||
-		loaded.KeyProtection != "KEY_PROTECTION_SOFTWARE_SEALED" || !bytes.Equal(loaded.Anchors[0].KeyID, f.auth.Anchor.ID) {
+		loaded.KeyProtection != "KEY_PROTECTION_SOFTWARE_DEV" || !bytes.Equal(loaded.Anchors[0].KeyID, f.auth.Anchor.ID) {
 		t.Fatalf("state %+v", loaded)
 	}
 	token, meta, err := f.dir.Credential()

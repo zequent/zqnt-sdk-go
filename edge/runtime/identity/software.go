@@ -89,9 +89,11 @@ const SealingKeySize = 32
 
 const sealedLabel = "zqnt-edge-identity-sealed-v1"
 
-// SealedKeyStore keeps P-256 private scalars encrypted at rest with AES-256-GCM under a sealing
-// key (SOFTWARE_SEALED); the scalar is decrypted into memory only while the runtime runs.
-type SealedKeyStore struct {
+// FileFileSealedKeyStore keeps P-256 private scalars encrypted at rest with AES-256-GCM under a
+// sealing key from a file or the environment. The sealing key sits next to the sealed key on the
+// same device, so this is no hardware protection: the keys report SOFTWARE_DEV, like a plain key
+// file, and are for development and simulators only.
+type FileSealedKeyStore struct {
 	blobStore
 	aead cipher.AEAD
 }
@@ -103,8 +105,8 @@ type sealedFile struct {
 	Ciphertext []byte `json:"ciphertext"`
 }
 
-// NewSealedKeyStore keeps keys as <dir>/<name>.sealed, sealed under sealingKey (32 bytes).
-func NewSealedKeyStore(dir string, sealingKey []byte) (*SealedKeyStore, error) {
+// NewFileSealedKeyStore keeps keys as <dir>/<name>.sealed, sealed under sealingKey (32 bytes).
+func NewFileSealedKeyStore(dir string, sealingKey []byte) (*FileSealedKeyStore, error) {
 	if len(sealingKey) != SealingKeySize {
 		return nil, fmt.Errorf("identity: sealing key has %d bytes, want %d", len(sealingKey), SealingKeySize)
 	}
@@ -120,14 +122,14 @@ func NewSealedKeyStore(dir string, sealingKey []byte) (*SealedKeyStore, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &SealedKeyStore{blobStore: b, aead: aead}, nil
+	return &FileSealedKeyStore{blobStore: b, aead: aead}, nil
 }
 
-func (s *SealedKeyStore) Protection() edgelinkv3.KeyProtection {
-	return edgelinkv3.KeyProtection_KEY_PROTECTION_SOFTWARE_SEALED
+func (s *FileSealedKeyStore) Protection() edgelinkv3.KeyProtection {
+	return edgelinkv3.KeyProtection_KEY_PROTECTION_SOFTWARE_DEV
 }
 
-func (s *SealedKeyStore) Generate(name string) (Key, error) {
+func (s *FileSealedKeyStore) Generate(name string) (Key, error) {
 	priv, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	if err != nil {
 		return nil, err
@@ -156,7 +158,7 @@ func (s *SealedKeyStore) Generate(name string) (Key, error) {
 	return softwareKey{priv, s.Protection()}, nil
 }
 
-func (s *SealedKeyStore) Load(name string) (Key, error) {
+func (s *FileSealedKeyStore) Load(name string) (Key, error) {
 	data, err := s.read(name)
 	if err != nil {
 		return nil, err
@@ -184,7 +186,7 @@ func (s *SealedKeyStore) Load(name string) (Key, error) {
 	return softwareKey{priv, s.Protection()}, nil
 }
 
-func (s *SealedKeyStore) Close() error { return nil }
+func (s *FileSealedKeyStore) Close() error { return nil }
 
 func sealedAAD(pub []byte) []byte { return append([]byte(sealedLabel), pub...) }
 

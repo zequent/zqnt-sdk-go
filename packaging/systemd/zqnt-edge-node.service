@@ -13,7 +13,7 @@ Restart=on-failure
 RestartSec=5s
 TimeoutStopSec=30s
 
-# /etc/zqnt-edge-node (node.yaml, sealing key), /var/lib/zqnt-edge-node (node.db, identity/),
+# /etc/zqnt-edge-node (node.yaml), /var/lib/zqnt-edge-node (node.db, identity/),
 # /run/zqnt-edge-node (node.sock; adapters in the zqnt-edge group may traverse it).
 ConfigurationDirectory=zqnt-edge-node
 StateDirectory=zqnt-edge-node
@@ -50,7 +50,7 @@ SystemCallErrorNumber=EPERM
 #SupplementaryGroups=dialout
 #PrivateDevices=no
 
-# identity.key_store tpm: uncomment these lines.
+# identity.key_store tpm or software-tpm-sealed: uncomment these lines.
 #SupplementaryGroups=tss
 #PrivateDevices=no
 #DeviceAllow=/dev/tpmrm0 rw

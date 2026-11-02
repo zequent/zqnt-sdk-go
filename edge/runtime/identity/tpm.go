@@ -62,6 +62,16 @@ func NewTPMKeyStore(dir string, t transport.TPMCloser) (*TPMKeyStore, error) {
 	if err != nil {
 		return nil, err
 	}
+	srk, err := createSRK(t)
+	if err != nil {
+		return nil, err
+	}
+	return &TPMKeyStore{blobStore: b, tpm: t, srk: srk, handles: map[*tpmKey]struct{}{}}, nil
+}
+
+// createSRK makes the owner hierarchy's standard ECC storage root key; the TPM derives the same
+// key from its seed every time.
+func createSRK(t transport.TPM) (*tpm2.CreatePrimaryResponse, error) {
 	srk, err := tpm2.CreatePrimary{
 		PrimaryHandle: tpm2.TPMRHOwner,
 		InPublic:      tpm2.New2B(tpm2.ECCSRKTemplate),
@@ -69,7 +79,7 @@ func NewTPMKeyStore(dir string, t transport.TPMCloser) (*TPMKeyStore, error) {
 	if err != nil {
 		return nil, fmt.Errorf("identity: TPM storage root key: %w", err)
 	}
-	return &TPMKeyStore{blobStore: b, tpm: t, srk: srk, handles: map[*tpmKey]struct{}{}}, nil
+	return srk, nil
 }
 
 func (s *TPMKeyStore) Protection() edgelinkv3.KeyProtection {

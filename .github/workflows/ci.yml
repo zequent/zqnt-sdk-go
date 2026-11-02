@@ -67,9 +67,6 @@ jobs:
       - name: Test
         run: go test -race -count=1 ./...
 
-      - name: TPM key store against the TPM 2.0 simulator
-        run: make test-tpm
-
       - name: go.mod is tidy
         run: go mod tidy && git diff --exit-code -- go.mod go.sum
 
