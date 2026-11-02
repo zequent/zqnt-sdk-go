@@ -341,7 +341,8 @@ zqnt-edge-node --config node.yaml                  # run; SIGTERM shuts down cle
 zqnt-edge-node --version
 ```
 
-Cross-compiled without cgo:
+Release archives for Linux come with every release (see
+[Installing an Edge Node](#installing-an-edge-node)); to build one yourself, without cgo:
 `CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -ldflags "-X main.version=v3.x.y" ./cmd/zqnt-edge-node`
 (also `amd64`, and `GOARCH=arm GOARM=7`).
 
@@ -365,6 +366,51 @@ store; a command still running is reported as interrupted on the next start. The
 connects, session losses and a periodic `node stats` line (link counters, lane backlog and drops).
 Not in this build yet: node identity and enrollment (the Hello goes out unsigned), several links
 with switching, and relaying.
+
+### Installing an Edge Node
+
+Every release (`vX.Y.Z`) attaches one archive per target to its
+[GitHub Release](https://github.com/zequent/zqnt-sdk-go/releases):
+`zqnt-edge-node_<version>_linux_amd64.tar.gz` (companion computers, x86 gateways),
+`_linux_arm64` (Raspberry Pi 4/5 and Jetson with a 64-bit OS) and `_linux_armv7` (32-bit Raspberry Pi
+OS), plus `SHA256SUMS` and an SPDX SBOM (`zqnt-edge-node_<version>.spdx.json`). Each archive holds
+the static binary, `LICENSE`, `NOTICE`, `THIRD_PARTY.md`, the example `node.yaml`, the systemd unit
+and `install.sh`.
+
+```bash
+VERSION=vX.Y.Z ARCH=arm64
+curl -fsSLO "https://github.com/zequent/zqnt-sdk-go/releases/download/${VERSION}/zqnt-edge-node_${VERSION}_linux_${ARCH}.tar.gz"
+curl -fsSLO "https://github.com/zequent/zqnt-sdk-go/releases/download/${VERSION}/SHA256SUMS"
+sha256sum -c --ignore-missing SHA256SUMS
+tar -xzf "zqnt-edge-node_${VERSION}_linux_${ARCH}.tar.gz"
+sudo "./zqnt-edge-node_${VERSION}_linux_${ARCH}/install.sh"
+sudoedit /etc/zqnt-edge-node/node.yaml          # node_id, assets, the link
+sudo -u zqnt-edge zqnt-edge-node --config /etc/zqnt-edge-node/node.yaml --check-config
+sudo systemctl enable --now zqnt-edge-node
+journalctl -u zqnt-edge-node -f
+```
+
+`install.sh` creates the system user and group `zqnt-edge`, installs the binary to
+`/usr/local/bin` (`sudo PREFIX=/usr ./install.sh` for `/usr/bin`) and the unit to
+`/etc/systemd/system`, and copies the example configuration only when
+`/etc/zqnt-edge-node/node.yaml` does not exist yet, so running it again upgrades the binary and keeps
+the configuration.
+
+| Path | |
+|---|---|
+| `/etc/zqnt-edge-node/node.yaml` | configuration (`root:zqnt-edge`, `0640`); a link `token_file` goes next to it with the same owner and mode |
+| `/var/lib/zqnt-edge-node/node.db` | durable outbox (`StateDirectory`, kept across restarts and upgrades) |
+| `/run/zqnt-edge-node/node.sock` | the socket Device Adapters attach to (`RuntimeDirectory`, recreated on every start) |
+
+The unit runs the node as `zqnt-edge` with no capabilities, a read-only system (`ProtectSystem=strict`)
+except its state and runtime directories, only Unix and IP sockets, and the `@system-service`
+system-call set; `systemd-analyze security zqnt-edge-node` lists the rest. It restarts on failure.
+Device Adapters reach the socket through the group: add the adapter's user to `zqnt-edge`
+(`sudo usermod -aG zqnt-edge <adapter-user>`) and set `local.mode: "0660"` in `node.yaml`. An adapter
+listens on a socket in a directory of its own (for example its own `RuntimeDirectory`) and is named
+in `local.default_adapter_endpoint`, since `/run/zqnt-edge-node` belongs to the node. A link over a
+serial (cellular) modem needs the device: in `systemctl edit zqnt-edge-node` set
+`SupplementaryGroups=dialout` and `PrivateDevices=no`.
 
 ## Client SDK
 
