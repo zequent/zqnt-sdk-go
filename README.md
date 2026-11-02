@@ -336,7 +336,8 @@ registered the asset.
 
 ```bash
 go install github.com/zequent/zqnt-sdk-go/v3/cmd/zqnt-edge-node@latest
-zqnt-edge-node --config node.yaml --check-config   # validate, print every problem, exit
+zqnt-edge-node --config node.yaml --check-config   # validate config and key store, print every problem, exit
+zqnt-edge-node enroll --config node.yaml --claim-code ZQ-XXXXX-XXXXX   # once, before the first start
 zqnt-edge-node --config node.yaml                  # run; SIGTERM shuts down cleanly
 zqnt-edge-node --version
 ```
@@ -350,7 +351,13 @@ The configuration (annotated example: [`examples/edge-node/node.yaml`](examples/
 
 | Key | Default | |
 |---|---|---|
-| `node_id` | required | the node's id on the platform |
+| `identity.key_store` | required | `tpm`, `software-tpm-sealed` or `software-dev` (see [Node identity](#node-identity)) |
+| `identity.dir` | `/var/lib/zqnt-edge-node/identity` | enrollment (`node.json`), credential, time high-water mark, key files |
+| `identity.sealing_key_file` / `sealing_key_env` | | `software-dev` only, optional: 32-byte key (64 hex digits) that encrypts the dev key at rest; the file must not be readable by others |
+| `identity.tpm_device` | `/dev/tpmrm0` | `tpm`, `software-tpm-sealed` |
+| `identity.node_class` | `infrastructure` | or `personal`; must match the claim |
+| `identity.suite` | `s1-chacha20-poly1305` | or `s1-aes-256-gcm` |
+| `identity.dev` | `false` | `software-dev` keys are refused unless `true` |
 | `assets` | none | announced in every Hello; assets adapters register on the socket are added and announced from the next session |
 | `store.path` | `/var/lib/zqnt-edge-node/node.db` | durable outbox |
 | `quotas.<lane>.max_items` / `max_bytes` | lane defaults | lanes `alarm`, `command_reply`, `status`, `telemetry`, `bulk`; sizes like `20MiB` |
@@ -359,13 +366,54 @@ The configuration (annotated example: [`examples/edge-node/node.yaml`](examples/
 | `report_interval` | `1m` | LinkReport to the platform and the `node stats` log line |
 | `shutdown_timeout` | `10s` | how long a stopping node waits for running commands |
 | `log.level` / `log.format` | `info` / `text` | `json` for log shippers |
-| `links` | required | exactly one link for now (`ip-session`: `endpoint`, `token_file`, `ca_file`, `insecure`) |
+| `links` | required | exactly one link for now (`ip-session`: `endpoint`, `ca_file`, `server_name`, `token_file` (default: the enrolled credential), `insecure`) |
 
 Shutdown stops accepting adapters, waits for running commands, closes the link and flushes the
 store; a command still running is reported as interrupted on the next start. The node logs
 connects, session losses and a periodic `node stats` line (link counters, lane backlog and drops).
-Not in this build yet: node identity and enrollment (the Hello goes out unsigned), several links
-with switching, and relaying.
+Not in this build yet: several links with switching, relaying, attestation and secure-element or
+phone key stores.
+
+### Node identity
+
+Every node has an ECDSA P-256 identity key and is enrolled once with a claim code from the console
+(spec `edge-link-handshake-v1` in zqnt-api). The platform assigns the node id; the node pins the
+installation's anchor keys and keeps a node-bound credential. Every session opens with a Hello
+signed by the identity key over the TLS channel binding (RFC 9266), and the node accepts only a
+Welcome signed by a platform key that a pinned anchor certified; a node whose clock is off gets
+the platform time in a signed HelloRetry first.
+
+| `key_store` | Key protection | |
+|---|---|---|
+| `tpm` | `TPM` | generated in the TPM 2.0 (`/dev/tpmrm0`), never leaves it; the blob in `identity.dir` is useless without that TPM |
+| `software-tpm-sealed` | `SOFTWARE_SEALED` | software P-256 key sealed by the TPM 2.0 (bound to that TPM, not to PCRs), unsealed into memory at start over an encrypted session; for TPMs that cannot hold the key themselves |
+| `software-dev` | `SOFTWARE_DEV` | plain key file, or encrypted with a sealing key from `sealing_key_file`/`sealing_key_env` (still `SOFTWARE_DEV`: that key lives on the same device); refused unless `identity.dev: true`; development, simulators, CI |
+
+Production installations require at least `SOFTWARE_SEALED` (spec decision OD-5), so a node
+without a TPM can only join a development installation. The annotated example
+[`examples/edge-node/node.yaml`](examples/edge-node/node.yaml) uses `tpm`;
+[`examples/edge-node/node-dev.yaml`](examples/edge-node/node-dev.yaml) is a development node.
+
+The node never falls back to another key store. `--check-config` checks that the sealing key or
+TPM device is there and whether the node is enrolled.
+
+```bash
+# enroll: the endpoint, ca_file and server_name default to the ip-session link
+sudo -u zqnt-edge zqnt-edge-node enroll --config /etc/zqnt-edge-node/node.yaml --claim-code ZQ-XXXXX-XXXXX
+# air-gapped / pinned: a provisioning file or QR payload (ZQNT-PROV1:...) from the console pins the
+# installation and its anchors instead of trusting them on first use
+sudo -u zqnt-edge zqnt-edge-node enroll --config /etc/zqnt-edge-node/node.yaml --provisioning provisioning.json
+zqnt-edge-node identity --config /etc/zqnt-edge-node/node.yaml          # node id, key and anchor fingerprints
+zqnt-edge-node rotate-key --config /etc/zqnt-edge-node/node.yaml        # new identity key, signed by old and new
+zqnt-edge-node renew-credential --config /etc/zqnt-edge-node/node.yaml  # the running node renews by itself
+```
+
+After enrolling, compare the anchor fingerprint the command prints with the one the console shows.
+The running node renews its credential when a third of its lifetime remains. A node that receives a
+revocation naming itself erases its enrollment, credential and identity key and stops; it needs a
+re-enrollment claim (`enroll --reenroll`). Both TPM key stores are tested against the TPM 2.0
+reference simulator in a module of their own, not in CI: run `make test-tpm` locally (cgo, a C
+compiler and libcrypto headers) after changing them.
 
 ### Installing an Edge Node
 
@@ -384,7 +432,8 @@ curl -fsSLO "https://github.com/zequent/zqnt-sdk-go/releases/download/${VERSION}
 sha256sum -c --ignore-missing SHA256SUMS
 tar -xzf "zqnt-edge-node_${VERSION}_linux_${ARCH}.tar.gz"
 sudo "./zqnt-edge-node_${VERSION}_linux_${ARCH}/install.sh"
-sudoedit /etc/zqnt-edge-node/node.yaml          # node_id, assets, the link
+sudoedit /etc/zqnt-edge-node/node.yaml          # identity.key_store, assets, the link
+sudo -u zqnt-edge zqnt-edge-node enroll --config /etc/zqnt-edge-node/node.yaml --claim-code ZQ-XXXXX-XXXXX
 sudo -u zqnt-edge zqnt-edge-node --config /etc/zqnt-edge-node/node.yaml --check-config
 sudo systemctl enable --now zqnt-edge-node
 journalctl -u zqnt-edge-node -f
@@ -400,6 +449,7 @@ the configuration.
 |---|---|
 | `/etc/zqnt-edge-node/node.yaml` | configuration (`root:zqnt-edge`, `0640`); a link `token_file` goes next to it with the same owner and mode |
 | `/var/lib/zqnt-edge-node/node.db` | durable outbox (`StateDirectory`, kept across restarts and upgrades) |
+| `/var/lib/zqnt-edge-node/identity/` | enrollment, credential and key files (`0700`, files `0600`, owned by `zqnt-edge`) |
 | `/run/zqnt-edge-node/node.sock` | the socket Device Adapters attach to (`RuntimeDirectory`, recreated on every start) |
 
 The unit runs the node as `zqnt-edge` with no capabilities, a read-only system (`ProtectSystem=strict`)
@@ -410,7 +460,9 @@ Device Adapters reach the socket through the group: add the adapter's user to `z
 listens on a socket in a directory of its own (for example its own `RuntimeDirectory`) and is named
 in `local.default_adapter_endpoint`, since `/run/zqnt-edge-node` belongs to the node. A link over a
 serial (cellular) modem needs the device: in `systemctl edit zqnt-edge-node` set
-`SupplementaryGroups=dialout` and `PrivateDevices=no`.
+`SupplementaryGroups=dialout` and `PrivateDevices=no`. The `tpm` and `software-tpm-sealed` key stores need the TPM: set
+`SupplementaryGroups=tss`, `PrivateDevices=no` and `DeviceAllow=/dev/tpmrm0 rw` (and run `enroll`
+as `zqnt-edge` with the `tss` group).
 
 ## Client SDK
 
