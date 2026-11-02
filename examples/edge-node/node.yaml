@@ -25,7 +25,7 @@ local:
   mode: "0660"
   # group: zqnt
   # Commands for assets whose adapter did not name its own socket go here.
-  default_adapter_endpoint: unix:///run/zqnt-edge-node/adapter.sock
+  default_adapter_endpoint: unix:///run/zqnt-adapter/adapter.sock
 
 # LinkReport to the platform and the "node stats" log line.
 report_interval: 1m

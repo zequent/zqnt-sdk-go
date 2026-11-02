@@ -39,7 +39,7 @@ const (
 //	  socket: /run/zqnt-edge-node/node.sock
 //	  mode: "0660"
 //	  group: zqnt
-//	  default_adapter_endpoint: unix:///run/zqnt-edge-node/adapter.sock
+//	  default_adapter_endpoint: unix:///run/zqnt-adapter/adapter.sock
 //	report_interval: 1m
 //	links:
 //	  - id: lte
