@@ -1,7 +1,22 @@
 # zqnt-edge-node configuration. Check it with: zqnt-edge-node --config node.yaml --check-config
 
-# The node's id, as registered on the platform.
-node_id: pi-north-gate
+# The node identity. The platform assigns the node id at enrollment:
+#   zqnt-edge-node enroll --config node.yaml --claim-code ZQ-XXXXX-XXXXX
+# stores it in identity.dir together with the pinned platform anchors and the node credential.
+identity:
+  # Where the identity key lives: tpm (generated in the TPM 2.0, never leaves it),
+  # software-sealed (encrypted at rest with a sealing key) or software-dev (plain file; refused
+  # unless dev: true; development and simulators only).
+  key_store: software-sealed
+  # 32 bytes as 64 hex digits; others must have no access (root:zqnt-edge 0640).
+  # Create it with: head -c 32 /dev/urandom | od -An -tx1 | tr -d ' \n'
+  sealing_key_file: /etc/zqnt-edge-node/sealing.key
+  # sealing_key_env: ZQNT_EDGE_SEALING_KEY
+  # tpm_device: /dev/tpmrm0
+  # dir: /var/lib/zqnt-edge-node/identity
+  # infrastructure, or personal for a device carried by a person; must match the claim.
+  node_class: infrastructure
+  # suite: s1-chacha20-poly1305   # or s1-aes-256-gcm
 
 # Assets announced in every Hello. Assets that adapters register on the local socket are added
 # while the node runs and announced from the next session on.
@@ -41,6 +56,7 @@ links:
   - id: lte
     driver: ip-session
     endpoint: edge-link.example.com:443
+    # The node credential from enrollment is used unless token_file is set.
     # token_file: /etc/zqnt-edge-node/token
     # ca_file: /etc/zqnt-edge-node/ca.pem
     # insecure: false

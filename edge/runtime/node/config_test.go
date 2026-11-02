@@ -16,7 +16,7 @@ import (
 )
 
 const minimal = `
-node_id: pi-1
+identity: {key_store: software-dev, dev: true}
 links:
   - id: lte
     driver: ip-session
@@ -35,6 +35,9 @@ func TestAMinimalConfigTakesTheDefaults(t *testing.T) {
 		time.Duration(cfg.ShutdownTimeout) != 10*time.Second || cfg.Log.Level != "info" || cfg.Log.Format != "text" {
 		t.Fatalf("defaults: %+v", cfg)
 	}
+	if cfg.Identity.Dir != "/var/lib/zqnt-edge-node/identity" || cfg.Identity.NodeClass != "infrastructure" || cfg.Identity.Suite != "s1-chacha20-poly1305" {
+		t.Fatalf("identity defaults: %+v", cfg.Identity)
+	}
 	if got := cfg.Links[0].Options["endpoint"]; got != "edge-link.example.com:443" {
 		t.Fatalf("link options %v", cfg.Links[0].Options)
 	}
@@ -51,7 +54,12 @@ func TestTheExampleConfigIsValid(t *testing.T) {
 
 func TestAFullConfigIsRead(t *testing.T) {
 	cfg, err := node.ParseConfig([]byte(`
-node_id: pi-1
+identity:
+  key_store: software-sealed
+  sealing_key_file: /etc/zqnt-edge-node/sealing.key
+  dir: /data/identity
+  node_class: personal
+  suite: s1-aes-256-gcm
 assets: [DOCK-1, DRONE-1]
 store:
   path: /data/node.db
@@ -77,6 +85,9 @@ links:
 	if err != nil {
 		t.Fatal(err)
 	}
+	if suite, _ := cfg.Identity.SuiteID(); suite != 0x0102 || cfg.Identity.Dir != "/data/identity" || cfg.Identity.NodeClass != "personal" {
+		t.Fatalf("identity %+v", cfg.Identity)
+	}
 	if cfg.Local.Mode != 0o660 || cfg.Local.Group != "0" || time.Duration(cfg.Store.FlushInterval) != 50*time.Millisecond {
 		t.Fatalf("local %+v store %+v", cfg.Local, cfg.Store)
 	}
@@ -97,10 +108,11 @@ func TestInvalidConfigsNameEveryProblem(t *testing.T) {
 		yaml string
 		want []string
 	}{
-		"empty":       {"{}", []string{"node_id is required", "links: one link is required"}},
+		"empty":       {"{}", []string{"identity.key_store is required", "links: one link is required"}},
+		"node id":     {minimal + "node_id: pi-1\n", []string{"field node_id not found"}},
 		"unknown key": {minimal + "report_intervall: 1m\n", []string{"field report_intervall not found"}},
 		"bad values": {`
-node_id: "pi 1"
+identity: {key_store: software-dev, node_class: soldier, suite: s9, tpm_device: /dev/tpm0}
 assets: [A, A, ""]
 quotas: {radio: {max_items: 1}, bulk: {max_items: -1}}
 local:
@@ -114,7 +126,8 @@ links:
     driver: ip-session
     endpoint: x:1
 `, []string{
-			`node_id "pi 1"`, `assets[1]: duplicate "A"`, "assets[2]: empty serial number",
+			"refused unless identity.dev is true", `node_class "soldier"`, `suite "s9"`, "tpm_device: only for key_store tpm",
+			`assets[1]: duplicate "A"`, "assets[2]: empty serial number",
 			`unknown lane "radio"`, "quotas.bulk: limits must not be negative",
 			"local.mode 0666", "local.group", "local.default_adapter_endpoint",
 			"report_interval must be at least 1s", `log.level "loud"`, `log.format "xml"`,
@@ -122,16 +135,19 @@ links:
 		"bad mode":     {minimal + "local: {mode: rw}\n", []string{`mode "rw" is not octal`}},
 		"bad size":     {minimal + "quotas: {bulk: {max_bytes: lots}}\n", []string{`"lots" is not a size`}},
 		"bad duration": {minimal + "report_interval: soon\n", []string{"soon"}},
-		"identity":     {minimal + "identity: {key_file: /etc/key}\n", []string{"identity: node identity and enrollment are not available yet"}},
+		"sealed without a key": {"identity: {key_store: software-sealed}\nlinks: [{id: lte, driver: ip-session, endpoint: \"a:1\"}]\n",
+			[]string{"software-sealed needs sealing_key_file or sealing_key_env"}},
+		"unknown key store": {"identity: {key_store: yubikey}\nlinks: [{id: lte, driver: ip-session, endpoint: \"a:1\"}]\n",
+			[]string{`key_store "yubikey"`}},
 		"two links": {`
-node_id: pi-1
+identity: {key_store: software-dev, dev: true}
 links:
   - {id: lte, driver: ip-session, endpoint: "a:1"}
   - {id: wifi, driver: ip-session, endpoint: "b:1"}
 `, []string{"links: 2 configured"}},
 		"relay": {minimal + "relay: {enabled: true, accept_from: [lte], forward_via: [lte]}\n", []string{"relay: relaying is not available"}},
 		"unknown driver": {`
-node_id: pi-1
+identity: {key_store: software-dev, dev: true}
 links: [{id: lora, driver: lora-raw}]
 `, []string{`unknown driver "lora-raw"`}},
 	}

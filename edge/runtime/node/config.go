@@ -14,6 +14,7 @@ import (
 	edgelinkv3 "github.com/zequent/zqnt-api/go/v3/gen/zqnt/edgelink/v3"
 	"go.yaml.in/yaml/v3"
 
+	"github.com/zequent/zqnt-sdk-go/v3/edge/runtime/identity"
 	"github.com/zequent/zqnt-sdk-go/v3/edge/runtime/link"
 	"github.com/zequent/zqnt-sdk-go/v3/edge/runtime/local"
 	"github.com/zequent/zqnt-sdk-go/v3/edge/runtime/store"
@@ -27,9 +28,11 @@ const (
 	DefaultShutdownTimeout = 10 * time.Second
 )
 
-// Config is the node configuration file.
+// Config is the node configuration file. The node id is not configured: the platform assigns it
+// at enrollment (zqnt-edge-node enroll) and the node reads it from the identity directory.
 //
-//	node_id: pi-north-gate
+//	identity:
+//	  key_store: tpm
 //	assets: [DOCK-1]
 //	store:
 //	  path: /var/lib/zqnt-edge-node/node.db
@@ -46,7 +49,8 @@ const (
 //	    driver: ip-session
 //	    endpoint: edge-link.example.com:443
 type Config struct {
-	NodeID string `yaml:"node_id"`
+	// Identity is the node identity: key store, identity directory, node class and suite.
+	Identity identity.Config `yaml:"identity"`
 	// Assets are announced in every Hello, together with the assets adapters register on the
 	// local socket while the node runs.
 	Assets []string    `yaml:"assets"`
@@ -60,10 +64,7 @@ type Config struct {
 	// ShutdownTimeout bounds how long a stopping node waits for running commands.
 	ShutdownTimeout Duration  `yaml:"shutdown_timeout"`
 	Log             LogConfig `yaml:"log"`
-	// Identity is reserved for the node identity and enrollment (zqnt-api#40); until then the
-	// node runs unsigned and a configured identity section is an error.
-	Identity    map[string]any `yaml:"identity"`
-	link.Config `yaml:",inline"`
+	link.Config     `yaml:",inline"`
 }
 
 // StoreConfig places the node's durable outbox.
@@ -176,6 +177,7 @@ func ParseConfig(data []byte) (Config, error) {
 }
 
 func (c *Config) applyDefaults() {
+	c.Identity.ApplyDefaults()
 	if c.Store.Path == "" {
 		c.Store.Path = DefaultStorePath
 	}
@@ -204,11 +206,8 @@ func (c Config) Validate() error {
 	var errs []error
 	add := func(format string, args ...any) { errs = append(errs, fmt.Errorf(format, args...)) }
 
-	switch {
-	case c.NodeID == "":
-		add("node_id is required")
-	case strings.ContainsFunc(c.NodeID, func(r rune) bool { return r <= ' ' || r == 0x7f }):
-		add("node_id %q must not contain spaces or control characters", c.NodeID)
+	if err := c.Identity.Validate(); err != nil {
+		errs = append(errs, err)
 	}
 	seen := map[string]bool{}
 	for i, sn := range c.Assets {
@@ -258,9 +257,6 @@ func (c Config) Validate() error {
 	case "text", "json":
 	default:
 		add("log.format %q: want text or json", c.Log.Format)
-	}
-	if c.Identity != nil {
-		add("identity: node identity and enrollment are not available yet; remove the section")
 	}
 	switch len(c.Links) {
 	case 0:

@@ -2,5 +2,8 @@
 useDefault = true
 
 [allowlist]
-description = "throwaway Reticulum test identity, not a credential (zqnt-sdk-go#22)"
-paths = ['''^edge/runtime/link/rns/testdata/vectors_0\.9\.4\.json$''']
+description = "Published test vectors, not credentials: the Reticulum test identity (zqnt-sdk-go#22) and the edge link handshake vectors (keys from fixed public seeds, zqnt-api spec/edge-link-handshake-v1)"
+paths = [
+  '''^edge/runtime/link/rns/testdata/vectors_0\.9\.4\.json$''',
+  '''^edge/runtime/identity/testdata/edge-link-handshake-v1\.vectors\.json$''',
+]

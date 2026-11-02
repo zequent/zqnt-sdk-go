@@ -40,7 +40,19 @@ type Driver interface {
 // session: the frame the handshake function returns goes out first on every new connection,
 // before any frame handed to Send.
 type Handshaker interface {
-	SetHandshake(handshake func() ([]byte, error))
+	SetHandshake(handshake func(Handshake) ([]byte, error))
+	// Reset ends connection conn (Handshake.Conn) when its peer failed the handshake; the driver
+	// connects again after a backoff that grows with every reset in a row. A connection that
+	// already ended is left alone.
+	Reset(conn uint64, reason string)
+}
+
+// Handshake describes the connection a handshake frame opens.
+type Handshake struct {
+	// Conn numbers the driver's connections; frames received on this connection carry it.
+	Conn uint64
+	// ChannelBinding is the TLS exporter of RFC 9266 for this connection, empty without TLS.
+	ChannelBinding []byte
 }
 
 // SendMeta says where and how a frame goes.
@@ -107,6 +119,9 @@ type RxFrame struct {
 	// Signal is nil when the link reports no radio measurements.
 	Signal     *Signal
 	ReceivedAt time.Time
+	// Conn is the connection the frame arrived on (Handshake.Conn); 0 for drivers without
+	// connections.
+	Conn uint64
 }
 
 // Signal is the radio measurement of a received frame.
@@ -213,6 +228,9 @@ type StateChange struct {
 	State  LinkState
 	Reason string
 	At     time.Time
+	// Conn is the connection the change is about (Handshake.Conn); 0 for drivers without
+	// connections.
+	Conn uint64
 }
 
 // MeshKind is how a link reaches peers beyond its neighbours, as zqnt.edgelink.v3.MeshKind.
