@@ -26,3 +26,4 @@ kubeconfig*
 /bin/
 
 
+/dist/
