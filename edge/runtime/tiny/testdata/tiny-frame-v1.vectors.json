@@ -1,0 +1,445 @@
+{
+  "frames": [
+    {
+      "ack_requested": false,
+      "body": "037547401cb123c706e6435e0207198757",
+      "counter": 1,
+      "decoded": {
+        "altitude": 519,
+        "battery": 87,
+        "heading": 270,
+        "latitude": 48.1371079,
+        "longitude": 11.5753822,
+        "speed": 12.5,
+        "time": 58017600
+      },
+      "direction": "uplink",
+      "epoch": 671,
+      "frame": "4401029fd861453c000000012f5653aa887450fc704f41b5a2b3e2fa3e06513d26f61261331c3d029b3c16fbc3b6d7",
+      "frame_size": 47,
+      "lane": 4,
+      "more": false,
+      "name": "position",
+      "node_tag": 3630253372,
+      "nonce": "01000000d861453c00000001",
+      "schema": 1,
+      "suite": 1
+    },
+    {
+      "ack_requested": true,
+      "body": "037547450001031cb1276006e65f68",
+      "counter": 2,
+      "decoded": {
+        "alert_code": "sensor.intrusion",
+        "code": 1,
+        "latitude": 48.1372,
+        "longitude": 11.5761,
+        "severity": 3,
+        "time": 58017605
+      },
+      "direction": "uplink",
+      "epoch": 671,
+      "frame": "6101029fd861453c00000002800c464e6eee584b828c6b080de3a601daa4788f05aff186c1b5b1b7fb5997da03",
+      "frame_size": 45,
+      "lane": 1,
+      "more": false,
+      "name": "alarm",
+      "node_tag": 3630253372,
+      "nonce": "01000000d861453c00000002",
+      "schema": 2,
+      "suite": 1
+    },
+    {
+      "ack_requested": true,
+      "body": "03754749000302",
+      "counter": 3,
+      "decoded": {
+        "alert_code": "power.battery_low",
+        "code": 3,
+        "latitude": null,
+        "longitude": null,
+        "severity": 2,
+        "time": 58017609
+      },
+      "direction": "uplink",
+      "epoch": 671,
+      "frame": "6102029fd861453c000000036583a0069a773d8b82b82d640cef7f96561da6daf338a0fe06",
+      "frame_size": 37,
+      "lane": 1,
+      "more": false,
+      "name": "alarm_without_position",
+      "node_tag": 3630253372,
+      "nonce": "01000000d861453c00000003",
+      "schema": 2,
+      "suite": 2
+    },
+    {
+      "ack_requested": false,
+      "body": "0375477c407b06f990",
+      "counter": 4,
+      "decoded": {
+        "battery": 64,
+        "flags": 6,
+        "rssi": -112,
+        "temperature": -7,
+        "time": 58017660,
+        "voltage": 12.3
+      },
+      "direction": "uplink",
+      "epoch": 671,
+      "frame": "4302029fd861453c0000000468d5915acb06a48ff5bebeccd4ea63b33eb23ed5edb7f767afc939",
+      "frame_size": 39,
+      "lane": 3,
+      "more": false,
+      "name": "status",
+      "node_tag": 3630253372,
+      "nonce": "01000000d861453c00000004",
+      "schema": 3,
+      "suite": 2
+    },
+    {
+      "ack_requested": false,
+      "body": "0375477dffff088080",
+      "counter": 5,
+      "decoded": {
+        "battery": null,
+        "flags": 8,
+        "rssi": null,
+        "temperature": null,
+        "time": 58017661,
+        "voltage": null
+      },
+      "direction": "uplink",
+      "epoch": 671,
+      "frame": "4b01029fd861453c00000005f7ccc23a87dbdc6f874869529149ce2369049ac648519411c71bce",
+      "frame_size": 39,
+      "lane": 3,
+      "more": true,
+      "name": "status_unknowns",
+      "node_tag": 3630253372,
+      "nonce": "01000000d861453c00000005",
+      "schema": 3,
+      "suite": 1
+    },
+    {
+      "ack_requested": false,
+      "body": "0029030000",
+      "counter": 6,
+      "decoded": {
+        "downlink_seq": 41,
+        "error": 0,
+        "error_code": "",
+        "result": "",
+        "state": 3
+      },
+      "direction": "uplink",
+      "epoch": 671,
+      "frame": "4201029fd861453c000000064e5def6f47c33f0e5ba32ea80860ba5288642472da17cf",
+      "frame_size": 35,
+      "lane": 2,
+      "more": false,
+      "name": "command_reply",
+      "node_tag": 3630253372,
+      "nonce": "01000000d861453c00000006",
+      "schema": 4,
+      "suite": 1
+    },
+    {
+      "ack_requested": false,
+      "body": "002a04000530313233343536373839616263",
+      "counter": 7,
+      "decoded": {
+        "downlink_seq": 42,
+        "error": 5,
+        "error_code": "command.failed",
+        "result": "30313233343536373839616263",
+        "state": 4
+      },
+      "direction": "uplink",
+      "epoch": 671,
+      "frame": "4202029fd861453c00000007ea3d5d31290ba38858f5968c9612c67c54ca6577da9501b6ae06376d94d7bc3336de3487",
+      "frame_size": 48,
+      "lane": 2,
+      "more": false,
+      "name": "command_reply_largest",
+      "node_tag": 3630253372,
+      "nonce": "01000000d861453c00000007",
+      "schema": 4,
+      "suite": 2
+    },
+    {
+      "ack_requested": true,
+      "body": "002b037547b81cb194c006e6f7c00028",
+      "counter": 1,
+      "decoded": {
+        "command_id": "navigation.go_to",
+        "downlink_seq": 43,
+        "expires": 58017720,
+        "params": "1cb194c006e6f7c00028",
+        "params_decoded": {
+          "altitude": 40,
+          "latitude": 48.14,
+          "longitude": 11.58
+        }
+      },
+      "direction": "downlink",
+      "epoch": 671,
+      "frame": "6201029fd861453c00000001b10adfc595202da711a0a76afbe5e23f7e82e80669c931868007f97d2c9b306b4c80",
+      "frame_size": 46,
+      "lane": 2,
+      "more": false,
+      "name": "command",
+      "node_tag": 3630253372,
+      "nonce": "02000000d861453c00000001",
+      "schema": 263,
+      "suite": 1
+    },
+    {
+      "ack_requested": true,
+      "body": "002b037547f4",
+      "counter": 2,
+      "decoded": {
+        "downlink_seq": 43,
+        "expires": 58017780
+      },
+      "direction": "downlink",
+      "epoch": 671,
+      "frame": "6201029fd861453c00000002f710c97eef5dd3e8c547004ad62e7f30cf78816ecdad31e5",
+      "frame_size": 36,
+      "lane": 2,
+      "more": false,
+      "name": "command_cancel",
+      "node_tag": 3630253372,
+      "nonce": "02000000d861453c00000002",
+      "schema": 5,
+      "suite": 1
+    }
+  ],
+  "inputs": {
+    "epoch": 671,
+    "other_root_key": "202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f",
+    "registry": "proto/v3/tiny_schemas.json version 1",
+    "root_key": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+    "time": "2026-11-03T12:00:00Z"
+  },
+  "key_schedule": [
+    {
+      "epoch": 671,
+      "k_epoch_suite_01": "3b11299f9a30921266325014e3e1fc56ac9ea84353220aaf9f54e2a0d943f812",
+      "k_epoch_suite_02": "a3d5c2da2261612967e3c810c2871f206e1805c105665b8babc171199ec73b21",
+      "node_tag": 3630253372,
+      "prk": "66f996487c546bf2c3383188e041696021300cd9c84feb4c47f87a7cb99d9f6e",
+      "root": "root_key"
+    },
+    {
+      "epoch": 672,
+      "k_epoch_suite_01": "1cb91caafaeadf8c810e5102b18aeee3d3d808a8c299f894c60509a52f49b66d",
+      "k_epoch_suite_02": "d0dccf7679b6ce2bc074c2eaad9118cf3f5dc6662b7d69cff02181cd9fb30244",
+      "node_tag": 1619234181,
+      "prk": "66f996487c546bf2c3383188e041696021300cd9c84feb4c47f87a7cb99d9f6e",
+      "root": "root_key"
+    },
+    {
+      "epoch": 671,
+      "k_epoch_suite_01": "35ae9042246037b9c388d5b78cf566c71d1d2232343e2c23e95c747a2cb98daa",
+      "k_epoch_suite_02": "2efd1ee967ef7981b7c15b7ff842f863632033f53511c1d1e983f87eb28645d9",
+      "node_tag": 2393445753,
+      "prk": "01ae145f69b38170b72acf83f6245ef94ad1026ee9dfd7346a3b0e12134ea697",
+      "root": "other_root_key"
+    },
+    {
+      "epoch": 672,
+      "k_epoch_suite_01": "9c1e9cd806fc8bea47f0de694483d3bd6003a4426306c1182af4814dd07b6cc2",
+      "k_epoch_suite_02": "dc6e30ab066916738d24ef4a981d7f78ad729b9e42326d6a9864ea006d39fb17",
+      "node_tag": 4246819069,
+      "prk": "01ae145f69b38170b72acf83f6245ef94ad1026ee9dfd7346a3b0e12134ea697",
+      "root": "other_root_key"
+    }
+  ],
+  "negative": [
+    {
+      "error": "authentication",
+      "frame": "4401029fd861453c000000012f5653aa887450fc714f41b5a2b3e2fa3e06513d26f61261331c3d029b3c16fbc3b6d7",
+      "name": "ciphertext_bit_flipped",
+      "open_as": "uplink"
+    },
+    {
+      "error": "authentication",
+      "frame": "4401029fd861453c000000012f5653aa887450fc704f41b5a2b3e2fa3e06513d26f61261331c3d029b3c16fbc3b657",
+      "name": "tag_bit_flipped",
+      "open_as": "uplink"
+    },
+    {
+      "error": "authentication",
+      "frame": "4101029fd861453c000000012f5653aa887450fc704f41b5a2b3e2fa3e06513d26f61261331c3d029b3c16fbc3b6d7",
+      "name": "lane_changed",
+      "open_as": "uplink"
+    },
+    {
+      "error": "authentication",
+      "frame": "4401029fd861453c000000032f5653aa887450fc704f41b5a2b3e2fa3e06513d26f61261331c3d029b3c16fbc3b6d7",
+      "name": "counter_changed",
+      "open_as": "uplink"
+    },
+    {
+      "error": "authentication",
+      "frame": "4401029fd861453c000000012f5653aa887450fc704f41b5a2b3e2fa3e06513d26f61261331c3d029b3c16fbc3b6d7",
+      "name": "wrong_direction",
+      "open_as": "downlink"
+    },
+    {
+      "error": "authentication",
+      "frame": "4402029fd861453c000000012f5653aa887450fc704f41b5a2b3e2fa3e06513d26f61261331c3d029b3c16fbc3b6d7",
+      "name": "suite_changed",
+      "open_as": "uplink"
+    },
+    {
+      "error": "malformed",
+      "frame": "8401029fd861453c000000012f5653aa887450fc704f41b5a2b3e2fa3e06513d26f61261331c3d029b3c16fbc3b6d7",
+      "name": "version_2",
+      "open_as": "uplink"
+    },
+    {
+      "error": "malformed",
+      "frame": "5401029fd861453c000000012f5653aa887450fc704f41b5a2b3e2fa3e06513d26f61261331c3d029b3c16fbc3b6d7",
+      "name": "reserved_flag",
+      "open_as": "uplink"
+    },
+    {
+      "error": "malformed",
+      "frame": "4001029fd861453c000000012f5653aa887450fc704f41b5a2b3e2fa3e06513d26f61261331c3d029b3c16fbc3b6d7",
+      "name": "lane_0",
+      "open_as": "uplink"
+    },
+    {
+      "error": "malformed",
+      "frame": "4406029fd861453c000000012f5653aa887450fc704f41b5a2b3e2fa3e06513d26f61261331c3d029b3c16fbc3b6d7",
+      "name": "unknown_suite",
+      "open_as": "uplink"
+    },
+    {
+      "error": "malformed",
+      "frame": "4401029fd861453c000000002f5653aa887450fc704f41b5a2b3e2fa3e06513d26f61261331c3d029b3c16fbc3b6d7",
+      "name": "counter_0",
+      "open_as": "uplink"
+    },
+    {
+      "error": "malformed",
+      "frame": "4202029fd861453c00000007ea3d5d31290ba38858f5968c9612c67c54ca6577da9501b6ae06376d94d7bc3336de348700",
+      "name": "too_long",
+      "open_as": "uplink"
+    },
+    {
+      "error": "malformed",
+      "frame": "4401029fd861453c000000012f5653aa887450fc704f41b5a2b3e2fa3e",
+      "name": "too_short",
+      "open_as": "uplink"
+    }
+  ],
+  "replay_window": {
+    "size": 64,
+    "steps": [
+      {
+        "accept": false,
+        "counter": 0,
+        "epoch": 671
+      },
+      {
+        "accept": true,
+        "counter": 1,
+        "epoch": 671
+      },
+      {
+        "accept": false,
+        "counter": 1,
+        "epoch": 671
+      },
+      {
+        "accept": true,
+        "counter": 3,
+        "epoch": 671
+      },
+      {
+        "accept": true,
+        "counter": 2,
+        "epoch": 671
+      },
+      {
+        "accept": false,
+        "counter": 2,
+        "epoch": 671
+      },
+      {
+        "accept": true,
+        "counter": 70,
+        "epoch": 671
+      },
+      {
+        "accept": true,
+        "counter": 7,
+        "epoch": 671
+      },
+      {
+        "accept": false,
+        "counter": 6,
+        "epoch": 671
+      },
+      {
+        "accept": false,
+        "counter": 70,
+        "epoch": 671
+      },
+      {
+        "accept": true,
+        "counter": 200,
+        "epoch": 671
+      },
+      {
+        "accept": false,
+        "counter": 5,
+        "epoch": 670
+      },
+      {
+        "accept": true,
+        "counter": 1,
+        "epoch": 672
+      },
+      {
+        "accept": true,
+        "counter": 199,
+        "epoch": 671
+      },
+      {
+        "accept": false,
+        "counter": 200,
+        "epoch": 671
+      },
+      {
+        "accept": false,
+        "counter": 1,
+        "epoch": 672
+      },
+      {
+        "accept": true,
+        "counter": 9,
+        "epoch": 674
+      },
+      {
+        "accept": false,
+        "counter": 2,
+        "epoch": 672
+      },
+      {
+        "accept": false,
+        "counter": 1,
+        "epoch": 673
+      },
+      {
+        "accept": true,
+        "counter": 8,
+        "epoch": 674
+      }
+    ]
+  },
+  "spec": "spec/tiny-frame-v1.md"
+}

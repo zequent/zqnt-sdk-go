@@ -45,6 +45,7 @@ import (
 
 	"github.com/zequent/zqnt-sdk-go/v3/edge/runtime/command"
 	"github.com/zequent/zqnt-sdk-go/v3/edge/runtime/store"
+	"github.com/zequent/zqnt-sdk-go/v3/edge/runtime/tiny"
 )
 
 // AdapterEndpointHeader is the gRPC metadata key on ReportCapabilities that names the reporting
@@ -251,6 +252,7 @@ func (g *gateway) ReportCapabilities(ctx context.Context, req *edgev3.ReportCapa
 	if err := g.s.router.register(sn, endpoint); err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
+	tiny.Standard().StampCapabilities(caps)
 	env := &edgelinkv3.Envelope{Body: &edgelinkv3.Envelope_Capabilities{Capabilities: caps}}
 	if err := g.s.publish(ctx, env, caps.GetObservedAt()); err != nil {
 		return nil, err

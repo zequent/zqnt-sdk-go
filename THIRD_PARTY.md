@@ -18,6 +18,7 @@ Status `review` marks file-level copyleft (ship unmodified, publish changes to i
 | `github.com/zequent/zqnt-api/go/v3` | Apache-2.0 | allow |
 | `go.uber.org/atomic` | MIT | allow |
 | `go.yaml.in/yaml/v3` | MIT | allow |
+| `golang.org/x/crypto` | BSD-3-Clause | allow |
 | `golang.org/x/net` | BSD-3-Clause | allow |
 | `golang.org/x/sys` | BSD-3-Clause | allow |
 | `golang.org/x/text` | BSD-3-Clause | allow |
