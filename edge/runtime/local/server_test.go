@@ -309,7 +309,9 @@ func TestAdapterReportsGoIntoTheirLanes(t *testing.T) {
 	}
 
 	if _, err := n.gateway().ReportCapabilities(ctx, &edgev3.ReportCapabilitiesRequest{
-		Capabilities: &capabilityv3.CapabilitySet{AssetSn: asset},
+		Capabilities: &capabilityv3.CapabilitySet{AssetSn: asset, Capabilities: []*capabilityv3.Capability{
+			{CommandId: "flight.land"}, {CommandId: "camera.take_photo"},
+		}},
 	}); err != nil {
 		t.Fatal(err)
 	}
@@ -326,6 +328,11 @@ func TestAdapterReportsGoIntoTheirLanes(t *testing.T) {
 	}
 	if !slices.Equal(lanes, want) {
 		t.Fatalf("lanes = %v, want %v", lanes, want)
+	}
+	reported := n.rec.all()[len(n.rec.all())-1].GetCapabilities().GetCapabilities()
+	if reported[0].GetTinySchemaId() != 258 || reported[1].GetTinySchemaId() != 0 {
+		t.Fatalf("tiny schema ids %d, %d; want 258 for flight.land and none for camera.take_photo",
+			reported[0].GetTinySchemaId(), reported[1].GetTinySchemaId())
 	}
 	if got := n.rec.all()[0].GetDeviceTime().AsTime(); !got.Equal(observed) {
 		t.Fatalf("device time = %v, want the sample's observed_at %v", got, observed)
