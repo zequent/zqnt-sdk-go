@@ -355,7 +355,7 @@ The configuration (annotated example: [`examples/edge-node/node.yaml`](examples/
 | `identity.dir` | `/var/lib/zqnt-edge-node/identity` | enrollment (`node.json`), credential, time high-water mark, key files |
 | `identity.sealing_key_file` / `sealing_key_env` | | `software-dev` only, optional: 32-byte key (64 hex digits) that encrypts the dev key at rest; the file must not be readable by others |
 | `identity.tpm_device` | `/dev/tpmrm0` | `tpm`, `software-tpm-sealed` |
-| `identity.node_class` | `infrastructure` | or `personal`; must match the claim |
+| `identity.node_class` | `infrastructure` | or `personal`; must match the claim, or the platform refuses the enrolment before it creates the node |
 | `identity.suite` | `s1-chacha20-poly1305` | or `s1-aes-256-gcm` |
 | `identity.dev` | `false` | `software-dev` keys are refused unless `true` |
 | `assets` | none | announced in every Hello; assets adapters register on the socket are added and announced from the next session |

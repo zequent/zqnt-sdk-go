@@ -13,6 +13,8 @@ import (
 	"time"
 
 	edgelinkv3 "github.com/zequent/zqnt-api/go/v3/gen/zqnt/edgelink/v3"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/zequent/zqnt-sdk-go/v3/edge/runtime/identity"
 	"github.com/zequent/zqnt-sdk-go/v3/edge/runtime/identity/identitytest"
@@ -156,6 +158,19 @@ func TestEnrollmentRefusals(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestAClaimOfAnotherClassCreatesNoNode(t *testing.T) {
+	f := newFixture(t)
+	o := f.options()
+	o.NodeClass = edgelinkv3.NodeClass_NODE_CLASS_PERSONAL
+	_, err := identity.Enroll(context.Background(), o)
+	if status.Code(err) != codes.FailedPrecondition {
+		t.Fatalf("want FailedPrecondition, got %v", err)
+	}
+	if nodes := f.server.Nodes(); len(nodes) != 0 {
+		t.Fatalf("the platform created %d nodes", len(nodes))
 	}
 }
 
