@@ -191,6 +191,7 @@ func enroll(ctx context.Context, o EnrollOptions, key Key) (*State, string, Cred
 			Assets:         o.Assets,
 			RuntimeVersion: o.RuntimeVersion,
 			DisplayName:    o.DisplayName,
+			NodeClass:      o.NodeClass,
 		}
 		transcript, err := handshake.EnrollmentProofTranscript(req, cb)
 		if err != nil {

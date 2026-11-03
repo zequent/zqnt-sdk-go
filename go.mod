@@ -7,7 +7,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/redis/go-redis/v9 v9.23.0
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.3
-	github.com/zequent/zqnt-api/go/v3 v3.0.1-0.20261102064010-50810d6799df
+	github.com/zequent/zqnt-api/go/v3 v3.0.1-0.20261103134345-01ced2ea30aa
 	go.yaml.in/yaml/v3 v3.0.5
 	golang.org/x/crypto v0.57.0
 	google.golang.org/grpc v1.84.0
