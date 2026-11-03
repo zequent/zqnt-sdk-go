@@ -37,7 +37,8 @@ type EnrolledNode struct {
 }
 
 // EnrollmentServer is an EdgeEnrollmentService that verifies proofs with the channel binding of
-// its own TLS session, as edge-link and connector do. Every refusal answers alike.
+// its own TLS session, as edge-link and connector do. Every refusal answers alike; a node class
+// other than the claim's is answered with FailedPrecondition before a node is created.
 type EnrollmentServer struct {
 	edgelinkv3.UnimplementedEdgeEnrollmentServiceServer
 	Authority      *Authority
@@ -154,6 +155,10 @@ func (s *EnrollmentServer) CompleteEnrollment(ctx context.Context, req *edgelink
 	transcript, err := handshake.EnrollmentProofTranscript(req, cb)
 	if err != nil || handshake.Verify(uint8(req.GetIdentityKey().GetAlg()), req.GetIdentityKey().GetPublicKey(), transcript, req.GetSignature()) != nil {
 		return nil, errRefused
+	}
+	if req.GetNodeClass() != edgelinkv3.NodeClass_NODE_CLASS_UNSPECIFIED && req.GetNodeClass() != s.NodeClass {
+		return nil, status.Errorf(codes.FailedPrecondition, "this code enrolls a %s node; this node is configured as %s",
+			s.NodeClass, req.GetNodeClass())
 	}
 	keyID := handshake.KeyID(handshake.AlgECDSAP256, req.GetIdentityKey().GetPublicKey())
 	token, expires := s.credential()
