@@ -91,11 +91,11 @@ func TestInteropThroughATransportNode(t *testing.T) {
 		}
 	}
 
-	d, err := link.New(rns.DriverID, map[string]any{
+	d, err := link.New(link.LinkConfig{ID: "rns", Driver: rns.DriverID, Options: map[string]any{
 		"address":           fmt.Sprintf("127.0.0.1:%d", port),
 		"identity":          filepath.Join(dir, "go.identity"),
 		"announce_interval": "2s",
-	})
+	}})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -124,7 +124,7 @@ func TestInteropThroughATransportNode(t *testing.T) {
 	retry := time.NewTicker(3 * time.Second)
 	defer retry.Stop()
 	send := func() {
-		if r := d.Send(ctx, peerHash, message); r.Status != link.Sent {
+		if r := d.Send(ctx, message, link.SendMeta{To: peerHash}); r.Status != link.Sent {
 			t.Logf("send: %s %s", r.Status, r.Reason)
 		}
 	}

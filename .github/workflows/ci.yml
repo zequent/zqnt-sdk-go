@@ -9,7 +9,7 @@ on:
       - '**/docker-compose*.yml'
       - '.github/dependabot.yml'
   push:
-    branches: [main, feature/v3-agentic]
+    branches: ["main", "feature/r*-sprint*"]
 
 # Pushes get a group of their own, so none of them is ever cancelled or dropped.
 concurrency:
@@ -22,6 +22,7 @@ permissions:
 env:
   GITLEAKS_VERSION: "8.24.3"
   GITLEAKS_SHA256: 9991e0b2903da4c8f6122b5c3186448b927a5da4deef1fe45271c3793f4ee29c
+  GO_LICENSES_VERSION: v2.0.1
 
 jobs:
   lint:
@@ -69,6 +70,35 @@ jobs:
       - name: go.mod is tidy
         run: go mod tidy && git diff --exit-code -- go.mod go.sum
 
+  licences:
+    name: Licence gate
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+
+      - name: Cache go-licenses
+        id: go-licenses
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/go-licenses
+          key: go-licenses-${{ env.GO_LICENSES_VERSION }}-${{ runner.os }}
+
+      - name: Install go-licenses
+        if: steps.go-licenses.outputs.cache-hit != 'true'
+        run: GOBIN=~/go-licenses go install "github.com/google/go-licenses/v2@${GO_LICENSES_VERSION}"
+
+      - name: Check dependency licences
+        run: GO_LICENSES=~/go-licenses/go-licenses scripts/licence-gate.sh --check
+
   secrets:
     name: Secret scan
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
@@ -91,7 +121,7 @@ jobs:
   preview-tag:
     name: Tag PR preview
     if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
-    needs: [lint, test, secrets]
+    needs: [lint, test, licences, secrets]
     runs-on: ubuntu-latest
     permissions:
       contents: write

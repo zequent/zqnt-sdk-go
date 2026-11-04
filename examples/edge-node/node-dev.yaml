@@ -1,0 +1,30 @@
+# zqnt-edge-node for development, simulators and CI: the identity key is a software key without
+# hardware protection (KEY_PROTECTION_SOFTWARE_DEV), which only development installations accept.
+#   zqnt-edge-node enroll --config node-dev.yaml --claim-code ZQ-XXXXX-XXXXX --insecure
+
+identity:
+  key_store: software-dev
+  dev: true
+  dir: ./identity
+  # Optional: encrypt the key file at rest with a 32-byte key (64 hex digits) from a file or the
+  # environment. Still SOFTWARE_DEV: the sealing key lives on the same device.
+  # sealing_key_file: ./dev-sealing.key
+  # sealing_key_env: ZQNT_EDGE_SEALING_KEY
+
+assets:
+  - SIM-DRONE-01
+
+store:
+  path: ./node.db
+
+local:
+  socket: ./node.sock
+
+log:
+  level: debug
+
+links:
+  - id: lan
+    driver: ip-session
+    endpoint: localhost:8013
+    insecure: true

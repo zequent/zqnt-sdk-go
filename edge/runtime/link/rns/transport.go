@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"maps"
 	"sync"
 	"time"
 )
@@ -89,6 +90,13 @@ func (t *Transport) PathTo(destinationHash []byte) (*Path, bool) {
 	defer t.mu.RUnlock()
 	p, ok := t.paths[hex.EncodeToString(destinationHash)]
 	return p, ok
+}
+
+// Paths is a snapshot of every known path, keyed by destination hash in hex.
+func (t *Transport) Paths() map[string]*Path {
+	t.mu.RLock()
+	defer t.mu.RUnlock()
+	return maps.Clone(t.paths)
 }
 
 // ErrUnknownDestination means no announce for the destination has been heard yet.

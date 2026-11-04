@@ -1,0 +1,59 @@
+[Unit]
+Description=Zequent Edge Node
+Documentation=https://github.com/zequent/zqnt-sdk-go#installing-an-edge-node
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=zqnt-edge
+Group=zqnt-edge
+ExecStart=/usr/local/bin/zqnt-edge-node --config /etc/zqnt-edge-node/node.yaml
+Restart=on-failure
+RestartSec=5s
+TimeoutStopSec=30s
+
+# /etc/zqnt-edge-node (node.yaml), /var/lib/zqnt-edge-node (node.db, identity/),
+# /run/zqnt-edge-node (node.sock; adapters in the zqnt-edge group may traverse it).
+ConfigurationDirectory=zqnt-edge-node
+StateDirectory=zqnt-edge-node
+StateDirectoryMode=0750
+RuntimeDirectory=zqnt-edge-node
+RuntimeDirectoryMode=0750
+UMask=0027
+
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+ProtectSystem=strict
+ReadWritePaths=/var/lib/zqnt-edge-node /run/zqnt-edge-node
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+
+# A cellular modem or other serial device: uncomment both lines.
+#SupplementaryGroups=dialout
+#PrivateDevices=no
+
+# identity.key_store tpm or software-tpm-sealed: uncomment these lines.
+#SupplementaryGroups=tss
+#PrivateDevices=no
+#DeviceAllow=/dev/tpmrm0 rw
+
+[Install]
+WantedBy=multi-user.target
