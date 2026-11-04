@@ -251,8 +251,12 @@ func checkDecoded(t *testing.T, f frameVector, m tiny.Message) {
 		if !ok || schema != c.Schema {
 			t.Errorf("%s: registry has schema %d for %v", f.Name, schema, want["command_id"])
 		}
+		decoded, err := reg.DecodeParams(c.Schema, c.Params)
+		if err != nil {
+			t.Fatal(err)
+		}
 		got = map[string]any{"command_id": want["command_id"], "downlink_seq": float64(c.DownlinkSeq),
-			"expires": seconds(t, c.Expires), "params": hex.EncodeToString(c.Params), "params_decoded": want["params_decoded"]}
+			"expires": seconds(t, c.Expires), "params": hex.EncodeToString(c.Params), "params_decoded": decoded}
 	default:
 		t.Fatalf("%s: schema %d", f.Name, m.Schema)
 	}
