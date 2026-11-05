@@ -464,6 +464,25 @@ serial (cellular) modem needs the device: in `systemctl edit zqnt-edge-node` set
 `SupplementaryGroups=tss`, `PrivateDevices=no` and `DeviceAllow=/dev/tpmrm0 rw` (and run `enroll`
 as `zqnt-edge` with the `tss` group).
 
+### Outage test against the platform
+
+`test/edgelink` runs a `zqnt-edge-node` built from the checkout against the platform's edge-link in
+Docker (connector, PostgreSQL, Redis, edge-link terminating TLS, toxiproxy in between): the node
+enrolls with a claim code and streams telemetry through a clean link, a 30 s outage, a slow lossy
+link, connection cuts and acknowledgements held back until it retransmits. Every sample has to
+reach the hand-off exactly once. It needs Docker, access to `ghcr.io/zequent` and about four
+minutes:
+
+```bash
+docker login ghcr.io
+go test -tags integration -count=1 -v -timeout 15m ./test/edgelink/
+```
+
+`ZQNT_CORE_IMAGE_TAG` (default `v3-latest`, the current sprint build) and `ZQNT_CORE_IMAGE_REPO`
+choose the core images, `ZQNT_TEST_LOG_DIR` keeps the service and node logs, and
+`ZQNT_TEST_KEEP_STACK=1` leaves the stack running for a look. CI runs it nightly and on demand
+(`Edge Link outage test`), not on pull requests.
+
 ## Client SDK
 
 
