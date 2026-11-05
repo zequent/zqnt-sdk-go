@@ -1,0 +1,52 @@
+name: Edge Link outage test
+
+# zqnt-edge-node against edge-link through toxiproxy (test/edgelink): nightly against the current
+# sprint build of the core images, or on demand against a build of choice. Not part of the PR
+# checks: it takes about four minutes and a Docker stack of five containers.
+on:
+  workflow_dispatch:
+    inputs:
+      core_image_tag:
+        description: Tag of ghcr.io/zequent/edge-link-service and connector-service to test against
+        default: v3-latest
+        type: string
+  schedule:
+    - cron: "17 3 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  outage-test:
+    name: Node and edge-link through toxiproxy
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+
+      - name: Log in to ghcr.io
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GH_PAT }}
+
+      - name: Run the test
+        env:
+          ZQNT_CORE_IMAGE_TAG: ${{ inputs.core_image_tag || 'v3-latest' }}
+          ZQNT_TEST_LOG_DIR: ${{ runner.temp }}/edge-link-outage-test
+        run: go test -tags integration -count=1 -v -timeout 15m ./test/edgelink/
+
+      - name: Keep the service and node logs
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: edge-link-outage-test-logs
+          path: ${{ runner.temp }}/edge-link-outage-test
+          if-no-files-found: ignore
