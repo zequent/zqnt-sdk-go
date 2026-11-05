@@ -5,6 +5,7 @@ import (
 	"net"
 	"os"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -82,16 +83,48 @@ func (e *echo) streams() int {
 
 func serve(t *testing.T) (*echo, string) {
 	t.Helper()
-	lis, err := net.Listen("tcp", "127.0.0.1:0")
-	if err != nil {
-		t.Fatal(err)
-	}
+	lis := listen(t, "127.0.0.1:0")
+	e, _ := serveOn(t, lis)
+	return e, lis.Addr().String()
+}
+
+func serveOn(t *testing.T, lis net.Listener) (*echo, *grpc.Server) {
+	t.Helper()
 	e := &echo{}
 	srv := grpc.NewServer()
 	edgelinkv3.RegisterEdgeLinkServiceServer(srv, e)
 	go func() { _ = srv.Serve(lis) }()
 	t.Cleanup(srv.Stop)
-	return e, lis.Addr().String()
+	return e, srv
+}
+
+func listen(t *testing.T, addr string) net.Listener {
+	t.Helper()
+	lis, err := net.Listen("tcp", addr)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return lis
+}
+
+// countDials accepts and drops every connection to addr for d and reports how many came.
+func countDials(t *testing.T, addr string, d time.Duration) int {
+	t.Helper()
+	lis := listen(t, addr)
+	var n atomic.Int64
+	go func() {
+		for {
+			c, err := lis.Accept()
+			if err != nil {
+				return
+			}
+			n.Add(1)
+			_ = c.Close()
+		}
+	}()
+	time.Sleep(d)
+	_ = lis.Close()
+	return int(n.Load())
 }
 
 func frame(t *testing.T, f *edgelinkv3.UplinkFrame) []byte {
@@ -207,6 +240,38 @@ func TestHandshakeFirstOnEveryConnection(t *testing.T) {
 	}
 	if res := d.Send(context.Background(), ping(t, 3), link.SendMeta{}); res.Status != link.Down {
 		t.Fatalf("Send after Close = %v", res.Status)
+	}
+}
+
+func TestReconnectsAtTheDriversBackoff(t *testing.T) {
+	lis := listen(t, "127.0.0.1:0")
+	addr := lis.Addr().String()
+	_, srv := serveOn(t, lis)
+	d, err := ipsession.New("lte", ipsession.Options{
+		Endpoint: addr, Insecure: true, MinBackoff: 10 * time.Millisecond, MaxBackoff: 50 * time.Millisecond,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := d.Open(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = d.Close() })
+	waitState(t, d, link.StateUp)
+
+	srv.Stop()
+	waitState(t, d, link.StateDown)
+	attempts := countDials(t, addr, 2*time.Second)
+	serveOn(t, listen(t, addr))
+	back := time.Now()
+	waitState(t, d, link.StateUp)
+	recovered := time.Since(back)
+	t.Logf("%d connection attempts in 2s while the platform was away, link up %s after it returned", attempts, recovered.Round(time.Millisecond))
+	if attempts < 5 {
+		t.Errorf("%d connection attempts in 2s, the connection backs off slower than the driver", attempts)
+	}
+	if recovered > 3*time.Second {
+		t.Errorf("link up %s after the platform returned", recovered)
 	}
 }
 
