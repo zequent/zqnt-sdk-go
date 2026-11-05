@@ -3,6 +3,7 @@ module github.com/zequent/zqnt-sdk-go/v3
 go 1.26.2
 
 require (
+	github.com/evilsocket/islazy v1.11.0
 	github.com/google/go-tpm v0.9.8
 	github.com/google/uuid v1.6.0
 	github.com/redis/go-redis/v9 v9.23.0
