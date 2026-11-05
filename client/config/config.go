@@ -9,11 +9,15 @@
 //	LIVE_DATA_SERVICE_HOST / _PORT / _USE_PLAINTEXT          localhost / 8003 / true
 //	MISSION_AUTONOMY_SERVICE_HOST / _PORT / _USE_PLAINTEXT   localhost / 8004 / true
 //	ZQNT_CLIENT_TOKEN                                        none
+//	ZQNT_INTERNAL_TLS / ZQNT_INTERNAL_TLS_CA                 false / /etc/zqnt/internal-tls/ca.crt
 //
 // Nothing set is the local stack (quarkus:dev or docker-compose.local.yml). A deployment sets the
 // hosts, _USE_PLAINTEXT=false for TLS (system trust store) whenever traffic leaves a private
-// network, and ZQNT_CLIENT_TOKEN from its secret store. There is deliberately no built-in
-// development credential: the local platform refuses anonymous calls too.
+// network, and ZQNT_CLIENT_TOKEN from its secret store. A client running inside an installation
+// with internal TLS sets ZQNT_INTERNAL_TLS=true: every service is then dialled over TLS, verified
+// against the installation CA in ZQNT_INTERNAL_TLS_CA (a service's own _USE_PLAINTEXT still wins
+// for that service). There is deliberately no built-in development credential: the local platform
+// refuses anonymous calls too.
 //
 //	cfg, err := config.FromEnv()
 //	if err != nil { ... }
@@ -22,6 +26,7 @@
 package config
 
 import (
+	"context"
 	"crypto/tls"
 	"fmt"
 	"net"
@@ -30,6 +35,7 @@ import (
 	"strings"
 
 	"github.com/zequent/zqnt-sdk-go/v3/client/auth"
+	"github.com/zequent/zqnt-sdk-go/v3/internaltls"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
@@ -73,7 +79,10 @@ type Config struct {
 	RemoteControl   Endpoint
 	LiveData        Endpoint
 	MissionAutonomy Endpoint
-	token           string
+	// InternalTLS: on, a TLS endpoint is verified against the installation's CA instead of the
+	// system trust store (ZQNT_INTERNAL_TLS, ZQNT_INTERNAL_TLS_CA).
+	InternalTLS internaltls.Config
+	token       string
 }
 
 // Local is the local development stack, with the credential from ZQNT_CLIENT_TOKEN if set.
@@ -96,6 +105,7 @@ func FromEnv() (Config, error) {
 func FromLookup(lookup func(string) (string, bool)) (Config, error) {
 	c := Local()
 	c.token = ""
+	c.InternalTLS = internaltls.FromLookup(lookup)
 	var err error
 	for _, s := range []struct {
 		prefix   string
@@ -106,7 +116,9 @@ func FromLookup(lookup func(string) (string, bool)) (Config, error) {
 		{LiveDataPrefix, &c.LiveData},
 		{MissionAutonomyPrefix, &c.MissionAutonomy},
 	} {
-		if *s.endpoint, err = endpoint(lookup, s.prefix, *s.endpoint); err != nil {
+		local := *s.endpoint
+		local.Plaintext = !c.InternalTLS.Enabled
+		if *s.endpoint, err = endpoint(lookup, s.prefix, local); err != nil {
 			return Config{}, err
 		}
 	}
@@ -125,22 +137,65 @@ func (c Config) HasToken() bool {
 	return c.token != ""
 }
 
-// DialOptions are the options to dial e with: its transport (TLS unless Plaintext), then extra —
-// the host application's own options, e.g. interceptors that set a per-caller credential, which
-// run before the SDK's — then the client credential (auth.DialOptions).
+// DialOptions are the options to dial e with: its transport (see TransportCredentials), then
+// extra — the host application's own options, e.g. interceptors that set a per-caller credential,
+// which run before the SDK's — then the client credential (auth.DialOptions). A CA that cannot be
+// read is not an option error: every connection attempt then fails with the explanation (Dial
+// reports it up front).
 func (c Config) DialOptions(e Endpoint, extra ...grpc.DialOption) []grpc.DialOption {
-	transport := grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{MinVersion: tls.VersionTLS12}))
-	if e.Plaintext {
-		transport = grpc.WithTransportCredentials(insecure.NewCredentials())
+	transport, err := c.TransportCredentials(e)
+	if err != nil {
+		transport = failingCredentials{err: err}
 	}
-	opts := append([]grpc.DialOption{transport}, extra...)
+	opts := append([]grpc.DialOption{grpc.WithTransportCredentials(transport)}, extra...)
 	return append(opts, auth.DialOptions(c.token)...)
 }
 
+// TransportCredentials are e's transport: plaintext when e.Plaintext, else TLS verified against
+// the installation CA when InternalTLS is on, or the system trust store otherwise.
+func (c Config) TransportCredentials(e Endpoint) (credentials.TransportCredentials, error) {
+	if e.Plaintext {
+		return insecure.NewCredentials(), nil
+	}
+	if c.InternalTLS.Enabled {
+		return c.InternalTLS.TransportCredentials()
+	}
+	return credentials.NewTLS(&tls.Config{MinVersion: tls.VersionTLS12}), nil
+}
+
 // Dial creates a client connection to e (see DialOptions). grpc.NewClient connects lazily; the
-// first call reports an unreachable service.
+// first call reports an unreachable service. An unreadable installation CA is reported here.
 func (c Config) Dial(e Endpoint, extra ...grpc.DialOption) (*grpc.ClientConn, error) {
+	if _, err := c.TransportCredentials(e); err != nil {
+		return nil, err
+	}
 	return grpc.NewClient(e.Target(), c.DialOptions(e, extra...)...)
+}
+
+// failingCredentials stand in for a TLS transport whose CA could not be read: every handshake
+// fails with that error instead of the connection silently going out in plaintext.
+type failingCredentials struct {
+	err error
+}
+
+func (f failingCredentials) ClientHandshake(context.Context, string, net.Conn) (net.Conn, credentials.AuthInfo, error) {
+	return nil, nil, f.err
+}
+
+func (f failingCredentials) ServerHandshake(net.Conn) (net.Conn, credentials.AuthInfo, error) {
+	return nil, nil, f.err
+}
+
+func (failingCredentials) Info() credentials.ProtocolInfo {
+	return credentials.ProtocolInfo{SecurityProtocol: "tls"}
+}
+
+func (f failingCredentials) Clone() credentials.TransportCredentials {
+	return f
+}
+
+func (failingCredentials) OverrideServerName(string) error {
+	return nil
 }
 
 func endpoint(lookup func(string) (string, bool), prefix string, local Endpoint) (Endpoint, error) {
@@ -173,8 +228,8 @@ func value(lookup func(string) (string, bool), name string) string {
 
 // String describes c without the credential.
 func (c Config) String() string {
-	return fmt.Sprintf("config.Config{Connector:%s RemoteControl:%s LiveData:%s MissionAutonomy:%s Token:%s}",
-		c.Connector, c.RemoteControl, c.LiveData, c.MissionAutonomy, redacted(c.token))
+	return fmt.Sprintf("config.Config{Connector:%s RemoteControl:%s LiveData:%s MissionAutonomy:%s %s Token:%s}",
+		c.Connector, c.RemoteControl, c.LiveData, c.MissionAutonomy, c.InternalTLS, redacted(c.token))
 }
 
 // GoString is String, so %#v does not print the credential either.
