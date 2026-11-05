@@ -1,0 +1,107 @@
+# The platform side of the Edge Node outage test (edgelink_test.go): connector with its database
+# and Redis, edge-link terminating TLS, and toxiproxy between the node and edge-link. The test
+# starts it under a project name of its own, fills in the keys and certificates it minted, and
+# removes it again. The core images default to the current sprint build; ZQNT_CORE_IMAGE_REPO and
+# ZQNT_CORE_IMAGE_TAG point at another build, for example one packaged from a core checkout.
+name: edge-link-toxiproxy
+
+x-core-env: &core-env
+  QUARKUS_PROFILE: prod,docker
+  REDIS_URL: redis://redis:6379
+  LICENSING_INSTALLATION_ID: ${ZQNT_TEST_INSTALLATION_ID:-edge-link-toxiproxy}
+  LICENSING_PUBLIC_KEY: ${ZQNT_TEST_LICENSE_PUBLIC_KEY:?minted by the test}
+  LICENSING_POLL_EVERY: 2s
+  SERVICE_AUTH_PRIVATE_KEY: ${ZQNT_TEST_SERVICE_PRIVATE_KEY:?minted by the test}
+  SERVICE_AUTH_PUBLIC_KEY: ${ZQNT_TEST_SERVICE_PUBLIC_KEY:?minted by the test}
+  ZQNT_SECURITY_ALLOW_DEV_KEYS: "true"
+  ZQNT_AUTH_KEYCLOAK_ISSUER: http://keycloak.invalid/realms/zequent
+  EDGE_NODES_MINIMUM_KEY_PROTECTION: SOFTWARE_DEV
+
+services:
+  postgres:
+    image: docker.io/timescale/timescaledb:2.30.2-pg16
+    environment:
+      POSTGRES_DB: zequent_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d zequent_db"]
+      interval: 2s
+      timeout: 3s
+      retries: 45
+
+  redis:
+    image: docker.io/library/redis:7.4.11-alpine
+    ports:
+      - "${ZQNT_TEST_REDIS_PORT:-26379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1s
+      timeout: 2s
+      retries: 30
+
+  connector:
+    image: ${ZQNT_CORE_IMAGE_REPO:-ghcr.io/zequent}/connector-service:${ZQNT_CORE_IMAGE_TAG:-v3-latest}
+    environment:
+      <<: *core-env
+      DATABASE_URL: jdbc:postgresql://postgres:5432/zequent_db
+      DATABASE_REACTIVE_URL: postgresql://postgres:5432/zequent_db
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: postgres
+      ZQNT_PEPPER_WEBHOOK_TOKENS: edge-link-toxiproxy-webhook-tokens
+      ZQNT_PEPPER_CLAIM_CODES: edge-link-toxiproxy-claim-codes
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "${ZQNT_TEST_CONNECTOR_PORT:-28010}:8010"
+
+  # Where edge-link hands samples off: the test's stand-in for live-data (livedata/main.go, built
+  # by the test for this container), which counts what arrives.
+  live-data:
+    image: docker.io/library/alpine:3.21
+    command: ["/live-data"]
+    volumes:
+      - "${ZQNT_TEST_LIVE_DATA_BIN:?built by the test}:/live-data:ro"
+    ports:
+      - "${ZQNT_TEST_LIVE_DATA_PORT:-28003}:8080"
+
+  # TLS terminates here, as Edge Link requires (sessions are bound to the TLS channel); the
+  # certificate comes from the test.
+  edge-link:
+    image: ${ZQNT_CORE_IMAGE_REPO:-ghcr.io/zequent}/edge-link-service:${ZQNT_CORE_IMAGE_TAG:-v3-latest}
+    environment:
+      <<: *core-env
+      CONNECTOR_SERVICE_HOST: connector
+      CONNECTOR_SERVICE_PORT: "8010"
+      LIVE_DATA_SERVICE_HOST: toxiproxy
+      LIVE_DATA_SERVICE_PORT: "8003"
+      REMOTE_CONTROL_SERVICE_HOST: toxiproxy
+      REMOTE_CONTROL_SERVICE_PORT: "8003"
+      EDGE_LINK_ANCHOR_PRIVATE_KEY: ${ZQNT_TEST_ANCHOR_PRIVATE_KEY:?minted by the test}
+      QUARKUS_HTTP_SSL_CERTIFICATE_FILES: /certs/edge-link.crt
+      QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILES: /certs/edge-link.key
+      QUARKUS_LOG_CATEGORY__COM_ZQNT_CORE_EDGELINK__LEVEL: DEBUG
+    volumes:
+      - "${ZQNT_TEST_CERT_DIR:?written by the test}:/certs:ro"
+    depends_on:
+      redis:
+        condition: service_healthy
+      connector:
+        condition: service_started
+      live-data:
+        condition: service_started
+    ports:
+      - "${ZQNT_TEST_EDGE_LINK_HTTP_PORT:-28007}:8006"
+      - "${ZQNT_TEST_EDGE_LINK_METRICS_PORT:-28009}:9000"
+
+  # The node dials toxiproxy, and edge-link hands off through it: the test creates the proxy to
+  # edge-link:8443 and the one to live-data:8003 over the API and injects the outage, the loss,
+  # the connection cuts and the slow hand-off there.
+  toxiproxy:
+    image: ghcr.io/shopify/toxiproxy:2.12.0
+    ports:
+      - "${ZQNT_TEST_TOXIPROXY_PORT:-28474}:8474"
+      - "${ZQNT_TEST_PROXY_PORT:-28006}:8006"
