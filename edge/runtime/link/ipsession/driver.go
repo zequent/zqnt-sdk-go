@@ -20,6 +20,7 @@ import (
 
 	edgelinkv3 "github.com/zequent/zqnt-api/go/v3/gen/zqnt/edgelink/v3"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/backoff"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
@@ -36,9 +37,13 @@ import (
 const DriverID = "ip-session"
 
 const (
-	maxFrame   = 4 << 20
-	sendBuffer = 1024
-	rxBuffer   = 1024
+	maxFrame          = 4 << 20
+	sendBuffer        = 1024
+	rxBuffer          = 1024
+	connectTimeout    = 10 * time.Second
+	keepaliveTimeout  = 10 * time.Second
+	backoffMultiplier = 1.6
+	backoffJitter     = 0.2
 )
 
 func init() {
@@ -61,7 +66,9 @@ type Options struct {
 	CAFile     string
 	ServerName string
 	// TokenFile holds the node credential, read again for every connection.
-	TokenFile  string
+	TokenFile string
+	// MinBackoff and MaxBackoff bound the wait before the next stream (500ms to 8s) and the
+	// wait between connection attempts underneath it.
 	MinBackoff time.Duration
 	MaxBackoff time.Duration
 	// RefusalMinBackoff and RefusalMaxBackoff bound the backoff after refused handshakes
@@ -168,7 +175,16 @@ func New(id string, opts Options) (*Driver, error) {
 
 func dialOptions(o Options) ([]grpc.DialOption, error) {
 	opts := []grpc.DialOption{
-		grpc.WithKeepaliveParams(keepalive.ClientParameters{Time: o.KeepaliveTime, Timeout: 10 * time.Second}),
+		grpc.WithKeepaliveParams(keepalive.ClientParameters{Time: o.KeepaliveTime, Timeout: keepaliveTimeout}),
+		grpc.WithConnectParams(grpc.ConnectParams{
+			Backoff: backoff.Config{
+				BaseDelay:  o.MinBackoff,
+				Multiplier: backoffMultiplier,
+				Jitter:     backoffJitter,
+				MaxDelay:   o.MaxBackoff,
+			},
+			MinConnectTimeout: connectTimeout,
+		}),
 	}
 	if o.Insecure {
 		opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))

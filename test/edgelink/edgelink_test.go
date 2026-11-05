@@ -9,13 +9,13 @@ import (
 )
 
 const (
-	sampleEvery   = 50 * time.Millisecond
-	baselineFor   = 10 * time.Second
-	outageFor     = 30 * time.Second
-	degradedFor   = 20 * time.Second
-	replayingFor  = 20 * time.Second
-	acksHeldFor   = 50 * time.Second
-	drainWithin   = 60 * time.Second
+	sampleEvery  = 50 * time.Millisecond
+	baselineFor  = 10 * time.Second
+	outageFor    = 30 * time.Second
+	degradedFor  = 20 * time.Second
+	replayingFor = 20 * time.Second
+	acksHeldFor  = 50 * time.Second
+	drainWithin  = 60 * time.Second
 )
 
 // TestEdgeNodeKeepsEverySampleExactlyOnce enrolls a zqnt-edge-node against edge-link through
