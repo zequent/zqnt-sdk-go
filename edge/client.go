@@ -18,7 +18,6 @@ import (
 	"github.com/zequent/zqnt-sdk-go/v3/edge/missionautonomy"
 
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 
 	connectorpb "github.com/zequent/zqnt-api/go/v3/gen/connector/proto"
 	livedatapb "github.com/zequent/zqnt-api/go/v3/gen/livedata/proto"
@@ -71,10 +70,12 @@ type EdgeClient struct {
 // edgeAdapter is the integrator-provided hardware control implementation.
 // opts are optional configuration overrides (see [Option] functions).
 //
-// The backend connection is plaintext; every call carries the adapter's edge credential
-// (ZQNT_EDGE_TOKEN / [WithEdgeToken]), and the adapter's own server only accepts commands signed
-// by the platform (ZQNT_PLATFORM_KEYS_URL / [WithPlatformKeysURL], ZQNT_PLATFORM_PUBLIC_KEY /
-// [WithPlatformPublicKey]). See package auth.
+// The backend connections are plaintext unless the installation's internal TLS is switched on
+// (ZQNT_INTERNAL_TLS=true with the CA in ZQNT_INTERNAL_TLS_CA / [WithInternalTLS]: every connection
+// then verifies the service's certificate against that CA and its host name); every call carries
+// the adapter's edge credential (ZQNT_EDGE_TOKEN / [WithEdgeToken]), and the adapter's own server
+// only accepts commands signed by the platform (ZQNT_PLATFORM_KEYS_URL / [WithPlatformKeysURL],
+// ZQNT_PLATFORM_PUBLIC_KEY / [WithPlatformPublicKey]). See package auth and package internaltls.
 func NewEdgeClient(endpoint, sn string, edgeAdapter adapter.EdgeAdapter, opts ...Option) (*EdgeClient, error) {
 	cfg := defaultConfig(endpoint, sn)
 	for _, o := range opts {
@@ -89,7 +90,12 @@ func NewEdgeClient(endpoint, sn string, edgeAdapter adapter.EdgeAdapter, opts ..
 
 	// Every call into the platform carries the adapter's edge credential; the platform refuses
 	// calls without one (see package auth).
-	dialOpts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
+	transport, err := cfg.auth.InternalTLS.TransportCredentials()
+	if err != nil {
+		return nil, fmt.Errorf("edge-go-sdk: %w", err)
+	}
+	log.Info("platform connections", "transport", cfg.auth.InternalTLS.String())
+	dialOpts := []grpc.DialOption{grpc.WithTransportCredentials(transport)}
 	if cfg.auth.EdgeToken != "" {
 		dialOpts = append(dialOpts, grpc.WithPerRPCCredentials(auth.BearerCredentials{Token: cfg.auth.EdgeToken}))
 	} else {

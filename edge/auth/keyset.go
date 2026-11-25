@@ -69,16 +69,25 @@ type KeySet struct {
 	stopOnce sync.Once
 }
 
-// NewKeySet returns a key set fetched from url. static may be nil. Call [KeySet.Start] to load it
-// in the background and keep it fresh, and [KeySet.Close] to stop that.
+// NewKeySet returns a key set fetched from url with a plain HTTP client. static may be nil. Call
+// [KeySet.Start] to load it in the background and keep it fresh, and [KeySet.Close] to stop that.
 func NewKeySet(url string, static ed25519.PublicKey, log *slog.Logger) *KeySet {
+	return NewKeySetWithClient(url, static, log, &http.Client{Timeout: keySetFetchTimeout})
+}
+
+// NewKeySetWithClient is NewKeySet fetching with client, e.g. one from
+// [github.com/zequent/zqnt-sdk-go/v3/internaltls.Config.HTTPClient] for an https key set inside the installation.
+func NewKeySetWithClient(url string, static ed25519.PublicKey, log *slog.Logger, client *http.Client) *KeySet {
 	if log == nil {
 		log = slog.Default()
+	}
+	if client == nil {
+		client = &http.Client{Timeout: keySetFetchTimeout}
 	}
 	return &KeySet{
 		url:             url,
 		static:          static,
-		client:          &http.Client{Timeout: keySetFetchTimeout},
+		client:          client,
 		log:             log,
 		now:             time.Now,
 		refreshInterval: keySetRefreshInterval,

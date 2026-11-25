@@ -7,13 +7,16 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"time"
 
 	base "github.com/zequent/zqnt-api/go/v3/gen/common/base/proto"
 	connectorpb "github.com/zequent/zqnt-api/go/v3/gen/connector/proto"
 	"github.com/zequent/zqnt-sdk-go/v3/client/auth"
 	"github.com/zequent/zqnt-sdk-go/v3/client/config"
 	"github.com/zequent/zqnt-sdk-go/v3/client/connector"
+	"github.com/zequent/zqnt-sdk-go/v3/internaltls/internaltlstest"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -143,5 +146,61 @@ func TestDialSendsTheCredentialAndHostOptionsRunFirst(t *testing.T) {
 
 	if got := strings.Join(r.headers, "|"); got != "Bearer fixed-token|Bearer caller-token" {
 		t.Fatalf("headers = %q", got)
+	}
+}
+
+func TestInternalTLSDialsEveryServiceOverTheInstallationCA(t *testing.T) {
+	pki := internaltlstest.NewTestCertificate(t, t.TempDir())
+	r := &recorder{}
+	lis, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	server := grpc.NewServer(grpc.Creds(credentials.NewTLS(pki.Server)))
+	connectorpb.RegisterConnectorServiceServer(server, r)
+	go func() { _ = server.Serve(lis) }()
+	t.Cleanup(server.Stop)
+	port := lis.Addr().(*net.TCPAddr).Port
+
+	c, err := config.FromLookup(lookup(map[string]string{
+		"ZQNT_INTERNAL_TLS":                      "true",
+		"ZQNT_INTERNAL_TLS_CA":                   pki.CAFile,
+		"CONNECTOR_SERVICE_HOST":                 "127.0.0.1",
+		"CONNECTOR_SERVICE_PORT":                 fmt.Sprint(port),
+		"LIVE_DATA_SERVICE_USE_PLAINTEXT":        "true",
+		"MISSION_AUTONOMY_SERVICE_USE_PLAINTEXT": "",
+	}))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if c.Connector.Plaintext || c.RemoteControl.Plaintext || c.MissionAutonomy.Plaintext {
+		t.Errorf("internal TLS dials every service over TLS: %+v", c)
+	}
+	if !c.LiveData.Plaintext {
+		t.Error("a service's own _USE_PLAINTEXT still wins")
+	}
+	conn, err := c.WithToken("fixed-token").Dial(c.Connector)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = conn.Close() })
+	if _, err := connector.New(conn).GetAssetBySn(context.Background(), "DOCK-1"); err != nil {
+		t.Fatalf("GetAssetBySn over internal TLS: %v", err)
+	}
+
+	missing := c
+	missing.InternalTLS.CAFile = t.TempDir() + "/missing.crt"
+	if _, err := missing.Dial(missing.Connector); err == nil || !strings.Contains(err.Error(), "ZQNT_INTERNAL_TLS_CA") {
+		t.Fatalf("an unreadable CA is reported by Dial, got %v", err)
+	}
+	failing, err := grpc.NewClient(c.Connector.Target(), missing.DialOptions(missing.Connector)...)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = failing.Close() })
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	if _, err := connector.New(failing).GetAssetBySn(ctx, "DOCK-1"); err == nil || !strings.Contains(err.Error(), "ZQNT_INTERNAL_TLS_CA") {
+		t.Fatalf("DialOptions with an unreadable CA must fail the call with the explanation, got %v", err)
 	}
 }

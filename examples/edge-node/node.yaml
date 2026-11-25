@@ -1,0 +1,62 @@
+# zqnt-edge-node configuration. Check it with: zqnt-edge-node --config node.yaml --check-config
+
+# The node identity. The platform assigns the node id at enrollment:
+#   zqnt-edge-node enroll --config node.yaml --claim-code ZQ-XXXXX-XXXXX
+# stores it in identity.dir together with the pinned platform anchors and the node credential.
+identity:
+  # Where the identity key lives:
+  #   tpm                  generated in the TPM 2.0 and never leaves it (KEY_PROTECTION_TPM)
+  #   software-tpm-sealed  software key sealed by the TPM 2.0, for TPMs that cannot hold the key
+  #                        themselves (SOFTWARE_SEALED, the production minimum)
+  #   software-dev         plain or file-sealed key (SOFTWARE_DEV): refused unless dev: true, and
+  #                        refused by production platforms; see node-dev.yaml
+  # The service needs the TPM: see the tpm lines in the systemd unit.
+  key_store: tpm
+  # tpm_device: /dev/tpmrm0
+  # dir: /var/lib/zqnt-edge-node/identity
+  # infrastructure, or personal for a device carried by a person; must match the claim.
+  node_class: infrastructure
+  # suite: s1-chacha20-poly1305   # or s1-aes-256-gcm
+
+# Assets announced in every Hello. Assets that adapters register on the local socket are added
+# while the node runs and announced from the next session on.
+assets:
+  - DOCK-1
+
+# The durable outbox: everything for the platform waits here while the link is down.
+store:
+  path: /var/lib/zqnt-edge-node/node.db
+  # flush_interval: 200ms
+
+# Lane quotas; a lane left out keeps its default (alarm 2000 items, command_reply 2000 items,
+# status 500 items, telemetry 50MiB, bulk 100MiB).
+quotas:
+  telemetry:
+    max_bytes: 20MiB
+
+# The socket Device Adapters attach to. Only owner and group may have access.
+local:
+  socket: /run/zqnt-edge-node/node.sock
+  mode: "0660"
+  # group: zqnt
+  # Commands for assets whose adapter did not name its own socket go here.
+  default_adapter_endpoint: unix:///run/zqnt-adapter/adapter.sock
+
+# LinkReport to the platform and the "node stats" log line.
+report_interval: 1m
+# How long a stopping node waits for running commands.
+shutdown_timeout: 10s
+
+log:
+  level: info
+  format: text
+
+# One link for now; switching between several links comes with the link manager.
+links:
+  - id: lte
+    driver: ip-session
+    endpoint: edge-link.example.com:443
+    # The node credential from enrollment is used unless token_file is set.
+    # token_file: /etc/zqnt-edge-node/token
+    # ca_file: /etc/zqnt-edge-node/ca.pem
+    # insecure: false

@@ -1,0 +1,10 @@
+# Reviewed dependencies that the policy alone would reject. Every entry needs all five fields;
+# an entry only applies while the dependency still reports the licence written here.
+#
+#   - package: example.org/some/module
+#     licence: LicenseRef-Example
+#     reason: why it may ship, and under which conditions
+#     reviewer: name
+#     date: 2026-11-01
+
+exceptions: []
