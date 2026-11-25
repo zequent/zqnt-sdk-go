@@ -3,6 +3,8 @@ package edgesdk
 import (
 	"log/slog"
 	"time"
+
+	"github.com/zequent/zqnt-sdk-go/v3/internaltls"
 )
 
 // Option is a functional option for configuring an [EdgeClient].
@@ -64,6 +66,12 @@ func WithPlatformPublicKey(key string) Option {
 // http://admin-console:8005/api/admin-console/auth/service-keys. Lets the platform rotate keys.
 func WithPlatformKeysURL(url string) Option {
 	return func(c *config) { c.auth.PlatformKeysURL = url }
+}
+
+// WithInternalTLS sets how the connections into the platform, and the fetch of an https key set,
+// are secured (default: ZQNT_INTERNAL_TLS and ZQNT_INTERNAL_TLS_CA, see package internaltls).
+func WithInternalTLS(cfg internaltls.Config) Option {
+	return func(c *config) { c.auth.InternalTLS = cfg }
 }
 
 // WithoutPlatformAuth accepts commands from anyone who can reach the adapter's port. Local

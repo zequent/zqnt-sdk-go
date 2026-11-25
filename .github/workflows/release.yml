@@ -1,7 +1,8 @@
 name: Release
 
 # The release is the tag vX.Y.Z itself (go get github.com/zequent/zqnt-sdk-go/v3@vX.Y.Z), cut by
-# the maintainer; this workflow tests it and creates the GitHub Release.
+# the maintainer; this workflow tests it, builds the zqnt-edge-node archives (linux amd64, arm64,
+# armv7) with SHA256SUMS and an SPDX SBOM, and creates the GitHub Release with them attached.
 
 on:
   push:
@@ -28,6 +29,26 @@ jobs:
       - name: Build, vet, test
         run: go build ./... && go vet ./... && go test ./... -timeout 5m
 
+      - name: Package zqnt-edge-node
+        run: scripts/package-edge-node.sh "${GITHUB_REF_NAME}" dist
+
+      - name: Unpack the amd64 binary for the SBOM
+        run: tar -xzf "dist/zqnt-edge-node_${GITHUB_REF_NAME}_linux_amd64.tar.gz" -C "$RUNNER_TEMP"
+
+      - name: SBOM
+        uses: anchore/sbom-action@66cbf4bc1f1c0d2edc94016e65bc221b6bb0ad6c # v0.24.3
+        with:
+          file: ${{ runner.temp }}/zqnt-edge-node_${{ github.ref_name }}_linux_amd64/zqnt-edge-node
+          format: spdx-json
+          output-file: dist/zqnt-edge-node_${{ github.ref_name }}.spdx.json
+          upload-artifact: false
+          upload-release-assets: false
+          dependency-snapshot: false
+
+      - name: Checksum the SBOM
+        working-directory: dist
+        run: sha256sum -- *.spdx.json >>SHA256SUMS
+
       - name: GitHub Release
         uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
         with:
@@ -35,5 +56,9 @@ jobs:
           name: ${{ github.ref_name }}
           generate_release_notes: true
           prerelease: false
+          files: |
+            dist/*.tar.gz
+            dist/*.spdx.json
+            dist/SHA256SUMS
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,142 @@
+{
+  "version": 1,
+  "spec": "spec/tiny-frame-v1.md",
+  "time_base": "2025-01-01T00:00:00Z",
+  "ranges": [
+    { "from": 0, "to": 0, "use": "invalid" },
+    { "from": 1, "to": 255, "use": "standard frames" },
+    { "from": 256, "to": 4095, "use": "standard commands (downlink COMMAND frames)" },
+    { "from": 4096, "to": 32767, "use": "reserved" },
+    { "from": 32768, "to": 65535, "use": "organization schemas, assigned by the platform per organization" }
+  ],
+  "schemas": [
+    {
+      "id": 1,
+      "name": "POSITION",
+      "direction": "uplink",
+      "lane": "LANE_TELEMETRY",
+      "decodes_to": "zqnt.telemetry.v3.TelemetrySample",
+      "body_sizes": [17],
+      "fields": [
+        { "name": "time", "type": "u32", "unit": "s since time_base" },
+        { "name": "latitude", "type": "i32", "scale": 1e-7, "unit": "deg" },
+        { "name": "longitude", "type": "i32", "scale": 1e-7, "unit": "deg" },
+        { "name": "altitude", "type": "i16", "unit": "m above mean sea level", "unknown": -32768 },
+        { "name": "speed", "type": "u8", "scale": 0.5, "unit": "m/s", "unknown": 255 },
+        { "name": "heading", "type": "u8", "scale": 2, "unit": "deg, 0..179", "unknown": 255 },
+        { "name": "battery", "type": "u8", "unit": "%, 0..100", "unknown": 255 }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "ALARM",
+      "direction": "uplink",
+      "lane": "LANE_ALARM",
+      "decodes_to": "zqnt.telemetry.v3.Alert",
+      "body_sizes": [7, 15],
+      "fields": [
+        { "name": "time", "type": "u32", "unit": "s since time_base" },
+        { "name": "code", "type": "u16", "values": "alarm_codes" },
+        { "name": "severity", "type": "u8", "values": "zqnt.telemetry.v3.AlertSeverity" },
+        { "name": "latitude", "type": "i32", "scale": 1e-7, "unit": "deg", "optional": true },
+        { "name": "longitude", "type": "i32", "scale": 1e-7, "unit": "deg", "optional": true }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "STATUS",
+      "direction": "uplink",
+      "lane": "LANE_STATUS",
+      "decodes_to": "zqnt.telemetry.v3.TelemetrySample",
+      "body_sizes": [9],
+      "fields": [
+        { "name": "time", "type": "u32", "unit": "s since time_base" },
+        { "name": "battery", "type": "u8", "unit": "%, 0..100", "unknown": 255 },
+        { "name": "voltage", "type": "u8", "scale": 0.1, "unit": "V", "unknown": 255 },
+        { "name": "flags", "type": "u8", "bits": ["charging", "external_power", "gnss_fix", "clock_unsynced", "tamper"] },
+        { "name": "temperature", "type": "i8", "unit": "degC", "unknown": -128 },
+        { "name": "rssi", "type": "i8", "unit": "dBm of the last downlink", "unknown": -128 }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "COMMAND_REPLY",
+      "direction": "uplink",
+      "lane": "LANE_COMMAND_REPLY",
+      "decodes_to": "zqnt.capability.v3.CommandEvent",
+      "body_min": 5,
+      "body_max": 18,
+      "fields": [
+        { "name": "downlink_seq", "type": "u16", "unit": "low 16 bits of the command's downlink seq" },
+        { "name": "state", "type": "u8", "values": "zqnt.capability.v3.CommandState" },
+        { "name": "error", "type": "u16", "values": "error_codes" },
+        { "name": "result", "type": "bytes", "max": 13, "layout": "the command schema's result" }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "COMMAND_CANCEL",
+      "direction": "downlink",
+      "lane": "LANE_COMMAND_REPLY",
+      "decodes_to": "zqnt.edgelink.v3.CommandCancel",
+      "body_sizes": [6],
+      "fields": [
+        { "name": "downlink_seq", "type": "u16", "unit": "low 16 bits of the cancelled command's downlink seq" },
+        { "name": "expires", "type": "u32", "unit": "s since time_base" }
+      ]
+    }
+  ],
+  "reserved_schemas": [
+    { "id": 6, "name": "ACK", "phase": "M3" },
+    { "id": 7, "name": "TIME_SYNC", "phase": "M3" },
+    { "id": 8, "name": "BEACON", "phase": "M4" },
+    { "id": 9, "name": "SCHEMA_SAMPLE", "phase": "M3" }
+  ],
+  "command_frame": {
+    "direction": "downlink",
+    "lane": "LANE_COMMAND_REPLY",
+    "decodes_to": "zqnt.edgelink.v3.CommandDelivery",
+    "fields": [
+      { "name": "downlink_seq", "type": "u16", "unit": "low 16 bits of the downlink seq" },
+      { "name": "expires", "type": "u32", "unit": "s since time_base" },
+      { "name": "params", "type": "bytes", "max": 12, "layout": "the command's params" }
+    ]
+  },
+  "commands": [
+    { "id": 257, "command_id": "flight.return_to_home", "params": [] },
+    { "id": 258, "command_id": "flight.land", "params": [] },
+    { "id": 259, "command_id": "flight.emergency_stop", "params": [] },
+    { "id": 260, "command_id": "mission.pause", "params": [] },
+    { "id": 261, "command_id": "mission.resume", "params": [] },
+    { "id": 262, "command_id": "mission.stop", "params": [] },
+    {
+      "id": 263,
+      "command_id": "navigation.go_to",
+      "params": [
+        { "name": "latitude", "type": "i32", "scale": 1e-7, "unit": "deg" },
+        { "name": "longitude", "type": "i32", "scale": 1e-7, "unit": "deg" },
+        { "name": "altitude", "type": "i16", "unit": "m relative to the takeoff point" }
+      ]
+    }
+  ],
+  "alarm_codes": [
+    { "value": 1, "code": "sensor.intrusion" },
+    { "value": 2, "code": "device.tamper" },
+    { "value": 3, "code": "power.battery_low" },
+    { "value": 4, "code": "geofence.breach" },
+    { "value": 5, "code": "person.sos" },
+    { "value": 6, "code": "detection.uav" },
+    { "value": 7, "code": "detection.person" },
+    { "value": 8, "code": "detection.vehicle" },
+    { "value": 9, "code": "link.jamming_suspected" }
+  ],
+  "error_codes": [
+    { "value": 0, "code": "" },
+    { "value": 1, "code": "command.expired" },
+    { "value": 2, "code": "command.unsupported" },
+    { "value": 3, "code": "command.invalid_params" },
+    { "value": 4, "code": "command.busy" },
+    { "value": 5, "code": "command.failed" },
+    { "value": 6, "code": "command.duplicate" }
+  ]
+}

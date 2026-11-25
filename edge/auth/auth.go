@@ -31,6 +31,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/zequent/zqnt-sdk-go/v3/internaltls"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -56,6 +57,9 @@ type Config struct {
 	PlatformKeysURL string
 	// Disabled skips the inbound check (ZQNT_EDGE_AUTH_DISABLED=true). Local SITL only.
 	Disabled bool
+	// InternalTLS moves the connections into the platform, and the fetch of an https key set, onto
+	// the installation's internal TLS (ZQNT_INTERNAL_TLS, ZQNT_INTERNAL_TLS_CA). Off: plaintext.
+	InternalTLS internaltls.Config
 }
 
 // FromEnv reads the Config from the environment.
@@ -68,6 +72,7 @@ func FromEnv() Config {
 		EdgeToken:         os.Getenv("ZQNT_EDGE_TOKEN"),
 		PlatformPublicKey: key,
 		PlatformKeysURL:   strings.TrimSpace(os.Getenv("ZQNT_PLATFORM_KEYS_URL")),
+		InternalTLS:       internaltls.FromEnv(),
 	}
 	switch strings.ToLower(strings.TrimSpace(os.Getenv("ZQNT_EDGE_AUTH_DISABLED"))) {
 	case "1", "true", "yes", "on":
@@ -214,7 +219,11 @@ func NewGuard(cfg Config, log *slog.Logger) (*Guard, error) {
 			}
 			static = key
 		}
-		g.keySet = NewKeySet(cfg.PlatformKeysURL, static, log)
+		client, err := cfg.InternalTLS.HTTPClient(keySetFetchTimeout)
+		if err != nil {
+			return nil, err
+		}
+		g.keySet = NewKeySetWithClient(cfg.PlatformKeysURL, static, log, client)
 		g.keySet.Start()
 		g.verifier = NewKeysVerifier(g.keySet)
 	}
